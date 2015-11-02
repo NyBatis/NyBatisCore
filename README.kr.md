@@ -1,5 +1,6 @@
 # NyBatis Data Mapper Framework
-## NyBatisCore
+
+## 소개
 
 NyBatis는 Java에서 RDB를 다루기 위한 Data Mapper Framework입니다.
 
