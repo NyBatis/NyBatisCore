@@ -56,7 +56,7 @@ OR
     <repository>
       <id>team-store-snapshots</id>
       <name>Store Maven Repository - Snapshots</name>
-      <url>http://mvn.skplanet.com/content/groups/team-store-snapshots</url>
+      <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
     </repository>
   </distributionManagement>
 
