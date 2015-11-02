@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+  <properties path="config.properties">
+    <property key="username" value="nayasis+#{driver}"/>
+    <property key="password" value="F332459"/>
+  </properties>
+
+  <environment id="sample01" default="true">
+    <datasource type="jdbc" poolMin="5" poolMax="20" poolStep="5" ping="true" pingQuery="SELECT 1 FROM DUAL" pingCycle="60" >
+      <driver>#{driver}</driver>
+      <url>#{url}</url>
+      <username>#{username}</username>
+      <password>#{password}</password>
+      <timeout>25</timeout> <!-- Optional -->
+      <autocommit>false</autocommit> <!-- Optional -->
+    </datasource>
+    <sqlpath>
+      <path>test01/sample.xml</path>
+      <path>test02/sub01</path>
+    </sqlpath>
+  </environment>
+
+  <environment id="sample02">
+    <datasource type="jdbc">
+      <driver>org.sqlite.JDBC</driver>
+      <url>jdbc:sqlite:./target/test-classes/localDb/SimpleLauncherHelloWorld.db</url>
+    </datasource>
+    <sqlpath>
+      <path>test02/sub02</path>
+    </sqlpath>
+  </environment>
+  
+<!--   <environment id="sample03"> -->
+<!--     <datasource type="jndi"> -->
+<!--       <initialContext>....</initialContext> -->
+<!--       <providerUrl>....</providerUrl> -->
+<!--       java:comp/env/ 생략 가능 -->
+<!--       <name>java:comp/env/Sample</name> -->
+<!--     </datasource> -->
+<!--     <sqlpath> -->
+<!--       <path>test03</path> -->
+<!--     </sqlpath> -->
+<!--   </environment> -->
+
+</configuration>

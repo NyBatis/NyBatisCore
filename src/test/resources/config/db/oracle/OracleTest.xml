@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list>
+
+<!-- Retrieve Test -->
+
+<sql id="select" fetch="50" cache="true" flush="60" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   rownum <= 10
+</sql>
+
+<sql id="dynamic" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  AND     rownum    <= #{rowNum}
+  ORDER BY ${orderKey}
+</sql>
+
+<sql id="dynamicError" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  AND     rownum    <= #{rowNum}
+  ORDER BY ${orderKey} !
+</sql>
+
+<sql id="paged">
+SELECT  *
+FROM    TB_DP_LIST_PROD
+WHERE   tenant_id = 'S01'
+AND     list_id   = 'TGR000000001'
+ORDER BY expo_ord, expo_ord_sub
+</sql>
+
+
+<!-- Function & Procedure Test -->
+
+<sql id="selectCursor">
+SELECT  test_function_01() AS rs
+FROM    DUAL
+</sql>
+
+<sql id="procedure01" >
+<!--
+CREATE OR REPLACE PROCEDURE TEST_PROCEDURE_01(
+     p_tenant_id IN  TB_DP_LIST.tenant_id%TYPE,
+     p_list_id   IN  TB_DP_LIST.list_id%TYPE,
+     o_list_nm   OUT TB_DP_LIST.list_nm%TYPE,
+     o_cnt       OUT NUMBER
+)
+IS
+BEGIN
+
+  o_cnt := 7;
+
+  SELECT  list_nm
+  INTO    o_list_nm
+  FROM    TB_DP_LIST
+  WHERE   tenant_id = p_tenant_id
+  AND     list_id   = p_list_id
+  ;
+
+END;
+ -->
+{ call TEST_PROCEDURE_01( #{tenantId}, #{listId}, #{listNm:out}, #{cnt:int:out} ) }
+</sql>
+
+<sql id="procedure02" >
+<!--
+CREATE OR REPLACE PROCEDURE TEST_PROCEDURE_02(
+       o_cursor OUT SYS_REFCURSOR,
+       o_cnt    OUT NUMBER
+)
+IS
+BEGIN
+    o_cnt := 7;
+    OPEN o_cursor FOR SELECT * FROM TB_DP_LIST WHERE rownum < 10;
+END;
+ -->
+{ call TEST_PROCEDURE_02( #{result:rs:out}, #{cnt:int:out} ) }
+</sql>
+
+<sql id="function01" >
+<!--
+CREATE OR REPLACE FUNCTION TEST_FUNCTION_01 RETURN SYS_REFCURSOR
+AS
+    l_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN   l_cursor FOR SELECT * FROM TB_DP_LIST WHERE rownum < 10;
+    RETURN l_cursor;
+END;
+ -->
+{ #{result:sys_refcursor:out} = call TEST_FUNCTION_01() }
+<!--
+{ #{result:RS:out} = call TEST_FUNCTION_01() }
+{ #{result:CURSOR:out} = call TEST_FUNCTION_01() }
+{ #{result:SYS_REFCURSOR:out} = call TEST_FUNCTION_01() }
+{ #{result:RESULTSET:out} = call TEST_FUNCTION_01() }
+{ #{result:ORACLE_RESULTSET:out} = call TEST_FUNCTION_01() }
+ -->
+
+</sql>
+
+<sql id="function01-NoOutReturn" >
+<!--
+CREATE OR REPLACE FUNCTION TEST_FUNCTION_01 RETURN SYS_REFCURSOR
+AS
+    l_cursor SYS_REFCURSOR;
+BEGIN
+    OPEN   l_cursor FOR SELECT * FROM TB_DP_LIST WHERE rownum < 10;
+    RETURN l_cursor;
+END;
+ -->
+{ call TEST_FUNCTION_01() } -- Oracle doesn't support function call having no result.
+</sql>
+
+<sql id="function02" >
+<!--
+CREATE OR REPLACE FUNCTION TEST_FUNCTION_02 RETURN VARCHAR
+AS
+BEGIN
+    RETURN 'SUCCESS';
+END;
+ -->
+{ #{result:out} = call TEST_FUNCTION_02() }
+</sql>
+
+</list>

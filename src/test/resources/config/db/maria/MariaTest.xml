@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<list>
+
+<sql id="selectActor">
+  SELECT  *
+  FROM    SAKILA.ACTOR
+  limit   0, 10
+</sql>
+
+<sql id="procedure01">
+<!--
+delimiter //
+CREATE PROCEDURE procedure01( OUT actor_count INT )
+BEGIN
+  SELECT COUNT(1) INTO actor_count FROM SAKILA.ACTOR;
+END//
+ -->
+ { call test.procedure01( #{count:out} ) }
+</sql>
+
+<sql id="procedure02">
+<!--
+delimiter //
+CREATE PROCEDURE procedure02()
+BEGIN
+    SELECT * FROM SAKILA.ACTOR;
+END//
+ -->
+ { call test.procedure02() }
+</sql>
+
+<sql id="procedure03">
+<!--
+delimiter //
+CREATE PROCEDURE procedure02()
+BEGIN
+    SELECT * FROM SAKILA.ACTOR;
+    SELECT * FROM SAKILA.CATEGORY;
+    SELECT   actor_id, first_name, last_name, B.name as category_name
+    FROM     SAKILA.ACTOR     A
+    JOIN        SAKILA.CATEGORY  B
+              ON( A.actor_id = B.category_id );
+END//
+ -->
+ { call test.procedure03() }
+</sql>
+
+</list>

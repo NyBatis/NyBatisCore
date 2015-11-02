@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<list>
+
+<sql
+ id="Merong">
+  <!-- Merong -->
+  <!--Merong
+   -->
+  SELECT  *
+  FROM    tb_dp_dataset_frame A
+  WHERE   tenant_id = 'S02'
+  <if test="#{id} < 1">
+  AND     dataset_id < A.test
+    <if test="#{id} > 3">
+    AND   dataset_id > 1.2
+    </if>
+  </if>
+  <if test="#{id} = 2">
+  AND     dataset_id < 2.1
+    <if test="#{id} > 3">
+    AND   dataset_id > 2.2
+    </if>
+  </if>
+  ORDER BY title
+</sql>
+
+<sql id="test" fetch="50" cache="true" cacheFlush="60" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   rownum <= 10
+  AND     list_id_merong <![CDATA[<]]>ABCDE 10
+</sql>
+
+<sql id="testDynamicSql" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  ORDER BY ${key}
+</sql>
+
+</list>

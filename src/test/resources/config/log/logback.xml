@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+  <!-- Console을 붙이던, File을 붙이던 아래 endoder만 넣어주면 된다. -->
+  <encoder class="org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder">
+    <pattern>%d{HH:mm:ss.SSS} %-5level %35(\(%F:%L\))</pattern>
+  </encoder>
+</appender>
+
+<logger name="org.nybatis" level="trace">
+  <appender-ref ref="console" />
+</logger>
+
+<logger name="specific.test.log" level="trace">
+  <appender-ref ref="console" />
+</logger>
+
+</configuration>

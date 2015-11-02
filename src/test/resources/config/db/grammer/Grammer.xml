@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<list>
+
+<sql id="select" fetch="50" cache="fifo" >
+  SELECT  *
+  FROM    PROD
+  WHERE   list_id  = #{listId}
+  <!-- AND     rownum  <= #{rowNum} -->
+  ORDER BY ${orderKey}
+  LIMIT 0, #{rowNum:int}
+</sql>
+
+<sql id="selectKey" fetch="50" cache="lru" flush="60" >
+  <key id="listId" >
+    SELECT 'A001' FROM PROD
+  </key>
+  <key id="rowNum">
+    SELECT 1 FROM PROD
+  </key>
+  <key id="keyValue">
+    SELECT 'keyValue' FROM PROD
+  </key>
+  <key>
+  </key>
+  SELECT  *, ${} AS key_value
+  FROM    PROD
+  WHERE   list_id = #{listId}
+  LIMIT 0, #{rowNum:int}
+</sql>
+
+<sql id="refOrigin" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  ORDER BY ${orderKey} !
+</sql>
+
+<sql id="refTestInvalid">
+SELECT *
+FROM
+(
+  <ref id="Grammer.refOrigin2" />
+  <ref id="refOrigin2" />
+)
+WHERE rownum <= 10
+</sql>
+
+<sql id="refTestValid">
+SELECT *
+FROM
+(
+  <ref id="Grammer.refOrigin" />
+)
+WHERE rownum <= 10
+</sql>
+
+<sql
+ id="Merong">
+  <!-- Merong -->
+  <!--Merong
+   -->
+  SELECT  *
+  FROM    tb_dp_dataset_frame A
+  WHERE   tenant_id = 'S02'
+  <if test="#{id} is empty ">
+  AND     dataset_id < A.test <!-- You can use '<' character in xml query instead of '&lt;' or '<![CDATA[-]]>' -->
+    <if test="#{id} > 3">
+    AND   dataset_id > 1.2
+    </if>
+  </if>
+  <if test="#{id} = 2">
+  AND     dataset_id < 2.1
+    <if test="#{id} > 3">
+    AND   dataset_id > 2.2
+    </if>
+  </if>
+  ORDER BY title
+</sql>
+
+<sql id="test" fetch="50" cache="true" flush="60" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   rownum <= 10
+  AND     list_id_merong <![CDATA[<]]>ABCDE 10
+</sql>
+
+<sql id="testDynamicSql" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  ORDER BY ${key}
+</sql>
+
+<sql id="insertLink" >
+  <key id="id">
+    SELECT IFNULL( MAX(id), 0 ) + 1 FROM TB_LINK
+  </key>
+  <ref id="implantateLink"/>
+</sql>
+
+<sql id="implantateLink" >
+  INSERT INTO TB_LINK (
+    id
+  , title
+  , group_name
+  , exec_count
+  , last_used_dt
+  , exec_path
+  , exec_path_relative
+  , exec_option
+  , exec_option_prefix
+  , cmd_prev
+  , cmd_next
+  , description
+  , id_list_to_link
+  , icon_byte
+  ) VALUES (
+    #{id}
+  , #{title}
+  , #{groupName}
+  , 0
+  , #{lastUsedDt}
+  , #{execPath}
+  , #{execPathRelative}
+  , #{execOption}
+  , #{execOptionPrefix}
+  , #{cmdPrev}
+  , #{cmdNext}
+  , #{description}
+  , #{idListToLinkJson}
+  , #{iconByte:BLOB}
+  )
+</sql>
+
+  <sql id="forEachPrimitiveParam">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <foreach key="#{names}" open="AND (" close=")" delimeter="UNION ALL" indexKey="#{index}">
+      SELECT #{index} AS index, #{names} AS name FROM DUAL
+    </foreach>
+    ORDER BY title
+  </sql>
+
+  <sql id="forEachAttributeFromParam">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <foreach key="#{names}" open="#{AND} (" close="#{CLOSE} )" delimeter="#{DELIMETER} - " indexKey="#{index}">
+      SELECT #{index} AS index, #{names} AS name FROM DUAL
+    </foreach>
+    ORDER BY title
+  </sql>
+
+  <sql id="forEach">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <if test="#{age} is not empty ">
+      AND     age > #{age}
+    </if>
+    <foreach key="#{names}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+      names LIKE '%' || #{names} || '%' || #{index} -- #{index}
+    </foreach>
+    ORDER BY title
+  </sql>
+
+  <sql id="forEachForVoParam">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <if test="#{age} is not empty">
+      AND     age > #{age}
+    </if>
+    <foreach key="#{children}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+      <if test="#{index} == 1" >
+      names LIKE '%' || #{children.name} || '%' || #{index} -- #{index}
+      </if>
+    </foreach>
+    <foreach key="#{children}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+        <if test="#{children.age} > 10">
+          names LIKE '%' || #{children.name} || '%' || #{index} OR age > #{children.age} -- #{index}
+        </if>
+    </foreach>
+    ORDER BY title
+  </sql>
+
+  <sql id="group">
+    UPDATE TABLE_SAMPLE
+    <group open="SET /* OPEN */" close=" /* CLOSE */" delimeter=",">
+      <if test="#{name} != empty">name = #{name}</if>
+      <if test="#{age} != empty">age = #{age}</if>
+      <if test="#{job} != empty">job = #{job}</if>
+    </group>
+    WHERE  1=1
+    <if test="#{name} != empty">
+    AND    name = #{name}
+    </if>
+  </sql>
+
+  <sql id="ifElseSwitch">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+
+    <if test="#{name} != empty">
+      AND name = #{name}
+    </if>
+
+    <else>
+      AND name = 'DANTE'
+    </else>
+
+
+    <if test="10 <= #{age} && #{age} <= 20">
+      AND age = 'TEENAGE'
+    </if>
+
+    <elseif test="40 <= #{age} && #{age} <= 50">
+      AND age = 'RATHER OLD'
+    </elseif>
+
+    <else>
+      AND age = 'DEFAULT'
+    </else>
+
+
+    <case>
+      <when test="#{key} + 1 == 3" >
+        AND key = '3'
+      </when>
+      <when test="#{key} + 1 == 4" >
+        AND key = '4'
+      </when>
+      <when test="#{key} + 1 == 5" >
+        AND key = '5'
+      </when>
+      <else>
+        AND key = 'DEFAULT'
+      </else>
+    </case>
+
+    <case>
+      <when test="#{val} - 1 == 3" >
+        AND val = '3'
+      </when>
+      <when test="#{val} - 1 == 4" >
+        AND val = '4'
+      </when>
+      <when test="#{val} - 1 == 5" >
+        AND val = '5'
+      </when>
+      <else>
+        AND val = 'DEFAULT'
+      </else>
+    </case>
+
+  </sql>
+
+</list>

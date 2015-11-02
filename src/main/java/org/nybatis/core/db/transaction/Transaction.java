@@ -1,0 +1,156 @@
+package org.nybatis.core.db.transaction;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
+
+import javax.sql.DataSource;
+
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.proxy.ProxyConnection;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Validator;
+
+public class Transaction {
+
+	/**
+	 * Token
+	 *   - EnvironmentId
+	 *     - Connection
+	 */
+	private Map<String, Map<String, Connection>> transactionPool = new Hashtable<>();
+
+    private static final Map<String, Connection> NULL_CONNECTIONS = new HashMap<>();
+
+	public void end( String token ) {
+		for( Connection conn : getStoredConnections(token).values() ) {
+			try {
+                conn.close();
+            } catch( SQLException e ) {}
+		}
+		transactionPool.remove( token );
+	}
+
+
+	public void end() {
+		for( String token : transactionPool.keySet() ) {
+			end( token );
+		}
+	}
+
+	public void commit( String token ) {
+		for( Connection conn : getStoredConnections(token).values() ) {
+			try {
+                conn.commit();
+            } catch( SQLException e ) {}
+		}
+		end( token );
+	}
+
+	public void commit() {
+		for( String token : transactionPool.keySet() ) {
+			commit( token );
+		}
+	}
+
+	public void rollback( String token ) {
+		for( Connection conn : getStoredConnections(token).values() ) {
+			try {
+				conn.rollback();
+			} catch( SQLException e ) {}
+		}
+		end( token );
+
+	}
+
+	public void rollback() {
+		for( String token : transactionPool.keySet() ) {
+			rollback( token );
+		}
+	}
+
+	private Map<String, Connection> getStoredConnections( String token ) {
+        return Validator.nvl( transactionPool.get( token ), NULL_CONNECTIONS );
+	}
+
+	private Connection getStoredConnection( String token, String environmentId ) {
+
+		Map<String, Connection> connections = getStoredConnections( token );
+
+		if( connections == null ) return null;
+
+		return connections.get( environmentId );
+
+	}
+
+	public synchronized Connection getConnection( String token, String environmentId ) {
+
+		Connection connection = getStoredConnection( token, environmentId );
+
+		if( connection == null ) {
+
+			DataSource dataSource = DatasourceManager.get( environmentId );
+
+			if( dataSource == null ) {
+				throw new SqlConfigurationException( "There is not datasource in environment (id:{}).", environmentId );
+			}
+
+			try {
+
+				connection = dataSource.getConnection();
+				storeConnection( token, environmentId, connection );
+
+            } catch( Exception e ) {
+				throw new DatabaseConfigurationException( e, "Fail to get connection (environmentId : {})", environmentId );
+			}
+
+		}
+
+		return connection;
+
+	}
+
+	public boolean isBegun( String token ) {
+		return transactionPool.containsKey( token );
+	}
+
+	public void begin( String token ) {
+		transactionPool.putIfAbsent( token, new HashMap<>() );
+	}
+	
+	private void storeConnection( String token, String environmentId, Connection connection ) {
+
+		if( ! isBegun( token ) ) return;
+
+		Map<String, Connection> connections = transactionPool.get( token );
+
+		if( connections == null ) return;
+
+		connections.putIfAbsent( environmentId, connection );
+
+	}
+
+    public void releaseConnection( String token, Connection connection ) {
+
+        if( connection == null ) return;
+
+        try {
+            if( ! isBegun(token) ) {
+                getStoredConnections( token ).remove( connection );
+                connection.close();
+            } else {
+                // It it not real releaseSavepoint !
+                // merely clear resources like Statement, PreparedStatement, CallableStatement and ResultSet occupied by connection
+                connection.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
+            }
+        } catch( SQLException e ) {
+            NLogger.error( e );
+        }
+
+    }
+
+}
