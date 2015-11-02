@@ -27,6 +27,7 @@ import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
 
 import com.rits.cloning.Cloner;
+import org.nybatis.core.util.StringUtil;
 
 /**
  * Reflection을 처리하는 유틸 클래스
@@ -152,7 +153,7 @@ public class Reflector {
         field.setAccessible( true );
 
         try {
-            field.set(bean, value);
+            field.set( bean, value );
 
         } catch ( ReflectiveOperationException e ) {
             throw new ReflectiveException( e.getMessage(), e );
@@ -312,7 +313,7 @@ public class Reflector {
     @SuppressWarnings( "rawtypes" )
     private void mergeToMethod( Map fromMap, Object toBean ) {
 
-    	List<Method> methods = getMethodsFrom(toBean);
+    	List<Method> methods = getMethodsFrom( toBean );
 
     	for( int i = methods.size() - 1; i >= 0; i-- ) {
     		if( methods.get(i).getParameterCount() == 1 ) continue;
@@ -363,7 +364,7 @@ public class Reflector {
     }
 
     public boolean isList( Object bean ) {
-    	return bean != null && isList(bean.getClass());
+    	return bean != null && isList( bean.getClass() );
     }
 
     public boolean isArray( Class<?> klass ) {
@@ -433,7 +434,8 @@ public class Reflector {
 
     public Map<String, Object> toMapFromJson( String fromJsonString ) {
         try {
-            return objectMapper.readValue( fromJsonString, new TypeReference<HashMap<String,Object>>() {} );
+            return objectMapper.readValue( getContent(fromJsonString), new TypeReference<HashMap<String, Object>>() {
+			} );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
         } catch( IOException e ) {
@@ -441,9 +443,17 @@ public class Reflector {
         }
     }
 
-    public <T> T toBeanFromJson( String fromJsonString, Class<T> toClass ) {
+	private String getContent( String fromJsonString ) {
+		return StringUtil.isEmpty( fromJsonString ) ? "{}" : fromJsonString;
+	}
+
+	private String getArrayContent( String fromJsonString ) {
+		return StringUtil.isEmpty( fromJsonString ) ? "[]" : fromJsonString;
+	}
+
+	public <T> T toBeanFromJson( String fromJsonString, Class<T> toClass ) {
     	try {
-    		return objectMapper.readValue( fromJsonString, toClass );
+    		return objectMapper.readValue( getContent( fromJsonString ), toClass );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
     	} catch( IOException e ) {
@@ -453,7 +463,7 @@ public class Reflector {
 
     public List<Map<String,Object>> toListFromJson( String fromJsonString ) {
     	try {
-    		return objectMapper.readValue( fromJsonString, new TypeReference<List<HashMap<String,Object>>>() {} );
+    		return objectMapper.readValue( getArrayContent(fromJsonString), new TypeReference<List<HashMap<String,Object>>>() {} );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
     	} catch( IOException e ) {
