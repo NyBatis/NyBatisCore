@@ -52,6 +52,14 @@ OR
     <skipTests>true</skipTests>
   </properties>
 
+  <distributionManagement>
+    <repository>
+      <id>team-store-snapshots</id>
+      <name>Store Maven Repository - Snapshots</name>
+      <url>http://mvn.skplanet.com/content/groups/team-store-snapshots</url>
+    </repository>
+  </distributionManagement>
+
   <repositories>
     <repository>
       <id>mesir-repo</id>
