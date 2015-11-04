@@ -21,7 +21,7 @@ public class DriverManager {
     private static Map<String, DriverAttributes> driverRepository = new Hashtable<>();
 
     public static void add( DriverAttributes driverAttributes ) {
-        driverRepository.put( driverAttributes.getDriverType(), driverAttributes );
+        driverRepository.put( driverAttributes.getDatabase(), driverAttributes );
     }
 
     public static DriverAttributes get( DataSource datasource ) {
