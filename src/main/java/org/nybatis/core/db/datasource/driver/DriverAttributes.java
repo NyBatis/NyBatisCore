@@ -13,10 +13,10 @@ import org.nybatis.core.validation.Validator;
 public class DriverAttributes {
 
     public static final String PAGE_PARAM_START = "NybatisPagebuilder.START";
-    public static final String PAGE_PARAM_END = "NybatisPagebuilder.END";
-    public static final String DRIVER_UNKOWN   = "unknown";
+    public static final String PAGE_PARAM_END   = "NybatisPagebuilder.END";
+    public static final String DATABASE_UNKOWN  = "unknown";
 
-    private String  driverType                 = DRIVER_UNKOWN;
+    private String  database                   = DATABASE_UNKOWN;
     private String  connectionClassNamePattern = "";
 
     private boolean enableGetParameterType     = true;
@@ -35,20 +35,20 @@ public class DriverAttributes {
     /**
      * Driver Attributes
      *
-     * @param driverType Driver name (oracle, mysql, etc...)
+     * @param database Driver name (oracle, mysql, etc...)
      * @param connectionClassNamePattern Driver name pattern to match with Database name. It must be regular expression.
      */
-    public DriverAttributes( String driverType, String connectionClassNamePattern ) {
-        setDriverType( driverType );
+    public DriverAttributes( String database, String connectionClassNamePattern ) {
+        setDatabase( database );
         setConnectionClassNamePattern( connectionClassNamePattern );
     }
 
-    public String getDriverType() {
-        return driverType;
+    public String getDatabase() {
+        return database;
     }
 
-    public DriverAttributes setDriverType( String driverType ) {
-        this.driverType = StringUtil.compressSpaceOrEnter( driverType ).toLowerCase();
+    public DriverAttributes setDatabase( String database ) {
+        this.database = StringUtil.compressSpaceOrEnter( database ).toLowerCase();
         return this;
     }
 
@@ -71,10 +71,10 @@ public class DriverAttributes {
 
         if( NLogger.isTraceEnabled() ) {
             NLogger.trace(
-                "Driver type      : {}\n" +
+                "Database type    : {}\n" +
                 "Pattern to match : {}\n" +
                 "Match result     : {}\n",
-                    driverType, connectionClassNamePattern, Validator.isFinded(connectionClassName, connectionClassNamePattern)
+                    database, connectionClassNamePattern, Validator.isFinded(connectionClassName, connectionClassNamePattern)
             );
         }
 

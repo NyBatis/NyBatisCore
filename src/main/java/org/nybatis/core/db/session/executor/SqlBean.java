@@ -72,6 +72,8 @@ public class SqlBean {
 
 	public SqlBean build() {
 
+		setDatabaseParameter();
+
 		String query = sqlNode.getText( sqlParam, properties.isPageSql(), properties.isCountSql() );
 
 		try {
@@ -86,6 +88,24 @@ public class SqlBean {
 		} catch( IllegalArgumentException | SqlConfigurationException e ) {
 			throw new SqlConfigurationException( e, "{} {}", toString(), e.getMessage() );
 		}
+
+	}
+
+	/**
+	 * Set database parameter to original parameters
+	 *
+	 * <pre>
+	 * { "nybatis.database" : "oracle" }
+	 * { "nybatis.database" : "mysql" }
+	 * { "nybatis.database" : "sqlite" }
+	 * { "nybatis.database" : "unknown" }
+	 * </pre>
+	 *
+	 */
+	private void setDatabaseParameter() {
+
+		String database = DatasourceManager.getAttributes( properties.getEnvironmentId() ).getDatabase();
+		sqlParam.put( Const.db.PARAMETER_DATABASE, database );
 
 	}
 

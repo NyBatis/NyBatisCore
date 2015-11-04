@@ -247,6 +247,7 @@ public class Const {
 		public static final String SINGLE_PARAMETER              = "NybatisSingleParameter";
 		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "DEFAULT_TABLE_NAME";
 		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "DEFAULT_ENVIRONMENT_ID";
+		public static final String PARAMETER_DATABASE            = "nybatis.database";
 
 		public static String getOrmSqlIdPrefix( String environmentId, String tableName ) {
 			return String.format( "%s%s.%s", ORM_SQL_PREFIX, environmentId, tableName );

@@ -32,6 +32,8 @@ public class ProcessOutputThread extends Thread {
 	 */
 	public void run() {
 
+		NLogger.trace( "ProcessOuputThread({}) is start", Thread.currentThread().getName() );
+
 		try {
 
 			readInputStream( inputStream, message, worker );

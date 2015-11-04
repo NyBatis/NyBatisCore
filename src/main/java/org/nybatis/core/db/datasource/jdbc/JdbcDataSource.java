@@ -14,6 +14,7 @@ import org.nybatis.core.db.configuration.connection.JdbcConnectionProperties;
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StopWatcher;
 
 public class JdbcDataSource implements DataSource {
@@ -98,9 +99,24 @@ public class JdbcDataSource implements DataSource {
 
 		}
 
+		NLogger.trace( "> Get connection" );
+		logPoolStatus();
+
 		return connectionPoolActive.push( proxyConnection ).getConnection();
 
     }
+
+	private void logPoolStatus() {
+
+		if( ! NLogger.isTraceEnabled() ) return;
+
+		int activeCount = connectionPoolActive.size();
+		int idleCount   = connectionPoolIdle.size();
+		int total       = activeCount + idleCount;
+
+		NLogger.trace( "> connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
+
+	}
 
 	private ProxyConnection createProxyConnection() {
 		return createProxyConnection( connectionProperties.getUserName(), connectionProperties.getUserPassword() );
@@ -152,6 +168,9 @@ public class JdbcDataSource implements DataSource {
 			connectionPoolIdle.push( proxyConnection );
 
 		}
+
+		NLogger.trace( "> Release connection" );
+		logPoolStatus();
 
     }
 
