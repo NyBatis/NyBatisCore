@@ -41,6 +41,7 @@ public class ProcessOutputThread extends Thread {
 
 		} finally {
 			try { if (inputStream != null) inputStream.close(); } catch ( IOException e ) {}
+			NLogger.trace( "ProcessOuputThread({}) is closed", Thread.currentThread().getName() );
 		}
 	}
 
