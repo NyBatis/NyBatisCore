@@ -164,7 +164,7 @@ public class ProxyConnection {
 	private void resetAutocommitStatus() {
 
 		try {
-			if( realConnection.getAutoCommit() != originalAutocommitStatus ) {
+			if( realConnection != null && realConnection.getAutoCommit() != originalAutocommitStatus ) {
                 realConnection.setAutoCommit( originalAutocommitStatus );
             }
 		} catch( SQLException e ) {}
