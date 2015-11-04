@@ -247,6 +247,10 @@ public class QueryResolver {
 
     private boolean hasKey( Map param, String key ) {
 
+        if( key.contains( ":" ) ) {
+            key = key.substring( 0, key.indexOf( ":" ) );
+        }
+
         if( param.containsKey(key) ) return true;
         return param.containsKey( Const.db.SINGLE_PARAMETER );
 
