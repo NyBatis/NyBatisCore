@@ -91,24 +91,6 @@ public class SqlBean {
 
 	}
 
-	/**
-	 * Set database parameter to original parameters
-	 *
-	 * <pre>
-	 * { "nybatis.database" : "oracle" }
-	 * { "nybatis.database" : "mysql" }
-	 * { "nybatis.database" : "sqlite" }
-	 * { "nybatis.database" : "unknown" }
-	 * </pre>
-	 *
-	 */
-	private void setDatabaseParameter() {
-
-		String database = DatasourceManager.getAttributes( properties.getEnvironmentId() ).getDatabase();
-		sqlParam.put( Const.db.PARAMETER_DATABASE, database );
-
-	}
-
 	private void setEnvironmentId( String environmentId ) {
 
 		if( environmentId == null ) {
@@ -205,6 +187,25 @@ public class SqlBean {
 
 		return String.format( "%s::%s", baseCacheKey, methodName ).hashCode();
 
+	}
+
+	/**
+	 * Set database parameter to original parameters
+	 *
+	 * <pre>
+	 * { "nybatis.database" : "oracle" }
+	 * { "nybatis.database" : "mysql" }
+	 * { "nybatis.database" : "sqlite" }
+	 * { "nybatis.database" : "unknown" }
+	 * </pre>
+	 *
+	 */
+	private void setDatabaseParameter() {
+		sqlParam.put( Const.db.PARAMETER_DATABASE, getDatabase() );
+	}
+
+	private String getDatabase() {
+		return DatasourceManager.getAttributes( properties.getEnvironmentId() ).getDatabase();
 	}
 
 }
