@@ -97,7 +97,7 @@ public interface OrmSession<T> {
     /**
      * Cache statements should not be cached at once when has been executed.
      */
-    OrmSession disableCacheAtOnce();
+    OrmSession disableCache();
 
     /**
      * Clear cache
@@ -107,8 +107,6 @@ public interface OrmSession<T> {
     OrmSession setCacheProperties( String cacheId );
 
     OrmSession setCacheProperties( String cacheId, Integer cacheFlushCycle );
-
-    OrmSession setRowFetchCountProperties( Integer rowFetchCount );
 
     /**
      * Get native sql sqlSession

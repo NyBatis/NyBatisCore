@@ -34,11 +34,11 @@ public interface BatchExecutor {
 	 * <br/><br/>
 	 * if it called, Transaction is activate automatically
 	 *
-	 * @param bufferSize  size to run executeBatch
+	 * @param transactionSize  size to commit execution
 	 * @return affected count by execute (insert, update, delete ... )
 	 */
 	@NotSupportCache
-	int execute( Integer bufferSize );
+	int execute( Integer transactionSize );
 
 	/**
 	 * Execute statement in batch mode without commit process.

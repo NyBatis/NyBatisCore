@@ -216,7 +216,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession disableCacheAtOnce() {
+    public OrmSession disableCache() {
         sqlSession.getProperties().isCacheEnable( false );
         return this;
     }
@@ -235,12 +235,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     @Override
     public OrmSession setCacheProperties( String cacheId, Integer cacheFlushCycle ) {
         SqlRepository.setCacheProperties( properties.sqlIdSelect(), cacheId, cacheFlushCycle );
-        return this;
-    }
-
-    @Override
-    public OrmSession setRowFetchCountProperties( Integer rowFetchCount ) {
-        SqlRepository.setRowFetchCountProperties( properties.sqlIdSelect(), rowFetchCount );
         return this;
     }
 

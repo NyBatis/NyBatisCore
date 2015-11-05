@@ -14,11 +14,12 @@ public class SqlProperties {
 	/**
 	 * Basic Properties
 	 */
-	private String  environmentId   = null;
-	private Integer fetchCount      = null;
-	private Boolean cacheEnable     = null;
-	private String  cacheId         = null;
-	private Integer cacheFlushCycle = null;
+	private String  environmentId    = null;
+	private Integer fetchSize        = null;
+	private Integer lobPrefetchSize  = null;
+	private Boolean cacheEnable      = null;
+	private String  cacheId          = null;
+	private Integer cacheFlushCycle  = null;
 
 	/**
 	 * Dynamic Properties
@@ -36,11 +37,12 @@ public class SqlProperties {
 	public SqlProperties( String environmentId, Node element ) {
 
 		// ** xml sample
-		// <sql id="selectKey" fetch="50" cache="cacheId" flush="60" >
+		// <sql id="selectKey" fetch="50" cache="cacheId" flush="60" lobPrefetch="1000" >
 
 		this.environmentId = environmentId;
 
-		setFetchCount( element.getAttrIgnoreCase( "fetch" ) );
+		setFetchSize( element.getAttrIgnoreCase( "fetch" ) );
+		setLobPrefetchSize( element.getAttrIgnoreCase( "lobPrefetch" ) );
 		setCacheId( element.getAttrIgnoreCase( "cache" ) );
 		setCacheFlushCycle( element.getAttrIgnoreCase( "flush" ) );
 
@@ -51,7 +53,8 @@ public class SqlProperties {
 		SqlProperties newProperties = properties.clone();
 
 		if( environmentId      != null ) newProperties.environmentId = environmentId;
-		if( fetchCount         != null ) newProperties.fetchCount = fetchCount;
+		if( fetchSize != null ) newProperties.fetchSize = fetchSize;
+		if( lobPrefetchSize != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
 		if( cacheEnable        != null ) newProperties.cacheEnable = cacheEnable;
 		if( cacheId            != null ) newProperties.cacheId = cacheId;
 		if( cacheFlushCycle    != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
@@ -80,22 +83,41 @@ public class SqlProperties {
 		this.environmentId = environmentId;
 	}
 
-	public Integer getFetchCount() {
-		return fetchCount;
+	public Integer getFetchSize() {
+		return fetchSize;
 	}
 
-	public boolean hasSpecificFetchCount() {
-		return fetchCount != null;
+	public boolean hasSpecificFetchSize() {
+		return fetchSize != null;
 	}
 
-	public void setFetchCount( Integer fetchCount ) {
-		this.fetchCount = fetchCount;
+	public void setFetchSize( Integer count ) {
+		this.fetchSize = count;
 	}
 
-	public void setFetchCount( String fetchCount ) {
-		if( StringUtil.isEmpty(fetchCount) ) return;
+	public void setFetchSize( String count ) {
+		if( StringUtil.isEmpty(count) ) return;
 		try {
-			this.fetchCount = Integer.parseInt( fetchCount );
+			this.fetchSize = Integer.parseInt( count );
+		} catch( NumberFormatException e ) {}
+	}
+
+	public boolean hasSpecificLobPreFetchSize() {
+		return lobPrefetchSize != null;
+	}
+
+	public Integer getLobPrefetchSize() {
+		return lobPrefetchSize;
+	}
+
+	public void setLobPrefetchSize( Integer count ) {
+		this.lobPrefetchSize = count;
+	}
+
+	public void setLobPrefetchSize( String count ) {
+		if( StringUtil.isEmpty(count) ) return;
+		try {
+			this.lobPrefetchSize = Integer.parseInt( count );
 		} catch( NumberFormatException e ) {}
 	}
 
@@ -193,8 +215,8 @@ public class SqlProperties {
 
 		sb.append( String.format("environmentId:[%s]", getEnvironmentId()) );
 
-		if( hasSpecificFetchCount() ) {
-			sb.append( String.format(", fetch:[%d]", getFetchCount()) );
+		if( hasSpecificFetchSize() ) {
+			sb.append( String.format(", fetch:[%d]", getFetchSize()) );
 		}
 
 		if( isCacheEnable() ) {
@@ -239,5 +261,7 @@ public class SqlProperties {
 	public boolean hasOrmDynamicSql() {
 		return this.ormSqlWhere != null || this.ormSqlOrderBy != null;
 	}
+
+
 
 }

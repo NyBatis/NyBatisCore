@@ -65,8 +65,8 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     @Override
-    public int execute( Integer bufferSize ) {
-        return executeBatch( bufferSize );
+    public int execute( Integer transactionSize ) {
+        return executeBatch( transactionSize );
     }
 
     @Override

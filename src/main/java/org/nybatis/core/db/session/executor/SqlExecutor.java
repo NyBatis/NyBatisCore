@@ -56,7 +56,6 @@ public class SqlExecutor {
 
 		Connection conn = null;
 
-
 		try {
 
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
@@ -108,7 +107,8 @@ public class SqlExecutor {
             StatementController stmtHandler = new StatementController( injectedSqlBean );
 
             stmtHandler.setParameter( preparedStatement );
-            stmtHandler.setRowFetchSize( preparedStatement, rowFetchSize );
+            stmtHandler.setFetchSize( preparedStatement, rowFetchSize );
+			stmtHandler.setLobPrefetchSize( preparedStatement );
 
             ResultSet rs = stmtHandler.executeQuery( preparedStatement );
 
