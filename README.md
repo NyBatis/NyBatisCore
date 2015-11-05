@@ -145,7 +145,7 @@ Map param = new HashMap();
 param.put( "name", "%y%" );
 param.put( "age", 19 );
 
-List<User> list02 = session.list()
+List<User> list03 = session.list()
    .where( "name like #{name} OR age >= #{age}", param )
    .orderBy( "name, age DESC" )
    .select();
