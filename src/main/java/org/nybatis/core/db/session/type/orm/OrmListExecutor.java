@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * ORM ListExecutor
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-21
  */
@@ -17,25 +19,52 @@ public interface OrmListExecutor<T> {
 
     int count( T parameter );
 
+    /**
+     * Add 'where' condition
+     *
+     * @param sqlExpression sql expression
+     * @return self instance
+     */
     OrmListExecutor<T> where( String sqlExpression );
 
+    /**
+     * Add 'where' condition
+     *
+     * @param sqlExpression sql expression
+     * @param parameter parameter to bind
+     * @return self instance
+     */
     OrmListExecutor<T> where( String sqlExpression, Object parameter );
 
-//    OrmListExecutor<T> removeWhere();
-
+    /**
+     * Set 'order by' expression
+     *
+     * @param sqlExpression sql expression
+     * @return self instance
+     */
     OrmListExecutor<T> orderBy( String sqlExpression );
 
     /**
-     * Set row fetch count temporary.<br/>
+     * Set row fetch size temporary.<br/>
      *
-     * @param count row fetch count.
+     * @param size row fetch size.
      */
-    OrmListExecutor<T> setRowFetchCountAtOnce( int count );
+    OrmListExecutor<T> setFetchSize( int size );
+
+    /**
+     * Set lob pre-fetch size temporary <br>
+     *
+     * It is oracle-based funtionality.
+     *
+     * @param size lob prefetch size
+     * @return
+     */
+    OrmListExecutor<T> setLobPrefetchSize( int size );
 
     /**
      * Cache statements should not be cached at once when has been executed.
      */
-    OrmListExecutor<T> disableCacheAtOnce();
+    OrmListExecutor<T> disableCache();
 
     /**
      * Clear cache

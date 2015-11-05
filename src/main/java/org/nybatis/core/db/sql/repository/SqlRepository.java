@@ -66,7 +66,7 @@ public class SqlRepository {
 		if( ! isExist(sqlId) ) return;
 
 		SqlProperties properties = getProperties( sqlId );
-		properties.setFetchCount( rowFetchCount );
+		properties.setFetchSize( rowFetchCount );
 
 	}
 

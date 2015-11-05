@@ -63,13 +63,19 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     }
 
     @Override
-    public OrmListExecutor<T> setRowFetchCountAtOnce( int count ) {
-        sqlSession.getProperties().setFetchCount( count );
+    public OrmListExecutor<T> setFetchSize( int size ) {
+        sqlSession.getProperties().setFetchSize( size );
         return this;
     }
 
     @Override
-    public OrmListExecutor<T> disableCacheAtOnce() {
+    public OrmListExecutor<T> setLobPrefetchSize( int size ) {
+        sqlSession.getProperties().setLobPrefetchSize( size );
+        return this;
+    }
+
+    @Override
+    public OrmListExecutor<T> disableCache() {
         sqlSession.getProperties().isCacheEnable( false );
         return this;
     }

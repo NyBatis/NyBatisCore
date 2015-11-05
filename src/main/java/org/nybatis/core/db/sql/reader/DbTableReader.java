@@ -80,7 +80,7 @@ public class DbTableReader {
             SqlProperties properties = sqlNode.getProperties();
 
             if( cacheId != null ) properties.setCacheId( cacheId );
-            if( flush   != null ) properties.setFetchCount( flush );
+            if( flush   != null ) properties.setFetchSize( flush );
 
             sqlNode.setMainId( mainId );
 

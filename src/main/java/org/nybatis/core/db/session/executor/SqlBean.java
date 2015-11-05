@@ -2,7 +2,7 @@ package org.nybatis.core.db.session.executor;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DriverAttributes;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.util.DbExecUtils;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
@@ -55,8 +55,8 @@ public class SqlBean {
 		this.sqlParam   = DbExecUtils.getParameterMergedWithGlobalParam( inputParam );
 
 		if( properties.isPageSql() ) {
-			sqlParam.put( DriverAttributes.PAGE_PARAM_START, this.properties.getPageSqlStart() );
-			sqlParam.put( DriverAttributes.PAGE_PARAM_END,   this.properties.getPageSqlEnd()   );
+			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );
+			sqlParam.put( DatabaseAttribute.PAGE_PARAM_END,   this.properties.getPageSqlEnd()   );
 		}
 
 		if( properties.hasOrmDynamicSql() ) {
@@ -149,7 +149,7 @@ public class SqlBean {
 		return properties;
 	}
 
-	public DriverAttributes getDatasourceAttribute() {
+	public DatabaseAttribute getDatasourceAttribute() {
 	    return DatasourceManager.getAttributes( getEnvironmentId() );
     }
 

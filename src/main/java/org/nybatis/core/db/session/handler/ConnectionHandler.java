@@ -67,7 +67,11 @@ public abstract class ConnectionHandler {
 
 	}
 
-	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer rowFetchSize ) throws SQLException {
+//	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer fetchSize ) throws SQLException {
+//		return getPreparedStatement( sqlBean, fetchSize, null );
+//	}
+
+	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer fetchSize, Integer lobPrefetchSize ) throws SQLException {
 
 		sqlBean.build();
 
@@ -76,7 +80,8 @@ public abstract class ConnectionHandler {
 		StatementController stmtHandler = new StatementController( sqlBean );
 
 		stmtHandler.setParameter( preparedStatement );
-		stmtHandler.setRowFetchSize( preparedStatement, rowFetchSize );
+		stmtHandler.setFetchSize( preparedStatement, fetchSize );
+		stmtHandler.setLobPrefetchSize( preparedStatement, lobPrefetchSize );
 
 		NLogger.debug( ">> {}\n{}", sqlBean, sqlBean.getDebugSql() );
 
@@ -84,8 +89,12 @@ public abstract class ConnectionHandler {
 
 	}
 
-	protected PreparedStatement getPreparedStatement( String sqlId, Object parameter, Integer rowFetchSize ) throws SQLException {
-		return getPreparedStatement( getSqlBean( sqlId, parameter ), rowFetchSize );
+	protected PreparedStatement getPreparedStatement( String sqlId, Object parameter, Integer fetchSize, Integer lobPrefetchSize ) throws SQLException {
+		return getPreparedStatement( getSqlBean( sqlId, parameter ), fetchSize, lobPrefetchSize );
+	}
+
+	protected PreparedStatement getPreparedStatement( String sqlId, Object parameter, Integer fetchSize ) throws SQLException {
+		return getPreparedStatement( getSqlBean( sqlId, parameter ), fetchSize, null );
 	}
 
 	protected PreparedStatement getPreparedStatement( String sqlId, Object parameter ) throws SQLException {
@@ -96,8 +105,12 @@ public abstract class ConnectionHandler {
 		return getPreparedStatement(sqlId, null, null);
 	}
 
-	protected PreparedStatement getPagedPreparedStatement( String sqlId, Object parameter, int start, int end, Integer rowFetchSize ) throws SQLException {
-		return getPreparedStatement( getPagedSqlBean( sqlId, parameter, start, end ), rowFetchSize);
+	protected PreparedStatement getPagedPreparedStatement( String sqlId, Object parameter, int start, int end, Integer fetchSize, Integer lobPrefetchSize ) throws SQLException {
+		return getPreparedStatement( getPagedSqlBean( sqlId, parameter, start, end ), fetchSize, lobPrefetchSize );
+	}
+
+	protected PreparedStatement getPagedPreparedStatement( String sqlId, Object parameter, int start, int end, Integer fetchSize ) throws SQLException {
+		return getPreparedStatement( getPagedSqlBean( sqlId, parameter, start, end ), fetchSize, null );
 	}
 
 	protected PreparedStatement getPagedPreparedStatement( String sqlId, Object parameter, int start, int end ) throws SQLException {

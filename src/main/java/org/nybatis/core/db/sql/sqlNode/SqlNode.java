@@ -1,7 +1,7 @@
 package org.nybatis.core.db.sql.sqlNode;
 
 import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DriverAttributes;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.sql.sqlNode.element.RootSqlElement;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
@@ -48,7 +48,7 @@ public class SqlNode {
 
 			if( DatasourceManager.isExist( getEnvironmentId() ) ) {
 
-				DriverAttributes envAttr = DatasourceManager.getAttributes( getEnvironmentId() );
+				DatabaseAttribute envAttr = DatasourceManager.getAttributes( getEnvironmentId() );
 
 				if( isPage ) {
 					sql = String.format( "%s%s%s", envAttr.getPageSqlPre(), sql, envAttr.getPageSqlPost() );

@@ -8,6 +8,8 @@ import org.nybatis.core.model.NMap;
 import java.util.List;
 
 /**
+ * ListExecutor
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-14
  */
@@ -46,6 +48,11 @@ public interface ListExecutor {
     @SupportCache
     void select( RowHandler rowHandler );
 
+    /**
+     * Set sql execution mode to count and get result
+     *
+     * @return result row's count
+     */
     int count();
 
     /**
@@ -57,22 +64,44 @@ public interface ListExecutor {
     ListExecutor setParameter( Object parameter );
 
     /**
-     * Set row fetch count temporary.<br/>
+     * Set row fetch size temporary.<br>
      *
-     * @param count row fetch count.
+     * @param size row fetch size.
+     * @return self instance
      */
-    ListExecutor setRowFetchCountAtOnce( int count );
+    ListExecutor setFetchSize( int size );
+
+    /**
+     * Set lob pre-fetch size temporary <br>
+     *
+     * It is oracle-based funtionality.
+     *
+     * @param size lob prefetch size
+     * @return self instance
+     */
+    ListExecutor setLobPrefetchSize( int size );
 
     /**
      * Cache statements should not be cached at once when has been executed.
+     *
+     * @return self instance
      */
-    ListExecutor disableCacheAtOnce();
+    ListExecutor disableCache();
 
     /**
      * Clear cache
+     *
+     * @return self instance
      */
     ListExecutor clearCache();
 
+    /**
+     * Set sql exeution mode to page and it's limit.
+     *
+     * @param start start rownum
+     * @param end   end rownum
+     * @return self instance
+     */
     ListExecutor setPage( int start, int end );
 
 }

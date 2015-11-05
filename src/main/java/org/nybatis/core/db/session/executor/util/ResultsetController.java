@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DriverAttributes;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.handler.RowHandler;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
@@ -186,11 +186,11 @@ public class ResultsetController {
 
 			if( sqlType == SqlType.BLOB ) {
 
-				DriverAttributes attributes = DatasourceManager.getAttributes( environmentId );
+				DatabaseAttribute attributes = DatasourceManager.getAttributes( environmentId );
 
-				if( attributes.enableBlobGet() ) {
+				if( attributes.enableToGetBlob() ) {
 
-					attributes.enableBlobGet( false );
+					attributes.enableToGetBlob( false );
 					TypeMapper.put( environmentId, SqlType.BLOB, new ByteArrayMapper() );
 
 					return getResult( sqlType, resultSet, columnIndex );

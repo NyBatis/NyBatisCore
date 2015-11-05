@@ -11,7 +11,7 @@
   LIMIT 0, #{rowNum:int}
 </sql>
 
-<sql id="selectKey" fetch="50" cache="lru" flush="60" >
+<sql id="selectKey" fetch="50" cache="lru" flush="60" lobPrefetch="1000" >
   <key id="listId" >
     SELECT 'A001' FROM PROD
   </key>

@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
-    private SqlSessionImpl sqlSession;
+    private SqlSessionImpl       sqlSession;
     private OrmSessionProperties properties  = new OrmSessionProperties();
     private Integer              bufferSize  = null;
 
@@ -22,14 +22,8 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
     }
 
     @Override
-    public OrmBatchExecutor setBufferSize( int bufferSize ) {
-        this.bufferSize = bufferSize;
-        return this;
-    }
-
-    @Override
-    public OrmBatchExecutor removeBufferSize() {
-        bufferSize = null;
+    public OrmBatchExecutor setTransactionSize( int size ) {
+        this.bufferSize = size;
         return this;
     }
 

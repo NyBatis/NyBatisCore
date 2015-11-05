@@ -58,13 +58,19 @@ public class ListExecutorImpl implements ListExecutor {
     }
 
     @Override
-    public ListExecutor setRowFetchCountAtOnce( int count ) {
-        properties.setFetchCount( count );
+    public ListExecutor setFetchSize( int size ) {
+        properties.setFetchSize( size );
         return this;
     }
 
     @Override
-    public ListExecutor disableCacheAtOnce() {
+    public ListExecutor setLobPrefetchSize( int size ) {
+        properties.setLobPrefetchSize( size );
+        return this;
+    }
+
+    @Override
+    public ListExecutor disableCache() {
         properties.isCacheEnable( false );
         return this;
     }

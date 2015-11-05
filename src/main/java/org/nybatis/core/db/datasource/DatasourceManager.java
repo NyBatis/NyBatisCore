@@ -1,7 +1,7 @@
 package org.nybatis.core.db.datasource;
 
-import org.nybatis.core.db.datasource.driver.DriverAttributes;
-import org.nybatis.core.db.datasource.driver.DriverManager;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 public class DatasourceManager {
 
 	private static Map<String, DataSource>       datasourceRepository = new Hashtable<>();
-	private static Map<String, DriverAttributes> attributeRepository  = new Hashtable<>();
+	private static Map<String, DatabaseAttribute> attributeRepository  = new Hashtable<>();
 
 	private static String defaultEnvironmentId;
 
@@ -22,12 +22,12 @@ public class DatasourceManager {
 			defaultEnvironmentId = environmentId;
 		}
 
-		DriverAttributes driverAttributes = DriverManager.get( datasource );
+		DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
 
 		datasourceRepository.put( environmentId, datasource );
-		attributeRepository.put( environmentId, driverAttributes );
+		attributeRepository.put( environmentId, databaseAttribute );
 
-		DriverManager.get( datasource );
+		DatabaseAttributeManager.get( datasource );
 
 	}
 
@@ -48,15 +48,15 @@ public class DatasourceManager {
 		return defaultEnvironmentId;
 	}
 
-	public static DriverAttributes getAttributes( String environmentId ) {
-		return Validator.nvl( attributeRepository.get( environmentId ), new DriverAttributes() );
+	public static DatabaseAttribute getAttributes( String environmentId ) {
+		return Validator.nvl( attributeRepository.get( environmentId ), new DatabaseAttribute() );
 	}
 
 	public static boolean isExist( String environmentId ) {
 		return environmentId != null && datasourceRepository.containsKey( environmentId );
 	}
 
-	public static DriverAttributes getAttributes() {
+	public static DatabaseAttribute getAttributes() {
 		return attributeRepository.get( defaultEnvironmentId );
 	}
 

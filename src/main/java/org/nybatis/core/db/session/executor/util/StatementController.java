@@ -1,7 +1,7 @@
 package org.nybatis.core.db.session.executor.util;
 
 import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DriverAttributes;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
@@ -110,15 +110,44 @@ public class StatementController {
 
 	}
 
-	public void setRowFetchSize( Statement statement, Integer rowFetchSize ) throws SQLException {
+	public void setFetchSize( Statement statement, Integer size ) throws SQLException {
 
-		if( rowFetchSize == null && sqlBean.getProperties().hasSpecificFetchCount() ) {
-			rowFetchSize = sqlBean.getProperties().getFetchCount();
+		if( size == null && sqlBean.getProperties().hasSpecificFetchSize() ) {
+			size = sqlBean.getProperties().getFetchSize();
 		}
 
-		if( rowFetchSize != null ) {
-			statement.setFetchSize( rowFetchSize );
-			NLogger.debug( "setFetchSize : {}", rowFetchSize );
+		if( size != null ) {
+			statement.setFetchSize( size );
+			NLogger.trace( "setFetchSize : {}", size );
+		}
+
+	}
+
+	public void setLobPrefetchSize( Statement statement ) throws SQLException {
+		setLobPrefetchSize( statement, null );
+	}
+
+	public void setLobPrefetchSize( Statement statement, Integer size ) throws SQLException {
+
+		if( ! sqlBean.getDatasourceAttribute().enableToDoLobPrefetch() ) return;
+
+		if( size == null && sqlBean.getProperties().hasSpecificLobPreFetchSize() ) {
+			size = sqlBean.getProperties().getLobPrefetchSize();
+		}
+
+		if( size != null ) {
+
+			try {
+
+				OracleStatementController oracleStatementController = new OracleStatementController();
+				oracleStatementController.setLobPrefetchCount( statement, size );
+				NLogger.trace( "setLobPreFetchSize : {}", size );
+
+			} catch( NoClassDefFoundError e ) {
+				NLogger.info( "Environment(id:{}) is not support Lob Prefetch.", sqlBean.getEnvironmentId() );
+				sqlBean.getDatasourceAttribute().enableToDoLobPrefetch( false );
+			}
+
 		}
 
 	}
@@ -172,7 +201,7 @@ public class StatementController {
 
 		SqlType outParamType;
 
-		if( sqlBean.getDatasourceAttribute().enableGetParameterType() ) {
+		if( sqlBean.getDatasourceAttribute().enableToGetParameterType() ) {
 
 			try {
 
@@ -182,7 +211,7 @@ public class StatementController {
 				NLogger.debug( ">> OutParameter Type : {}, {}, {}", struct.getKey(), outParamType, outParamTypeCode );
 
 			} catch( SQLException e ) {
-				sqlBean.getDatasourceAttribute().enableGetParameterType( false );
+				sqlBean.getDatasourceAttribute().enableToGetParameterType( false );
 				outParamType = struct.getType();
 			}
 
@@ -212,9 +241,9 @@ public class StatementController {
 
 			if( sqlType == SqlType.BLOB ) {
 
-				if( sqlBean.getDatasourceAttribute().enableBlobGet() ) {
+				if( sqlBean.getDatasourceAttribute().enableToGetBlob() ) {
 
-					sqlBean.getDatasourceAttribute().enableBlobGet( false );
+					sqlBean.getDatasourceAttribute().enableToGetBlob( false );
 					TypeMapper.put( sqlBean.getEnvironmentId(), SqlType.BLOB, new ByteArrayMapper() );
 
 					return getResult( sqlType, statement, paramIndex );
@@ -252,11 +281,11 @@ public class StatementController {
 
 			if( value.getType() == SqlType.BLOB ) {
 
-				DriverAttributes attributes = DatasourceManager.getAttributes( environmentId );
+				DatabaseAttribute attributes = DatasourceManager.getAttributes( environmentId );
 
-				if( attributes.enableBlobGet() ) {
+				if( attributes.enableToGetBlob() ) {
 
-					attributes.enableBlobGet( false );
+					attributes.enableToGetBlob( false );
 					TypeMapper.put( environmentId, SqlType.BLOB, new ByteArrayMapper() );
 
 					return setParameter( environmentId, statement, paramIndex, value );

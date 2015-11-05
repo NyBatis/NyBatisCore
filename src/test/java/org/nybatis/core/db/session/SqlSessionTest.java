@@ -233,7 +233,7 @@ public class SqlSessionTest {
 			Param param = new Param( "A001" );
 
 			if( i == 3 ) {
-				listExecutor.disableCacheAtOnce();
+				listExecutor.disableCache();
 			}
 
 			if( i == 8 ) {
