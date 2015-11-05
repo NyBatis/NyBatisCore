@@ -252,7 +252,7 @@ public class QueryResolver {
         }
 
         if( param.containsKey(key) ) return true;
-        return param.containsKey( Const.db.SINGLE_PARAMETER );
+        return param.containsKey( Const.db.PARAMETER_SINGLE );
 
     }
 
@@ -265,8 +265,8 @@ public class QueryResolver {
             if( klass == StringBuffer.class || klass == StringBuilder.class ) {
                 value = value.toString();
             }
-        } else if( param.containsKey( Const.db.SINGLE_PARAMETER ) ) {
-            value = param.get( Const.db.SINGLE_PARAMETER );
+        } else if( param.containsKey( Const.db.PARAMETER_SINGLE ) ) {
+            value = param.get( Const.db.PARAMETER_SINGLE );
         }
 
         return value;

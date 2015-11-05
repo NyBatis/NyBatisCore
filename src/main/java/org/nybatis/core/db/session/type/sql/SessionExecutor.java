@@ -184,7 +184,7 @@ public interface SessionExecutor {
 	 *
 	 * @return self instance
 	 */
-	SessionExecutor disableCacheAtOnce();
+	SessionExecutor disableCache();
 
 	/**
 	 * Clear cache

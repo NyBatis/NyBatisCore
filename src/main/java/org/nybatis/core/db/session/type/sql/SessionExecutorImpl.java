@@ -104,7 +104,7 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     @Override
-    public SessionExecutor disableCacheAtOnce() {
+    public SessionExecutor disableCache() {
         properties.isCacheEnable( false );
         return this;
     }

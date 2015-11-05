@@ -15,7 +15,7 @@ public class NListPrinter {
     private static final int     LIMIT_CNT_toString = 5_000;
     private static final String  NEW_LINE           = "-------------------------------------------------------------";
 
-    NList nlist = null;
+    private NList nlist = null;
 
     public NListPrinter( NList nlist ) {
         this.nlist = nlist;

@@ -231,12 +231,13 @@ public class Const {
 	 */
 	public static class db {
 
-		public static final String ORM_SQL_PREFIX                = "NybatisOrm-";
-		public static final String ORM_PARAMETER_ENTITY          = ORM_SQL_PREFIX + "Entity-";
-		public static final String ORM_PARAMETER_USER            = ORM_SQL_PREFIX + "User-";
-		public static final String ORM_PARAMETER_WHERE           = ORM_SQL_PREFIX + "DynamicSqlWhere";
-		public static final String ORM_PARAMETER_ORDER_BY        = ORM_SQL_PREFIX + "DynamicSqlOrderBy";
-		public static final String ORM_SQL_SELECT                = ".select";
+		public static final String ORM_SQL_PREFIX                = "NybatisOrm";
+		public static final String ORM_PARAMETER_ENTITY          = ORM_SQL_PREFIX + "-Entity-";
+		public static final String ORM_PARAMETER_USER            = ORM_SQL_PREFIX + "-User-";
+		public static final String ORM_PARAMETER_WHERE           = ORM_SQL_PREFIX + "-DynamicSqlWhere";
+		public static final String ORM_PARAMETER_ORDER_BY        = ORM_SQL_PREFIX + "-DynamicSqlOrderBy";
+		public static final String ORM_SQL_SELECT_SINGLE         = ".selectSingle";
+		public static final String ORM_SQL_SELECT_LIST           = ".selectList";
 		public static final String ORM_SQL_UPDATE                = ".update";
 		public static final String ORM_SQL_INSERT                = ".insert";
 		public static final String ORM_SQL_DELETE                = ".delete";
@@ -244,9 +245,9 @@ public class Const {
 		public static final int    DEFAULT_CACHE_FLUSH_CYCLE     = Integer.MAX_VALUE;
 		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;
 
-		public static final String SINGLE_PARAMETER              = "NybatisSingleParameter";
-		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "DEFAULT_TABLE_NAME";
-		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "DEFAULT_ENVIRONMENT_ID";
+		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "-DEFAULT_TABLE_NAME";
+		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "-DEFAULT_ENVIRONMENT_ID";
+		public static final String PARAMETER_SINGLE              = "NybatisSingleParameter";
 		public static final String PARAMETER_DATABASE            = "nybatis.database";
 
 		public static String getOrmSqlIdPrefix( String environmentId, String tableName ) {

@@ -16,7 +16,7 @@ public class DatabaseAttribute {
     public static final String DATABASE_UNKOWN  = "unknown";
 
     private String  database                   = DATABASE_UNKOWN;
-    private String  patternToMatchDriverName   = "";
+    private String patternToMatchClassName     = "";
 
     private boolean enableToGetParameterType   = true;
     private boolean enableToGetBLob            = true;
@@ -36,11 +36,11 @@ public class DatabaseAttribute {
      * Driver Attributes
      *
      * @param database Driver name (oracle, mysql, etc...)
-     * @param patternToMatchDriverName Driver name pattern to match with Database name. It must be regular expression.
+     * @param patternToMatchClassName Driver name pattern to match with Database name. It must be regular expression.
      */
-    public DatabaseAttribute( String database, String patternToMatchDriverName ) {
+    public DatabaseAttribute( String database, String patternToMatchClassName ) {
         setDatabase( database );
-        setPatternToMatchDriverName( patternToMatchDriverName );
+        setPatternToMatchClassName( patternToMatchClassName );
     }
 
     public String getDatabase() {
@@ -48,16 +48,16 @@ public class DatabaseAttribute {
     }
 
     public DatabaseAttribute setDatabase( String database ) {
-        this.database = StringUtil.compressSpaceOrEnter( database ).toLowerCase();
+        this.database = StringUtil.compressSpaceOrEnter( database );
         return this;
     }
 
-    public String getPatternToMatchDriverName() {
-        return patternToMatchDriverName;
+    public String getPatternToMatchClassName() {
+        return patternToMatchClassName;
     }
 
-    public DatabaseAttribute setPatternToMatchDriverName( String pattern ) {
-        this.patternToMatchDriverName = StringUtil.compressSpaceOrEnter( pattern );
+    public DatabaseAttribute setPatternToMatchClassName( String pattern ) {
+        this.patternToMatchClassName = StringUtil.compressSpaceOrEnter( pattern );
         return this;
     }
 
@@ -68,7 +68,7 @@ public class DatabaseAttribute {
      * @return if matched with pattern, return true
      */
     public boolean isMatched( String driverName ) {
-        return Validator.isFinded( driverName, patternToMatchDriverName );
+        return Validator.isFinded( driverName, patternToMatchClassName );
     }
 
     public boolean enableToGetParameterType() {
@@ -131,13 +131,13 @@ public class DatabaseAttribute {
         return String.format(
                 "Database\n" +
                 " - name : [%s]\n" +
-                " - Pattern to match with driver name: [%s]\n" +
+                " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
                 " - pre : [%s]\n" +
                 " - post: [%s]"
                 ,
                 getDatabase(),
-                patternToMatchDriverName,
+                patternToMatchClassName,
                 getPageSqlPre(),
                 getPageSqlPost()
         );
@@ -146,7 +146,7 @@ public class DatabaseAttribute {
 
     public DatabaseAttribute clone() {
 
-        DatabaseAttribute attribute = new DatabaseAttribute( database, patternToMatchDriverName );
+        DatabaseAttribute attribute = new DatabaseAttribute( database, patternToMatchClassName );
 
         attribute.enableToGetParameterType = enableToGetParameterType;
         attribute.enableToGetBLob          = enableToGetBLob;

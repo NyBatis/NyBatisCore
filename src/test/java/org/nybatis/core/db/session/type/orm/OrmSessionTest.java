@@ -233,7 +233,7 @@ public class OrmSessionTest {
 
         OrmSession ormSession = SessionManager.openOrmSession( NybatisTest.class );
 
-        ormSession.setCacheProperties( "lru" );
+        ormSession.enableCache( "lru" );
 
         NybatisTest domain = new NybatisTest();
         domain.setListId( "RNK00000" );
@@ -250,7 +250,7 @@ public class OrmSessionTest {
 
         OrmSession<NybatisTest> ormSession = SessionManager.openOrmSession( NybatisTest.class );
 
-        ormSession.setCacheProperties( "lru" );
+        ormSession.enableCache( "lru" );
 
         NLogger.debug( getData( "RNK00000", "70" ) );
         assertEquals( "PROD-70", getData( "RNK00000", "70" ).getProdName() );

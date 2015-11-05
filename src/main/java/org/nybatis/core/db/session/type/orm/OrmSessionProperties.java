@@ -61,8 +61,12 @@ public class OrmSessionProperties {
         return Const.db.getOrmSqlIdPrefix( environmentId, tableName );
     }
 
-    public String sqlIdSelect() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT;
+    public String sqlIdSelectSingle() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_SINGLE;
+    }
+
+    public String sqlIdSelectList() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_LIST;
     }
 
     public String sqlIdInsert() {
@@ -90,7 +94,7 @@ public class OrmSessionProperties {
 
         where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
 
-        String singleParamKey = String.format( "%s%s", prefix, Const.db.SINGLE_PARAMETER );
+        String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
 
         if( parameter == null ) {
             inputParam.put( singleParamKey, null );
