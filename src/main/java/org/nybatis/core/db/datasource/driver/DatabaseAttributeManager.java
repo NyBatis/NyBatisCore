@@ -2,6 +2,7 @@ package org.nybatis.core.db.datasource.driver;
 
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.reflection.Reflector;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -49,26 +50,26 @@ public class DatabaseAttributeManager {
 
     private static DatabaseAttribute get( Connection connection ) throws SQLException {
 
-        DatabaseMetaData metaData = connection.getMetaData();
+        Connection realConnection = new Reflector().unwrapProxyBean( connection );
 
-        String driverName = metaData.getDriverName();
+        String className = realConnection.getClass().getName();
 
         NLogger.trace( "--------------------------------------" );
-        NLogger.trace( "Driver name : {}", driverName );
+        NLogger.trace( "Connection class name : {}", className );
         NLogger.trace( "--------------------------------------" );
 
         for( DatabaseAttribute attribute : driverRepository.values() ) {
-            if( attribute.isMatched( driverName ) ) {
+            if( attribute.isMatched( className ) ) {
                 NLogger.trace( attribute );
                 return attribute.clone();
             }
         }
 
-        if( ! driverRepository.containsKey( driverName ) ) {
-            add( new DatabaseAttribute( driverName, driverName ) );
+        if( ! driverRepository.containsKey( className ) ) {
+            add( new DatabaseAttribute( className, className ) );
         }
 
-        DatabaseAttribute databaseAttribute = driverRepository.get( driverName );
+        DatabaseAttribute databaseAttribute = driverRepository.get( className );
 
         NLogger.trace( databaseAttribute );
 

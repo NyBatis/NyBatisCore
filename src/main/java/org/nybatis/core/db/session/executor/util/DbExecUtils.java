@@ -41,7 +41,7 @@ public class DbExecUtils {
 		if( isPrimitive(parameter) ) {
 
 			if( primitiveParameterKey == null ) {
-				primitiveParameterKey = Const.db.SINGLE_PARAMETER;
+				primitiveParameterKey = Const.db.PARAMETER_SINGLE;
 			}
 
 			newParam.put( primitiveParameterKey, parameter );

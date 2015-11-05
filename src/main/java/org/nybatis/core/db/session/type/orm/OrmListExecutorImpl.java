@@ -24,25 +24,25 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     @Override
     public List<T> select() {
         properties.setEntityParameter( null );
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
     }
 
     @Override
     public List<T> select( T entity ) {
         properties.setEntityParameter( entity );
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
     }
 
     @Override
     public List<T> select( Map parameter ) {
         properties.setEntityParameter( parameter );
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
     }
 
     @Override
     public int count( T parameter ) {
         properties.setEntityParameter( parameter );
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().count();
+        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().count();
     }
 
     @Override

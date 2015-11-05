@@ -100,8 +100,8 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private void refreshCache() {
-        if( SqlRepository.getProperties( properties.sqlIdSelect() ).isCacheEnable() ) {
-            sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).disableCacheAtOnce().select( domainClass );
+        if( SqlRepository.getProperties( properties.sqlIdSelectSingle() ).isCacheEnable() ) {
+            sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).disableCache().select( domainClass );
         }
     }
 
@@ -137,7 +137,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private T select() {
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select( domainClass );
     }
 
     @Override
@@ -154,7 +154,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private NMap selectMap() {
-        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).select();
+        return sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select();
     }
 
     @Override
@@ -228,13 +228,13 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession setCacheProperties( String cacheId ) {
-        return setCacheProperties( cacheId, null );
+    public OrmSession enableCache( String cacheId ) {
+        return enableCache( cacheId, null );
     }
 
     @Override
-    public OrmSession setCacheProperties( String cacheId, Integer cacheFlushCycle ) {
-        SqlRepository.setCacheProperties( properties.sqlIdSelect(), cacheId, cacheFlushCycle );
+    public OrmSession enableCache( String cacheId, Integer flushSeconds ) {
+        SqlRepository.setCacheProperties( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
         return this;
     }
 

@@ -54,10 +54,11 @@ public class DbTableReader {
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT, selectSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE, updateSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE, deleteSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT, insertSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_SINGLE, selectSingleSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_LIST,   selectListSql( layout ),   cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE,        updateSql( layout ),       cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,        deleteSql( layout ),       cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT,        insertSql( layout ),       cacheId, flush );
 
         } finally {
             readLocker.unlock();
@@ -92,13 +93,33 @@ public class DbTableReader {
 
     }
 
-    private String selectSql( TableLayout layout ) {
+    private String selectSingleSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
+            sb.append( String.format(
+                    getTestNode("#{%s} != null","AND %s = #{%s%s}"),
+                    getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
+            ));
+        }
+
+        sb.append( getOverrideWhereNode() );
+        sb.append( getOverrideOrderbyNode() );
+
+        return sb.toString();
+
+    }
+
+    private String selectListSql( TableLayout layout ) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( String.format( "SELECT /*+ %s%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+
+        for( Column column : layout.getColumns() ) {
             sb.append( String.format(
                     getTestNode("#{%s} != null","AND %s = #{%s%s}"),
                     getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
@@ -116,7 +137,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format("UPDATE /*+ %s%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
+        sb.append( String.format("UPDATE /*+ %s%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
         sb.append( "<group delimeter=\",\">\n" );
 
         for( Column column : layout.getColumns() ) {
@@ -150,7 +171,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
             sb.append( String.format(
@@ -199,7 +220,7 @@ public class DbTableReader {
         }
 
         sb.append( String.format( "INSERT /*+ %s%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
-                Const.db.ORM_SQL_PREFIX, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
+                Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
                 structureDefine,
                 structureValues
         ) );
