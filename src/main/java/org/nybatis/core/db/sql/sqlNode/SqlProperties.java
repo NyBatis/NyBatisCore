@@ -139,6 +139,11 @@ public class SqlProperties {
 		this.cacheEnable = true;
 	}
 
+	/**
+	 * Get cache flush cycle
+	 *
+	 * @return cache flush cycle (unit:seconds)
+	 */
 	public int getCacheFlushCycle() {
 		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE );
 	}
@@ -147,14 +152,19 @@ public class SqlProperties {
 		return cacheFlushCycle != null;
 	}
 
-	public void setCacheFlushCycle( Integer cacheFlushCycle ) {
-		this.cacheFlushCycle = cacheFlushCycle;
+	/**
+	 * Set cache flush cycle
+	 *
+	 * @param seconds flush cycle (unit:seconds)
+	 */
+	public void setCacheFlushCycle( Integer seconds ) {
+		this.cacheFlushCycle = seconds;
 	}
 
-	public void setCacheFlushCycle( String cacheFlushCycle ) {
-		if( StringUtil.isEmpty(cacheFlushCycle) ) return;
+	public void setCacheFlushCycle( String seconds ) {
+		if( StringUtil.isEmpty(seconds) ) return;
 		try {
-			this.cacheFlushCycle = Integer.parseInt( cacheFlushCycle );
+			this.cacheFlushCycle = Integer.parseInt( seconds );
 		} catch( NumberFormatException e ) {}
 	}
 
