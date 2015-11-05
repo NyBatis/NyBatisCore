@@ -74,7 +74,7 @@ List<User> list = session.sqlId( "User.mapper", param ).list().select( User.clas
 
 ```
 
-XML SQL only contains <font color="red">id</font> and <font color="red">query</font> and does not contains code dependent attribute like **parameter type** or **return class**.
+XML SQL only contains <font color="red">id</font> and <font color="red">query</font>. it does not contains code dependent attribute like **parameter type** or **return class**.
 
 
 SQL also can be injected in NyBatis like Spring JDBC template.
