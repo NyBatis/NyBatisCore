@@ -10,6 +10,12 @@ import java.util.Date;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 
+/**
+ * TimeStampMapper
+ *
+ * java.sql.Date handle data as Date only and miss time information(HH:MI:SS).<br>
+ * So It is necessary to handle data as TimeStamp
+ */
 public class TimeStampMapper implements TypeMapperIF<Date>{
 
 	@Override
