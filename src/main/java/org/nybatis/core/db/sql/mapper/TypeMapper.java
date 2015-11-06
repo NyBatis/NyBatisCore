@@ -56,8 +56,14 @@ public class TypeMapper {
     	put( SqlType.BLOB,          new BlobMapper()       );
     	put( SqlType.BLOB_BOXED,    new BlobBoxedMapper()  ); // for java
     	put( SqlType.LONGVARBINARY, new BlobMapper()       );
-    	put( SqlType.DATE,          new DateMapper()       );
-    	put( SqlType.TIME,          new TimeMapper()       );
+
+		/**
+		 * java.sql.Date handle data as Date only and miss time information(HH:MI:SS).<br>
+		 * So It is necessary to handle data as TimeStamp
+		 */
+
+		put( SqlType.DATE,          new TimeStampMapper()  );
+    	put( SqlType.TIME,          new TimeStampMapper()  );
     	put( SqlType.TIMESTAMP,     new TimeStampMapper()  );
 
     	// cursor outPatameter
