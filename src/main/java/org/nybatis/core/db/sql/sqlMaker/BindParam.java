@@ -130,7 +130,7 @@ public class BindParam {
             		} else if( type == SqlType.DOUBLE ) {
             			this.value = Double.parseDouble( (String) value );
             		} else if( type == SqlType.DATE || type == SqlType.TIME || type == SqlType.TIMESTAMP  ) {
-            			this.value = new NDate( (String) value ).toDate();
+            			this.value = new NDate( (String) value, "YYYY-MM-DD HH:MI:SS" ).toDate();
             		} else if( type == SqlType.REAL || type == SqlType.DECIMAL || type == SqlType.NUMERIC  ) {
             			this.value = new BigDecimal( (String) value );
             		} else if( type == SqlType.LIST ) {

@@ -181,10 +181,8 @@ public class QueryResolver {
 
             } else {
 
-                Object val = getValue( param, key );
-
                 BindStruct bindStruct = new BindStruct( key, quotChecker.isOn() );
-                BindParam  bindParam  = bindStruct.toBindParam( val );
+                BindParam  bindParam  = bindStruct.toBindParam( getValue(param, bindStruct.getKey()) );
 
                 bindStructs.put( key, bindStruct );
                 bindParams.put( key, bindParam );
