@@ -169,4 +169,27 @@ ormSession.batch().update( users );
 ormSession.batch().delete( users );
 ```
 
-It does not needs any addtional configuration. 
+It does not needs any addtional configuration.
+ 
+### Simple Unit Test ###
+
+Dificullty of testing DAO (DataAccessObject) is that testing data is flexible so it is necessary to create each DAO's own testing data.
+
+But creating test data is a little annoying to implement in code.
+ 
+Using Spring Jdbc template or Pure jdbc statement or Interface query of MyBatis... Using many DMF in one source is not delight work.
+
+
+In NyBatis, you can run **sql script** to make preliminary data easily in test code.  
+ 
+```
+SqlSession sqlSession = SessionManager.openSession();
+sqlSession.sql( "INSERT INTO USER ( name, age ) VALUES ( 'test', '20' )" ).execute();
+
+... \\ Real Testing Code
+
+sqlSession.sql( "DELETE USER WHERE name = 'test'" ).execute();
+
+```
+
+

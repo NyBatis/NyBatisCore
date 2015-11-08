@@ -9,56 +9,43 @@
   <cache id="static" class="nayasis.common.cache.staticCache" />
 
   <environment id="sqlite" default="true" >
-    <datasource type="jdbc" poolMin="1" poolMax="1" ping="true" pingQuery="SELECT 1" pingCycle="600" >
+    <datasource type="jdbc" poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
     </datasource>
-    <page>
-      <post>LIMIT #{start}, #{end}</post>
-    </page>
     <sqlpath>
       <path>sqlite</path>
     </sqlpath>
   </environment>
 
   <environment id="sqliteUnpooled" >
-    <datasource type="jdbc" ping="true" pingQuery="SELECT 1 FROM DUAL" pingCycle="60" unpooled="true"  >
+    <datasource type="jdbc" ping="true" pingCycle="60" unpooled="true"  >
       <driver>#{driver}</driver>
       <url>jdbc:sqlite:#{default.root}/localDb/TestDb</url>
     </datasource>
-    <page>
-      <post>LIMIT #{start}, #{end}</post>
-    </page>
-     <sqlpath>
-       <path>sqlite</path>
-     </sqlpath>
+    <sqlpath>
+      <path>sqlite</path>
+    </sqlpath>
   </environment>
 
   <environment id="oracle" >
-    <datasource type="jdbc" ping="true" pingQuery="SELECT 1 FROM DUAL" pingCycle="60" >
+    <datasource type="jdbc" ping="true" pingCycle="60" >
       <driver>oracle.jdbc.driver.OracleDriver</driver>
       <url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>
       <username>SPSAC</username>
       <password>ompskp1!</password>
     </datasource>
-    <page>
-      <pre>SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NyBatisPagedTable.* FROM (</pre>
-      <post>) NyBatisPagedTable WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}</post>
-    </page>
     <sqlpath>
       <path>oracle</path>
     </sqlpath>
   </environment>
 
   <!--<environment id="maria" >-->
-  <!--<datasource type="jdbc" ping="true" pingQuery="SELECT 1 FROM DUAL" pingCycle="60" >-->
+  <!--<datasource type="jdbc" ping="true" pingCycle="60" >-->
   <!--<driver>org.mariadb.jdbc.Driver</driver>-->
   <!--<url>jdbc:mariadb://127.0.0.1:3306:sakila</url>-->
   <!--<username>root</username>-->
   <!--</datasource>-->
-  <!--<page>-->
-  <!--<post>LIMIT #{start}, #{end}</post>-->
-  <!--</page>-->
   <!--<sqlpath>-->
   <!--<path>maria</path>-->
   <!--</sqlpath>-->

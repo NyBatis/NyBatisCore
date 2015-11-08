@@ -69,7 +69,7 @@ public class JdbcDatasourceProperties {
 	}
 
 	public void setPingQuery( String query ) {
-		this.pingQuery = StringUtil.compressSpaceOrEnter( query );
+		pingQuery = query;
 	}
 
 	/**
@@ -99,12 +99,12 @@ public class JdbcDatasourceProperties {
 	    return pingEnable;
     }
 
-    public void setPingEnable( boolean pingEnable ) {
-	    this.pingEnable = pingEnable;
+    public void setPingEnable( boolean enable ) {
+	    pingEnable = enable;
     }
 
-    public void setPingEnable( String pingEnable ) {
-    	this.pingEnable = StringUtil.isTrue( pingEnable );
+    public void setPingEnable( String enable ) {
+    	pingEnable = StringUtil.isTrue( enable );
     }
 
 	public boolean isPooled() {
