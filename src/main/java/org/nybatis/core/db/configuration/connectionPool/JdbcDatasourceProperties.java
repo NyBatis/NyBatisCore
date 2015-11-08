@@ -69,10 +69,7 @@ public class JdbcDatasourceProperties {
 	}
 
 	public void setPingQuery( String query ) {
-		this.pingQuery = query;
-		if( StringUtil.isEmpty( pingQuery ) ) {
-			pingEnable = false;
-		}
+		this.pingQuery = StringUtil.compressSpaceOrEnter( query );
 	}
 
 	/**
@@ -119,7 +116,7 @@ public class JdbcDatasourceProperties {
     }
 
 	public void setPooled( String isPooled ) {
-		this.isPooled = StringUtil.isTrue( isPooled );
+		this.isPooled = StringUtil.isEmpty( isPooled ) || StringUtil.isTrue( isPooled );
 	}
 
 }
