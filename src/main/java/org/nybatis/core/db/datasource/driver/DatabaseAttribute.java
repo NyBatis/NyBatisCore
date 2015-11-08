@@ -27,6 +27,8 @@ public class DatabaseAttribute {
     private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM ( ";
     private String  countSqlPost               = " )";
 
+    private String  pingQuery                  = "SELECT 1";
+
     /**
      * Driver Attributes
      */
@@ -123,6 +125,14 @@ public class DatabaseAttribute {
     }
     public DatabaseAttribute setCountSqlPost( String sql ) {
         this.countSqlPost = StringUtil.compressSpaceOrEnter( sql ) + " ";
+        return this;
+    }
+
+    public String getPingQuery() {
+        return pingQuery;
+    }
+    public DatabaseAttribute setPingQuery( String query ) {
+        pingQuery = StringUtil.compressSpaceOrEnter( query );
         return this;
     }
 

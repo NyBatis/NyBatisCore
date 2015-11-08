@@ -2,6 +2,7 @@ package org.nybatis.core.db.datasource;
 
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
+import org.nybatis.core.db.datasource.jdbc.JdbcDataSource;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
@@ -24,11 +25,19 @@ public class DatasourceManager {
 
 		DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
 
+		setPingQuery( datasource, databaseAttribute );
+
 		datasourceRepository.put( environmentId, datasource );
 		attributeRepository.put( environmentId, databaseAttribute );
 
 		DatabaseAttributeManager.get( datasource );
 
+	}
+
+	private void setPingQuery( DataSource datasource, DatabaseAttribute databaseAttribute ) {
+		if( datasource instanceof JdbcDataSource ) {
+			((JdbcDataSource) datasource).getDatasourceProperties().setPingQuery( databaseAttribute.getPingQuery() );
+		}
 	}
 
 	@SuppressWarnings( "static-access" )

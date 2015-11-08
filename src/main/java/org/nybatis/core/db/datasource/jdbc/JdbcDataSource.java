@@ -38,6 +38,10 @@ public class JdbcDataSource implements DataSource {
 
 	}
 
+	public JdbcDatasourceProperties getDatasourceProperties() {
+		return datasourceProperties;
+	}
+
 	@Override
     public Connection getConnection() throws SQLException {
 		return getConnection( connectionProperties.getUserName(), connectionProperties.getUserPassword() );

@@ -67,7 +67,6 @@ public class DatasourceBuilder {
 				datasourceProperties.setPoolStep(   prop.getValue(datasource, "poolStep"  ) );
 				datasourceProperties.setPingCycle(  prop.getValue(datasource, "pingCycle" ) );
 				datasourceProperties.setPingEnable( prop.getValue(datasource, "ping"      ) );
-				datasourceProperties.setPingQuery(  prop.getValue(datasource, "pingQuery" ) );
 				datasourceProperties.setPooled(     prop.getValue(datasource, "unpooled"  ) );
 
 				factory = new JdbcDataSourceFactory( datasourceProperties, connectionProperties );
