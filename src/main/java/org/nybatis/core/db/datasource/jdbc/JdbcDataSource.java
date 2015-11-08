@@ -99,10 +99,12 @@ public class JdbcDataSource implements DataSource {
 
 		}
 
+		proxyConnection = connectionPoolActive.push( proxyConnection );
+
 		NLogger.trace( "> Get connection" );
 		logPoolStatus();
 
-		return connectionPoolActive.push( proxyConnection ).getConnection();
+		return proxyConnection.getConnection();
 
     }
 
