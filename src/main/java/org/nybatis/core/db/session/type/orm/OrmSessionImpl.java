@@ -118,9 +118,19 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private int delete() {
-        int cnt = sqlSession.sqlId( properties.sqlIdDelete(), properties.getParameter() ).execute();
-        refreshCache();
+
+        boolean pkNotNull = properties.isPkNotNull();
+
+        String sqlId = pkNotNull ? properties.sqlIdDeleteSingle() : properties.sqlIdDeleteList();
+
+        int cnt = sqlSession.sqlId( sqlId, properties.getParameter() ).execute();
+
+        if( pkNotNull ) {
+            refreshCache();
+        }
+
         return cnt;
+
     }
 
     @Override

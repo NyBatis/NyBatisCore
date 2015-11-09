@@ -77,8 +77,12 @@ public class OrmSessionProperties {
         return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE;
     }
 
-    public String sqlIdDelete() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE;
+    public String sqlIdDeleteSingle() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_SINGLE;
+    }
+
+    public String sqlIdDeleteList() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_LIST;
     }
 
     public void addWhere( String where, Object parameter ) {
