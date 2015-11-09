@@ -29,7 +29,7 @@ public class CharacterUtil {
 	 * 
 	 * @param width 출력할 크기
 	 */
-	public static void setFullwidthCharacterWidth( int width ) {
+	public static void setCjkCharacterWidth( int width ) {
 		if( width >= 1 )
 			fullwidthCharacterWidth = width;
 	}

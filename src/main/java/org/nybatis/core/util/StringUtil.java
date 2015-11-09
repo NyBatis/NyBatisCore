@@ -38,21 +38,19 @@ public class StringUtil {
 	 *
 	 * @param width 출력할 크기
 	 */
-	public static void setCharacterWidthCJK( int width ) {
-
-		CharacterUtil.setFullwidthCharacterWidth( width );
-
+	public static void setCjkCharacterWidth( int width ) {
+		CharacterUtil.setCjkCharacterWidth( width );
 	}
 
 	/**
 	 * 문자열의 길이를 구한다. <br>
 	 *
-	 * CJK 문자일 경우 1글자의 크기를 {@link StringUtil#setCharacterWidthCJK(int)} 로 세팅한 width 로 변환해 구한다.
+	 * CJK 문자일 경우 1글자의 크기를 {@link StringUtil#setCjkCharacterWidth(int)} 로 세팅한 width 로 변환해 구한다.
 	 *
 	 * @param value 검사할 문자열
 	 * @return 문자열의 길이
 	 */
-	public static int getLengthCJK( Object value ) {
+	public static int getCjkLength( Object value ) {
 
 		if( value == null ) return 0;
 
@@ -83,7 +81,7 @@ public class StringUtil {
 	public static String lpadCJK( Object value, char padChar, int length ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
-				: value.toString().length() + ( length - getLengthCJK( value ) );
+				: value.toString().length() + ( length - getCjkLength( value ) );
 
 		return lpad( value, padChar, adjustLength );
 
@@ -100,7 +98,7 @@ public class StringUtil {
 	public static String rpadCJK( Object value, char padChar, int length ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
-				: value.toString().length() + ( length - getLengthCJK( value ) );
+				: value.toString().length() + ( length - getCjkLength( value ) );
 
 		return rpad( value, padChar, adjustLength );
 
@@ -257,7 +255,7 @@ public class StringUtil {
      */
     private static boolean hasHangulJongsung( String string ) {
 
-    	if( string == null || string.length() == 0 ) return false;
+		if( isEmpty(string) ) return false;
 
     	return CharacterUtil.hasHangulJongsung( string.charAt( string.length() - 1 ) );
 
@@ -265,7 +263,7 @@ public class StringUtil {
 
     private static boolean hasHangulJosa( String string, char c ) {
 
-    	if( string == null || string.length() == 0 ) return false;
+		if( isEmpty(string) ) return false;
 
     	if( ! CharacterUtil.isKorean( string.charAt( string.length() - 1 ) ) ) return false;
 
@@ -517,12 +515,10 @@ public class StringUtil {
      */
     public static String unescape( Object param ) {
 
-        if( param == null ) return "";
+		if( isEmpty(param) ) return "";
 
-        String srcTxt = param.toString();
-
+        String  srcTxt  = param.toString();
         Pattern pattern = Pattern.compile( "\\\\(b|t|n|f|r|\\\"|\\\'|\\\\)|([u|U][0-9a-fA-F]{4})" );
-
         Matcher matcher = pattern.matcher( srcTxt );
 
         StringBuffer sb = new StringBuffer( srcTxt.length() );
@@ -532,13 +528,10 @@ public class StringUtil {
         	String replacedChar = null;
 
         	if( matcher.start(1) >= 0 ) {
-
         		replacedChar = getUnescapedSequence( matcher.group(1) );
 
         	} else if( matcher.start(2) >= 0 ) {
-
         		replacedChar = getUnescapedUnicodeChar( matcher.group(2) );
-
         	}
 
             matcher.appendReplacement( sb, Matcher.quoteReplacement(replacedChar) );
@@ -570,13 +563,11 @@ public class StringUtil {
     private static String getUnescapedSequence( String escapedString ) {
 
     	switch( escapedString.charAt(0) ) {
-
     		case 'b' : return "\b";
     		case 't' : return "\t";
     		case 'n' : return "\n";
     		case 'f' : return "\f";
     		case 'r' : return "\r";
-
     	}
 
     	return escapedString;
@@ -676,11 +667,8 @@ public class StringUtil {
      * @since  2011-08-09
      */
     public static String getPhoneNumber( Object phoneNumber ) {
-
-    	if( isEmpty( phoneNumber ) ) return "";
-
+    	if( isEmpty(phoneNumber) ) return "";
     	return nvl(phoneNumber).replaceAll( "\\D*(02|\\d{3})\\D*(\\d{3,4})\\D*(\\d{4})", "$1-$2-$3" );
-
     }
 
     /**
@@ -779,7 +767,7 @@ public class StringUtil {
      */
     public static String encode( Object value ) {
 
-    	String result = null;
+    	String result;
 
     	try (
     		ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -791,9 +779,7 @@ public class StringUtil {
     		result = DatatypeConverter.printBase64Binary( bos.toByteArray() );
 
     	} catch ( IOException e ) {
-
     		throw new IoException( e );
-
 		}
 
         return result;
@@ -812,7 +798,7 @@ public class StringUtil {
 
     	byte o[] = DatatypeConverter.parseBase64Binary( nvl(value) );
 
-        Object vo = null;
+        Object vo;
 
     	try (
     		ByteArrayInputStream bis = new ByteArrayInputStream( o );
@@ -834,10 +820,7 @@ public class StringUtil {
     public static String encodeUrl( Object text ) {
 
     	try {
-
-//    		return URLEncoder.encode( nvl(text), "UTF-8" ).replaceAll( "+", "%20" );
 			return URLEncoder.encode( nvl(text), "UTF-8" );
-
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
@@ -847,9 +830,7 @@ public class StringUtil {
     public static String decodeUrl( Object text ) {
 
     	try {
-
     		return URLDecoder.decode( nvl( text ), "UTF-8" );
-
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
@@ -863,11 +844,8 @@ public class StringUtil {
 	 * @return 숫자만 추출된 문자열
 	 */
 	public static String extractNumber( String string ) {
-
 		if( isEmpty( string ) ) return "";
-
 		return string.replaceAll( "[^0-9]", "" );
-
 	}
 
 	/**
@@ -877,11 +855,8 @@ public class StringUtil {
 	 * @return 대문자만 추출된 문자열
 	 */
 	public static String extractUpperCharacters( String string ) {
-
 		if( isEmpty( string ) ) return "";
-
 		return string.replaceAll( "[^A-Z]", "" );
-
 	}
 
 	/**
@@ -891,43 +866,8 @@ public class StringUtil {
 	 * @return 소문자만 추출된 문자열
 	 */
 	public static String extractLowerCharacters( String string ) {
-
 		if( isEmpty( string ) ) return "";
-
 		return string.replaceAll( "[^a-z]", "" );
-
-	}
-
-	/**
-	 * 에러를 문자열로 만든다.
-	 *
-	 * @param exception 에러
-	 * @return 문자열
-	 */
-	public static StringBuffer getStackTrace( Throwable exception ) {
-
-		StringBuffer sb = new StringBuffer();
-
-		if( exception == null ) return sb;
-
-	    StackTraceElement[] stackTrace = exception.getStackTrace();
-
-		sb.append( exception ).append( '\n' );
-
-		for( StackTraceElement trace : stackTrace ) {
-			sb.append( "\tat " ).append( trace ).append('\n');
-		}
-
-	    Throwable cause = exception.getCause();
-
-	    if( cause != null ) {
-
-	    	sb.append( "Caused By : " );
-	        sb.append( getStackTrace(cause) );
-	    }
-
-	    return sb;
-
 	}
 
 	/**
@@ -1127,60 +1067,19 @@ public class StringUtil {
 
 		List<String> result = new ArrayList<>();
 
-	    if( value == null || pattern == null ) return result;
+		if( isEmpty(value) || isEmpty(pattern) ) return result;
 
 	    Pattern p = Pattern.compile( pattern );
 
 	    Matcher matcher = p.matcher( value );
 
 	    while( matcher.find() ) {
-
 	        for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
-
 	            result.add( matcher.group(i) );
-
 	        }
-
 	    }
 
 	    return result;
-
-	}
-
-	/**
-	 * 정규식 패턴에 해당하는 최초 문자열을 추출한다.
-	 *
-	 * <pre>
-	 *
-	 *  String pattern = "/admkr(.+?)note(.+?)$";
-	 *
-	 *  String finded = StringUtil.capturePattern( "/admkrAAAAnoteBBBB", pattern );
-	 *
-	 *  System.out.println( finded ); --> 'AAAA'
-	 *
-	 *  ----------------------------------------------------------------
-	 *
-	 *  StringUtil.capturePattern( "1.2.3.4", "\\." )   --> ""
-	 *
-	 *  StringUtil.capturePattern( "1.2.3.4", "(\\.)" ) --> "."
-	 *
-	 * </pre>
-	 *
-	 * @param value 검사할 문자열
-	 * @param pattern 정규식
-	 * @return 패턴에 해당하는 문자열
-	 */
-	public static String capturePattern( String value, String pattern ) {
-
-		if( value == null || pattern == null ) return "";
-
-	    Pattern p = Pattern.compile( pattern );
-
-	    Matcher matcher = p.matcher( value );
-
-	    if( matcher.find() ) return matcher.group( 1 );
-
-	    return "";
 
 	}
 
@@ -1254,6 +1153,13 @@ public class StringUtil {
 		return "Y".equals( toYn( value ) );
 	}
 
+	/**
+	 * Check one string is equals to other string
+	 *
+	 * @param one    string to compare
+	 * @param other  other string to compare
+	 * @return
+	 */
 	public static boolean equals( String one, String other ) {
 
 		if( one == null && other == null ) return true;

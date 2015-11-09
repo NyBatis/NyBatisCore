@@ -82,8 +82,6 @@ public class StringUtilTest {
 		assertEquals( 2, capturedList.size() );
 		assertEquals( Arrays.asList( "Merong", "Nayasis" ), capturedList );
 
-		assertEquals( "Merong", StringUtil.capturePattern( value, "#\\{(.+?)\\}" ) );
-
 	}
 
 	@Test

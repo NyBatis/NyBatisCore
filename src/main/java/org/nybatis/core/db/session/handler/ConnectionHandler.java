@@ -67,10 +67,6 @@ public abstract class ConnectionHandler {
 
 	}
 
-//	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer fetchSize ) throws SQLException {
-//		return getPreparedStatement( sqlBean, fetchSize, null );
-//	}
-
 	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer fetchSize, Integer lobPrefetchSize ) throws SQLException {
 
 		sqlBean.build();

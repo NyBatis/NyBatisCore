@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.executor.util;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.SqlBean;
@@ -14,6 +15,8 @@ import org.nybatis.core.exception.unchecked.JdbcImplementException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StopWatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -22,6 +25,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class StatementController {
+
+	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_SQL );
 
 	private SqlBean sqlBean;
 
@@ -35,9 +40,17 @@ public class StatementController {
 
 		ResultSet resultSet = statement.executeQuery();
 
-		NLogger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+		log( watcher );
 
 		return resultSet;
+
+	}
+
+	private void log( StopWatcher watcher ) {
+
+		if( logger.isDebugEnabled() ) {
+			NLogger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+		}
 
 	}
 
@@ -47,7 +60,7 @@ public class StatementController {
 
 		int affectedCount = statement.executeUpdate();
 
-		NLogger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+		log( watcher );
 
 		return affectedCount;
 
@@ -67,7 +80,7 @@ public class StatementController {
 
 		boolean result = statement.execute();
 
-		NLogger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+		log( watcher );
 
 		return result;
 

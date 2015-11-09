@@ -1,11 +1,5 @@
 package org.nybatis.core.db.session.executor.util;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.handler.RowHandler;
@@ -18,6 +12,12 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.util.StringUtil;
+
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ResultsetController {
 
@@ -83,7 +83,7 @@ public class ResultsetController {
 
     		if( rowFetchSize != null ) {
     			resultSet.setFetchSize( rowFetchSize );
-    			NLogger.debug( "rowFetchSize : {}", rowFetchSize );
+				NLogger.trace( "rowFetchSize : {}", rowFetchSize );
     		}
 
     		while( resultSet.next() ) {
