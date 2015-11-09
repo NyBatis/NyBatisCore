@@ -27,7 +27,7 @@ public class NListPrinter {
      * @param width full-width character's printed width in console
      */
     public static void setFullwidthCharacterWidth( int width ) {
-        CharacterUtil.setFullwidthCharacterWidth( width );
+        CharacterUtil.setCjkCharacterWidth( width );
     }
 
     /**
@@ -183,11 +183,11 @@ public class NListPrinter {
 
             int columnWidth = 0;
 
-            columnWidth = Math.max( columnWidth, StringUtil.getLengthCJK(key) );
-            columnWidth = Math.max( columnWidth, StringUtil.getLengthCJK( nlist.alias.get(key)) ) + 2; // (%s)
+            columnWidth = Math.max( columnWidth, StringUtil.getCjkLength( key ) );
+            columnWidth = Math.max( columnWidth, StringUtil.getCjkLength( nlist.alias.get( key ) ) ) + 2; // (%s)
 
             for( NMap row : nlist.dataBody ) {
-                columnWidth = Math.max(  columnWidth, StringUtil.getLengthCJK(row.get(key)) );
+                columnWidth = Math.max(  columnWidth, StringUtil.getCjkLength( row.get( key ) ) );
             }
 
             list.put( key, columnWidth );

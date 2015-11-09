@@ -6,6 +6,8 @@ import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.TypeUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

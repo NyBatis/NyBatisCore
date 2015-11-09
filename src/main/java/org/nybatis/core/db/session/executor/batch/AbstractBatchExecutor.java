@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.executor.batch;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.SelectKeyExecutor;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.batch.module.Logs;
@@ -8,8 +9,9 @@ import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StopWatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -18,11 +20,13 @@ import java.util.Map;
 
 public abstract class AbstractBatchExecutor {
 
-	protected String        token;
-	protected SqlProperties properties;
+	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_BATCH );
+
+	protected String         token;
+	protected SqlProperties  properties;
 
 	public AbstractBatchExecutor( String token, SqlProperties properties ) {
-		this.token          = token;
+		this.token      = token;
 		this.properties = properties;
 	}
 
@@ -103,7 +107,6 @@ public abstract class AbstractBatchExecutor {
 			throw exception;
 
 		} catch( ClassCastException e ) {
-			NLogger.error( e );
 			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
 
 		}
@@ -128,7 +131,7 @@ public abstract class AbstractBatchExecutor {
 
 			} catch( SQLException e ) {
 
-				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Duplicated Parameter\n{}",
+				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameter\n{}",
 						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog(key) );
 
 				exception.setErrorCode( e.getErrorCode() );
@@ -138,9 +141,9 @@ public abstract class AbstractBatchExecutor {
 
 		}
 
-		if( NLogger.isDebugEnabled() ) {
+		if( logger.isDebugEnabled() ) {
 			for( Object key : statements.keySet() ) {
-				NLogger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms\n{}", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key), logs.getLog(key) );
+				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms\n{}", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key), logs.getLog(key) );
 			}
 		}
 

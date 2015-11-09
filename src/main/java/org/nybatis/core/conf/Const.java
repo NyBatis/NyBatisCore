@@ -3,6 +3,8 @@ package org.nybatis.core.conf;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.StringUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -254,6 +256,9 @@ public class Const {
 		public static String getOrmSqlIdPrefix( String environmentId, String tableName ) {
 			return String.format( "%s%s.%s", ORM_SQL_PREFIX, environmentId, tableName );
 		}
+
+		public static final String LOG_SQL                       = "nybatis.sql";
+		public static final String LOG_BATCH                     = "nybatis.batch";
 
 	}
 
