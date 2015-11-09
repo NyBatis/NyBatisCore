@@ -194,9 +194,13 @@ public class SqlBean {
 	 *
 	 * <pre>
 	 * { "nybatis.database" : "oracle" }
+	 * or
 	 * { "nybatis.database" : "mysql" }
+	 * or
 	 * { "nybatis.database" : "sqlite" }
+	 * or
 	 * { "nybatis.database" : "unknown" }
+	 * or ...
 	 * </pre>
 	 *
 	 */
