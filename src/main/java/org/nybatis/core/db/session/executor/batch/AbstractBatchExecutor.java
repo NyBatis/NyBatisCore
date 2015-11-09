@@ -48,8 +48,8 @@ public abstract class AbstractBatchExecutor {
 		String environmentId = properties.getEnvironmentId();
 
 		Statements  statements  = getStatements().init( token, environmentId );
-		Logs logs        = getLogs();
-		SqlBean sqlBean     = null;
+		Logs        logs        = getLogs();
+		SqlBean     sqlBean     = null;
 
 
 
@@ -128,7 +128,7 @@ public abstract class AbstractBatchExecutor {
 
 			} catch( SQLException e ) {
 
-				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n{}",
+				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Duplicated Parameter\n{}",
 						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog(key) );
 
 				exception.setErrorCode( e.getErrorCode() );

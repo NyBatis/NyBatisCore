@@ -240,7 +240,8 @@ public class Const {
 		public static final String ORM_SQL_SELECT_LIST           = ".selectList";
 		public static final String ORM_SQL_UPDATE                = ".update";
 		public static final String ORM_SQL_INSERT                = ".insert";
-		public static final String ORM_SQL_DELETE                = ".delete";
+		public static final String ORM_SQL_DELETE_SINGLE         = ".deleteSingle";
+		public static final String ORM_SQL_DELETE_LIST           = ".deleteList";
 
 		public static final int    DEFAULT_CACHE_FLUSH_CYCLE     = Integer.MAX_VALUE;
 		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;

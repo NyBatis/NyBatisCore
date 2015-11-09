@@ -12,5 +12,6 @@ public interface Logs {
     int    getParamSize( Object key );
     void   clear();
     String getLog( Object key );
+    String getDuplicatedParameters( Object key );
 
 }

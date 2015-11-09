@@ -9,14 +9,17 @@ import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
+import org.nybatis.core.model.NMap;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BatchPreparedStatementExecutor extends AbstractBatchExecutor {
 
@@ -80,8 +83,6 @@ public class BatchPreparedStatementExecutor extends AbstractBatchExecutor {
 		@Override
 		public String getLog( Object key ) {
 
-			if( ! NLogger.isDebugEnabled() ) return "";
-
 			StringBuilder log = new StringBuilder();
 
 			log.append( "\t- [SQL] :\n" ).append( sqlPool.get( key ) );
@@ -99,6 +100,39 @@ public class BatchPreparedStatementExecutor extends AbstractBatchExecutor {
 			log.append( paramLog.toDebugString() );
 
 			return log.toString();
+
+		}
+
+		@Override
+		public String getDuplicatedParameters( Object key ) {
+
+			NList log = new NList();
+
+			Set<Integer> hashSet  = new HashSet<>();
+			Set<Integer> inserted = new HashSet<>();
+
+			for( List<BindParam> params : paramListPool.get(key) ) {
+
+				NMap param = new NMap();
+
+				for( BindParam bindParam : params ) {
+					param.put( bindParam.getKey(), bindParam.getValue() );
+				}
+
+				int hash = param.hashCode();
+
+				if( hashSet.contains( hash ) ) {
+					if( ! inserted.contains( hash ) ) {
+						log.addRow( param );
+						inserted.add( hash );
+					}
+				} else {
+					hashSet.add( hash );
+				}
+
+			}
+
+			return log.toDebugString( true, true );
 
 		}
 

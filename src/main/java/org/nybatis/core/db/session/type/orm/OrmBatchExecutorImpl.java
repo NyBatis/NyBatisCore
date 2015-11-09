@@ -39,7 +39,7 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     @Override
     public int delete( List<T> parameterList ) {
-        return executeBatch( properties.sqlIdDelete(), parameterList );
+        return executeBatch( properties.sqlIdDeleteSingle(), parameterList );
     }
 
     private int executeBatch( String sqlId, List<?> params ) {

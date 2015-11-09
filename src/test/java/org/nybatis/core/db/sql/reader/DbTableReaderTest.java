@@ -50,7 +50,7 @@ public class DbTableReaderTest {
 
         NLogger.debug( SqlRepository.get( sqlIdPrefix + Const.db.ORM_SQL_INSERT ) );
         NLogger.debug( SqlRepository.get( sqlIdPrefix + Const.db.ORM_SQL_UPDATE) );
-        NLogger.debug( SqlRepository.get( sqlIdPrefix + Const.db.ORM_SQL_DELETE) );
+        NLogger.debug( SqlRepository.get( sqlIdPrefix + Const.db.ORM_SQL_DELETE_SINGLE ) );
         NLogger.debug( SqlRepository.get( sqlIdPrefix + Const.db.ORM_SQL_SELECT_SINGLE ) );
 
     }
