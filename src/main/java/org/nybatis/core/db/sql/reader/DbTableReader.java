@@ -98,7 +98,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
             sb.append( String.format(
@@ -118,7 +118,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
             sb.append( String.format(
@@ -138,7 +138,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format("UPDATE /*+ %s%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
+        sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
         sb.append( "<group delimeter=\",\">\n" );
 
         for( Column column : layout.getColumns() ) {
@@ -172,7 +172,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
             sb.append( String.format(
@@ -191,7 +191,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
             sb.append( String.format(
@@ -239,7 +239,7 @@ public class DbTableReader {
             isFirst = false;
         }
 
-        sb.append( String.format( "INSERT /*+ %s%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
+        sb.append( String.format( "INSERT /*+ %s.%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
                 Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
                 structureDefine,
                 structureValues
