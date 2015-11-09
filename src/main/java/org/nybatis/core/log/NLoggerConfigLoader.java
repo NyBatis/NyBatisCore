@@ -34,19 +34,15 @@ public class NLoggerConfigLoader {
 		context.reset();
 		
 		try {
-
 			configurator.doConfigure( stream );
 
 		} catch( JoranException e ) {
-			
 			e.printStackTrace();
 			
         } finally {
         	
         	try {
-	            
         		stream.close();
-
         	} catch( IOException e ) {
 	            e.printStackTrace();
             }
