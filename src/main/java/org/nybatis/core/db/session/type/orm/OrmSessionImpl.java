@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class OrmSessionImpl<T> implements OrmSession<T> {
 
-    private SqlSessionImpl sqlSession;
+    private SqlSessionImpl       sqlSession;
     private OrmSessionProperties properties = new OrmSessionProperties();
     private Class<T>             domainClass;
 
@@ -59,6 +59,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         checkPkNotNull();
         int cnt = sqlSession.sqlId( properties.sqlIdInsert(), properties.getParameter() ).execute();
         refreshCache();
+        properties.init();
         return cnt;
     }
 
@@ -84,7 +85,9 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public int update( T entity ) {
         checkNotNull( entity );
         properties.setEntityParameter( entity );
-        return update();
+        int cnt = update();
+        properties.init();
+        return cnt;
     }
 
     @Override
@@ -129,6 +132,8 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
             refreshCache();
         }
 
+        properties.init();
+
         return cnt;
 
     }
@@ -147,7 +152,9 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private T select() {
-        return sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select( domainClass );
+        T result = sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select( domainClass );
+        properties.init();
+        return result;
     }
 
     @Override
@@ -178,36 +185,36 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession where( String sqlExpression ) {
+    public OrmSession<T> where( String sqlExpression ) {
         return where( sqlExpression, null );
     }
 
     @Override
-    public OrmSession where( String sqlExpression, Object parameter ) {
+    public OrmSession<T> where( String sqlExpression, Object parameter ) {
         properties.addWhere( sqlExpression, parameter );
         return this;
     }
 
     @Override
-    public OrmSession commit() {
+    public OrmSession<T> commit() {
         sqlSession.commit();
         return this;
     }
 
     @Override
-    public OrmSession rollback() {
+    public OrmSession<T> rollback() {
         sqlSession.rollback();
         return this;
     }
 
     @Override
-    public OrmSession beginTransaction() {
+    public OrmSession<T> beginTransaction() {
         sqlSession.beginTransaction();
         return this;
     }
 
     @Override
-    public OrmSession endTransaction() {
+    public OrmSession<T> endTransaction() {
         sqlSession.endTransaction();
         return this;
     }
@@ -218,7 +225,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession changeEnvironmentId( String id ) {
+    public OrmSession<T> changeEnvironmentId( String id ) {
         sqlSession.changeEnvironmentId( id );
         properties.setEnvironmentId( id );
         createOrmSql();
@@ -226,24 +233,24 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession disableCache() {
+    public OrmSession<T> disableCache() {
         sqlSession.getProperties().isCacheEnable( false );
         return this;
     }
 
     @Override
-    public OrmSession clearCache() {
+    public OrmSession<T> clearCache() {
         sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 
     @Override
-    public OrmSession enableCache( String cacheId ) {
+    public OrmSession<T> enableCache( String cacheId ) {
         return enableCache( cacheId, null );
     }
 
     @Override
-    public OrmSession enableCache( String cacheId, Integer flushSeconds ) {
+    public OrmSession<T> enableCache( String cacheId, Integer flushSeconds ) {
         SqlRepository.setCacheProperties( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
         return this;
     }

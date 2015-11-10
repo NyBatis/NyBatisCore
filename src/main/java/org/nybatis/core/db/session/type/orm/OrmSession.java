@@ -131,7 +131,7 @@ public interface OrmSession<T> {
      * @param sqlExpression sql expression
      * @return self instance
      */
-    OrmSession where( String sqlExpression );
+    OrmSession<T> where( String sqlExpression );
 
     /**
      * Set <font color=blue><b>WHERE</b></font> clause used in SQL.
@@ -142,27 +142,27 @@ public interface OrmSession<T> {
      * @param parameter     parameter only applied in sql expression
      * @return self instance
      */
-    OrmSession where( String sqlExpression, Object parameter );
+    OrmSession<T> where( String sqlExpression, Object parameter );
 
     /**
      * Commit and end transaction if it was activated
      */
-    OrmSession commit();
+    OrmSession<T> commit();
 
     /**
      * Rollback and end transaction if it was activated
      */
-    OrmSession rollback();
+    OrmSession<T> rollback();
 
     /**
      * Begin transaction forcedly
      */
-    OrmSession beginTransaction();
+    OrmSession<T> beginTransaction();
 
     /**
      * End transaction forcedly
      */
-    OrmSession endTransaction();
+    OrmSession<T> endTransaction();
 
     /**
      * Check transaction is activate
@@ -176,17 +176,17 @@ public interface OrmSession<T> {
      *
      * @param id environment id
      */
-    OrmSession changeEnvironmentId( String id );
+    OrmSession<T> changeEnvironmentId( String id );
 
     /**
      * Cache statements should not be cached at once when has been executed.
      */
-    OrmSession disableCache();
+    OrmSession<T> disableCache();
 
     /**
      * Clear cache
      */
-    OrmSession clearCache();
+    OrmSession<T> clearCache();
 
     /**
      * Enable cache
@@ -194,7 +194,7 @@ public interface OrmSession<T> {
      * @param cacheId
      * @return self instance
      */
-    OrmSession enableCache( String cacheId );
+    OrmSession<T> enableCache( String cacheId );
 
     /**
      * Enable cache
@@ -203,7 +203,7 @@ public interface OrmSession<T> {
      * @param flushSeconds cache flush cycle (unit:seconds)
      * @return self instance
      */
-    OrmSession enableCache( String cacheId, Integer flushSeconds );
+    OrmSession<T> enableCache( String cacheId, Integer flushSeconds );
 
     /**
      * Get native sql sqlSession
