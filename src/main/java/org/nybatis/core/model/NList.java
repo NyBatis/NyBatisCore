@@ -40,6 +40,10 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     public NList() {}
 
+    public NList( String json ) {
+        fromJson( json );
+    }
+
     public NList( NList initialData ) {
         if( initialData == null || initialData.size() == 0 ) return;
     	dataBody.addAll( initialData.dataBody );
@@ -60,6 +64,21 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
         for( Object key : header )
             this.header.put( key, data.size() );
+
+    }
+
+
+    public NList fromJson( String json ) {
+
+        if( StringUtil.isEmpty(json) ) return this;
+
+        List<Map<String, Object>> maps = new Reflector().toListFromJson( json );
+
+        for( Map map : maps ) {
+            addRow( map );
+        }
+
+        return refreshKey();
 
     }
 
