@@ -49,7 +49,7 @@ public class StatementController {
 	private void log( StopWatcher watcher ) {
 
 		if( logger.isDebugEnabled() ) {
-			NLogger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+			logger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
 		}
 
 	}
