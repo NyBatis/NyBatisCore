@@ -41,6 +41,14 @@ public class OrmSessionProperties {
 
     }
 
+    public OrmSessionProperties init() {
+        wheres.clear();
+        orderBy = null;
+        entityParameter.clear();
+        userParameter.clear();
+        return this;
+    }
+
     public String getEnvironmentId() {
         return environmentId;
     }
