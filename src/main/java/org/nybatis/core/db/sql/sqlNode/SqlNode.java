@@ -15,7 +15,7 @@ import java.util.Map;
 public class SqlNode {
 
 	private String               sqlId;
-	private RootSqlElement structuredSql;
+	private RootSqlElement       structuredSql;
 	private SqlProperties        properties;
 	private Map<String, SqlNode> keySqls = null;
 

@@ -12,10 +12,10 @@ public interface OrmBatchExecutor<T> {
 
     OrmBatchExecutor setTransactionSize( int size );
 
-    int insert( List<T> parameterList );
+    int insert( List<?> parameterList );
 
-    int update( List<T> parameterList );
+    int update( List<?> parameterList );
 
-    int delete( List<T> parameterList );
+    int delete( List<?> parameterList );
 
 }

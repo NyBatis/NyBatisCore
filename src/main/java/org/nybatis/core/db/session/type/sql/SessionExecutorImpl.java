@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.SqlExecutor;
 import org.nybatis.core.db.sql.reader.SqlReader;
@@ -16,12 +17,10 @@ import org.nybatis.core.validation.Assertion;
 public class SessionExecutorImpl implements SessionExecutor {
 
     SqlSessionImpl sqlSession;
-    SqlProperties properties;
-    SqlBean sqlBean;
+    SqlBean        sqlBean;
 
     public SessionExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
-        this.properties = sqlSession.getProperties().clone();
     }
 
     public SessionExecutor sqlId( String id ) {
@@ -45,7 +44,7 @@ public class SessionExecutorImpl implements SessionExecutor {
 
     public SessionExecutor sql( String sql, Object parameter ) {
 
-        SqlNode sqlNode = new SqlReader().read( properties.getEnvironmentId(), sql );
+        SqlNode sqlNode = new SqlReader().read( sqlSession.getProperties().getEnvironmentId(), sql );
 
         sqlBean = new SqlBean( sqlNode, parameter );
 
@@ -53,7 +52,11 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     private SqlExecutor getExecutor() {
-        return new SqlExecutor( sqlSession.getToken(), sqlBean.init( properties ) );
+        try {
+            return new SqlExecutor( sqlSession.getToken(), sqlBean.init( sqlSession.getProperties() ) );
+        } finally {
+            sqlSession.initProperties();
+        }
     }
 
     @Override
@@ -68,7 +71,7 @@ public class SessionExecutorImpl implements SessionExecutor {
 
     @Override
     public ListExecutor list() {
-        return new ListExecutorImpl( sqlSession, properties, sqlBean );
+        return new ListExecutorImpl( sqlSession, sqlBean );
     }
 
     @Override
@@ -98,20 +101,32 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     @Override
-    public SessionExecutor setAutoCommitAtOnce( boolean yn ) {
-        properties.isAutocommit( yn );
+    public SessionExecutor setAutoCommit( boolean enable ) {
+        sqlSession.getProperties().isAutocommit( enable );
         return this;
     }
 
     @Override
     public SessionExecutor disableCache() {
-        properties.isCacheEnable( false );
+        CacheManager.disableCache( sqlBean.getSqlId() );
+        return this;
+    }
+
+    @Override
+    public SessionExecutor enableCache( String cacheId ) {
+        return enableCache( cacheId, null );
+    }
+
+    @Override
+    public SessionExecutor enableCache( String cacheId, Integer flushCycle ) {
+        CacheManager.enableCache( sqlBean.getSqlId(), cacheId, flushCycle );
         return this;
     }
 
     @Override
     public SessionExecutor clearCache() {
-        properties.isCacheClear( true );
+        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
+
 }

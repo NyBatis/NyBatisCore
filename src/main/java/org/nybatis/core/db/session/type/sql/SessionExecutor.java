@@ -177,14 +177,31 @@ public interface SessionExecutor {
 	 * @param yn whether or not of statement to be commited.
 	 * @return self instance
 	 */
-	SessionExecutor setAutoCommitAtOnce( boolean yn );
+	SessionExecutor setAutoCommit( boolean yn );
 
 	/**
-	 * Cache statements should not be cached at once when has been executed.
+	 * Disable statements cache functionality.
 	 *
 	 * @return self instance
 	 */
 	SessionExecutor disableCache();
+
+	/**
+	 * Enable statements cache functionality.
+	 *
+	 * @param cacheId	cache id
+	 * @return self instance
+	 */
+	SessionExecutor enableCache( String cacheId );
+
+	/**
+	 * Enable statements cache functionality.
+	 *
+	 * @param cacheId		cache id
+	 * @param flushCycle	cache flush cycle (seconds)
+	 * @return self instance
+	 */
+	SessionExecutor enableCache( String cacheId, Integer flushCycle );
 
 	/**
 	 * Clear cache

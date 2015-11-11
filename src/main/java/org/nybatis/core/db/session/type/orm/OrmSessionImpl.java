@@ -1,5 +1,7 @@
 package org.nybatis.core.db.session.type.orm;
 
+import org.nybatis.core.db.cache.CacheManager;
+import org.nybatis.core.db.session.type.sql.SessionExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.db.sql.reader.DbTableReader;
@@ -43,28 +45,24 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public int insert( T entity ) {
-        checkNotNull( entity );
+    public int insert( Object entity ) {
+
+        Assertion.isNotNull( entity, new SqlConfigurationException( "OrmSession input parameter is null." ) );
+
         properties.setEntityParameter( entity );
-        return insert();
-    }
-
-    @Override
-    public int insert( Map parameter ) {
-        properties.setEntityParameter( parameter );
-        return insert();
-    }
-
-    private int insert() {
         checkPkNotNull();
-        int cnt = sqlSession.sqlId( properties.sqlIdInsert(), properties.getParameter() ).execute();
-        refreshCache();
-        properties.init();
-        return cnt;
+
+        try {
+            return getSessionExecutor( properties.sqlIdInsert() ).execute();
+        } finally {
+            refreshCache();
+            properties.clear();
+        }
+
     }
 
     @Override
-    public int merge( T entity ) {
+    public int merge( Object entity ) {
         if( selectMap( entity ).size() == 0 ) {
             return insert( entity );
         } else {
@@ -73,50 +71,22 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public int merge( Map parameter ) {
-        if( selectMap( parameter ).size() == 0 ) {
-            return insert( parameter );
-        } else {
-            return update( parameter );
-        }
-    }
+    public int update( Object entity ) {
 
-    @Override
-    public int update( T entity ) {
-        checkNotNull( entity );
         properties.setEntityParameter( entity );
-        int cnt = update();
-        properties.init();
-        return cnt;
-    }
 
-    @Override
-    public int update( Map parameter ) {
-        properties.setEntityParameter( parameter );
-        return update();
-    }
-
-    private int update() {
-        int cnt = sqlSession.sqlId( properties.sqlIdUpdate(), properties.getParameter() ).execute();
-        refreshCache();
-        return cnt;
-    }
-
-    private void refreshCache() {
-        if( SqlRepository.getProperties( properties.sqlIdSelectSingle() ).isCacheEnable() ) {
-            sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).disableCache().select( domainClass );
+        try {
+            return getSessionExecutor( properties.sqlIdUpdate() ).execute();
+        } finally {
+            refreshCache();
+            properties.clear();
         }
+
     }
 
     @Override
-    public int delete( T entity ) {
+    public int delete( Object entity ) {
         properties.setEntityParameter( entity );
-        return delete();
-    }
-
-    @Override
-    public int delete( Map parameter ) {
-        properties.setEntityParameter( parameter );
         return delete();
     }
 
@@ -124,54 +94,54 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
         boolean pkNotNull = properties.isPkNotNull();
 
-        String sqlId = pkNotNull ? properties.sqlIdDeleteSingle() : properties.sqlIdDeleteList();
-
-        int cnt = sqlSession.sqlId( sqlId, properties.getParameter() ).execute();
+        int cnt = getSessionExecutor( properties.sqlIdDelete() ).execute();
 
         if( pkNotNull ) {
             refreshCache();
         }
 
-        properties.init();
+        properties.clear();
 
         return cnt;
 
     }
 
     @Override
-    public T select( T entity ) {
-        checkNotNull( entity );
+    public T select( Object entity ) {
+
         properties.setEntityParameter( entity );
-        return select();
+        checkPkNotNull();
+
+        try {
+            return getSessionExecutor( properties.sqlIdSelectSingle() ).select( domainClass );
+        } finally {
+            properties.clear();
+        }
+
     }
 
     @Override
-    public T select( Map parameter ) {
-        properties.setEntityParameter( parameter );
-        return select();
-    }
+    public NMap selectMap( Object entity ) {
 
-    private T select() {
-        T result = sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select( domainClass );
-        properties.init();
-        return result;
-    }
-
-    @Override
-    public NMap selectMap( T entity ) {
-        checkNotNull( entity );
         properties.setEntityParameter( entity );
-        return selectMap();
+        checkPkNotNull();
+
+        try {
+            return getSessionExecutor( properties.sqlIdSelectSingle() ).select();
+        } finally {
+            properties.clear();
+        }
+
     }
 
-    @Override
-    public NMap selectMap( Map parameter ) {
-        properties.setEntityParameter( parameter );
-        return selectMap();
+    private SessionExecutor getSessionExecutor( String sqlId ) {
+        return sqlSession.sqlId( sqlId, properties.getParameter() );
     }
 
-    private NMap selectMap() {
-        return sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).select();
+    private void refreshCache() {
+        if( SqlRepository.getProperties( properties.sqlIdSelectSingle() ).isCacheEnable() ) {
+            sqlSession.sqlId( properties.sqlIdSelectSingle(), properties.getParameter() ).clearCache().select( domainClass );
+        }
     }
 
     @Override
@@ -234,13 +204,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public OrmSession<T> disableCache() {
-        sqlSession.getProperties().isCacheEnable( false );
-        return this;
-    }
-
-    @Override
-    public OrmSession<T> clearCache() {
-        sqlSession.getProperties().isCacheClear( true );
+        CacheManager.disableCache( properties.sqlIdSelectSingle() );
         return this;
     }
 
@@ -251,17 +215,19 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public OrmSession<T> enableCache( String cacheId, Integer flushSeconds ) {
-        SqlRepository.setCacheProperties( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
+        CacheManager.enableCache( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
+        return this;
+    }
+
+    @Override
+    public OrmSession<T> clearCache() {
+        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 
     @Override
     public SqlSession getSqlSession() {
         return sqlSession;
-    }
-
-    private void checkNotNull( Object parameter ) {
-        Assertion.isNotNull( parameter, new SqlConfigurationException( "OrmSession input parameter is null." ) );
     }
 
     private void checkPkNotNull() {

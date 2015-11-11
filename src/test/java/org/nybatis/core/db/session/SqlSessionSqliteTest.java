@@ -1,6 +1,8 @@
 package org.nybatis.core.db.session;
 
+import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
+import org.nybatis.core.db.session.type.sql.ListExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.transaction.TransactionManager;
@@ -256,11 +258,37 @@ public class SqlSessionSqliteTest {
 		Map<String, String> param = new HashMap<>();
 
 		param.put( "tableName", TABLE_NAME );
-		param.put( "prodId",    "10" );
+		param.put( "prodId", "10" );
 
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 
 		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+
+	}
+
+	@Test
+	public void case11_cache() {
+
+		NLogger.debug( new CacheManager() );
+
+		SqlSession sqlSession = SessionManager.openSession();
+
+		ListExecutor listExecutor = sqlSession.sqlId( "Sqlite.selectForList", "RNK00001" ).list();
+
+		for( int i = 0; i < 10; i++ ) {
+
+			if( i == 3 ) {
+				listExecutor.clearCache();
+			}
+
+			if( i == 8 ) {
+				listExecutor.disableCache();
+			}
+
+			List<ResultVo> list = listExecutor.select( ResultVo.class );
+			NLogger.debug( "index : {}, count : {}", i, list.size() );
+
+		}
 
 	}
 

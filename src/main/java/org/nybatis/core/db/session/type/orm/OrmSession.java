@@ -16,98 +16,50 @@ public interface OrmSession<T> {
     /**
      * Insert entity
      *
-     * @param entity entity to insert. it must contain PK data.
+     * @param entity entity parameter to insert. it must contain PK data.
      * @return affected count
      */
-    int insert( T entity );
-
-    /**
-     * Insert map entity
-     *
-     * @param parameter parameter to insert. it must contain PK data.
-     * @return affected count
-     */
-    int insert( Map parameter );
+    int insert( Object entity );
 
     /**
      * Merge entity
      *
-     * @param entity entity to merge. it must contain PK data.
+     * @param entity entity parameter to merge. it must contain PK data.
      * @return affected count
      */
-    int merge( T entity );
-
-    /**
-     * Merge map entity
-     *
-     * @param parameter parameter to merge. it must contain PK data.
-     * @return affected count
-     */
-    int merge( Map parameter );
+    int merge( Object entity );
 
     /**
      * Update entity
      *
-     * @param entity entity to update
+     * @param entity entity parameter to update.
      * @return affected count
      */
-    int update( T entity );
-
-    /**
-     * Update map entity
-     *
-     * @param parameter parameter to update
-     * @return affected count
-     */
-    int update( Map parameter );
+    int update( Object entity );
 
     /**
      * Delete entity
      *
-     * @param entity entity to delete
+     * @param entity entity parameter to delete.
      * @return affected count
      */
-    int delete( T entity );
-
-    /**
-     * Delete map entity
-     *
-     * @param parameter parameter to delete
-     * @return affected count
-     */
-    int delete( Map parameter );
+    int delete( Object entity );
 
     /**
      * Select entity
      *
-     * @param entity entity parameter to select. it must contain PK data.
+     * @param entity entity parameter to select.
      * @return selected entity
      */
-    T select( T entity );
-
-    /**
-     * Select entity
-     *
-     * @param parameter parameter to select. it must contain PK data.
-     * @return selected entity
-     */
-    T select( Map parameter );
+    T select( Object entity );
 
     /**
      * Select entity and get to map data format.
      *
-     * @param entity
+     * @param entity entity parameter to select.
      * @return
      */
-    NMap selectMap( T entity );
-
-    /**
-     * Select entity and get to map data format.
-     *
-     * @param parameter
-     * @return
-     */
-    NMap selectMap( Map parameter );
+    NMap selectMap( Object entity );
 
     /**
      * Get list executor

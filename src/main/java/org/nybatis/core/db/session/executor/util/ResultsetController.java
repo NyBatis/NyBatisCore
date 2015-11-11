@@ -31,7 +31,7 @@ public class ResultsetController {
 
 		List<T> list = new ArrayList<>();
 
-		boolean isPrimitiveReturn = DbExecUtils.isPrimitive( returnType );
+		boolean isPrimitiveReturn = DbUtils.isPrimitive( returnType );
 
 		if( isPrimitiveReturn ) {
 

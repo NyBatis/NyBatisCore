@@ -11,11 +11,20 @@ import java.util.Map;
  */
 public interface OrmListExecutor<T> {
 
+    /**
+     * Retrieve list
+     *
+     * @return list
+     */
     List<T> select();
 
-    List<T> select( T parameter );
-
-    List<T> select( Map parameter );
+    /**
+     * Retrieve list
+     *
+     * @param parameter parameter
+     * @return
+     */
+    List<T> select( Object parameter );
 
     int count( T parameter );
 
@@ -65,6 +74,23 @@ public interface OrmListExecutor<T> {
      * Cache statements should not be cached at once when has been executed.
      */
     OrmListExecutor<T> disableCache();
+
+    /**
+     * Enable cache
+     *
+     * @param cacheId
+     * @return self instance
+     */
+    OrmListExecutor<T> enableCache( String cacheId );
+
+    /**
+     * Enable cache
+     *
+     * @param cacheId cacheId
+     * @param flushSeconds cache flush cycle (unit:seconds)
+     * @return self instance
+     */
+    OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds );
 
     /**
      * Clear cache

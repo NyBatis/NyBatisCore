@@ -82,11 +82,28 @@ public interface ListExecutor {
     ListExecutor setLobPrefetchSize( int size );
 
     /**
-     * Cache statements should not be cached at once when has been executed.
+     * Disable statements cache functionality.
      *
      * @return self instance
      */
     ListExecutor disableCache();
+
+    /**
+     * Enable statements cache functionality.
+     *
+     * @param cacheId	cache id
+     * @return self instance
+     */
+    ListExecutor enableCache( String cacheId );
+
+    /**
+     * Enable statements cache functionality.
+     *
+     * @param cacheId		cache id
+     * @param flushCycle	cache flush cycle (seconds)
+     * @return self instance
+     */
+    ListExecutor enableCache( String cacheId, Integer flushCycle );
 
     /**
      * Clear cache

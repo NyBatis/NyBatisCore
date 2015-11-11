@@ -238,12 +238,11 @@ public class Const {
 		public static final String ORM_PARAMETER_USER            = ORM_SQL_PREFIX + "-User-";
 		public static final String ORM_PARAMETER_WHERE           = ORM_SQL_PREFIX + "-DynamicSqlWhere";
 		public static final String ORM_PARAMETER_ORDER_BY        = ORM_SQL_PREFIX + "-DynamicSqlOrderBy";
-		public static final String ORM_SQL_SELECT_SINGLE         = ".selectSingle";
-		public static final String ORM_SQL_SELECT_LIST           = ".selectList";
+		public static final String ORM_SQL_SELECT_SINGLE         = ".select.single";
+		public static final String ORM_SQL_SELECT_MULTI          = ".select.multi";
 		public static final String ORM_SQL_UPDATE                = ".update";
 		public static final String ORM_SQL_INSERT                = ".insert";
-		public static final String ORM_SQL_DELETE_SINGLE         = ".deleteSingle";
-		public static final String ORM_SQL_DELETE_LIST           = ".deleteList";
+		public static final String ORM_SQL_DELETE = ".delete";
 
 		public static final int    DEFAULT_CACHE_FLUSH_CYCLE     = Integer.MAX_VALUE;
 		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;

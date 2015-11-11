@@ -1,6 +1,6 @@
 package org.nybatis.core.db.session.executor;
 
-import org.nybatis.core.db.session.executor.util.DbExecUtils;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.model.NMap;
@@ -34,7 +34,7 @@ public class SelectKeyExecutor {
 
         Object inputParams = sqlBean.getInputParams();
 
-        if( inputParams != null && ! DbExecUtils.isPrimitive( inputParams.getClass() ) && selectKeys.size() != 0 ) {
+        if( inputParams != null && ! DbUtils.isPrimitive( inputParams.getClass() ) && selectKeys.size() != 0 ) {
             new Reflector().merge( selectKeys, inputParams );
         }
 

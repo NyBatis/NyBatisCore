@@ -1,6 +1,6 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
-import org.nybatis.core.db.session.executor.util.DbExecUtils;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
@@ -34,15 +34,15 @@ public class ForEachSqlElement extends SqlElement {
 	}
 
 	private String getDelimeter( Map param ) {
-		return DbExecUtils.getParameterBindedValue( delimeter, param );
+		return DbUtils.getParameterBindedValue( delimeter, param );
 	}
 
 	private String getClose( Map param ) {
-		return DbExecUtils.getParameterBindedValue( close, param );
+		return DbUtils.getParameterBindedValue( close, param );
 	}
 
 	private String getOpen( Map param ) {
-		return DbExecUtils.getParameterBindedValue( open, param );
+		return DbUtils.getParameterBindedValue( open, param );
 	}
 
 	private Map clone( Map param ) {
@@ -85,7 +85,7 @@ public class ForEachSqlElement extends SqlElement {
 
 			} else {
 
-				NMap localParam = DbExecUtils.toNRowParameter( loopParam, paramKey );
+				NMap localParam = DbUtils.toNRowParameter( loopParam, paramKey );
 
 				if( indexKeyOn )
 					localParam.put( indexKey, i );

@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.SqlExecutor;
 import org.nybatis.core.db.session.handler.RowHandler;
@@ -10,18 +11,18 @@ import org.nybatis.core.model.NMap;
 import java.util.List;
 
 /**
+ * ListExecutor implements
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-14
  */
 public class ListExecutorImpl implements ListExecutor {
 
     SqlSessionImpl sqlSession;
-    SqlProperties properties;
-    SqlBean sqlBean;
+    SqlBean        sqlBean;
 
-    public ListExecutorImpl( SqlSessionImpl sqlSession, SqlProperties properties, SqlBean sqlBean ) {
+    public ListExecutorImpl( SqlSessionImpl sqlSession, SqlBean sqlBean ) {
         this.sqlSession = sqlSession;
-        this.properties = properties;
         this.sqlBean    = sqlBean;
     }
 
@@ -59,36 +60,51 @@ public class ListExecutorImpl implements ListExecutor {
 
     @Override
     public ListExecutor setFetchSize( int size ) {
-        properties.setFetchSize( size );
+        sqlSession.getProperties().setFetchSize( size );
         return this;
     }
 
     @Override
     public ListExecutor setLobPrefetchSize( int size ) {
-        properties.setLobPrefetchSize( size );
+        sqlSession.getProperties().setLobPrefetchSize( size );
         return this;
     }
 
     @Override
     public ListExecutor disableCache() {
-        properties.isCacheEnable( false );
+        CacheManager.disableCache( sqlBean.getSqlId() );
+        return this;
+    }
+
+    @Override
+    public ListExecutor enableCache( String cacheId ) {
+        return enableCache( cacheId, null );
+    }
+
+    @Override
+    public ListExecutor enableCache( String cacheId, Integer flushCycle ) {
+        CacheManager.enableCache( sqlBean.getSqlId(), cacheId, flushCycle );
         return this;
     }
 
     @Override
     public ListExecutor clearCache() {
-        properties.isCacheClear( true );
+        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 
     @Override
     public ListExecutor setPage( int start, int end ) {
-        properties.setPageSql( start, end );
+        sqlSession.getProperties().setPageSql( start, end );
         return this;
     }
 
     private SqlExecutor getExecutor() {
-        return new SqlExecutor( sqlSession.getToken(), sqlBean.init( properties ) );
+        try {
+            return new SqlExecutor( sqlSession.getToken(), sqlBean.init( sqlSession.getProperties() ) );
+        } finally {
+            sqlSession.initProperties();
+        }
     }
 
 }
