@@ -2,7 +2,7 @@ package org.nybatis.core.db.session.executor;
 
 import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.executor.util.CacheResultsetController;
-import org.nybatis.core.db.session.executor.util.DbExecUtils;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.ResultsetController;
 import org.nybatis.core.db.session.executor.util.StatementController;
 import org.nybatis.core.db.session.handler.RowHandler;
@@ -32,8 +32,8 @@ public class SqlExecutor {
 	private SqlBean sqlBean;
 
 	private String  sqlId;
-	private boolean isCacheSql    = false;
 	private boolean isCacheEnable = false;
+	private boolean isCacheClear  = false;
 
 	public SqlExecutor( String token, SqlBean sqlBean ) {
 
@@ -41,14 +41,8 @@ public class SqlExecutor {
 		this.sqlBean = sqlBean;
 		this.sqlId   = sqlBean.getSqlId();
 
-		isCacheSql    = CacheManager.isCacheSql( sqlId );
-		isCacheEnable = isCacheSql && sqlBean.getProperties().isCacheEnable();
-
-		boolean isClearCache = sqlBean.getProperties().isCacheClear();
-
-		if( isCacheSql && isCacheEnable && isClearCache ) {
-			CacheManager.getCache( sqlId ).clear();
-		}
+		isCacheEnable = CacheManager.isCacheSql( sqlId );
+		isCacheClear  = sqlBean.getProperties().isCacheClear();
 
 	}
 
@@ -142,7 +136,7 @@ public class SqlExecutor {
 
     public NMap call( Class<?>... resultSetReturnType ) {
 
-		if( isCacheSql && isCacheEnable ) {
+		if( isCacheEnable && ! isCacheClear) {
 			NMap cacheValue = (NMap) getCache( "call" );
 			if( cacheValue != null ) return cacheValue;
 		}
@@ -169,7 +163,7 @@ public class SqlExecutor {
 
         } );
 
-		if( isCacheSql ) {
+		if( isCacheEnable ) {
 			setCache( "call", pipe.get() );
 		}
 
@@ -194,7 +188,7 @@ public class SqlExecutor {
 
 		}
 
-		if( DbExecUtils.isPrimitive( returnType ) ) {
+		if( DbUtils.isPrimitive( returnType ) ) {
 			return new Reflector().toBeanFromBean( result.getBy(0), returnType );
 		} else {
 			return result.toBean( returnType );
@@ -204,7 +198,7 @@ public class SqlExecutor {
 
 	public void selectList( RowHandler rowHandler ) {
 
-		if( isCacheSql && isCacheEnable ) {
+		if( isCacheEnable && ! isCacheClear) {
 
 			@SuppressWarnings( "unchecked" )
             NList cacheValue = (NList) getCache( "selectList" );
@@ -220,7 +214,7 @@ public class SqlExecutor {
 
 		sqlBean.build();
 
-		if( isCacheSql ) {
+		if( isCacheEnable ) {
 			executeQueryForCache( "selectList", rowHandler, null );
 		} else {
 			executeQuery( sqlBean, rowHandler, null );
@@ -231,7 +225,7 @@ public class SqlExecutor {
 
 	public NMap select() {
 
-		if( isCacheSql && isCacheEnable ) {
+		if( isCacheEnable && ! isCacheClear) {
 			NMap cacheValue = (NMap) getCache( "select" );
 			if( cacheValue != null ) return cacheValue;
 		}
@@ -250,7 +244,7 @@ public class SqlExecutor {
 		}, 1 );
 
 
-		if( isCacheSql ) {
+		if( isCacheEnable ) {
 			setCache( "select", pipe.get() );
 		}
 
@@ -295,7 +289,7 @@ public class SqlExecutor {
 
 		List<T> result = new ArrayList<>();
 
-		boolean isPrimitiveReturn = DbExecUtils.isPrimitive( returnType );
+		boolean isPrimitiveReturn = DbUtils.isPrimitive( returnType );
 
 		if( isPrimitiveReturn ) {
 
@@ -340,7 +334,7 @@ public class SqlExecutor {
 
 		NMap result = select();
 
-		if( DbExecUtils.isPrimitive( returnType ) ) {
+		if( DbUtils.isPrimitive( returnType ) ) {
 
 			PrimitiveConverter converter;
 

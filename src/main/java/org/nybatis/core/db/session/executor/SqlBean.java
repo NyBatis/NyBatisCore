@@ -3,7 +3,7 @@ package org.nybatis.core.db.session.executor;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
-import org.nybatis.core.db.session.executor.util.DbExecUtils;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
@@ -52,7 +52,7 @@ public class SqlBean {
 
 		this.properties = properties.merge( sqlNode.getProperties() );
 
-		this.sqlParam   = DbExecUtils.getParameterMergedWithGlobalParam( inputParam );
+		this.sqlParam   = DbUtils.getParameterMergedWithGlobalParam( inputParam );
 
 		if( properties.isPageSql() ) {
 			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );

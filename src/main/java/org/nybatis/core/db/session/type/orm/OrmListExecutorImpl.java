@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
-    private SqlSessionImpl sqlSession;
+    private SqlSessionImpl       sqlSession;
     private OrmSessionProperties properties  = new OrmSessionProperties();
     private Class<T>             domainClass = null;
 
@@ -28,13 +29,7 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     }
 
     @Override
-    public List<T> select( T entity ) {
-        properties.setEntityParameter( entity );
-        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
-    }
-
-    @Override
-    public List<T> select( Map parameter ) {
+    public List<T> select( Object parameter ) {
         properties.setEntityParameter( parameter );
         return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
     }
@@ -76,7 +71,18 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> disableCache() {
-        sqlSession.getProperties().isCacheEnable( false );
+        CacheManager.disableCache( properties.sqlIdSelectSingle() );
+        return this;
+    }
+
+    @Override
+    public OrmListExecutor<T> enableCache( String cacheId ) {
+        return enableCache( cacheId, null );
+    }
+
+    @Override
+    public OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds ) {
+        CacheManager.enableCache( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
         return this;
     }
 

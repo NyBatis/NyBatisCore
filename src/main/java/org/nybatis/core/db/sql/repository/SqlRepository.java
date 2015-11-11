@@ -49,24 +49,24 @@ public class SqlRepository {
 
 	}
 
-	public static void setCacheProperties( String sqlId, String cacheId, Integer cacheFlushCycle ) {
+//	public static void setCacheProperties( String sqlId, String cacheId, Integer flushCycle ) {
+//
+//		if( ! isExist(sqlId) ) return;
+//
+//		SqlProperties properties = getProperties( sqlId );
+//
+//		properties.setCacheId( cacheId );
+//		properties.setCacheFlushCycle( flushCycle );
+//		properties.isCacheEnable( true );
+//
+//	}
+
+	public static void setFetchSize( String sqlId, Integer fetchSize ) {
 
 		if( ! isExist(sqlId) ) return;
 
 		SqlProperties properties = getProperties( sqlId );
-
-		properties.setCacheId( cacheId );
-		properties.setCacheFlushCycle( cacheFlushCycle );
-		properties.isCacheEnable( true );
-
-	}
-
-	public static void setRowFetchCountProperties( String sqlId, Integer rowFetchCount ) {
-
-		if( ! isExist(sqlId) ) return;
-
-		SqlProperties properties = getProperties( sqlId );
-		properties.setFetchSize( rowFetchCount );
+		properties.setFetchSize( fetchSize );
 
 	}
 

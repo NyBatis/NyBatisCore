@@ -55,10 +55,9 @@ public class DbTableReader {
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
             read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_SINGLE, selectSingleSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_LIST,   selectListSql( layout ),   cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_MULTI,  selectListSql( layout ),   cacheId, flush );
             read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE,        updateSql( layout ),       cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_SINGLE, deleteSingleSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_LIST,   deleteListSql( layout ),   cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,        deleteSql( layout ),       cacheId, flush );
             read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT,        insertSql( layout ),       cacheId, flush );
 
         } finally {
@@ -118,7 +117,7 @@ public class DbTableReader {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_MULTI, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
             sb.append( String.format(
@@ -168,30 +167,11 @@ public class DbTableReader {
 
     }
 
-    private String deleteSingleSql( TableLayout layout ) {
+    private String deleteSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
-
-        for( Column column : layout.getPkColumns() ) {
-            sb.append( String.format(
-                    getTestNode( "#{%s} != null", "AND %s = #{%s}" ),
-                    getOverrideKey( column.getKey() ), column.getName(), getOverrideKey( column.getKey() )
-            ));
-        }
-
-        sb.append( getOverrideWhereNode() );
-
-        return sb.toString();
-
-    }
-
-    private String deleteListSql( TableLayout layout ) {
-
-        StringBuilder sb = new StringBuilder();
-
-        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE_LIST, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
             sb.append( String.format(

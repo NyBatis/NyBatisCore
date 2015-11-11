@@ -10,10 +10,12 @@ import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
+import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 
 public class CacheManager {
 
-	private static final Cache NULL_CACHE = new NullCache();
+	private static final Cache  NULL_CACHE = new NullCache();
 	private static       Object lock       = new Object();
 
 	private static Map<String, Cache>        cachePool    = new HashMap<>();
@@ -42,17 +44,15 @@ public class CacheManager {
 
 	public static Cache getCache( String sqlId ) {
 
-		if( ! isCacheSql(sqlId) ) return NULL_CACHE;
+		if( ! isCacheSql( sqlId ) ) return NULL_CACHE;
 
 		synchronized( lock ) {
 
-			if( cachePool.containsKey(sqlId) ) return cachePool.get( sqlId );
+			if( ! cachePool.containsKey(sqlId) ) {
+				enableCache( sqlId, null, null );
+			}
 
-			registerCache( sqlId );
-
-			Cache cache = cachePool.get( sqlId );
-
-			return ( cache == null ) ? NULL_CACHE : cache;
+			return Validator.nvl( cachePool.get(sqlId), NULL_CACHE );
 
         }
 
@@ -60,13 +60,15 @@ public class CacheManager {
 
 	public static boolean isCacheSql( String sqlId ) {
 
+		if( ! SqlRepository.isExist( sqlId ) ) return false;
+
 		SqlProperties properties = SqlRepository.getProperties( sqlId );
 
 		if( ! properties.isCacheEnable() ) return false;
 
 		String cacheId = properties.getCacheId();
 
-		if( ! hasCacheModel(cacheId) ) {
+		if( ! hasCacheModel( cacheId ) ) {
 			NLogger.warn( "Sql[id:{}] does not have cache model[id:{}]. It'll be never cached.", sqlId, cacheId );
 			properties.isCacheEnable( false );
 			return false;
@@ -76,28 +78,63 @@ public class CacheManager {
 
 	}
 
-	public static void registerCache( String sqlId ) {
+	public static void setCacheProperties( String sqlId, String cacheId, Integer flushCycle ) {
 
-		SqlProperties prop = SqlRepository.getProperties( sqlId );
+		if( ! SqlRepository.isExist( sqlId ) ) return;
 
-		CacheModel cacheModel = cacheModels.get( prop.getCacheId() );
+		SqlProperties properties = SqlRepository.getProperties( sqlId );
+
+		properties.setCacheId( cacheId );
+		properties.setCacheFlushCycle( flushCycle );
+		properties.isCacheEnable( true );
+
+	}
+
+	public static void disableCache( String sqlId ) {
+
+		if( ! SqlRepository.isExist(sqlId) ) return;
+
+		SqlProperties properties = SqlRepository.getProperties( sqlId );
+
+		if( ! properties.isCacheEnable() ) return;
+
+		properties.setCacheId( null );
+		properties.clearCacheFlushCycle();
+		properties.isCacheEnable( false );
+
+		if( ! cachePool.containsKey(sqlId) ) return;
+
+		Cache cache = cachePool.get( sqlId );
+		cache.clear();
+
+		cachePool.remove( sqlId );
+
+	}
+
+	public static void enableCache( String sqlId, String cacheId, Integer flushCycle ) {
+
+		if( ! SqlRepository.isExist(sqlId) ) return;
+
+		SqlProperties properties = SqlRepository.getProperties( sqlId );
+
+		CacheModel cacheModel = cacheModels.get( Validator.nvl( cacheId, properties.getCacheId()) );
+
+		if( cacheModel == null ) {
+			NLogger.warn( "sql({})'s cache model({}) is not exist,", sqlId, properties.getCacheId() );
+			disableCache( sqlId );
+			return;
+		}
 
 		try {
 
 			Cache cache = cacheModel.makeCache();
-
-			cache.setFlushCycle( prop.getCacheFlushCycle() );
-
+			cache.setFlushCycle( Validator.nvl( flushCycle, properties.getCacheFlushCycle()) );
 			cachePool.put( sqlId, cache );
 
 		} catch( ClassCastException e ) {
-
-			cacheModels.remove( prop.getCacheId() );
-			prop.setCacheId( null );
-			prop.isCacheEnable( false );
-
-			NLogger.warn( e, "cache[id:{}]'s class({}) is fail to initialize. Sql[id:{}] will be never cached.", prop.getCacheId(), cacheModel.getKlass(), sqlId );
-
+			NLogger.warn( e, "cache model({})'s class({}) is fail to initialize. Sql({}) will be never cached.", properties.getCacheId(), cacheModel.getKlass(), sqlId );
+			cacheModels.remove( properties.getCacheId() );
+			disableCache( sqlId );
 		}
 
 	}
@@ -109,9 +146,9 @@ public class CacheManager {
 		for( CacheModel cacheModel : cacheModels.values() ) {
 
 			reportCacheModel.addRow( "cacheId", cacheModel.getId() );
-			reportCacheModel.addRow( "class", cacheModel.getKlass().getName() );
-			reportCacheModel.addRow( "size", cacheModel.getSize() );
-			reportCacheModel.addRow( "flush", cacheModel.getFlush() );
+			reportCacheModel.addRow( "class",   cacheModel.getKlass().getName() );
+			reportCacheModel.addRow( "size",    cacheModel.getSize() );
+			reportCacheModel.addRow( "flush",   cacheModel.getFlush() );
 
 		}
 

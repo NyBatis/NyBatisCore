@@ -7,6 +7,8 @@ import org.nybatis.core.model.NMap;
 import java.util.List;
 
 /**
+ * OrmBatchExecutor implements
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-21
  */
@@ -28,18 +30,18 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
     }
 
     @Override
-    public int insert( List<T> parameterList ) {
+    public int insert( List<?> parameterList ) {
         return executeBatch( properties.sqlIdInsert(), parameterList );
     }
 
     @Override
-    public int update( List<T> parameterList ) {
+    public int update( List<?> parameterList ) {
         return executeBatch( properties.sqlIdUpdate(), parameterList );
     }
 
     @Override
-    public int delete( List<T> parameterList ) {
-        return executeBatch( properties.sqlIdDeleteSingle(), parameterList );
+    public int delete( List<?> parameterList ) {
+        return executeBatch( properties.sqlIdDelete(), parameterList );
     }
 
     private int executeBatch( String sqlId, List<?> params ) {

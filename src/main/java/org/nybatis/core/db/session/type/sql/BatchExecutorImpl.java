@@ -19,13 +19,11 @@ import java.util.List;
 public class BatchExecutorImpl implements BatchExecutor {
 
     SqlSessionImpl sqlSession;
-    SqlProperties properties;
     SqlNode        sqlNode;
     List<Object>   parameters;
 
     public BatchExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
-        this.properties = sqlSession.getProperties().clone();
     }
 
     public BatchExecutorImpl batchSqlId( String id, List<?> parameters ) {
@@ -75,11 +73,17 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     private int executeBatch( Integer bufferSize ) {
-        if( sqlNode == null ) {
-            return new BatchStatementExecutor( sqlSession.getToken(), properties ).executeSql( parameters, bufferSize );
-        } else {
-            return new BatchPreparedStatementExecutor( sqlSession.getToken(), properties ).executeSql( sqlNode, parameters, bufferSize );
+        try {
+            if( sqlNode == null ) {
+                return new BatchStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( parameters, bufferSize );
+            } else {
+                return new BatchPreparedStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( sqlNode, parameters, bufferSize );
+            }
+        } finally {
+            sqlSession.initProperties();
+            parameters.clear();
         }
+
     }
 
 }

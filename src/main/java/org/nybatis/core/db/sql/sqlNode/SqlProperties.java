@@ -48,13 +48,23 @@ public class SqlProperties {
 
 	}
 
+	public void clear() {
+		cacheClear         = null;
+		autocommit         = null;
+		countSql           = null;
+		pageSqlStart       = null;
+		pageSqlEnd         = null;
+		ormSqlWhere        = null;
+		ormSqlOrderBy      = null;
+	}
+
 	public SqlProperties merge( SqlProperties properties ) {
 
 		SqlProperties newProperties = properties.clone();
 
 		if( environmentId      != null ) newProperties.environmentId = environmentId;
-		if( fetchSize != null ) newProperties.fetchSize = fetchSize;
-		if( lobPrefetchSize != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
+		if( fetchSize          != null ) newProperties.fetchSize = fetchSize;
+		if( lobPrefetchSize    != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
 		if( cacheEnable        != null ) newProperties.cacheEnable = cacheEnable;
 		if( cacheId            != null ) newProperties.cacheId = cacheId;
 		if( cacheFlushCycle    != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
@@ -159,6 +169,10 @@ public class SqlProperties {
 	 */
 	public void setCacheFlushCycle( Integer seconds ) {
 		this.cacheFlushCycle = seconds;
+	}
+
+	public void clearCacheFlushCycle() {
+		cacheFlushCycle = null;
 	}
 
 	public void setCacheFlushCycle( String seconds ) {

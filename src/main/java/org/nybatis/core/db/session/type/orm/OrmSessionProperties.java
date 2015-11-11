@@ -1,7 +1,7 @@
 package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.db.session.executor.util.DbExecUtils;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
@@ -41,7 +41,7 @@ public class OrmSessionProperties {
 
     }
 
-    public OrmSessionProperties init() {
+    public OrmSessionProperties clear() {
         wheres.clear();
         orderBy = null;
         entityParameter.clear();
@@ -74,7 +74,7 @@ public class OrmSessionProperties {
     }
 
     public String sqlIdSelectList() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_LIST;
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_MULTI;
     }
 
     public String sqlIdInsert() {
@@ -85,12 +85,8 @@ public class OrmSessionProperties {
         return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE;
     }
 
-    public String sqlIdDeleteSingle() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_SINGLE;
-    }
-
-    public String sqlIdDeleteList() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_LIST;
+    public String sqlIdDelete() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE;
     }
 
     public void addWhere( String where, Object parameter ) {
@@ -149,7 +145,7 @@ public class OrmSessionProperties {
 
     private NMap setParameter( String prefix, Object parameter ) {
 
-        NMap params = DbExecUtils.toNRowParameter( parameter );
+        NMap params = DbUtils.toNRowParameter( parameter );
 
         NMap newParams = new NMap();
 

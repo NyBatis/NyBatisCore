@@ -226,22 +226,22 @@ public class SqlSessionTest {
 
 		SqlSession sqlSession = SessionManager.openSession();
 
-		ListExecutor listExecutor = sqlSession.sqlId( "Sqlite.selectForList" ).list();
+		ListExecutor listExecutor = sqlSession.sqlId( "Sqlite.selectForList", "RNK00001" ).list();
 
 		for( int i = 0; i < 10; i++ ) {
 
 			Param param = new Param( "A001" );
 
 			if( i == 3 ) {
-				listExecutor.disableCache();
-			}
-
-			if( i == 8 ) {
 				listExecutor.clearCache();
 			}
 
+			if( i == 8 ) {
+				listExecutor.disableCache();
+			}
+
 			List<ResultVo> list = listExecutor.select( ResultVo.class );
-			NLogger.debug( "************************************\n{}", list );
+			NLogger.debug( "index : {} ************************************\n{}", i, list.size() );
 
 		}
 

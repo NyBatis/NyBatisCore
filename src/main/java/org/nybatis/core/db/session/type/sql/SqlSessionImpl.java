@@ -2,6 +2,7 @@ package org.nybatis.core.db.session.type.sql;
 
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
+import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.orm.OrmSession;
@@ -17,6 +18,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
+ * SqlSession Implements
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-11
  */
@@ -24,6 +27,7 @@ public class SqlSessionImpl implements SqlSession {
 
     private String         token;
     private SqlProperties  properties;
+    private SqlProperties  originalProperties;
 
     public SqlSessionImpl( String token, SqlProperties properties ) {
         init( token, properties );
@@ -31,11 +35,17 @@ public class SqlSessionImpl implements SqlSession {
 
     private void init( String token, SqlProperties properties ) {
 
-        this.token      = token;
-        this.properties = Validator.nvl( properties, new SqlProperties() );
+        this.token              = token;
+        this.originalProperties = Validator.nvl( properties, new SqlProperties() );
+        this.properties         = originalProperties.clone();
 
         assertionEnvironmentId( this.properties.getRawEnvironmentId() );
 
+    }
+
+    public SqlSessionImpl initProperties() {
+        properties = originalProperties.clone();
+        return this;
     }
 
     private void assertionEnvironmentId( String environmentId ) {
@@ -156,6 +166,8 @@ public class SqlSessionImpl implements SqlSession {
                 }
             }
 
+            initProperties();
+
         }
 
     }
@@ -163,17 +175,19 @@ public class SqlSessionImpl implements SqlSession {
     @Override
     public SqlSession changeEnvironmentId( String id ) {
         assertionEnvironmentId( id );
+        originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         return this;
     }
 
     @Override
     public <T> OrmSession<T> openOrmSession( String tableName, Class<T> domainClass ) {
-        return SessionManager.openOrmSession( properties.getEnvironmentId(), tableName, domainClass );
+        return new SessionCreator().createOrmSession( token, properties.getEnvironmentId(), tableName, domainClass );
     }
 
     @Override
     public <T> OrmSession<T> openOrmSession( Class<T> domainClass ) {
-        return SessionManager.openOrmSession( domainClass );
+        return openOrmSession( null, domainClass );
     }
+
 }

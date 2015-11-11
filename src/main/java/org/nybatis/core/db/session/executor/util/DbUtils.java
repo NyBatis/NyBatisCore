@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DbExecUtils {
+public class DbUtils {
 
     public static NMap getParameterMergedWithGlobalParam( Object parameter ) {
 
@@ -128,9 +128,9 @@ public class DbExecUtils {
 	 * <pre>
 	 * NMap parameter = new NMap( "{'name':'abc', 'age':'2'}" );
 	 *
-	 * DbExecUtils.getParameterBindedValue( "1", parameter ) --> 1
-	 * DbExecUtils.getParameterBindedValue( "#{name}", parameter ) --> abc
-	 * DbExecUtils.getParameterBindedValue( "PRE #{age} POST", parameter ) --> PRE 2 POST
+	 * DbUtils.getParameterBindedValue( "1", parameter ) --> 1
+	 * DbUtils.getParameterBindedValue( "#{name}", parameter ) --> abc
+	 * DbUtils.getParameterBindedValue( "PRE #{age} POST", parameter ) --> PRE 2 POST
 	 * </pre>
 	 *
 	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
