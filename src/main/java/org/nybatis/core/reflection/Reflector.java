@@ -10,6 +10,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.nybatis.core.reflection.mapper.NObjectMapper;
 
 import com.rits.cloning.Cloner;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 
 /**
  * Reflection을 처리하는 유틸 클래스
@@ -434,8 +436,8 @@ public class Reflector {
 
     public Map<String, Object> toMapFromJson( String fromJsonString ) {
         try {
-            return objectMapper.readValue( getContent(fromJsonString), new TypeReference<HashMap<String, Object>>() {
-			} );
+			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJsonString ), new TypeReference<HashMap<String, Object>>() {} );
+			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
         } catch( IOException e ) {
