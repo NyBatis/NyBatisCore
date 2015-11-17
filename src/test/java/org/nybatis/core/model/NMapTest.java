@@ -134,4 +134,15 @@ public class NMapTest {
 
     }
 
+	@Test
+	public void nullTest() {
+
+		String json = null;
+
+		NMap a = new NMap( json );
+
+		NLogger.debug( a.toDebugString(false, false) );
+
+	}
+
 }
