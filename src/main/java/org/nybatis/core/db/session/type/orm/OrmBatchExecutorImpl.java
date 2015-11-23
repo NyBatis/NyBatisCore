@@ -24,24 +24,24 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
     }
 
     @Override
-    public OrmBatchExecutor setTransactionSize( int size ) {
+    public OrmBatchExecutor<T> setTransactionSize( int size ) {
         this.bufferSize = size;
         return this;
     }
 
     @Override
-    public int insert( List<?> parameterList ) {
-        return executeBatch( properties.sqlIdInsert(), parameterList );
+    public int insert( List<?> parameters ) {
+        return executeBatch( properties.sqlIdInsert(), parameters );
     }
 
     @Override
-    public int update( List<?> parameterList ) {
-        return executeBatch( properties.sqlIdUpdate(), parameterList );
+    public int update( List<?> parameters ) {
+        return executeBatch( properties.sqlIdUpdate(), parameters );
     }
 
     @Override
-    public int delete( List<?> parameterList ) {
-        return executeBatch( properties.sqlIdDelete(), parameterList );
+    public int delete( List<?> parameters ) {
+        return executeBatch( properties.sqlIdDelete(), parameters );
     }
 
     private int executeBatch( String sqlId, List<?> params ) {
