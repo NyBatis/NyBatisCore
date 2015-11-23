@@ -487,7 +487,7 @@ public class Reflector {
     	return objectMapper.convertValue( fromBean, Map.class );
 	}
 
-    public NMap toNRowFromBean( Object fromBean ) {
+    public NMap toNMapFromBean( Object fromBean ) {
     	return new NMap( toMapFromBean( fromBean ) );
     }
 
