@@ -28,17 +28,17 @@
     </sqlpath>
   </environment>
 
-  <environment id="oracle" >
-    <datasource type="jdbc" ping="true" pingCycle="60" >
-      <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>
-      <username>SPSAC</username>
-      <password>ompskp1!</password>
-    </datasource>
-    <sqlpath>
-      <path>oracle</path>
-    </sqlpath>
-  </environment>
+  <!--<environment id="oracle" >-->
+    <!--<datasource type="jdbc" ping="true" pingCycle="60" >-->
+      <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->
+      <!--<url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>-->
+      <!--<username>SPSAC</username>-->
+      <!--<password>ompskp1!</password>-->
+    <!--</datasource>-->
+    <!--<sqlpath>-->
+      <!--<path>oracle</path>-->
+    <!--</sqlpath>-->
+  <!--</environment>-->
 
   <!--<environment id="maria" >-->
   <!--<datasource type="jdbc" ping="true" pingCycle="60" >-->
@@ -51,16 +51,16 @@
   <!--</sqlpath>-->
   <!--</environment>-->
 
-  <environment id="storeDev" >
-    <datasource type="jdbc">
-      <driver>oracle.jdbc.driver.OracleDriver</driver>
-      <url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>
-      <username>STORE_DEV</username>
-      <password>ompskp1!</password>
-    </datasource>
-    <sqlpath>
-      <path>./mapper</path>
-    </sqlpath>
-  </environment>
+  <!--<environment id="storeDev" >-->
+    <!--<datasource type="jdbc">-->
+      <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->
+      <!--<url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>-->
+      <!--<username>STORE_DEV</username>-->
+      <!--<password>ompskp1!</password>-->
+    <!--</datasource>-->
+    <!--<sqlpath>-->
+      <!--<path>./mapper</path>-->
+    <!--</sqlpath>-->
+  <!--</environment>-->
 
 </configuration>

@@ -13,8 +13,8 @@
       <url>#{url}</url>
       <username>#{username}</username>
       <password>#{password}</password>
-      <timeout>25</timeout> <!-- Optional -->
-      <autocommit>false</autocommit> <!-- Optional -->
+      <timeout>25</timeout> <!-- Optional
+      <autocommit>false</autocommit> <!-- Optional
     </datasource>
     <sqlpath>
       <path>test01/sample.xml</path>
@@ -32,16 +32,16 @@
     </sqlpath>
   </environment>
   
-<!--   <environment id="sample03"> -->
-<!--     <datasource type="jndi"> -->
-<!--       <initialContext>....</initialContext> -->
-<!--       <providerUrl>....</providerUrl> -->
-<!--       java:comp/env/ 생략 가능 -->
-<!--       <name>java:comp/env/Sample</name> -->
-<!--     </datasource> -->
-<!--     <sqlpath> -->
-<!--       <path>test03</path> -->
-<!--     </sqlpath> -->
-<!--   </environment> -->
+  <environment id="sample03">
+    <datasource type="jndi">
+      <initialContext>....</initialContext>
+      <providerUrl>....</providerUrl>
+      <!-- it is possible to omit "java:comp/env/" -->
+      <name>java:comp/env/Sample</name>
+    </datasource>
+    <sqlpath>
+      <path>test03</path>
+    </sqlpath>
+  </environment>
 
 </configuration>
