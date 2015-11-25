@@ -30,13 +30,13 @@ public abstract class AbstractBatchExecutor {
 		this.properties = properties;
 	}
 
-	public int executeSql( List<?> paramList, Integer commitCount ) {
-		return executeSql( null, paramList, commitCount );
+	public int executeSql( List<?> parameters, Integer commitCount ) {
+		return executeSql( null, parameters, commitCount );
 	}
 
-	public int executeSql( SqlNode sqlNode, List<?> paramList, Integer commitCount ) {
+	public int executeSql( SqlNode sqlNode, List<?> parameters, Integer commitCount ) {
 
-		if( paramList == null || paramList.size() == 0 ) return 0;
+		if( parameters == null || parameters.size() == 0 ) return 0;
 
 		if( sqlNode != null ) {
 			properties = sqlNode.getProperties().merge( properties );
@@ -55,15 +55,13 @@ public abstract class AbstractBatchExecutor {
 		Logs        logs        = getLogs();
 		SqlBean     sqlBean     = null;
 
-
-
 		int executeCount = 0;
 
 		TransactionManager.begin( token );
 
 		try {
 
-			for( Object param : paramList ) {
+			for( Object param : parameters ) {
 
 				sqlBean = statements.generateSqlBean( sqlNode, param );
 
@@ -97,7 +95,7 @@ public abstract class AbstractBatchExecutor {
 
 			statements.close();
 
-			return paramList.size();
+			return parameters.size();
 
 		} catch( SQLException e ) {
 

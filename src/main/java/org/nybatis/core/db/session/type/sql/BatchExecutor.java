@@ -3,7 +3,7 @@ package org.nybatis.core.db.session.type.sql;
 import org.nybatis.core.db.annotation.NotSupportCache;
 
 /**
- * The primary Java interface for SQL management in NayasisCommon library.
+ * The primary Java interface for SQL management in Nybatis.
  * Through this interface you can execute sql or manage transaction.
  *
  * <pre>
