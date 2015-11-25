@@ -100,10 +100,11 @@ public class BindParam {
 
         	type = SqlType.find( klass );
 
-        	if( klass.isArray() ) {
-        		this.value = Arrays.asList( value );
+        	if( type != SqlType.BLOB &&  type != SqlType.BLOB_BOXED ) {
+				if( klass.isArray() ) {
+        			this.value = Arrays.asList( value );
+				}
         	}
-
 
         } else {
 
