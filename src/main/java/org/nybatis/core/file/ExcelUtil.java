@@ -1,6 +1,7 @@
 package org.nybatis.core.file;
 
 import java.io.File;
+import java.util.Map;
 
 import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.file.handler.ExcelHandler;
@@ -68,38 +69,71 @@ public class ExcelUtil {
 	}
 
 	/**
-	 * Write data to excelFile at 'Sheet1'
+	 * Write data to excel file
 	 *
 	 * @param excelFile excel file to write data
-	 * @param data 		grid data
-	 * @throws IoException	File I/O Exception
+	 * @param data      key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
 	 */
-	public static void writeTo( File excelFile, NList data ) throws IoException {
-		getHandler().writeTo( excelFile, data );
+	public static void writeTo( File excelFile, Map<String, NList> worksheets ) throws IoException {
+		getHandler().writeTo( excelFile, worksheets );
 	}
 
 	/**
 	 * Write data to excelFile
 	 *
 	 * @param excelFile		excel file to write data
-	 * @param data			grid data
 	 * @param sheetName		sheet name of excel file to write
+	 * @param worksheet		grid data
 	 * @throws IoException	File I/O Exception
 	 */
-	public static void writeTo( File excelFile, NList data, String sheetName ) throws IoException {
-		getHandler().writeTo( excelFile, data, sheetName );
+	public static void writeTo( File excelFile, String sheetName, NList worksheet ) throws IoException {
+		getHandler().writeTo( excelFile, sheetName, worksheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param excelFile excel file to write
+	 * @param worksheet grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( File excelFile, NList worksheet ) throws IoException {
+		getHandler().writeTo( excelFile, worksheet );
+	}
+
+	/**
+	 * Write data to excel file
+	 *
+	 * @param excelFile  excel file to write data
+	 * @param worksheets key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( String excelFile, Map<String, NList> worksheets ) throws IoException {
+	    writeTo( new File( excelFile ), worksheets );
 	}
 
 	/**
 	 * Write data to excelFile
 	 *
 	 * @param excelFile		excel file to write data
-	 * @param data			grid data
 	 * @param sheetName		sheet name of excel file to write
+	 * @param worksheet		grid data
 	 * @throws IoException	File I/O Exception
 	 */
-	public static void writeTo( String excelFile, NList data ) throws IoException {
-	    writeTo( new File( excelFile ), data );
+	public static void writeTo( String excelFile, String sheetName, NList worksheet ) throws IoException {
+		writeTo( new File( excelFile ), sheetName, worksheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param excelFile excel file to write
+	 * @param worksheet grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( String excelFile, NList worksheet ) throws IoException {
+		writeTo( new File( excelFile ), worksheet );
 	}
 
 	/**
@@ -114,16 +148,27 @@ public class ExcelUtil {
     	return getHandler().readFrom( excelFile, sheetName );
     }
 
-    /**
-     * Read data from excel file at 'Sheet1'
-     *
-     * @param excelFile		excel file to read
-     * @return grid data
-     * @throws IoException  File I/O Exception
-     */
-    public static NList readFrom( File excelFile ) throws IoException {
+	/**
+	 * Read all sheets from excel file
+	 *
+	 * @param excelFile excel file to read.
+	 * @return key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+    public static Map<String, NList> readFrom( File excelFile ) throws IoException {
     	return getHandler().readFrom( excelFile );
     }
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param excelFile excel file to read
+	 * @return grid data from first sheet
+	 * @throws IoException file I/O exception
+	 */
+	public static NList readFirstSheetFrom( File excelFile ) throws IoException {
+		return getHandler().readFirstSheetFrom( excelFile );
+	}
 
 	/**
 	 * Read data from excel file
@@ -137,15 +182,26 @@ public class ExcelUtil {
         return readFrom( new File(excelFile), sheetName );
     }
 
-    /**
-     * Read data from excel file at 'Sheet1'
-     *
-     * @param excelFile		excel file to read
-     * @return grid data
-     * @throws IoException  File I/O Exception
-     */
-    public static NList readFrom( String excelFile ) throws IoException {
+	/**
+	 * Read all sheets from excel file
+	 *
+	 * @param excelFile excel file to read.
+	 * @return key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+    public static Map<String, NList> readFrom( String excelFile ) throws IoException {
     	return readFrom( new File(excelFile) );
     }
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param excelFile excel file to read
+	 * @return grid data from first sheet
+	 * @throws IoException file I/O exception
+	 */
+	public static NList readFirstSheetFrom( String excelFile ) throws IoException {
+		return readFirstSheetFrom( new File( excelFile ) );
+	}
 
 }

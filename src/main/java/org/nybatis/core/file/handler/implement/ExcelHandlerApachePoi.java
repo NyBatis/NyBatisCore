@@ -1,18 +1,5 @@
 package org.nybatis.core.file.handler.implement;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import org.nybatis.core.exception.unchecked.IoException;
-import org.nybatis.core.file.handler.ExcelHandler;
-import org.nybatis.core.model.NList;
-import org.nybatis.core.model.NMap;
-import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.validation.Validator;
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -25,15 +12,25 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.file.handler.ExcelHandler;
+import org.nybatis.core.model.NList;
+import org.nybatis.core.model.NMap;
+import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
-	@SuppressWarnings( "resource" )
-	public void writeTo( File excelFile, final NList data, String sheetName ) throws IoException {
-
-		if( data == null || data.size() == 0 )
-			throw new IoException( "There is no data to write file [{}] in sheet [{}]", excelFile, sheetName );
+	public void writeTo( File excelFile, Map<String, NList> data ) throws IoException {
 
 		excelFile = FileUtil.makeFile( excelFile );
 
@@ -41,9 +38,26 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 			throw new IoException( "ExcelFile[{}] to write is not exist.", excelFile );
 		}
 
+		Workbook workbook = ( "xls".equalsIgnoreCase(FileUtil.getExtention(excelFile )) ) ? new HSSFWorkbook() : new XSSFWorkbook();
+
+		for( String sheetName : data.keySet() ) {
+			writeTo( workbook, sheetName, data.get(sheetName) );
+		}
+
+		try (
+			FileOutputStream fos = new FileOutputStream( excelFile )
+		) {
+			workbook.write( fos );
+		} catch( IOException e ) {
+			throw new IoException( e, "Error on writing excel file[{}].", excelFile );
+		}
+
+	}
+
+	private void writeTo( Workbook workbook, String sheetName, NList data ) {
+
 		int idxColumn = 0, idxRow = 0;
 
-		Workbook workbook = ( "xls".equalsIgnoreCase(FileUtil.getExtention(excelFile )) ) ? new HSSFWorkbook() : new XSSFWorkbook();
 		Sheet    sheet    = workbook.createSheet( sheetName );
 		Row      row      = sheet.createRow( idxRow++ );
 
@@ -75,104 +89,107 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 		}
 
-		try (
-			FileOutputStream fos = new FileOutputStream( excelFile )
-		) {
-			workbook.write( fos );
-		} catch( IOException e ) {
-			throw new IoException( e, "Error on writing excel file[{}].", excelFile );
-		}
-
 	}
 
 	@Override
-    public NList readFrom( File excelFile, String sheetName ) throws IoException {
+	public Map<String, NList> readFrom( File excelFile ) throws IoException {
 
-        NList result = new NList();
+		Map<String, NList> result = new LinkedHashMap<>();
 
-        try (
-        	FileInputStream fis      = new FileInputStream( excelFile );
-        	Workbook        workbook = new HSSFWorkbook( fis )
+		try (
+			FileInputStream fis      = new FileInputStream( excelFile );
+			Workbook        workbook = new HSSFWorkbook( fis )
 		) {
 
-            Sheet sheet = workbook.getSheet( sheetName );
+			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
+				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
+			}
 
-            if( sheet == null )
-            	throw new IoException( "There is no sheet name [{}] in file [{}].", sheetName, excelFile );
+		} catch( IOException e ) {
+			throw new IoException( e, "Error on reading excel file[{}].", excelFile );
+		}
 
-            NMap header = getExcelColumnHeader( sheet );
+		return result;
 
-            if( header.size() == 0 )
-            	throw new IoException( "There is no header in sheet [{}] of file [{}]", sheetName, excelFile );
-
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-
-        	for( int idxRow = 1, maxRowCnt = sheet.getPhysicalNumberOfRows(); idxRow < maxRowCnt; idxRow++ ) {
-
-        		Row  row  = sheet.getRow( idxRow );
-
-        		NMap data = new NMap();
-
-        		for( int idxColumn = 0, maxColumnCnt = row.getPhysicalNumberOfCells(); idxColumn < maxColumnCnt; idxColumn++ ) {
-
-        			Cell cell = row.getCell( idxColumn );
-
-        			if( cell == null ) continue;
-
-        			String key = header.getString( idxColumn );
-
-        			switch( cell.getCellType() ) {
-
-        				case Cell.CELL_TYPE_FORMULA :
-
-        					if( StringUtil.isNotEmpty( cell ) ) {
-
-        						switch( evaluator.evaluateFormulaCell(cell) ) {
-        							case Cell.CELL_TYPE_NUMERIC :
-        	        					data.put( key, getNumericCellValue(cell) );
-        	        					break;
-        							case Cell.CELL_TYPE_BOOLEAN :
-        	        					data.put( key, cell.getBooleanCellValue() );
-        	        					break;
-        							case Cell.CELL_TYPE_STRING  :
-        								data.put( key, cell.getStringCellValue() );
-        								break;
-        						}
-
-        					} else {
-        						data.put( key, cell.getStringCellValue() );
-        					}
-
-        					break;
-
-        				case Cell.CELL_TYPE_NUMERIC :
-        					data.put( key, getNumericCellValue(cell) );
-        					break;
-
-        				case Cell.CELL_TYPE_BOOLEAN :
-        					data.put( key, cell.getBooleanCellValue() );
-        					break;
-        				default :
-        					data.put( key, cell.getStringCellValue() );
-
-        			}
+	}
 
 
-        		}
+	private NList readFrom( Workbook workbook, int sheetIndex ) {
 
-        		result.addRow( data );
+		NList result = new NList();
 
-        	}
+		Sheet sheet = workbook.getSheetAt( sheetIndex );
 
-        } catch( IOException e ) {
-        	throw new IoException( e, "Error on reading excel file[{}].", excelFile );
-        }
+		if( sheet == null ) return result;
 
-        return result;
+		NMap header = getExcelColumnHeader( sheet );
 
-    }
+		if( header.size() == 0 ) return result;
 
-    private NMap getExcelColumnHeader( Sheet sheet ) {
+		FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+		for( int idxRow = 1, maxRowCnt = sheet.getPhysicalNumberOfRows(); idxRow < maxRowCnt; idxRow++ ) {
+
+			Row  row  = sheet.getRow( idxRow );
+
+			NMap data = new NMap();
+
+			for( int idxColumn = 0, maxColumnCnt = row.getPhysicalNumberOfCells(); idxColumn < maxColumnCnt; idxColumn++ ) {
+
+				Cell cell = row.getCell( idxColumn );
+
+				if( cell == null ) continue;
+
+				String key = header.getString( idxColumn );
+
+				switch( cell.getCellType() ) {
+
+					case Cell.CELL_TYPE_FORMULA :
+
+						if( StringUtil.isNotEmpty( cell ) ) {
+
+							switch( evaluator.evaluateFormulaCell(cell) ) {
+								case Cell.CELL_TYPE_NUMERIC :
+									data.put( key, getNumericCellValue(cell) );
+									break;
+								case Cell.CELL_TYPE_BOOLEAN :
+									data.put( key, cell.getBooleanCellValue() );
+									break;
+								case Cell.CELL_TYPE_STRING  :
+									data.put( key, cell.getStringCellValue() );
+									break;
+							}
+
+						} else {
+							data.put( key, cell.getStringCellValue() );
+						}
+
+						break;
+
+					case Cell.CELL_TYPE_NUMERIC :
+						data.put( key, getNumericCellValue(cell) );
+						break;
+
+					case Cell.CELL_TYPE_BOOLEAN :
+						data.put( key, cell.getBooleanCellValue() );
+						break;
+					default :
+						data.put( key, cell.getStringCellValue() );
+
+				}
+
+
+			}
+
+			result.addRow( data );
+
+		}
+
+		return result;
+
+	}
+
+	private NMap getExcelColumnHeader( Sheet sheet ) {
 
     	NMap result = new NMap();
 
@@ -222,7 +239,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
     }
 
 
-    public static boolean isCellDateFormatted( Cell cell ) {
+    private boolean isCellDateFormatted( Cell cell ) {
 
     	if (cell == null) return false;
 
