@@ -69,7 +69,9 @@ public class DbUtils {
 				Object val = tempParam.get( key );
 
 				if( isPrimitive(val) ) {
-					if( TypeUtil.isArray( val ) ) val = TypeUtil.toList( val );
+					if( isTargetToConvetAsList(val) ) {
+						val = TypeUtil.toList( val );
+					}
 					newParam.put( primitiveParameterKey + key, val );
 				} else {
 					NMap newVal = toNRowParameter( val, primitiveParameterKey + key );
@@ -81,6 +83,27 @@ public class DbUtils {
 		}
 
 		return newParam;
+
+	}
+
+	/**
+	 * Check if value is target to convert as list.
+	 *
+	 * BLOB data (byte[], Byte[]) must be excluded.
+	 *
+	 * @param value
+	 * @return true if value is excluded in 'byte[]' or 'Byte[]' and type is array.
+	 */
+	private static boolean isTargetToConvetAsList( Object value ) {
+
+		if( value == null ) return false;
+
+		Class klass = value.getClass();
+
+		if( klass == byte[].class     ) return false;
+		if( klass == Byte[].class     ) return false;
+
+		return TypeUtil.isArray( value );
 
 	}
 
