@@ -1,5 +1,6 @@
 package org.nybatis.core.file.handler.implement;
 
+import jxl.read.biff.BiffException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -92,14 +93,46 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 	}
 
 	@Override
+	public NList readFrom( File excelFile, String sheetName ) throws IoException {
+		return readFrom( excelFile, ( workbook, result ) -> {
+			result.put( sheetName, readFrom( workbook, workbook.getSheetIndex(sheetName) ) );
+		} ).get( sheetName );
+	}
+
+	@Override
+	public NList readFirstSheetFrom( File excelFile ) throws IoException {
+		return readFrom( excelFile, ( workbook, result ) -> {
+			Sheet sheet = workbook.getSheetAt( 0 );
+			if( sheet != null ) {
+				result.put( "FirstSheet", readFrom( workbook, 0 ) );
+			}
+		} ).get( 0 );
+	}
+
+
+	@Override
 	public Map<String, NList> readFrom( File excelFile ) throws IoException {
+		return readFrom( excelFile, ( workbook, result ) -> {
+			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
+				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
+			}
+		} );
+	}
+
+	private interface Reader {
+		void read( Workbook workbook, Map<String,NList> result );
+	}
+
+	private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
 
 		Map<String, NList> result = new LinkedHashMap<>();
 
 		try (
-			FileInputStream fis      = new FileInputStream( excelFile );
-			Workbook        workbook = new HSSFWorkbook( fis )
+				FileInputStream fis      = new FileInputStream( excelFile );
+				Workbook        workbook = new HSSFWorkbook( fis )
 		) {
+
+			reader.read( workbook, result );
 
 			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
 				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );

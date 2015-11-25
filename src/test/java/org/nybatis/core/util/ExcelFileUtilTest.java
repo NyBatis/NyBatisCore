@@ -25,7 +25,7 @@ public class ExcelFileUtilTest {
 
 		NLogger.debug( ">> Write Xls : [{}]", xlsFileToWrite );
 		ExcelUtil.writeTo( xlsFileToWrite, tableXls  );
-		tableXls  = ExcelUtil.readFrom( xlsFileToWrite );
+		tableXls  = ExcelUtil.readFirstSheetFrom( xlsFileToWrite );
 		NLogger.debug( tableXls );
 
 //		FileUtil.delete( xlsFileToWrite  );
@@ -36,7 +36,7 @@ public class ExcelFileUtilTest {
 
 		NLogger.debug( ">> Write Xlsx : [{}]", xlsxFileToWrite );
 		ExcelUtil.writeTo( xlsxFileToWrite, tableXlsx );
-		tableXlsx = ExcelUtil.readFrom( xlsxFileToWrite );
+		tableXlsx = ExcelUtil.readFirstSheetFrom( xlsxFileToWrite );
 		NLogger.debug( tableXlsx );
 
 		FileUtil.delete( xlsxFileToWrite );
