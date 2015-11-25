@@ -58,12 +58,12 @@ public class SqlSessionSqliteTest {
 		TransactionManager.commit();
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case00_printSqlRepository() {
 		NLogger.debug( new SqlRepository().toString() );
 	}
 
-	@Test( expectedExceptions = SqlException.class )
+	@Test( sequential = true, expectedExceptions = SqlException.class )
 	public void case00_nullParameterBindingError() {
 
 		SqlSession sqlSession = getSession();
@@ -89,7 +89,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_initDummyDataByStatementBatch() {
 
 		case10_initTable();
@@ -117,7 +117,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_initDummyDataByPreparedStatementBatch() {
 
 		case10_initTable();
@@ -146,7 +146,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_initDummyData() {
 
 		case10_initTable();
@@ -172,7 +172,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_select() {
 
 		SqlSession sqlSession = getSession();
@@ -196,7 +196,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_transactionTest_01() {
 
 		SqlSession sqlSession = getSession();
@@ -225,7 +225,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_transactionTest_02_CommitTest_01_DeleteAndCommit() {
 
 		case10_initDummyDataByPreparedStatementBatch();
@@ -250,7 +250,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case10_transactionTest_03_CommitTest_02_CheckCommitted() {
 
 		SqlSession sqlSession = getSession();
@@ -266,7 +266,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test
+	@Test( sequential = true )
 	public void case11_cache() {
 
 		NLogger.debug( new CacheManager() );

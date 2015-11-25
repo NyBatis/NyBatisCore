@@ -10,12 +10,12 @@ import java.util.List;
  */
 public interface OrmBatchExecutor<T> {
 
-    OrmBatchExecutor setTransactionSize( int size );
+    OrmBatchExecutor<T> setTransactionSize( int size );
 
-    int insert( List<?> parameterList );
+    int insert( List<?> parameters );
 
-    int update( List<?> parameterList );
+    int update( List<?> parameters );
 
-    int delete( List<?> parameterList );
+    int delete( List<?> parameters );
 
 }
