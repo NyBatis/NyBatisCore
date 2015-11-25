@@ -9,11 +9,15 @@ import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StopWatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.naming.event.NamingListener;
+import java.sql.BatchUpdateException;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,7 +115,7 @@ public abstract class AbstractBatchExecutor {
 
 	}
 
-	private void executeBatch( Statements statements, Logs logs  ) {
+	private void executeBatch( Statements statements, Logs logs  ) throws SQLException {
 
 		Map<Object, Long> elapsedTimes = new HashMap<>();
 
@@ -127,14 +131,35 @@ public abstract class AbstractBatchExecutor {
 
 				elapsedTimes.put( key, watcher.elapsedMiliSeconds() );
 
-			} catch( SQLException e ) {
+			} catch( BatchUpdateException e ) {
 
-				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameter\n{}",
-						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog(key) );
+				int successCount = 0;
+				int failCount = 0;
+				int notAavailable = 0;
+
+				int[] updateCounts = e.getUpdateCounts();
+
+				// {1,1,1,0,0,0,0,0,0,0} : sqlite
+
+				for( int i = 0, iCnt = updateCounts.length; i < iCnt; i++ ) {
+					if( updateCounts[i] >= 0 ) {
+						successCount++;
+					} else if( updateCounts[i] == Statement.SUCCESS_NO_INFO ) {
+						notAavailable++;
+					} else if( updateCounts[i] == Statement.EXECUTE_FAILED ) {
+						failCount++;
+					}
+				}
+
+				NLogger.debug( ">> successCount : {}, notAavailable : {}, failCount : {}", successCount, notAavailable, failCount );
+
+				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
+						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
 
 				exception.setErrorCode( e.getErrorCode() );
 
 				throw exception;
+
 			}
 
 		}
