@@ -65,13 +65,7 @@ public abstract class ExcelHandler {
 	 * @return grid data
 	 * @throws IoException  File I/O Exception
 	 */
-	public NList readFrom( File excelFile, String sheetName ) throws IoException {
-
-		Map<String, NList> worksheets = readFrom( excelFile );
-
-		return worksheets.containsKey( sheetName ) ? worksheets.get( sheetName ) : new NList();
-
-	}
+	public abstract NList readFrom( File excelFile, String sheetName ) throws IoException;
 
 	/**
 	 * Read first sheet from excel file
@@ -80,19 +74,7 @@ public abstract class ExcelHandler {
 	 * @return grid data from first sheet
 	 * @throws IoException file I/O exception
 	 */
-	public NList readFirstSheetFrom( File excelFile ) throws IoException {
-
-		Map<String, NList> worksheets = readFrom( excelFile );
-
-		if( worksheets.size() == 0 ) return new NList();
-
-		List sheetNames = new ArrayList( worksheets.keySet() );
-
-		Collections.sort( sheetNames );
-
-		return worksheets.get( sheetNames.get( 0 ) );
-
-	}
+	public abstract NList readFirstSheetFrom( File excelFile ) throws IoException;
 
 	/**
 	 * Read all sheets from excel file

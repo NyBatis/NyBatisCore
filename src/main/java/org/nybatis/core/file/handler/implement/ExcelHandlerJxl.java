@@ -21,6 +21,7 @@ import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.validation.Validator;
 
 public class ExcelHandlerJxl extends ExcelHandler {
 
@@ -98,7 +99,36 @@ public class ExcelHandlerJxl extends ExcelHandler {
     }
 
     @Override
+    public NList readFrom( File excelFile, String sheetName ) throws IoException {
+        return readFrom( excelFile, ( workbook, result ) -> {
+            result.put( sheetName, readFrom( workbook, sheetName ) );
+        } ).get( sheetName );
+    }
+
+    @Override
+    public NList readFirstSheetFrom( File excelFile ) throws IoException {
+        return readFrom( excelFile, ( workbook, result ) -> {
+            Sheet sheet = workbook.getSheet( 0 );
+            if( sheet != null ) {
+                result.put( "FirstSheet", readFrom( workbook, sheet.getName() ) );
+            }
+        } ).get( 0 );
+    }
+
+    @Override
     public Map<String, NList> readFrom( File excelFile ) throws IoException {
+        return readFrom( excelFile, ( workbook, result ) -> {
+            for( String sheetName : workbook.getSheetNames() ) {
+                result.put( sheetName, readFrom(workbook, sheetName) );
+            }
+        } );
+    }
+
+    private interface Reader {
+        void read( Workbook workbook, Map<String,NList> result );
+    }
+
+    private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
 
         if( FileUtil.isNotExist(excelFile) ) {
             throw new IoException( "ExcelFile[{}] to read is not exist.", excelFile );
@@ -112,9 +142,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
 
             workBook = Workbook.getWorkbook( excelFile );
 
-            for( String sheetName : workBook.getSheetNames() ) {
-                result.put( sheetName, readFrom(workBook, sheetName) );
-            }
+            reader.read( workBook, result );
 
             return result;
 
