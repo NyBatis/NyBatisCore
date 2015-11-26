@@ -21,22 +21,24 @@ public class BizException extends BaseRuntimeException {
     /**
      * Exception 생성자
      *
-     * @param message   에러메세지(또는 메세지코드)
-     * @param messageParam '@' 문자를 치환할 파라미터
+     * @param errorCode   에러코드(메세지코드)
+     * @param messageParam '{}' 문자를 치환할 파라미터
      */
-    public BizException( String message, Object... messageParam ) {
-        super( message, messageParam );
+    public BizException( String errorCode, Object... messageParam ) {
+        super( errorCode, messageParam );
+        super.setErrorCode( errorCode );
     }
 
     /**
      * Exception 생성자
      *
      * @param rootCause 원인이 되는 예외
-     * @param message 에러메세지(또는 메세지코드)
-     * @param messageParam '@' 문자를 치환할 파라미터
+     * @param errorCode 에러코드(메세지코드)
+     * @param messageParam '{}' 문자를 치환할 파라미터
      */
-    public BizException( Throwable rootCause, String message, Object... messageParam ) {
-        super( rootCause, message, messageParam );
+    public BizException( Throwable rootCause, String errorCode, Object... messageParam ) {
+        super( rootCause, errorCode, messageParam );
+        super.setErrorCode( errorCode );
     }
 
     /**

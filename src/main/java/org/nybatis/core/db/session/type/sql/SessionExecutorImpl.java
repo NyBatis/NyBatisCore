@@ -7,6 +7,7 @@ import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
 
@@ -31,7 +32,7 @@ public class SessionExecutorImpl implements SessionExecutor {
 
         SqlNode sqlNode = SqlRepository.get( id );
 
-        Assertion.isNotNull( sqlNode, "There is no sql id({}) in repository.", id );
+        Assertion.isNotNull( sqlNode, "There is no sql id({}) in repository.", id, SqlConfigurationException.class );
 
         sqlBean = new SqlBean( sqlNode, parameter );
 
