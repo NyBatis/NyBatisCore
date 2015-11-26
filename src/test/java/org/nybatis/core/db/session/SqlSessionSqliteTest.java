@@ -292,4 +292,39 @@ public class SqlSessionSqliteTest {
 
 	}
 
+	@Test( sequential = true )
+	public void case11_batchErrorLog() {
+
+		case10_initTable();
+
+		SqlSession sqlSession = getSession();
+
+		List<String> sqlList = new ArrayList<>();
+
+		for( int i = 0; i < 100; i++ ) {
+
+			String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
+					TABLE_NAME,
+					"RNK" + StringUtil.lpad( i, '0', 5 ),
+					i,
+					"PROD-" + i
+			);
+
+			sqlList.add( sql );
+
+		}
+
+		String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
+				TABLE_NAME,
+				"RNK" + StringUtil.lpad( 10, '0', 5 ),
+				10,
+				"PROD-" + 10
+		);
+
+		sqlList.add( 13, sql );
+
+		sqlSession.batchSql( sqlList ).execute( 10 );
+
+	}
+
 }
