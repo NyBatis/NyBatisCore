@@ -127,9 +127,16 @@ public class CacheManager {
 
 		try {
 
-			Cache cache = cacheModel.makeCache();
-			cache.setFlushCycle( Validator.nvl( flushCycle, properties.getCacheFlushCycle()) );
-			cachePool.put( sqlId, cache );
+			if( ! cachePool.containsKey( sqlId ) ) {
+
+				properties.isCacheEnable( true );
+				properties.setCacheId( cacheModel.getId() );
+
+				Cache cache = cacheModel.makeCache();
+				cache.setFlushCycle( Validator.nvl( flushCycle, properties.getCacheFlushCycle()) );
+				cachePool.put( sqlId, cache );
+
+			}
 
 		} catch( ClassCastException e ) {
 			NLogger.warn( e, "cache model({})'s class({}) is fail to initialize. Sql({}) will be never cached.", properties.getCacheId(), cacheModel.getKlass(), sqlId );

@@ -110,7 +110,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public T select( Object entity ) {
 
         properties.setEntityParameter( entity );
-        checkPkNotNull();
 
         try {
             return getSessionExecutor( properties.sqlIdSelectSingle() ).select( domainClass );
@@ -124,7 +123,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public NMap selectMap( Object entity ) {
 
         properties.setEntityParameter( entity );
-        checkPkNotNull();
 
         try {
             return getSessionExecutor( properties.sqlIdSelectSingle() ).select();
