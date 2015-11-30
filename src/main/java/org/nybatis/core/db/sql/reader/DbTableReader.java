@@ -54,11 +54,12 @@ public class DbTableReader {
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_SINGLE, selectSingleSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_MULTI,  selectListSql( layout ),   cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE,        updateSql( layout ),       cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,        deleteSql( layout ),       cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT,        insertSql( layout ),       cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout ),   cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ), cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout ),   cacheId, flush );
 
         } finally {
             readLocker.unlock();
@@ -93,11 +94,11 @@ public class DbTableReader {
 
     }
 
-    private String selectSingleSql( TableLayout layout ) {
+    private String selectPkSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_SINGLE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
             sb.append( String.format(
@@ -113,11 +114,11 @@ public class DbTableReader {
 
     }
 
-    private String selectListSql( TableLayout layout ) {
+    private String selectSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_MULTI, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
             sb.append( String.format(
@@ -133,11 +134,11 @@ public class DbTableReader {
 
     }
 
-    private String updateSql( TableLayout layout ) {
+    private String updatePkSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
+        sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
         sb.append( "<group delimeter=\",\">\n" );
 
         for( Column column : layout.getColumns() ) {
@@ -186,7 +187,26 @@ public class DbTableReader {
 
     }
 
-    private String insertSql( TableLayout layout ) {
+    private String deletePkSql( TableLayout layout ) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+
+        for( Column column : layout.getPkColumns() ) {
+            sb.append( String.format(
+                    getTestNode( "#{%s} != null", "AND %s = #{%s}" ),
+                    getOverrideKey( column.getKey() ), column.getName(), getOverrideKey( column.getKey() )
+            ));
+        }
+
+        sb.append( getOverrideWhereNode() );
+
+        return sb.toString();
+
+    }
+
+    private String insertPkSql( TableLayout layout ) {
 
         StringBuilder sb = new StringBuilder();
 
@@ -220,7 +240,7 @@ public class DbTableReader {
         }
 
         sb.append( String.format( "INSERT /*+ %s.%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
-                Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
+                Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
                 structureDefine,
                 structureValues
         ) );

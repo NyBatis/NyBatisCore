@@ -69,24 +69,28 @@ public class OrmSessionProperties {
         return Const.db.getOrmSqlIdPrefix( environmentId, tableName );
     }
 
-    public String sqlIdSelectSingle() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_SINGLE;
+    public String sqlIdSelectPk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_PK;
     }
 
-    public String sqlIdSelectList() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_MULTI;
+    public String sqlIdSelect() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT;
     }
 
-    public String sqlIdInsert() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_INSERT;
+    public String sqlIdInsertPk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_INSERT_PK;
     }
 
-    public String sqlIdUpdate() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE;
+    public String sqlIdUpdatePk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE_PK;
     }
 
     public String sqlIdDelete() {
         return sqlIdPrefix() + Const.db.ORM_SQL_DELETE;
+    }
+
+    public String sqlIdDeletePk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_PK;
     }
 
     public void addWhere( String where, Object parameter ) {
