@@ -4,7 +4,6 @@ import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author nayasis@gmail.com
@@ -25,19 +24,19 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     @Override
     public List<T> select() {
         properties.setEntityParameter( null );
-        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
     }
 
     @Override
     public List<T> select( Object parameter ) {
         properties.setEntityParameter( parameter );
-        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().select( domainClass );
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
     }
 
     @Override
     public int count( T parameter ) {
         properties.setEntityParameter( parameter );
-        return sqlSession.sqlId( properties.sqlIdSelectList(), properties.getParameter() ).list().count();
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().count();
     }
 
     @Override
@@ -71,7 +70,7 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> disableCache() {
-        CacheManager.disableCache( properties.sqlIdSelectSingle() );
+        CacheManager.disableCache( properties.sqlIdSelectPk() );
         return this;
     }
 
@@ -82,7 +81,7 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds ) {
-        CacheManager.enableCache( properties.sqlIdSelectSingle(), cacheId, flushSeconds );
+        CacheManager.enableCache( properties.sqlIdSelectPk(), cacheId, flushSeconds );
         return this;
     }
 

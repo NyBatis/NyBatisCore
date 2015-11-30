@@ -31,12 +31,12 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     @Override
     public int insert( List<?> parameters ) {
-        return executeBatch( properties.sqlIdInsert(), parameters );
+        return executeBatch( properties.sqlIdInsertPk(), parameters );
     }
 
     @Override
     public int update( List<?> parameters ) {
-        return executeBatch( properties.sqlIdUpdate(), parameters );
+        return executeBatch( properties.sqlIdUpdatePk(), parameters );
     }
 
     @Override

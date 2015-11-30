@@ -30,7 +30,7 @@ public interface OrmSession<T> {
     int merge( Object entity );
 
     /**
-     * Update entity
+     * Update entity.
      *
      * @param entity entity parameter to update.
      * @return affected count
@@ -38,7 +38,7 @@ public interface OrmSession<T> {
     int update( Object entity );
 
     /**
-     * Delete entity
+     * Delete entity. If entity belongs to domain class, only PK records affected.
      *
      * @param entity entity parameter to delete.
      * @return affected count
@@ -46,7 +46,7 @@ public interface OrmSession<T> {
     int delete( Object entity );
 
     /**
-     * Select entity
+     * Select entity. If entity belongs to domain class, only PK records affected.
      *
      * @param entity entity parameter to select.
      * @return selected entity
@@ -54,7 +54,8 @@ public interface OrmSession<T> {
     T select( Object entity );
 
     /**
-     * Select entity and get to map data format.
+     * Select entity as map data. If entity belongs to domain class, only PK records affected.
+     *
      *
      * @param entity entity parameter to select.
      * @return
