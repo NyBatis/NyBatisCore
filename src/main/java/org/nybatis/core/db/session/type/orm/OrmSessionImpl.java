@@ -201,8 +201,8 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
-    public OrmSession<T> changeEnvironmentId( String id ) {
-        sqlSession.changeEnvironmentId( id );
+    public OrmSession<T> setEnvironmentId( String id ) {
+        sqlSession.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         createOrmSql();
         return this;
