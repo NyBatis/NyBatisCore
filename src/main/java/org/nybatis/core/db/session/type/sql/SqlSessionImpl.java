@@ -49,7 +49,7 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     private void assertionEnvironmentId( String environmentId ) {
-        Assertion.isTrue( DatasourceManager.isExist( environmentId ), "There is no database environment (id : {}}", environmentId );
+//        Assertion.isTrue( DatasourceManager.isExist( environmentId ), "There is no database environment (id : {}}", environmentId );
     }
 
     public SqlProperties getProperties() {
