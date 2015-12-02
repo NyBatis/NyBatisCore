@@ -39,17 +39,11 @@ public class SqlSessionImpl implements SqlSession {
         this.originalProperties = Validator.nvl( properties, new SqlProperties() );
         this.properties         = originalProperties.clone();
 
-        assertionEnvironmentId( this.properties.getRawEnvironmentId() );
-
     }
 
     public SqlSessionImpl initProperties() {
         properties = originalProperties.clone();
         return this;
-    }
-
-    private void assertionEnvironmentId( String environmentId ) {
-//        Assertion.isTrue( DatasourceManager.isExist( environmentId ), "There is no database environment (id : {}}", environmentId );
     }
 
     public SqlProperties getProperties() {
@@ -174,7 +168,6 @@ public class SqlSessionImpl implements SqlSession {
 
     @Override
     public SqlSession setEnvironmentId( String id ) {
-        assertionEnvironmentId( id );
         originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         return this;
@@ -188,6 +181,11 @@ public class SqlSessionImpl implements SqlSession {
     @Override
     public <T> OrmSession<T> openOrmSession( Class<T> domainClass ) {
         return openOrmSession( null, domainClass );
+    }
+
+    @Override
+    public SqlSession openSeperateSession() {
+        return null;
     }
 
 }

@@ -238,7 +238,6 @@ public class Validator {
 
     }
 
-
     /**
      * 문자열이 숫자를 가지고 있는지 여부를 확인한다.
      *
@@ -320,8 +319,29 @@ public class Validator {
         return isMatched( value, "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$" );
     }
 
-    public static <T> T nvl( T value, T nullValue ) {
-    	return ( value == null ) ? nullValue : value;
+    /**
+     * Let you replace null with another value.
+     *
+     * if value is null, examine null value.
+     * if nullValue is null, examine next another nullValue.
+     * if it is not null in another nullValues, it returns as result.
+     *
+     * @param value             value to examine not null.
+     * @param nullValue         other value to examine not null.
+     * @param anotherNullValue  another values to examine not null.
+     * @return not null value from begin with.
+     */
+    public static <T> T nvl( T value, T nullValue, T... anotherNullValue ) {
+
+        if( value     != null ) return value;
+        if( nullValue != null ) return nullValue;
+
+        for( T val : anotherNullValue ) {
+            if( val != null ) return val;
+        }
+
+        return null;
+
     }
 
 }

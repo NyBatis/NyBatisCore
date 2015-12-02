@@ -10,8 +10,9 @@ import org.nybatis.core.log.NLogger;
 
 public class GlobalSqlParameter {
 
-	private static final String SQL_PARAM   = GlobalSqlParameter.class.getName() + ".SQL_PARAM";
-	private static final String ENVIRONMENT = GlobalSqlParameter.class.getName() + ".ENVIRONMENT";
+	private static final String SQL_PARAM              = GlobalSqlParameter.class.getName() + ".SQL_PARAM";
+	private static final String ENVIRONMENT_COMPULSIVE = GlobalSqlParameter.class.getName() + ".ENVIRONMENT_COMPULSIVE";
+	private static final String ENVIRONMENT_DEFAULT    = GlobalSqlParameter.class.getName() + ".ENVIRONMENT_DEFAULT";
 
 	@SuppressWarnings( "unchecked" )
     private static Map<Object, Object> getMap() {
@@ -57,23 +58,42 @@ public class GlobalSqlParameter {
 		return getMap();
 	}
 
-	public static void setEnvironmentId( String id ) {
+	public static void setCompulsiveEnvironmentId( String id ) {
 
 		if( DatasourceManager.get( id ) == null ) {
 			NLogger.warn( "Environment(id:{}) is not exits.", id );
 			return;
 		}
 
-		NThreadLocal.set( ENVIRONMENT, id );
+		NThreadLocal.set( ENVIRONMENT_COMPULSIVE, id );
 
 	}
 
-	public static void removeEnvironmentId() {
-		NThreadLocal.set( ENVIRONMENT, null );
+	public static void removeCompulsiveEnvironmentId() {
+		NThreadLocal.set( ENVIRONMENT_COMPULSIVE, null );
 	}
 
-	public static String getEnvironmentId() {
-		return (String) NThreadLocal.get( ENVIRONMENT );
+	public static String getCompulsiveEnvironmentId() {
+		return (String) NThreadLocal.get( ENVIRONMENT_COMPULSIVE );
+	}
+
+	public static void setDefaultEnvironmentId( String id ) {
+
+		if( DatasourceManager.get( id ) == null ) {
+			NLogger.warn( "Environment(id:{}) is not exits.", id );
+			return;
+		}
+
+		NThreadLocal.set( ENVIRONMENT_DEFAULT, id );
+
+	}
+
+	public static void removeDefaultEnvironmentId() {
+		NThreadLocal.set( ENVIRONMENT_DEFAULT, null );
+	}
+
+	public static String getDefaultEnvironmentId() {
+		return (String) NThreadLocal.get( ENVIRONMENT_DEFAULT );
 	}
 
 }

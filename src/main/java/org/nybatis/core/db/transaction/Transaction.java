@@ -13,6 +13,7 @@ import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
 public class Transaction {
@@ -88,6 +89,8 @@ public class Transaction {
 	}
 
 	public synchronized Connection getConnection( String token, String environmentId ) {
+
+		Assertion.isTrue( DatasourceManager.isExist( environmentId ), new SqlConfigurationException("There is no database environment (id : {}}", environmentId) );
 
 		Connection connection = getStoredConnection( token, environmentId );
 

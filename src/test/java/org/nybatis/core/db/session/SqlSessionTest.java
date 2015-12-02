@@ -207,7 +207,7 @@ public class SqlSessionTest {
 
 		NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );
 
-		GlobalSqlParameter.setEnvironmentId( "oracle" );
+		GlobalSqlParameter.setCompulsiveEnvironmentId( "oracle" );
 
 		try {
 			NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );
@@ -551,7 +551,7 @@ public class SqlSessionTest {
 	@Test
 	public void unpooledDatasource() {
 
-		SessionManager.setGlobalEnvironment( "sqliteUnpooled" );
+		SessionManager.setCompulsiveEnvironment( "sqliteUnpooled" );
 
 		select();
 

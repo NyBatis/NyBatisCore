@@ -11,7 +11,7 @@ import java.sql.ResultSet;
 import java.util.List;
 
 /**
- * The primary Java interface for SQL management in NayasisCommon library.
+ * The primary Java interface for SQL management in NyBatis.
  * Through this interface you can execute sql or manage transaction.
  *
  * <pre>
@@ -20,12 +20,12 @@ import java.util.List;
  * Map param = new HashMap();
  * param.put( <font color=red>"id"</font>, <font color=blue>"merong"</font> );
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, param );
+ * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, param ).update();
  *
  * session.rollback();
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"A001"</font> );
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"B002"</font> );
+ * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"A001"</font> ).update();
+ * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"B002"</font> ).update();
  *
  * session.commit();
  *
@@ -56,12 +56,12 @@ public interface SqlSession {
 	SqlSession rollback();
 
 	/**
-	 * Begin transaction forcedly
+	 * Begin transaction forcibly
 	 */
 	SqlSession beginTransaction();
 
 	/**
-	 * End transaction forcedly
+	 * End transaction forcibly
 	 */
 	SqlSession endTransaction();
 
@@ -93,8 +93,32 @@ public interface SqlSession {
 	 */
 	SqlSession setEnvironmentId( String id );
 
+	/**
+	 * Open ORM Session.
+	 * environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
+	 *
+	 * @param tableName     database table name
+	 * @param domainClass   domain class represent to database table
+	 * @return OrmSession
+	 */
 	<T> OrmSession<T> openOrmSession( String tableName, Class<T> domainClass );
 
+	/**
+	 * Open ORM Session.
+	 * table name is determined by <b>name</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class or domain class's uncamel name.
+	 * and environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
+	 *
+	 * @param domainClass   domain class represent to database table
+	 * @return OrmSession
+	 */
 	<T> OrmSession<T> openOrmSession( Class<T> domainClass );
+
+	/**
+	 * Open seperated Sql Session for nested transaction handling.
+	 * Environment id is along to current SqlSession.
+	 *
+	 * @return seperated SqlSession (Connection is different from another SqlSession)
+	 */
+	SqlSession openSeperateSession();
 
 }

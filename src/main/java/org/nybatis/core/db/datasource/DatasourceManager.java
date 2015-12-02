@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class DatasourceManager {
 
-	private static Map<String, DataSource>       datasourceRepository = new Hashtable<>();
+	private static Map<String, DataSource>        datasourceRepository = new Hashtable<>();
 	private static Map<String, DatabaseAttribute> attributeRepository  = new Hashtable<>();
 
 	private static String defaultEnvironmentId;

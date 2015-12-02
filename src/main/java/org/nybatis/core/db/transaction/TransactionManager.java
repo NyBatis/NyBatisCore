@@ -55,8 +55,8 @@ public class TransactionManager implements Observer {
 		getTransaction().rollback();
 	}
 
-	public static Connection getConnection( String token, String datasourceId ) {
-		return getTransaction().getConnection( token, datasourceId );
+	public static Connection getConnection( String token, String environmentId ) {
+		return getTransaction().getConnection( token, environmentId );
 	}
 
 	public static void releaseConnection( String token, Connection connection ) {
