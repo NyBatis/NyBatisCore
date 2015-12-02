@@ -83,10 +83,7 @@ public class SqlProperties {
 	}
 
 	public String getEnvironmentId() {
-		return Validator.nvl(
-				environmentId,
-				Validator.nvl( GlobalSqlParameter.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() )
-		);
+		return Validator.nvl( environmentId, GlobalSqlParameter.getCompulsiveEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public void setEnvironmentId( String environmentId ) {

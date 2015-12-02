@@ -94,7 +94,7 @@ public class SqlBean {
 	private void setEnvironmentId( String environmentId ) {
 
 		if( environmentId == null ) {
-			throw new DatabaseConfigurationException( "Database configuration does not loaded." );
+			throw new SqlConfigurationException( "Database configuration does not loaded." );
 		}
 
 		properties.setEnvironmentId( environmentId );
