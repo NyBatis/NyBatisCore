@@ -7,6 +7,7 @@ import java.util.Observer;
 
 import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.context.ThreadRoot;
+import org.nybatis.core.log.NLogger;
 
 public class TransactionToken implements Observer {
 
@@ -47,12 +48,16 @@ public class TransactionToken implements Observer {
 
 		}
 
-		return String.format( "%s::%d", key, currentToken );
+		String token = String.format( "%s::%d", key, currentToken );
+		NLogger.trace( ">> createToken : {}", token );
+		return token;
 
 	}
 
 	public static String getDefaultToken() {
-		return String.format( "%s::%d", ThreadRoot.getKey(), 0 );
+		String token = String.format( "%s::%d", ThreadRoot.getKey(), 0 );
+		NLogger.trace( ">> defaultToken : {}", token );
+		return token;
 	}
 
 
