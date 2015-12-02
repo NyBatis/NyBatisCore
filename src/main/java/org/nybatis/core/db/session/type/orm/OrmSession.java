@@ -125,11 +125,11 @@ public interface OrmSession<T> {
     boolean isTransactionBegun();
 
     /**
-     * Change environment id
+     * Set environment id
      *
      * @param id environment id
      */
-    OrmSession<T> changeEnvironmentId( String id );
+    OrmSession<T> setEnvironmentId( String id );
 
     /**
      * Cache statements should not be cached at once when has been executed.

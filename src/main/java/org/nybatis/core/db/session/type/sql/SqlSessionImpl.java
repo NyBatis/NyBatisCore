@@ -173,7 +173,7 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     @Override
-    public SqlSession changeEnvironmentId( String id ) {
+    public SqlSession setEnvironmentId( String id ) {
         assertionEnvironmentId( id );
         originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );

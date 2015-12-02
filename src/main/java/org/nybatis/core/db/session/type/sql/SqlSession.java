@@ -87,11 +87,11 @@ public interface SqlSession {
 	SqlSession useConnection( ConnectionHandler worker ) throws BaseRuntimeException;
 
 	/**
-	 * Change environment id
+	 * Set environment id
 	 *
 	 * @param id environment id
 	 */
-	SqlSession changeEnvironmentId( String id );
+	SqlSession setEnvironmentId( String id );
 
 	<T> OrmSession<T> openOrmSession( String tableName, Class<T> domainClass );
 
