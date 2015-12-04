@@ -13,6 +13,7 @@ import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.validation.Validator;
 
 import java.util.List;
 import java.util.Map;
@@ -92,13 +93,7 @@ public class SqlBean {
 	}
 
 	private void setEnvironmentId( String environmentId ) {
-
-		if( environmentId == null ) {
-			throw new SqlConfigurationException( "Database configuration does not loaded." );
-		}
-
 		properties.setEnvironmentId( environmentId );
-
 	}
 
 	public String toString() {
@@ -118,7 +113,7 @@ public class SqlBean {
 	}
 
 	public String getEnvironmentId() {
-		return properties.getEnvironmentId();
+		return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getCompulsiveEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public String getSqlId() {
@@ -209,7 +204,7 @@ public class SqlBean {
 	}
 
 	private String getDatabase() {
-		return DatasourceManager.getAttributes( properties.getEnvironmentId() ).getDatabase();
+		return DatasourceManager.getAttributes( properties.getStandAloneEnvironmentId() ).getDatabase();
 	}
 
 }

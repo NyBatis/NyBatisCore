@@ -44,6 +44,7 @@ public abstract class AbstractBatchExecutor {
 
 		if( sqlNode != null ) {
 			properties = sqlNode.getProperties().merge( properties );
+			properties.setEnvironmentId( sqlNode.getEnvironmentId() );
 		}
 
 		if( commitCount != null && commitCount > 0 ) {
@@ -53,7 +54,7 @@ public abstract class AbstractBatchExecutor {
 			commitCount = null;
 		}
 
-		String environmentId = properties.getEnvironmentId();
+		String environmentId = properties.getStandAloneEnvironmentId();
 
 		Statements  statements  = getStatements().init( token, environmentId );
 		Logs        logs        = getLogs();

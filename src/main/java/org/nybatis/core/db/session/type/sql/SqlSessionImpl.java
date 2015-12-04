@@ -127,7 +127,7 @@ public class SqlSessionImpl implements SqlSession {
 
         try {
 
-            conn = TransactionManager.getConnection( token, properties.getEnvironmentId() );
+            conn = TransactionManager.getConnection( token, properties.getStandAloneEnvironmentId() );
 
             worker.setProperties( properties );
             worker.setConnection( conn );
@@ -185,7 +185,7 @@ public class SqlSessionImpl implements SqlSession {
 
     @Override
     public SqlSession openSeperateSession() {
-        return null;
+        return SessionManager.openSeperateSession( properties.getEnvironmentId() );
     }
 
 }

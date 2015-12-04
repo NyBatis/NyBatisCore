@@ -1,5 +1,9 @@
 package org.nybatis.core.util;
 
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NList;
+import org.nybatis.core.validation.Validator;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 public class ValidatorTest {
@@ -35,6 +39,25 @@ public class ValidatorTest {
         
         return count;
         
+    }
+
+    @Test
+    public void nvl() {
+
+        String val01 = null;
+        String val02 = "1";
+        String val03 = "2";
+
+        Assert.assertEquals( Validator.nvl( val01, val02 ), "1" );
+
+        val02 = null;
+
+        Assert.assertEquals( Validator.nvl( val01, val02, val03 ), "2" );
+
+        NList list = new NList();
+
+        Assert.assertEquals( list.size( "key"), 0 );
+
     }
     
 }

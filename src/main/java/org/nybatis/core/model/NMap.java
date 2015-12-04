@@ -63,10 +63,20 @@ public class NMap extends LinkedHashMap<Object, Object> {
 	    return this;
 	}
 
+	/**
+	 * Convert data to Json format
+	 * @param prettyPrint pretty print Y/N
+	 * @return Json string
+	 */
 	public String toJson( boolean prettyPrint ) {
 		return new Reflector().toJson( this, prettyPrint );
 	}
 
+	/**
+	 * Convert data to Json format
+	 *
+	 * @return Json string
+	 */
 	public String toJson() {
 		return toJson(false);
 	}

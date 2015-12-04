@@ -32,7 +32,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
         this.sqlSession = sqlSession;
 
-        properties.setEnvironmentId( sqlSession.getProperties().getEnvironmentId() );
+        properties.setEnvironmentId( sqlSession.getProperties().getStandAloneEnvironmentId() );
         properties.setTableName( tableName );
 
         createOrmSql();

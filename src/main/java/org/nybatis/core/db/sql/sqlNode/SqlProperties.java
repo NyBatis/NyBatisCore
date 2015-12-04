@@ -24,13 +24,13 @@ public class SqlProperties {
 	/**
 	 * Dynamic Properties
 	 */
-	private Boolean cacheClear         = null;
-	private Boolean autocommit         = null;
-	private Boolean countSql           = null;
-	private Integer pageSqlStart       = null;
-	private Integer pageSqlEnd         = null;
-	private String  ormSqlWhere        = null;
-	private String  ormSqlOrderBy      = null;
+	private Boolean cacheClear       = null;
+	private Boolean autocommit       = null;
+	private Boolean countSql         = null;
+	private Integer pageSqlStart     = null;
+	private Integer pageSqlEnd       = null;
+	private String  ormSqlWhere      = null;
+	private String  ormSqlOrderBy    = null;
 
 	public SqlProperties() {}
 
@@ -83,7 +83,11 @@ public class SqlProperties {
 	}
 
 	public String getEnvironmentId() {
-		return Validator.nvl( environmentId, GlobalSqlParameter.getCompulsiveEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+		return environmentId;
+	}
+
+	public String getStandAloneEnvironmentId() {
+		return Validator.nvl( environmentId, GlobalSqlParameter.getCompulsiveEnvironmentId(), GlobalSqlParameter.getDefaultEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public void setEnvironmentId( String environmentId ) {
