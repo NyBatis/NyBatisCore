@@ -116,10 +116,10 @@ public class SqlSessionMultiEnvironmentTest {
 		 * SQL_ID : FileName.id
 		 *
 		 * SQL_ID owns it's environments. it can be detemined by {@link GlobalSqlParameter#setDefaultEnvironmentId(String)}
-		 * but default value is configuration's default environment.
+		 * but when there is no global default environment setting, default value is configuration's default environment.
 		 *
 		 * When the value set by {@link GlobalSqlParameter#setDefaultEnvironmentId(String)} is not included in SQL_ID's environments,
-		 * it is ignored and SQL_ID executed in it's posessed environment id.
+		 * it is ignored and SQL_ID executed in it's possessed environment id.
 		 */
 
 		SqlSession session = SessionManager.openSession();
