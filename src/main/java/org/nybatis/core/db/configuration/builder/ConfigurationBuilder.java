@@ -64,9 +64,6 @@ public class ConfigurationBuilder {
 
 				cacheBuilder.checkEachSqlCache();
 
-				// only clear file information to check build error. not clear sql information. :)
-				new SqlRepository().clearFileLoadingLog();
-
 				buildChecker.add( file.toString() );
 
             }

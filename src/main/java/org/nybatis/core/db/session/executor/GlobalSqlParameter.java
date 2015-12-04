@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 
 public class GlobalSqlParameter {
@@ -80,8 +81,7 @@ public class GlobalSqlParameter {
 	public static void setDefaultEnvironmentId( String id ) {
 
 		if( DatasourceManager.get( id ) == null ) {
-			NLogger.warn( "Environment(id:{}) is not exits.", id );
-			return;
+			throw new DatabaseConfigurationException( "Environment({}) is not exits.", id );
 		}
 
 		NThreadLocal.set( ENVIRONMENT_DEFAULT, id );

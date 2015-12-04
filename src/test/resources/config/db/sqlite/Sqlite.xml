@@ -102,4 +102,8 @@ WHERE rownum <= 10
   ORDER BY prod_id
 </sql>
 
+<sql id="selectForMultiEnvironmentTest">
+  SELECT * FROM NYBATIS_TEST
+</sql>
+
 </list>

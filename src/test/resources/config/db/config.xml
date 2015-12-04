@@ -8,7 +8,7 @@
   <cache id="lru"    class="nayasis.common.cache.lruCache"    size="1024" />
   <cache id="static" class="nayasis.common.cache.staticCache" />
 
-  <environment id="sqlite" default="true" >
+  <environment id="sqlite01" default="true" >
     <datasource type="jdbc" poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
@@ -18,13 +18,23 @@
     </sqlpath>
   </environment>
 
-  <environment id="sqliteUnpooled" >
-    <datasource type="jdbc" ping="true" pingCycle="60" unpooled="true"  >
+  <environment id="sqlite02" >
+    <datasource type="jdbc" ping="true" pingCycle="60"  >
       <driver>#{driver}</driver>
       <url>jdbc:sqlite:#{default.root}/localDb/TestDb02</url>
     </datasource>
     <sqlpath>
       <path>sqlite</path>
+    </sqlpath>
+  </environment>
+
+  <environment id="sqlite03" >
+    <datasource type="jdbc" ping="true" pingCycle="60"  >
+      <driver>#{driver}</driver>
+      <url>jdbc:sqlite:#{default.root}/localDb/TestDb03</url>
+    </datasource>
+    <sqlpath>
+      <path>./sqliteSeperated/Sqlite03.xml</path>
     </sqlpath>
   </environment>
 
