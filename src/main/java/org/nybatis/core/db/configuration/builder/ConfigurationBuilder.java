@@ -57,7 +57,6 @@ public class ConfigurationBuilder {
 
 				for( Node environment : root.getChildElements("environment") ) {
 					new DatasourceBuilder( environment, propertiesBuilder );
-//					new PageBuilder( environment, propertiesBuilder );
 					try {
 						new SqlBuilder( environment, propertiesBuilder, FileUtil.getDirectory(file) );
 					} catch (FileNotFoundException e) {}

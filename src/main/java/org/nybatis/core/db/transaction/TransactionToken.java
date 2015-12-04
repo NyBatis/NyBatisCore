@@ -48,16 +48,12 @@ public class TransactionToken implements Observer {
 
 		}
 
-		String token = String.format( "%s::%d", key, currentToken );
-		NLogger.trace( ">> createToken : {}", token );
-		return token;
+		return String.format( "%s::%d", key, currentToken );
 
 	}
 
 	public static String getDefaultToken() {
-		String token = String.format( "%s::%d", ThreadRoot.getKey(), 0 );
-		NLogger.trace( ">> defaultToken : {}", token );
-		return token;
+		return String.format( "%s::%d", ThreadRoot.getKey(), 0 );
 	}
 
 

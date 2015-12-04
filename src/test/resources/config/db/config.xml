@@ -21,7 +21,7 @@
   <environment id="sqliteUnpooled" >
     <datasource type="jdbc" ping="true" pingCycle="60" unpooled="true"  >
       <driver>#{driver}</driver>
-      <url>jdbc:sqlite:#{default.root}/localDb/TestDb</url>
+      <url>jdbc:sqlite:#{default.root}/localDb/TestDb02</url>
     </datasource>
     <sqlpath>
       <path>sqlite</path>

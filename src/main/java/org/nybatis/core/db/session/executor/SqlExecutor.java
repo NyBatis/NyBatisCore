@@ -54,6 +54,10 @@ public class SqlExecutor {
 
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
 
+			if( NLogger.isTraceEnabled() ) {
+				NLogger.trace( ">> transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
+			}
+
 			boolean autoCommitConnection = conn.getAutoCommit();
 			boolean autoCommitTemporary  = sqlBean.getProperties().isAutocommit();
 			boolean autoCommitForce      = autoCommitConnection == false && autoCommitTemporary == true;

@@ -19,7 +19,10 @@ public class SessionCreator {
 	public SqlSession createSqlSession( String token, String environmentId ) {
 
 		SqlProperties properties = new SqlProperties();
-		properties.setEnvironmentId( StringUtil.isNotEmpty( environmentId ) ? environmentId : properties.getEnvironmentId() );
+
+		if( StringUtil.isNotEmpty(environmentId) ) {
+			properties.setEnvironmentId( environmentId );
+		}
 
 		return new SqlSessionImpl( token, properties );
 

@@ -45,7 +45,7 @@ public class SqlFileReader {
 
 				String sqlId = String.format( "%s.%s", baseId, id );
 
-				checkSqlIdDuplication( sqlId );
+				checkEnvironmentDuplication( sqlId );
 
 				SqlNode sql = xmlParser.parse( sqlId, node );
 
@@ -67,35 +67,15 @@ public class SqlFileReader {
 
 	}
 
-	private void checkSqlIdDuplication( String sqlId ) {
+	private void checkEnvironmentDuplication( String sqlId ) {
 
-		if( ! SqlRepository.sqlRepository.containsKey( sqlId ) ) return;
+		if( ! SqlRepository.isExist( sqlId ) ) return;
+
+		SqlRepository.get( sqlId ).addEnvironmentId( xmlParser.getEnvironmentId() );
 
     	LoadedFile existedFile = getLoadedFileInfo( sqlId );
 
-		SqlRepository.sqlRepository.clear();
-		SqlRepository.sqlRepositoryFiles.clear();
-
-    	String errorGuideMessage = null;
-
-    	if( file.toString().equals( existedFile.getFilePath() ) ) {
-    		if( ! xmlParser.getEnvironmentId().equals( existedFile.getEnvironmentId() )) {
-    			errorGuideMessage = StringUtil.format( "Same SqlId({}) existed in environment({}). One SqlId must be affilated with One unique environment.", sqlId, existedFile.getEnvironmentId() );
-    		}
-    	}
-
-    	if( errorGuideMessage == null ) {
-    		errorGuideMessage = "FileName itself is used as SqlPath's main key. So rename other file to avoid conflict.";
-    	}
-
-    	throw new DatabaseConfigurationException(
-    			"There is duplicated sql (id:{})."
-    			+ "\n\t- environmentId        : {}"
-    			+ "\n\t- file                 : {}"
-    			+ "\n\t- existedEnvironmentId : {}"
-    			+ "\n\t- existedFile          : {}"
-    			+ "\n{}",
-    			sqlId, xmlParser.getEnvironmentId(), file, existedFile.getEnvironmentId(), existedFile.getFilePath(), errorGuideMessage );
+		NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, existedFile.getEnvironmentId(), existedFile.getFilePath() );
 
 	}
 
