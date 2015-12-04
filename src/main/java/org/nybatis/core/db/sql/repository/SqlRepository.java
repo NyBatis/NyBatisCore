@@ -18,12 +18,8 @@ import org.nybatis.core.file.FileUtil;
  */
 public class SqlRepository {
 
-	public static final SqlProperties EMPTY_PROPERTIES   = new SqlProperties();
-
+	public static final SqlProperties      EMPTY_PROPERTIES   = new SqlProperties();
 	public static Map<String, SqlNode>     sqlRepository      = new Hashtable<>();
-
-	// loaded file information. it must be cleared when configration build completed.
-	public static Map<String, LoadedFile>  sqlRepositoryFiles = new Hashtable<>();
 
 	public static boolean isExist( String sqlId ) {
 		return sqlId != null && sqlRepository.containsKey( sqlId );
@@ -35,8 +31,28 @@ public class SqlRepository {
 	}
 
 	public static void put( String sqlId, SqlNode sqlNode ) {
+		put( sqlId, sqlNode, null );
+	}
+
+	public static void put( String sqlId, SqlNode sqlNode, File xmlFile ) {
+
 		if( sqlId == null || sqlNode == null ) return;
-		sqlRepository.put( sqlId, sqlNode );
+
+		if( isExist( sqlId ) ) {
+
+			String environmentId = sqlNode.getEnvironmentId();
+			get( sqlId ).addEnvironmentId( environmentId );
+
+			if( xmlFile == null ) {
+				NLogger.trace( "Sql({}) has multiple environment({})", sqlId, environmentId );
+			} else {
+				NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile.getPath() );
+			}
+
+		} else {
+			sqlRepository.put( sqlId, sqlNode );
+		}
+
 	}
 
 	public static SqlProperties getProperties( String sqlId ) {
@@ -122,10 +138,6 @@ public class SqlRepository {
 
 	public Collection<SqlNode> getSqls() {
 		return sqlRepository.values();
-	}
-
-	public void clearFileLoadingLog() {
-		sqlRepositoryFiles.clear();
 	}
 
 }

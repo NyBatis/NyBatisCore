@@ -48,7 +48,7 @@ public class ListExecutorImpl implements ListExecutor {
 
     @Override
     public int count() {
-        sqlBean.getProperties().isCountSql( true );
+        sqlSession.getProperties().isCountSql( true );
         return getExecutor().select( Integer.class );
     }
 

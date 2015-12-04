@@ -32,7 +32,7 @@ public class SessionExecutorImpl implements SessionExecutor {
 
         SqlNode sqlNode = SqlRepository.get( id );
 
-        Assertion.isNotNull( sqlNode, "There is no sql id({}) in repository.", id, SqlConfigurationException.class );
+        Assertion.isNotNull( sqlNode, new SqlConfigurationException( "There is no sql id({}) in repository.", id ) );
 
         sqlBean = new SqlBean( sqlNode, parameter );
 

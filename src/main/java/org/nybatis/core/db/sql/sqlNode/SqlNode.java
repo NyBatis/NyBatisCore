@@ -34,7 +34,7 @@ public class SqlNode {
 		this.properties    = new SqlProperties( environment, inputXmlSql );
 		this.keySqls       = Validator.nvl( keySqls, NULL_KEY_SQLS );
 
-		environmentIds.add( environment );
+		addEnvironmentId( environment );
 
 	}
 
@@ -87,7 +87,9 @@ public class SqlNode {
 	}
 
 	public void addEnvironmentId( String id ) {
-		environmentIds.add( id );
+		if( StringUtil.isNotEmpty(id) ) {
+			environmentIds.add( id );
+		}
 	}
 
 	/**
@@ -101,11 +103,11 @@ public class SqlNode {
 	 */
     public String getEnvironmentId() {
 
-		if( environmentIds.isEmpty() ) return DatasourceManager.getDefaultEnvironmentId();
+		String globalDefaultEnvironmentId = GlobalSqlParameter.getDefaultEnvironmentId();
 
-		String globalEnvironmentId = GlobalSqlParameter.getDefaultEnvironmentId();
+		if( environmentIds.isEmpty() ) return Validator.nvl( globalDefaultEnvironmentId, DatasourceManager.getDefaultEnvironmentId() );
 
-		if( environmentIds.contains( globalEnvironmentId ) ) return globalEnvironmentId;
+		if( environmentIds.contains( globalDefaultEnvironmentId ) ) return globalDefaultEnvironmentId;
 
 		return properties.getEnvironmentId();
 
