@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="configuration">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="properties"  minOccurs="0" maxOccurs="1" />
+        <xs:element ref="environment" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="properties">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="property" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="path" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="property">
+    <xs:complexType>
+      <xs:attribute name="key"   type="xs:string" />
+      <xs:attribute name="value" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="environment">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="datasource" sub >
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="id"      type="xs:ID"      use="required"/>
+      <xs:attribute name="default" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="datasourceJdbc">
+    <xs:sequence>
+      <xs:element name="driver"     type="xs:string"      minOccurs="1" maxOccurs="1" />
+      <xs:element name="url"        type="xs:string"      minOccurs="1" maxOccurs="1" />
+      <xs:element name="username"   type="xs:string"      minOccurs="0" maxOccurs="1" />
+      <xs:element name="password"   type="xs:string"      minOccurs="0" maxOccurs="1" />
+      <xs:element name="timeout"    type="xs:positiveInteger" />
+      <xs:element name="autocommit" type="xs:boolean"     />
+    </xs:sequence>
+    <xs:attribute name="type"       type="xs:string" fixed="jdbc" use="required"/>
+    <xs:attribute name="poolMin"    type="xs:positiveInteger" />
+    <xs:attribute name="poolMax"    type="xs:positiveInteger" />
+    <xs:attribute name="poolStep"   type="xs:positiveInteger" />
+    <xs:attribute name="ping"       type="xs:boolean"     />
+    <xs:attribute name="pingCycle"  type="xs:positiveInteger" />
+  </xs:complexType>
+
+  <xs:complexType name="datasourceJndi">
+    <xs:sequence>
+      <xs:element name="initialContext" type="xs:string"    minOccurs="0" maxOccurs="1"/>
+      <xs:element name="providerUrl"    type="xs:string"    minOccurs="0" maxOccurs="1"/>
+      <xs:element name="name"           type="xs:string"    minOccurs="1" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="type" type="xs:string" fixed="jndi" use="required" />
+  </xs:complexType>
+
+</xs:schema>
