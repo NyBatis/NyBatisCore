@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+       Copyright 2009-2012 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+
+<!ELEMENT configuration (properties?, environment*)>
+
+  <!ELEMENT properties (property*)>
+  <!ATTLIST properties
+    path CDATA #IMPLIED
+    >
+
+    <!ELEMENT property EMPTY>
+    <!ATTLIST property
+      key CDATA #REQUIRED
+      value CDATA #REQUIRED
+      >
+
+
+  <!ELEMENT environment (datasource, sqlpath?)>
+  <!ATTLIST environment
+    id CDATA #REQUIRED
+    default (true|false) #IMPLIED
+    >
+
+  <!ELEMENT datasource ( driver, url, (username | password | timeout | autocommit ) | (initialContext , providerUrl), name )>
+  <!ATTLIST datasource
+    type      (jdbc|jndi) #REQUIRED
+    poolMin   CDATA #IMPLIED
+    poolMax   CDATA #IMPLIED
+    poolStep  CDATA #IMPLIED
+    ping      CDATA #IMPLIED
+    pingCycle CDATA #IMPLIED
+    >
+
+    <!ELEMENT driver ANY>
+    <!ELEMENT url ANY>
+    <!ELEMENT username ANY>
+    <!ELEMENT password ANY>
+    <!ELEMENT timeout ANY>
+    <!ELEMENT autocommit ANY>
+    <!ELEMENT initialContext ANY>
+    <!ELEMENT providerUrl ANY>
+    <!ELEMENT name ANY>
+
+  <!ELEMENT sqlpath ( path )>
+    <!ELEMENT path ANY>
