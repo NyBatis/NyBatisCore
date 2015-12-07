@@ -81,7 +81,7 @@ public class BatchExecutorImpl implements BatchExecutor {
             }
         } finally {
             sqlSession.initProperties();
-            parameters.clear();
+            parameters = new ArrayList<>();
         }
 
     }
