@@ -10,7 +10,7 @@
     <property key="password" value="F332459"/>
   </properties>
 
-  <environment id="sample01" default="true" >
+  <environment id="sample01" default="true">
     <datasource type="jdbc" poolMin="5" poolMax="20" poolStep="5" ping="true" pingCycle="60" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
@@ -47,5 +47,6 @@
       <path>test03</path>
     </sqlpath>
   </environment>
+
 
 </configuration>

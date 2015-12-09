@@ -7,7 +7,8 @@
         <xs:element ref="properties"  minOccurs="0" maxOccurs="1" />
         <xs:element ref="environment" minOccurs="1" maxOccurs="unbounded" />
       </xs:sequence>
-    </xs:complexType>
+  </xs:complexType>
+
   </xs:element>
 
   <xs:element name="properties">
@@ -29,11 +30,12 @@
   <xs:element name="environment">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="datasource" sub >
+        <xs:element name="datasource">
         </xs:element>
       </xs:sequence>
       <xs:attribute name="id"      type="xs:ID"      use="required"/>
       <xs:attribute name="default" type="xs:boolean" />
+      <xsd:ass
     </xs:complexType>
   </xs:element>
 
@@ -62,5 +64,14 @@
     </xs:sequence>
     <xs:attribute name="type" type="xs:string" fixed="jndi" use="required" />
   </xs:complexType>
+
+  <xs:simpleType name="datasourceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="jdbc"/>
+      <xs:enumeration value="jndi"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
 
 </xs:schema>
