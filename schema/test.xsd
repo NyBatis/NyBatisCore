@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  elementFormDefault="qualified">
+
+  <xs:element name="root" type="root"/>
+
+  <xs:element name="node" type="node">
+    <xs:alternative type="node-type-A" test="@mode = 'A'"/>
+    <xs:alternative type="node-type-B" test="@mode = 'B'"/>
+  </xs:element>
+
+
+  <xs:complexType name="root">
+    <xs:sequence>
+      <xs:element ref="node" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Base type -->
+  <xs:complexType name="node">
+    <xs:attribute name="mode" type="allowed-node-types"/>
+  </xs:complexType>
+
+  <xs:simpleType name="allowed-node-types">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="A"/>
+      <xs:enumeration value="B"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Type A -->
+  <xs:complexType name="node-type-A">
+    <xs:complexContent>
+      <xs:extension base="node">
+        <xs:attribute name="value" type="xs:string" use="required"/>
+        <xs:anyAttribute />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Type B -->
+  <xs:complexType name="node-type-B">
+    <xs:complexContent>
+      <xs:extension base="node">
+        <xs:attribute name="name" type="xs:string" use="required"/>
+        <xs:anyAttribute processContents="skip"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+</xs:schema>
