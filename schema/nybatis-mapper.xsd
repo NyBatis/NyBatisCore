@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Define root (mapper) -->
+
+  <xs:element name="mapper">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="sql" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+    <xs:unique name="uniqueSqlId" >
+      <xs:selector xpath="sql" />
+      <xs:field xpath="@id" />
+    </xs:unique>
+  </xs:element>
+
+
+  <!-- Define sql -->
+
+  <xs:element name="sql">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="key"      />
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="id"         type="notEmpty" use="required"/>
+      <xs:attribute name="fetch"      type="xs:positiveInteger" />
+      <xs:attribute name="cache"      type="notEmpty" />
+      <xs:attribute name="flush"      type="xs:positiveInteger" />
+      <xs:attribute name="autocommit" type="xs:boolean" />
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- Define group -->
+
+  <xs:group name="ifElse">
+    <xs:sequence>
+      <xs:element ref="if"     minOccurs="1" maxOccurs="1" />
+      <xs:element ref="elseif" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element ref="else"   minOccurs="0" maxOccurs="1"         />
+    </xs:sequence>
+  </xs:group>
+
+
+  <!-- Define Sql Node -->
+
+  <xs:element name="key">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="id" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="if">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="test" type="notEmpty" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="elseif">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="test" type="notEmpty" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="else">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="case">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="when" minOccurs="1" maxOccurs="unbounded" />
+        <xs:element ref="else" minOccurs="0" maxOccurs="1" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="when">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="foreach"  />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="test" type="notEmpty" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="foreach">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group   ref="ifElse"   />
+        <xs:element ref="case"     />
+        <xs:element ref="group"    />
+        <xs:element ref="ref"      />
+      </xs:choice>
+      <xs:attribute name="key"       type="notEmpty" use="required" />
+      <xs:attribute name="open"      type="notEmpty" />
+      <xs:attribute name="close"     type="notEmpty" />
+      <xs:attribute name="delimeter" type="notEmpty" />
+      <xs:attribute name="indexKey"  type="notEmpty" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="group">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="if" minOccurs="1" maxOccurs="unbounded" />
+      </xs:sequence>
+      <xs:attribute name="open"      type="notEmpty" />
+      <xs:attribute name="close"     type="notEmpty" />
+      <xs:attribute name="delimeter" type="notEmpty" />
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="ref">
+    <xs:complexType>
+      <xs:attribute name="id" type="notEmpty" use="required" />
+    </xs:complexType>
+  </xs:element>
+
+
+  <!-- Validation -->
+
+  <xs:simpleType name="notEmpty">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

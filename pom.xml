@@ -52,11 +52,19 @@ OR
     <skipTests>true</skipTests>
   </properties>
 
+  <!--<distributionManagement>-->
+    <!--<repository>-->
+      <!--<id>team-store-snapshots</id>-->
+      <!--<name>Store Maven Repository - Snapshots</name>-->
+      <!--<url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>-->
+    <!--</repository>-->
+  <!--</distributionManagement>-->
+
   <distributionManagement>
     <repository>
-      <id>team-store-snapshots</id>
-      <name>Store Maven Repository - Snapshots</name>
-      <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
+      <id>internal.repo</id>
+      <name>Temporary Staging Repository</name>
+      <url>file://${project.build.directory}/mvn-repo</url>
     </repository>
   </distributionManagement>
 

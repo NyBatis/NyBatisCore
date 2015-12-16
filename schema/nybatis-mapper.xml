@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nybatis-mapper.xsd">
+
+<sql id="select" fetch="50" cache="notRegistered" flush="60" >
+  SELECT  *
+  FROM    PROD
+  WHERE   list_id  = #{listId}
+  <!-- AND     rownum  <= #{rowNum} -->
+  ORDER BY ${orderKey}
+  LIMIT 0, #{rowNum:int}
+</sql>
+
+  <sql id="select1" >
+    SELECT * FROM TABLE
+    <key id="11">aa
+    </key>
+    <ref id="22"/>
+    <if test="111">
+    </if>
+    <if test="s"></if>
+    <elseif test="aa"></elseif>
+    <else></else>
+    <if test="11">aa
+
+    </if>
+
+    <foreach key="dd"></foreach>
+    <case>
+      <when test="aa"></when>
+      <else/>
+    </case>
+    <ref id="sss"></ref>
+    <group>
+      <if test="aa"></if>
+    </group>
+  </sql>
+
+  <sql id="select02" fetch="50" cache="notRegistered" flush="60" >
+
+  </sql>
+
+<sql id="selectKey" fetch="50" cache="notRegistered" flush="60" autocommit="true" >
+  <key id="listId">
+    SELECT 'A001'
+  </key>
+  <key id="rowNum">
+    SELECT 4
+  </key>
+  <key id="keyValue">
+    SELECT 'keyValue' AS key
+    UNION ALL
+    SELECT list_id
+    FROM   PROD
+    LIMIT  0, #{rowNum}
+  </key>
+  SELECT  *, ${} "key_value"
+  FROM    PROD
+  WHERE   list_id = #{listId}
+  LIMIT 0, #{rowNum}
+</sql>
+
+<sql id="insert" autocommit="true" >
+INSERT
+INTO   PROD
+(
+  list_id,
+  prod_id,
+  price,
+  image
+) VALUES (
+  #{listId},
+  #{prodId},
+  #{price},
+  #{image}
+)
+</sql>
+
+<sql id="delete" >
+DELETE
+FROM    PROD
+WHERE   list_id = #{listId}
+</sql>
+
+<sql id="refOrigin" >
+  SELECT  *
+  FROM    TB_DP_LIST_PROD
+  WHERE   tenant_id = #{tenantId}
+  ORDER BY ${orderKey}
+</sql>
+
+<sql id="refTestInvalid">
+SELECT *
+FROM
+(
+  <ref id="Sqlite.refOrigin2" />
+)
+WHERE rownum &lt;= 10
+</sql>
+
+<sql id="refTestValid">
+SELECT *
+FROM
+(
+  <ref id="Sqlite.refOrigin" />
+)
+WHERE rownum &lt;= 10
+</sql>
+
+<sql id="selectForParamTest" fetch="50" cache="fifo" flush="10" >
+  SELECT  *
+  FROM    PROD
+  WHERE   list_id  =  #{listId}
+  AND     ( prod_id  =  #{prodId} or prod_id = #{_globalSession_} )
+  AND     price    >= #{price:int}
+</sql>
+
+<sql id="selectForList" fetch="50" cache="lru">
+  SELECT  *
+  FROM    PROD
+  WHERE   list_id  =  #{listId}
+  ORDER BY prod_id
+</sql>
+
+<sql id="selectWithoutParam" fetch="50" cache="fifo" flush="60" >
+  SELECT  *
+  FROM    PROD
+  WHERE   list_id  = 'A001'
+  ORDER BY prod_id
+</sql>
+
+<sql id="selectForMultiEnvironmentTest">
+  SELECT * FROM NYBATIS_TEST
+</sql>
+
+</mapper>
