@@ -33,7 +33,10 @@ public class DatasourceBuilder {
 
 		NLogger.debug( "configurate datasource (id:{})", environmentId );
 
-		setDatasource( environment.getChildElement("datasource") );
+		setDatasource( environment );
+		setDatasourceJdbc( environment );
+		setDatasourceJdbcUnpooled( environment );
+		setDatasourceJndi( environment );
 
 	}
 
@@ -41,7 +44,9 @@ public class DatasourceBuilder {
 		return StringUtil.isTrue( environment.getAttrIgnoreCase( "default" ) );
 	}
 
-	private void setDatasource( Node datasource ) {
+	private void setDatasource( Node environment ) {
+
+		Node datasource = environment.getChildElement( "datasource" );
 
 		if( datasource == null ) return;
 
@@ -89,6 +94,80 @@ public class DatasourceBuilder {
 				return;
 
 		}
+
+		new DatasourceManager().set( environmentId, factory.getDataSource() );
+
+	}
+
+	private void setDatasourceJdbc( Node environment ) {
+
+		Node datasource = environment.getChildElement( "datasourceJdbc" );
+
+		if( datasource == null ) return;
+
+		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
+
+		connectionProperties.setDriverName(   prop.getValue(datasource, "driver"     ) );
+		connectionProperties.setUrl(          prop.getValue(datasource, "url"        ) );
+		connectionProperties.setUserName(     prop.getValue(datasource, "username"   ) );
+		connectionProperties.setUserPassword( prop.getValue(datasource, "password"   ) );
+		connectionProperties.setTimeout(      prop.getValue(datasource, "timeout"    ) );
+		connectionProperties.setAutoCommit(   prop.getValue(datasource, "autocommit" ) );
+
+		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
+
+		datasourceProperties.setPoolMin(    prop.getValue(datasource, "poolMin"   ) );
+		datasourceProperties.setPoolMax(    prop.getValue(datasource, "poolMax"   ) );
+		datasourceProperties.setPoolStep(   prop.getValue(datasource, "poolStep"  ) );
+		datasourceProperties.setPingCycle(  prop.getValue(datasource, "pingCycle" ) );
+		datasourceProperties.setPingEnable( prop.getValue(datasource, "ping"      ) );
+
+
+
+		DatasourceFactory factory = new JdbcDataSourceFactory( datasourceProperties, connectionProperties );
+
+		new DatasourceManager().set( environmentId, factory.getDataSource() );
+
+	}
+
+	private void setDatasourceJdbcUnpooled( Node environment ) {
+
+		Node datasource = environment.getChildElement( "datasourceJdbcUnpooled" );
+
+		if( datasource == null ) return;
+
+		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
+
+		connectionProperties.setDriverName(   prop.getValue(datasource, "driver"     ) );
+		connectionProperties.setUrl(          prop.getValue(datasource, "url"        ) );
+		connectionProperties.setUserName(     prop.getValue(datasource, "username"   ) );
+		connectionProperties.setUserPassword( prop.getValue(datasource, "password"   ) );
+		connectionProperties.setTimeout(      prop.getValue(datasource, "timeout"    ) );
+		connectionProperties.setAutoCommit(   prop.getValue(datasource, "autocommit" ) );
+
+		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
+
+		datasourceProperties.setPooled( false );
+
+		DatasourceFactory factory = new JdbcDataSourceFactory( datasourceProperties, connectionProperties );
+
+		new DatasourceManager().set( environmentId, factory.getDataSource() );
+
+	}
+
+	private void setDatasourceJndi( Node environment ) {
+
+		Node datasource = environment.getChildElement( "datasourceJndi" );
+
+		if( datasource == null ) return;
+
+		JndiConnectionProperties jndiConnectionProperties = new JndiConnectionProperties(
+				prop.getValue( datasource, "initialContext" ),
+				prop.getValue( datasource, "providerUrl"    ),
+				prop.getValue( datasource, "name"           )
+		);
+
+		DatasourceFactory factory = new JndiDatasourceFactory( jndiConnectionProperties );
 
 		new DatasourceManager().set( environmentId, factory.getDataSource() );
 
