@@ -67,12 +67,12 @@ public class DatasourceBuilder {
 
 				JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
 
-				datasourceProperties.setPoolMin(    prop.getValue(datasource, "poolMin"   ) );
-				datasourceProperties.setPoolMax(    prop.getValue(datasource, "poolMax"   ) );
-				datasourceProperties.setPoolStep(   prop.getValue(datasource, "poolStep"  ) );
-				datasourceProperties.setPingCycle(  prop.getValue(datasource, "pingCycle" ) );
-				datasourceProperties.setPingEnable( prop.getValue(datasource, "ping"      ) );
-				datasourceProperties.setPooled(     prop.getValue(datasource, "unpooled"  ) );
+				datasourceProperties.setPoolMin(    prop.getAttrVal(datasource, "poolMin"    ) );
+				datasourceProperties.setPoolMax(    prop.getAttrVal(datasource, "poolMax"    ) );
+				datasourceProperties.setPoolStep(   prop.getAttrVal(datasource, "poolStep"   ) );
+				datasourceProperties.setPingCycle(  prop.getAttrVal(datasource, "pingCycle"  ) );
+				datasourceProperties.setPingEnable( prop.getAttrVal(datasource, "ping"       ) );
+				datasourceProperties.setPooled(     prop.getAttrVal(datasource, "unpooled"   ) );
 
 				factory = new JdbcDataSourceFactory( datasourceProperties, connectionProperties );
 
@@ -107,20 +107,20 @@ public class DatasourceBuilder {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
-		connectionProperties.setDriverName(   prop.getValue(datasource, "driver"     ) );
-		connectionProperties.setUrl(          prop.getValue(datasource, "url"        ) );
-		connectionProperties.setUserName(     prop.getValue(datasource, "username"   ) );
-		connectionProperties.setUserPassword( prop.getValue(datasource, "password"   ) );
-		connectionProperties.setTimeout(      prop.getValue(datasource, "timeout"    ) );
-		connectionProperties.setAutoCommit(   prop.getValue(datasource, "autocommit" ) );
+		connectionProperties.setDriverName(   prop.getValue(  datasource, "driver"     ) );
+		connectionProperties.setUrl(          prop.getValue(  datasource, "url"        ) );
+		connectionProperties.setUserName(     prop.getValue(  datasource, "username"   ) );
+		connectionProperties.setUserPassword( prop.getValue(  datasource, "password"   ) );
+		connectionProperties.setTimeout(      prop.getAttrVal(datasource, "timeout"    ) );
+		connectionProperties.setAutoCommit(   prop.getAttrVal(datasource, "autocommit" ) );
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
 
-		datasourceProperties.setPoolMin(    prop.getValue(datasource, "poolMin"   ) );
-		datasourceProperties.setPoolMax(    prop.getValue(datasource, "poolMax"   ) );
-		datasourceProperties.setPoolStep(   prop.getValue(datasource, "poolStep"  ) );
-		datasourceProperties.setPingCycle(  prop.getValue(datasource, "pingCycle" ) );
-		datasourceProperties.setPingEnable( prop.getValue(datasource, "ping"      ) );
+		datasourceProperties.setPoolMin(    prop.getAttrVal( datasource, "poolMin"     ) );
+		datasourceProperties.setPoolMax(    prop.getAttrVal( datasource, "poolMax"     ) );
+		datasourceProperties.setPoolStep(   prop.getAttrVal( datasource, "poolStep"    ) );
+		datasourceProperties.setPingCycle(  prop.getAttrVal( datasource, "pingCycle"   ) );
+		datasourceProperties.setPingEnable( prop.getAttrVal( datasource, "ping"        ) );
 
 
 
@@ -138,12 +138,12 @@ public class DatasourceBuilder {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
-		connectionProperties.setDriverName(   prop.getValue(datasource, "driver"     ) );
-		connectionProperties.setUrl(          prop.getValue(datasource, "url"        ) );
-		connectionProperties.setUserName(     prop.getValue(datasource, "username"   ) );
-		connectionProperties.setUserPassword( prop.getValue(datasource, "password"   ) );
-		connectionProperties.setTimeout(      prop.getValue(datasource, "timeout"    ) );
-		connectionProperties.setAutoCommit(   prop.getValue(datasource, "autocommit" ) );
+		connectionProperties.setDriverName(   prop.getValue(  datasource, "driver"     ) );
+		connectionProperties.setUrl(          prop.getValue(  datasource, "url"        ) );
+		connectionProperties.setUserName(     prop.getValue(  datasource, "username"   ) );
+		connectionProperties.setUserPassword( prop.getValue(  datasource, "password"   ) );
+		connectionProperties.setTimeout(      prop.getAttrVal(datasource, "timeout"    ) );
+		connectionProperties.setAutoCommit(   prop.getAttrVal(datasource, "autocommit" ) );
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
 
