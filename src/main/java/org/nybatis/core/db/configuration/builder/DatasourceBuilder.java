@@ -48,7 +48,7 @@ public class DatasourceBuilder {
 
 		Node datasource = environment.getChildElement( "datasource" );
 
-		if( datasource == null ) return;
+		if( datasource.isNull() ) return;
 
 		DatasourceFactory factory;
 
@@ -103,7 +103,7 @@ public class DatasourceBuilder {
 
 		Node datasource = environment.getChildElement( "datasourceJdbc" );
 
-		if( datasource == null ) return;
+		if( datasource.isNull() ) return;
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
@@ -134,7 +134,7 @@ public class DatasourceBuilder {
 
 		Node datasource = environment.getChildElement( "datasourceJdbcUnpooled" );
 
-		if( datasource == null ) return;
+		if( datasource.isNull() ) return;
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
@@ -159,7 +159,7 @@ public class DatasourceBuilder {
 
 		Node datasource = environment.getChildElement( "datasourceJndi" );
 
-		if( datasource == null ) return;
+		if( datasource.isNull() ) return;
 
 		JndiConnectionProperties jndiConnectionProperties = new JndiConnectionProperties(
 				prop.getValue( datasource, "initialContext" ),
