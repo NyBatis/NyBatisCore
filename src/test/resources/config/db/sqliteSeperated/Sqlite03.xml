@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<list>
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
 <sql id="selectForMultiEnvironmentTest">
   SELECT * FROM NYBATIS_TEST
 </sql>
 
-</list>
+</mapper>

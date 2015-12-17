@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<root xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:noNamespaceSchemaLocation="file:test.xsd"
->
-
-  <node mode="A" value="3"/>
-  <node mode="B" name="asd"  a="s" asd="asd"/>
-
-</root>
