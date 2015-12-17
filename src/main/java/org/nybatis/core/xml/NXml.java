@@ -612,7 +612,11 @@ public class NXml {
 	        return this;
         } catch( FileNotFoundException e ) {
 	        throw new IoException( e );
-        }
+        } catch( IoException e ) {
+			throw e;
+		} catch( ParseException e ) {
+			throw new ParseException( String.format( "%s on file[%s].", e.getMessage(), file ), e );
+		}
 
 	}
 

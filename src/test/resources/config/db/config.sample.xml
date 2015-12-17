@@ -1,24 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="nybatis-config.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.0" xsi:schemaLocation="urn:nybatis.configuration:1.0 http://nybatis.github.io/schema/nybatis-config.xsd">
 
   <properties path="config.properties">
     <property key="username" value="nayasis+#{driver}"/>
     <property key="password" value="F332459"/>
   </properties>
 
-  <cache id="fifo"   class="nayasis.common.cache.fifoCache"   size="512"  flush="60000" />
-  <cache id="lru"    class="nayasis.common.cache.lruCache"    size="1024" />
-  <cache id="static" class="nayasis.common.cache.staticCache" />
-  <cache id="sample01" class="nayasis.common.cache.staticCache" />
-
   <environment id="sample01" default="true">
-    <datasourceJdbc>
+    <datasourceJdbc poolMin="5" poolMax="20" poolStep="5" ping="true" pingCycle="60" timeout="25" autocommit="false">
       <driver>#{driver}</driver>
       <url>#{url}</url>
       <username>#{username}</username>
       <password>#{password}</password>
-      <timeout>25</timeout>
-      <autocommit>false</autocommit>
     </datasourceJdbc>
     <sqlPath>
       <path>test01/sample.xml</path>
@@ -27,27 +20,18 @@
   </environment>
 
   <environment id="sample02">
-    <datasourceJdbcUnpooled>
+    <datasourceJdbc>
       <driver>org.sqlite.JDBC</driver>
       <url>jdbc:sqlite:./target/test-classes/localDb/SimpleLauncherHelloWorld.db</url>
-    </datasourceJdbcUnpooled>
+    </datasourceJdbc>
     <sqlPath>
-      <path>test01/sample.xml</path>
-      <path>test02/sub01</path>
+      <path>test02/sub02</path>
     </sqlPath>
   </environment>
-
-  <environment id="aa">
-    <datasourceJndi>
-      <name>java:comp/env/Sample</name>
-      <initialContext>..</initialContext>
-      <providerUrl>...</providerUrl>
-    </datasourceJndi>
-  </environment>
-
-
+  
   <environment id="sample03">
     <datasourceJndi>
+      <!-- it is possible to omit "java:comp/env/" -->
       <name>java:comp/env/Sample</name>
       <initialContext>...</initialContext>
       <providerUrl>....</providerUrl>
@@ -56,6 +40,5 @@
       <path>test03</path>
     </sqlPath>
   </environment>
-
 
 </configuration>
