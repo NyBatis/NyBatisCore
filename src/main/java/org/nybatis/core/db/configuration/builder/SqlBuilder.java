@@ -8,6 +8,7 @@ import org.nybatis.core.xml.node.Node;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class SqlBuilder {
 
@@ -26,7 +27,10 @@ public class SqlBuilder {
 
 		if( StringUtil.isEmpty( environmentId ) ) return;
 
-		for( Node sqlPath : environment.getChildElements( "sqlpath" ) ) {
+		List<Node> paths = environment.getChildElements( "sqlPath" );
+		paths.addAll( environment.getChildElements( "sqlpath" ) );
+
+		for( Node sqlPath : paths ) {
 			for( Node path : sqlPath.getChildElements( "path" ) ) {
 				readSql( path, environmentId );
 			}
