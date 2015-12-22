@@ -36,13 +36,57 @@ import java.util.List;
  */
 public interface SqlSession {
 
+	/**
+	 * Set SQL ID in mapper
+	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @return executor to run sql
+	 */
 	SessionExecutor sqlId( String id );
+
+	/**
+	 * Set SQL ID in mapper
+	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @param  parameter Parameter to bind with sql. it consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return executor to run sql
+	 */
 	SessionExecutor sqlId( String id, Object parameter );
+
+	/**
+	 * Set plain SQL.
+	 * @param  sql plain sql
+	 * @return executor to run sql
+	 */
 	SessionExecutor sql( String sql );
+
+	/**
+	 * Set plain SQL.
+	 * @param  sql plain sql
+	 * @param  parameter Parameter to bind with sql. it consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return executor to run sql
+	 */
 	SessionExecutor sql( String sql, Object parameter );
 
+	/**
+	 * Set SQL ID in mapper for batch execution.
+	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return batch mode executor to run sql
+	 */
 	BatchExecutor batchSqlId( String id, List<?> parameters );
+
+	/**
+	 * Set plain SQLs for batch execution.
+	 * @param  sqlList plain sqls
+	 * @return batch mode executor to run sql
+	 */
 	BatchExecutor batchSql( List<String> sqlList );
+
+	/**
+	 * Set SQL ID in mapper for batch execution.
+	 * @param  sql plain sql
+	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return batch mode executor to run sql
+	 */
 	BatchExecutor batchSql( String sql,  List<?> parameters );
 
 	/**
