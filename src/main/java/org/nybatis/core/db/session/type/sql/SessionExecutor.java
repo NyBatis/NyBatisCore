@@ -34,6 +34,7 @@ public interface SessionExecutor {
 	/**
 	 * Retrieve a single row
 	 *
+	 * @return single row data
 	 */
 	@SupportCache
 	NMap select();
@@ -58,8 +59,9 @@ public interface SessionExecutor {
 	/**
 	 * Execute statement
 	 *
-	 * <br/><br/>
+	 * <pre>
 	 * if it called, Transaction is activate automatically
+	 * </pre>
 	 *
 	 * @return affected count by execute (insert, update, delete ... )
 	 */
@@ -76,7 +78,7 @@ public interface SessionExecutor {
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();
-	 * NMap result = session.call( sqlId, param );
+	 * NMap result = session.sqlId( sqlId, param ).call();
 	 *
 	 * System.out.println( result.toStringForDebug() );
 	 *
@@ -92,10 +94,7 @@ public interface SessionExecutor {
 	 *
 	 * </pre>
 	 *
-	 * @param sqlId             Id mapped to xml or Statement
-	 * @param parameter         parameter consist of Map, Bean or Primitive (int, Integer, Date... )
-	 * @param listReturnTypes   (optional) return type of ResultSet(s). basic return type is NMap.
-	 * @return
+	 * @return result of out parameters
 	 */
 	@SupportCacheOnlyResult
 	NMap call();
@@ -110,7 +109,7 @@ public interface SessionExecutor {
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();
-	 * NMap result = session.call( sqlId, param );
+	 * NMap result = session.sqlId( sqlId, param ).call();
 	 *
 	 * System.out.println( result.toStringForDebug() );
 	 *
@@ -126,10 +125,8 @@ public interface SessionExecutor {
 	 *
 	 * </pre>
 	 *
-	 * @param sqlId             Id mapped to xml or Statement
-	 * @param parameter         parameter consist of Map, Bean or Primitive (int, Integer, Date... )
-	 * @param listReturnTypes   (optional) return type of ResultSet(s). basic return type is NMap.
-	 * @return
+	 * @param listReturnTypes return type of ResultSet(s). basic return type is NMap.
+	 * @return result of out parameters
 	 */
 	@SupportCacheOnlyResult
 	NMap call( Class<?>... listReturnTypes );
@@ -144,7 +141,7 @@ public interface SessionExecutor {
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();
-	 * String result = session.call( sqlId, param, String.class );
+	 * String result = session.sqlId( sqlId, param ).call( String.class );
 	 *
 	 * System.out.println( result );
 	 *
@@ -154,8 +151,6 @@ public interface SessionExecutor {
 	 *
 	 * </pre>
 	 *
-	 * @param sqlId             Id mapped to xml or Statement
-	 * @param parameter         parameter consist of Map, Bean or Primitive (int, Integer, Date... )
 	 * @param returnType        Map or Bean (if you want to return row), Primitive (if you want to single value)
 	 * @param listReturnTypes   (optional) return type of ResultSet(s). basic return type is NMap.
 	 * @return
@@ -166,7 +161,7 @@ public interface SessionExecutor {
 	/**
 	 * Set parameter
 	 *
-	 * @param parameter parameter to set
+	 * @param parameter parameter to set. it consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return self instance
 	 */
 	SessionExecutor setParameter( Object parameter );

@@ -15,8 +15,8 @@ import java.util.List;
 public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     private SqlSessionImpl       sqlSession;
-    private OrmSessionProperties properties  = new OrmSessionProperties();
-    private Integer              bufferSize  = null;
+    private OrmSessionProperties properties      = new OrmSessionProperties();
+    private Integer              transactionSize = null;
 
     public OrmBatchExecutorImpl( SqlSessionImpl sqlSession, OrmSessionProperties properties ) {
         this.sqlSession  = sqlSession;
@@ -25,7 +25,7 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     @Override
     public OrmBatchExecutor<T> setTransactionSize( int size ) {
-        this.bufferSize = size;
+        this.transactionSize = size;
         return this;
     }
 
@@ -48,7 +48,7 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
         List<NMap> parameters = properties.getParameters( params );
 
-        return new BatchExecutorImpl( sqlSession ).batchSqlId( sqlId, parameters ).execute( bufferSize );
+        return new BatchExecutorImpl( sqlSession ).batchSqlId( sqlId, parameters ).setTransactionSize( transactionSize ).execute();
 
     }
 
