@@ -82,7 +82,7 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     @Override
-    public BatchExecutor setTransactionSize( int size ) {
+    public BatchExecutor setTransactionSize( Integer size ) {
         transactionSize = size;
         return this;
     }

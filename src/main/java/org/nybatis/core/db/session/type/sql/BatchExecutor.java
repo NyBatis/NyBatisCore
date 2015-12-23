@@ -42,6 +42,6 @@ public interface BatchExecutor {
 	 * @param size  size to commit execution
 	 * @return self instance
 	 */
-	BatchExecutor setTransactionSize( int size );
+	BatchExecutor setTransactionSize( Integer size );
 
 }
