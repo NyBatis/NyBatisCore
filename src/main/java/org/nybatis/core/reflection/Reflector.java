@@ -106,15 +106,17 @@ public class Reflector {
      * @param field 객체에 선언된 field
      * @return field에 담겨있는 값
      */
-    public Object getFieldValueFrom( Object bean, Field field ) {
+    public <T> T getFieldValueFrom( Object bean, Field field ) {
 
         field.setAccessible( true );
 
         try {
-            return field.get( bean );
+
+			Object val = field.get( bean );
+			return val == null ? null : (T) val;
 
         } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new ReflectiveException( e );
         }
 
     }
@@ -127,17 +129,16 @@ public class Reflector {
      * @return field에 담겨있는 값
      * @throws ReflectiveOperationException field 접근 실패시
      */
-    public Object getFieldValueFrom( Object bean, String fieldName ) {
+    public <T> T getFieldValueFrom( Object bean, String fieldName ) {
 
         try {
 
             Field field = bean.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
 
-            return field.get( bean );
+			return getFieldValueFrom( bean, field );
 
         } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new ReflectiveException( e );
         }
 
 
