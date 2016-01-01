@@ -1060,7 +1060,7 @@ public class StringUtil {
 	 * </pre>
 	 *
 	 * @param value 검사할 문자열
-	 * @param pattern 정규식
+	 * @param pattern 정규식 (capture 될 문자열을 반드시 ( ) 로 감싸주어야 함)
 	 * @return 패턴에 해당하는 문자열
 	 */
 	public static List<String> capturePatterns( String value, String pattern ) {

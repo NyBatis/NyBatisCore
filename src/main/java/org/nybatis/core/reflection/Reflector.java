@@ -32,9 +32,9 @@ import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 /**
- * Reflection을 처리하는 유틸 클래스
+ * Reflection Utility
  *
- * @author 정화수
+ * @author nayasis@gmail.com
  *
  */
 public class Reflector {
@@ -435,12 +435,12 @@ public class Reflector {
 		return toJson( fromBean, false );
 	}
 
-    public Map<String, Object> toMapFromJson( String fromJsonString ) {
+    public Map<String, Object> toMapFromJson( String fromJson ) {
         try {
-			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJsonString ), new TypeReference<HashMap<String, Object>>() {} );
+			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJson ), new TypeReference<HashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
         } catch( JsonParseException e ) {
-            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
+            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
         } catch( IOException e ) {
             throw new JsonIOException( e );
         }
@@ -464,15 +464,27 @@ public class Reflector {
     	}
     }
 
-    public List<Map<String,Object>> toListFromJson( String fromJsonString ) {
-    	try {
-    		return objectMapper.readValue( getArrayContent(fromJsonString), new TypeReference<List<HashMap<String,Object>>>() {} );
-        } catch( JsonParseException e ) {
-            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
-    	} catch( IOException e ) {
-    		throw new JsonIOException( e );
-    	}
+	public <T> List<T> toListFromJson( String fromJson, TypeReference typeReference ) {
+		try {
+			return objectMapper.readValue( getArrayContent(fromJson), typeReference );
+		} catch( JsonParseException e ) {
+			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
+		} catch( IOException e ) {
+			throw new JsonIOException( e );
+		}
+	}
+
+    public List<Map<String,Object>> toListFromJsonAsMap( String fromJson ) {
+    	return toListFromJson( fromJson, new TypeReference<List<HashMap<String,Object>>>() {}  );
     }
+
+	public List toListFromJson( String fromJson ) {
+		return toListFromJson( fromJson, new TypeReference<List>() {}  );
+	}
+
+	public List toListFromJsonAsString( String fromJson ) {
+		return toListFromJson( fromJson, new TypeReference<List<String>>() {}  );
+	}
 
 	public <T> T toBeanFromMap( Map<?, ?> fromMap, Class<T> toClass ) {
 		return objectMapper.convertValue( fromMap, toClass );
