@@ -2,6 +2,8 @@ package org.nybatis.core.reflection;
 
 import java.io.File;
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.nybatis.core.log.NLogger;
@@ -135,6 +137,21 @@ public class ReflectorTest {
 		reflector.merge( fromNMap, toVo );
 
 		NLogger.debug( "after\n{}", toVo );
+
+	}
+
+	@Test
+	public void simpleArrayTest() {
+
+		List array = Arrays.asList( "A", "B", "C", "D", "E", 99 );
+
+		String json = reflector.toJson( array );
+
+		assertEquals( json, "[\"A\",\"B\",\"C\",\"D\",\"E\",99]" );
+
+		List arrayFromJson = reflector.toListFromJson( json );
+
+		assertEquals( arrayFromJson, array );
 
 	}
 
