@@ -1,8 +1,14 @@
 package org.nybatis.core.model;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
+import bsh.Primitive;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.Assert;
@@ -144,5 +150,40 @@ public class NMapTest {
 		NLogger.debug( a.toDebugString(false, false) );
 
 	}
+
+	@Test
+	public void convertSetToList() {
+
+		Map<String, Object> testMap = new HashMap<>();
+
+		Set<String> testSet = new HashSet<>();
+
+		testSet.add( "A" );
+		testSet.add( "B" );
+		testSet.add( "C" );
+
+		byte[] testArray01 = new byte[] { 0, 1, 2, 3, 4, 5 };
+		Byte[] testArray02 = new Byte[] { 0, 1, 2, 3, 4, 5 };
+
+		testMap.put( "set",    testSet     );
+		testMap.put( "byte01", testArray01 );
+		testMap.put( "byte02", testArray02 );
+
+		NMap map = new NMap( testMap );
+
+		Assert.assertEquals( map.get( "set"  ) instanceof Set,    true  );
+		Assert.assertEquals( map.get( "set"  ) instanceof List,   false );
+		Assert.assertEquals( map.get( "byte01" ) instanceof byte[], true  );
+		Assert.assertEquals( map.get( "byte02" ) instanceof Byte[], true  );
+
+		map.fromBean( testMap );
+
+		Assert.assertEquals( map.get( "set"  ) instanceof Set,    false );
+		Assert.assertEquals( map.get( "set"  ) instanceof List,   true  );
+		Assert.assertEquals( map.get( "byte01" ) instanceof byte[], true  );
+		Assert.assertEquals( map.get( "byte02" ) instanceof byte[], true  );
+
+	}
+
 
 }
