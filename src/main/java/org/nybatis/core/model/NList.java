@@ -584,7 +584,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     private Object getKey( int keyIndex ) {
 
-        Assertion.isTrue( keyIndex < 0 || keyIndex >= keySize(), new IndexOutOfBoundsException( String.format( "Index[%d] is out of bounds from 0 to %d", keyIndex, keySize() ) ) );
+        Assertion.isTrue( 0 <= keyIndex &&  keyIndex <= keySize(), new IndexOutOfBoundsException( String.format( "Index[%d] is out of bounds from 0 to %d", keyIndex, keySize() ) ) );
 
         Iterator<Object> iterator = header.keySet().iterator();
 
