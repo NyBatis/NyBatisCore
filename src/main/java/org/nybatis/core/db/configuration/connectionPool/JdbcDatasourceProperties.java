@@ -4,7 +4,7 @@ import org.nybatis.core.util.StringUtil;
 
 public class JdbcDatasourceProperties {
 
-	private boolean isPooled    = false;
+	private boolean isPooled    = true;
 
 	private int     poolMin     = 1;
 	private int     poolMax     = 1;

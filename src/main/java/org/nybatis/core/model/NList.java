@@ -337,7 +337,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @return key에 해당하는 List
      */
     @SuppressWarnings( { "unchecked", "rawtypes" } )
-    public List toList( String key ) {
+    public <T> List<T> toList( String key ) {
 
     	List result = new ArrayList<>();
 
