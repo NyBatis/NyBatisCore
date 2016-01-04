@@ -46,7 +46,11 @@ public class DbUtils {
 				primitiveParameterKey = Const.db.PARAMETER_SINGLE;
 			}
 
-			newParam.put( primitiveParameterKey, parameter );
+			if( isTargetToConvetAsList(parameter) ) {
+				newParam.put( primitiveParameterKey, TypeUtil.toList( parameter ) );
+			} else {
+				newParam.put( primitiveParameterKey, parameter );
+			}
 
 		} else {
 

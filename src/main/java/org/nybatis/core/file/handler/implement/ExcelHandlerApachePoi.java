@@ -13,9 +13,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.nybatis.core.exception.unchecked.ExcelNoHeadException;
 import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.file.handler.ExcelHandler;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -94,8 +96,11 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
 	public NList readFrom( File excelFile, String sheetName ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
-			result.put( sheetName, readFrom( workbook, workbook.getSheetIndex(sheetName) ) );
+		return readFrom( excelFile, new Reader() {
+			@Override
+			public void read( Workbook workbook, Map<String, NList> result ) {
+				result.put( sheetName, readFrom( workbook, workbook.getSheetIndex( sheetName ) ) );
+			}
 		} ).get( sheetName );
 	}
 
@@ -132,10 +137,10 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 				Workbook        workbook = new HSSFWorkbook( fis )
 		) {
 
-			reader.read( workbook, result );
-
-			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
-				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
+			try {
+				reader.read( workbook, result );
+			} catch( ExcelNoHeadException e ) {
+				NLogger.trace( "Excel Sheet (file:{}, sheet:{}) has no header", excelFile, e.getMessage() );
 			}
 
 		} catch( IOException e ) {
@@ -229,6 +234,10 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
     	if( sheet == null || sheet.getPhysicalNumberOfRows() == 0 ) return result;
 
     	Row row = sheet.getRow( 0 );
+
+		if( row == null ) {
+			throw new ExcelNoHeadException( sheet.getSheetName() );
+		}
 
     	for( int i = 0, iCnt = row.getPhysicalNumberOfCells(); i < iCnt; i++ ) {
 

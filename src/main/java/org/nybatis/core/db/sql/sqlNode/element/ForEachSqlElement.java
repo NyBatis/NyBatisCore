@@ -1,5 +1,6 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
@@ -54,10 +55,16 @@ public class ForEachSqlElement extends SqlElement {
 	@Override
     public String toString( Map param ) throws SqlParseException {
 
-		if( ! TypeUtil.isList(param.get(paramKey))  ) return "";
-		if( ((List)param.get(paramKey)).size() == 0 ) return "";
+		boolean isSingleParameter = param.containsKey( Const.db.PARAMETER_SINGLE );
 
-		List    loopParams  = TypeUtil.toList( param.get( paramKey ) );
+		String paramKey = isSingleParameter ? Const.db.PARAMETER_SINGLE : this.paramKey;
+
+		if( ! TypeUtil.isList(param.get(paramKey))  ) return "";
+
+		List loopParams = TypeUtil.toList( param.get( paramKey ) );
+
+		if( loopParams.size() == 0 ) return "";
+
 		boolean delimiterOn = ! StringUtil.isEmpty( getDelimeter( param ) );
 		boolean indexKeyOn  = ! StringUtil.isEmpty( indexKey );
 
@@ -78,7 +85,7 @@ public class ForEachSqlElement extends SqlElement {
 				localParam.put( paramKey, loopParam );
 				if( indexKeyOn ) localParam.put( indexKey, i );
 
-				newSql = getSqlTemplate( localParam );
+				newSql = getSqlTemplate( localParam, isSingleParameter );
 
 				String targetKey = String.format( "%s[%d]", paramKey, i );
 				newSql = bindLoopParam( paramKey, targetKey, loopParam, newSql, param );
@@ -90,7 +97,7 @@ public class ForEachSqlElement extends SqlElement {
 				if( indexKeyOn )
 					localParam.put( indexKey, i );
 
-				newSql = getSqlTemplate( localParam );
+				newSql = getSqlTemplate( localParam, isSingleParameter );
 
 				for( Object sourceKey : localParam.keySet() ) {
 
@@ -164,11 +171,17 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	public String getSqlTemplate( Map param ) throws SqlParseException {
+	public String getSqlTemplate( Map param, boolean isSingleParameter ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 
-		return QueryResolver.makeDynamicSql( sqlTemplate, param );
+		sqlTemplate = QueryResolver.makeDynamicSql( sqlTemplate, param );
+
+		if( isSingleParameter ) {
+			sqlTemplate = sqlTemplate.replaceAll( "#\\{.+?\\}", String.format("#{%s}", Const.db.PARAMETER_SINGLE) );
+		}
+
+		return sqlTemplate;
 
 	}
 
