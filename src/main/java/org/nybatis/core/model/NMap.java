@@ -32,16 +32,18 @@ public class NMap extends LinkedHashMap<Object, Object> {
 	}
 
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
-    public NMap( Map vo ) {
-		super( vo );
+    public NMap( Map value ) {
+		super( value );
 	}
 
-	public NMap( Object vo ) {
-		fromBean( vo );
-	}
+	public NMap( Object value ) {
 
-	public NMap( String json ) {
-	    fromJson( json );
+		if( value instanceof String || value instanceof StringBuffer || value instanceof StringBuilder ) {
+			fromJson( value.toString() );
+		} else {
+			fromBean( value );
+		}
+
 	}
 
 	public NMap ignoreCastingError( boolean ignore ) {

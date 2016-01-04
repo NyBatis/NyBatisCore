@@ -61,7 +61,7 @@ public class ForEachSqlElement extends SqlElement {
 
 		if( ! TypeUtil.isList(param.get(paramKey))  ) return "";
 
-		List loopParams = TypeUtil.toList( param.get( paramKey ) );
+		List loopParams = TypeUtil.toList( param.get(paramKey) );
 
 		if( loopParams.size() == 0 ) return "";
 
@@ -88,7 +88,7 @@ public class ForEachSqlElement extends SqlElement {
 				newSql = getSqlTemplate( localParam, isSingleParameter );
 
 				String targetKey = String.format( "%s[%d]", paramKey, i );
-				newSql = bindLoopParam( paramKey, targetKey, loopParam, newSql, param );
+				newSql = bindLoopParam( newSql, paramKey, targetKey, loopParam, param );
 
 			} else {
 
@@ -102,7 +102,7 @@ public class ForEachSqlElement extends SqlElement {
 				for( Object sourceKey : localParam.keySet() ) {
 
 					String targetKey = String.format( "%s[%d].%s", paramKey, i, ((String)sourceKey).replace(paramKey + ".", "") );
-					newSql = bindLoopParam( (String)sourceKey, targetKey, localParam.get( sourceKey ), newSql, param );
+					newSql = bindLoopParam( newSql, (String)sourceKey, targetKey, localParam.get( sourceKey ), param );
 
 				}
 
@@ -110,7 +110,7 @@ public class ForEachSqlElement extends SqlElement {
 
 			if( indexKeyOn ) {
 				String indexKeyTarget = String.format( "%s[%d].%s", paramKey, i, indexKey );
-				newSql = bindLoopParam( indexKey, indexKeyTarget, i, newSql, param );
+				newSql = bindLoopParam( newSql, indexKey, indexKeyTarget, i, param );
 			}
 
 			loopSql.append( newSql );
@@ -129,12 +129,12 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	private String bindLoopParam( String sourceKey, String targetKey, Object value, String sql, Map inputParam ) {
+	private String bindLoopParam( String sql, String sourceKey, String targetKey, Object value, Map originalParameter ) {
 
 		String newSql = QueryResolver.makeLoopSql( sql, sourceKey, targetKey );
 
 		if( ! sql.equals( newSql ) ) {
-			inputParam.put( targetKey, value );
+			originalParameter.put( targetKey, value );
 		}
 
 		return newSql;

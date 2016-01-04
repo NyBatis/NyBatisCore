@@ -34,87 +34,58 @@ public class DbUtils {
 		return toNRowParameter( parameter, null );
 	}
 
-	public static NMap toNRowParameter( Object parameter, String primitiveParameterKey ) {
+	public static NMap toNRowParameter( Object parameter, String parentKey ) {
 
-		NMap newParam = new NMap();
+		NMap param = new NMap();
 
-		if( parameter == null ) return newParam;
+		if( parameter == null ) return param;
 
 		if( isPrimitive(parameter) ) {
 
-			if( primitiveParameterKey == null ) {
-				primitiveParameterKey = Const.db.PARAMETER_SINGLE;
+			if( parentKey == null ) {
+				parentKey = Const.db.PARAMETER_SINGLE;
 			}
 
-			if( isTargetToConvetAsList(parameter) ) {
-				newParam.put( primitiveParameterKey, TypeUtil.toList( parameter ) );
-			} else {
-				newParam.put( primitiveParameterKey, parameter );
-			}
+			NMap singleParam = new NMap( );
+			singleParam.put( parentKey, parameter );
+
+			param.fromBean( singleParam );
+
+			return param;
 
 		} else {
 
-			if( primitiveParameterKey == null ) {
-				primitiveParameterKey = "";
+			if( parentKey == null ) {
+				parentKey = "";
 			} else {
-				primitiveParameterKey = primitiveParameterKey + ".";
+				parentKey = parentKey + ".";
 			}
 
 			NMap tempParam = new NMap();
-
-			if( parameter instanceof Map ) {
-				tempParam.putAll( (Map) parameter );
-			} else {
-				tempParam.fromBean( parameter );
-			}
+			tempParam.fromBean( parameter );
 
 			for( Object key : tempParam.keySet() ) {
 
 				Object val = tempParam.get( key );
 
 				if( isPrimitive(val) ) {
-					if( isTargetToConvetAsList(val) ) {
-						val = TypeUtil.toList( val );
-					}
-					newParam.put( primitiveParameterKey + key, val );
+					param.put( parentKey + key, val );
 				} else {
-					NMap newVal = toNRowParameter( val, primitiveParameterKey + key );
-					newParam.putAll( newVal );
+					NMap newVal = toNRowParameter( val, parentKey + key );
+					param.putAll( newVal );
 				}
 
 			}
 
 		}
 
-		return newParam;
-
-	}
-
-	/**
-	 * Check if value is target to convert as list.
-	 *
-	 * BLOB data (byte[], Byte[]) must be excluded.
-	 *
-	 * @param value
-	 * @return true if value is excluded in 'byte[]' or 'Byte[]' and type is array.
-	 */
-	private static boolean isTargetToConvetAsList( Object value ) {
-
-		if( value == null ) return false;
-
-		Class klass = value.getClass();
-
-		if( klass == byte[].class     ) return false;
-		if( klass == Byte[].class     ) return false;
-
-		return TypeUtil.isArray( value );
+		return param;
 
 	}
 
 	public static boolean isPrimitive( Object object ) {
 		return object == null || isPrimitive( object.getClass() );
 	}
-
 
 	public static boolean isPrimitive( Class<?> klass ) {
 
