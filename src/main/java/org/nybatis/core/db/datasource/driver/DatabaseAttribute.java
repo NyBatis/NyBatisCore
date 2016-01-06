@@ -23,9 +23,9 @@ public class DatabaseAttribute {
     private boolean enableToDoLobPrefetch      = true;
 
     private String  pageSqlPre                 = "";
-    private String  pageSqlPost                = String.format( " LIMIT #{%s}, #{%s}", PAGE_PARAM_START, PAGE_PARAM_END );
-    private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM ( ";
-    private String  countSqlPost               = " )";
+    private String  pageSqlPost                = String.format( "\nLIMIT #{%s}, #{%s}", PAGE_PARAM_START, PAGE_PARAM_END );
+    private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM (\n";
+    private String  countSqlPost               = "\n)";
 
     private String  pingQuery                  = "SELECT 1";
 
