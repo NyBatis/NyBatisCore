@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 
@@ -26,8 +28,7 @@ public class QueryResolver {
 
     public QueryResolver() {}
 
-    @SuppressWarnings( "rawtypes" )
-    public QueryResolver( String sql, Map param ) {
+    public QueryResolver( String sql, NMap param ) {
         Assertion.isNotEmpty( sql, "SQL must not be empty." );
     	originalSql = sql;
     	makeSql( makeDynamicSql(sql, param), param );
@@ -116,8 +117,7 @@ public class QueryResolver {
         return params;
     }
 
-    @SuppressWarnings( "rawtypes" )
-    public static String makeDynamicSql( String query, Map param ) {
+    public static String makeDynamicSql( String query, NMap param ) {
 
         StringBuilder newQuery = new StringBuilder();
 
@@ -137,12 +137,11 @@ public class QueryResolver {
 
             newQuery.append( query.substring( previousStartIndex, startIndex ) );
 
-            Object val = getValue( param, key );
-
-            if( val == null ) {
-                newQuery.append( String.format( "${%s}", key ) );
-            } else {
+            try {
+                Object val = getValue( param, key );
                 newQuery.append( val );
+            } catch( JsonPathNotFoundException e ) {
+                newQuery.append( String.format( "${%s}", key ) );
             }
 
             previousStartIndex = endIndex + 1;
@@ -155,8 +154,7 @@ public class QueryResolver {
 
     }
 
-    @SuppressWarnings( "rawtypes" )
-    private void makeSql( String sql, Map param ) {
+    private void makeSql( String sql, NMap param ) {
 
         QuotChecker quotChecker = new QuotChecker();
 
@@ -182,7 +180,11 @@ public class QueryResolver {
             } else {
 
                 BindStruct bindStruct = new BindStruct( key, quotChecker.isOn() );
-                BindParam  bindParam  = bindStruct.toBindParam( getValue(param, bindStruct.getKey()) );
+                BindParam  bindParam  = null;
+
+                try {
+                    bindParam = bindStruct.toBindParam( getValue(param, bindStruct.getKey()) );
+                } catch( JsonPathNotFoundException e ) {}
 
                 bindStructs.put( key, bindStruct );
                 bindParams.put( key, bindParam );
@@ -243,28 +245,31 @@ public class QueryResolver {
 
     }
 
-    private boolean hasKey( Map param, String key ) {
+    private boolean hasKey( NMap param, String key ) {
 
         if( key.contains( ":" ) ) {
             key = key.substring( 0, key.indexOf( ":" ) );
         }
 
-        if( param.containsKey(key) ) return true;
-        return param.containsKey( Const.db.PARAMETER_SINGLE );
+        if( param.containsKey( Const.db.PARAMETER_SINGLE ) ) return true;
+
+        try {
+            param.getByJsonPath( key );
+            return true;
+        } catch( JsonPathNotFoundException e ) {
+            return false;
+        }
 
     }
 
-    private static Object getValue( @SuppressWarnings( "rawtypes" ) Map param, String key ) {
+    private static Object getValue( NMap param, String key ) throws JsonPathNotFoundException {
 
-        Object value = param.get( key );
+        Object value;
 
-        if( value != null ) {
-            Class klass = value.getClass();
-            if( klass == StringBuffer.class || klass == StringBuilder.class ) {
-                value = value.toString();
-            }
-        } else if( param.containsKey( Const.db.PARAMETER_SINGLE ) ) {
-            value = param.get( Const.db.PARAMETER_SINGLE );
+        try {
+            value = param.getByJsonPath( key );
+        } catch( JsonPathNotFoundException e ) {
+            value = param.getByJsonPath( Const.db.PARAMETER_SINGLE );
         }
 
         return value;

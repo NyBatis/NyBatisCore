@@ -60,9 +60,7 @@ public class StringUtil {
 		int result = 0;
 
 		for( int i = 0, iCnt = val.length(); i < iCnt; i++ ) {
-
 			result += CharacterUtil.getLength( val.charAt( i ) );
-
 		}
 
 		return result;
@@ -741,7 +739,7 @@ public class StringUtil {
 	 */
 	public static String compressEnter( Object value ) {
 		if( isEmpty(value) ) return "";
-		return value.toString().replaceAll( " *[\n\r]", "\n" ).replaceAll( "[\n\r]+", "\n" ).trim();
+		return value.toString().replaceAll( " *[\n\r]", "\n" ).replaceAll( "[\n\r]+", "\n" );
 	}
 
     /**

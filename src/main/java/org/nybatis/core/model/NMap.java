@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.reflection.Reflector;
 
 /**
@@ -36,6 +39,12 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		super( value );
 	}
 
+	/**
+	 * Constructor
+	 *
+	 * @param value if value is String (or StringBuffer or StringBuilder), init map with json parser.
+	 *              if value is Entity, init map with Bean Parser.
+	 */
 	public NMap( Object value ) {
 
 		if( value instanceof String || value instanceof StringBuffer || value instanceof StringBuilder ) {
@@ -211,7 +220,33 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		super.putAll( map );
 	}
 
-	public Object getBy( int keyIndex ) {
+	/**
+	 * Get value by json path
+	 *
+	 * @param jsonPath json path
+	 * @see https://github.com/jayway/JsonPath
+	 * @return value(s) extracted by json path
+	 * @throws JsonPathNotFoundException
+	 */
+	public Object getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
+
+		if( containsKey( jsonPath ) ) {
+			return get( jsonPath );
+		} else {
+
+			try {
+				return JsonPath.read( this, jsonPath );
+			} catch( PathNotFoundException e ) {
+				throw new JsonPathNotFoundException( e.getMessage() );
+			} catch( IllegalArgumentException e ) {
+				throw new JsonPathNotFoundException( e.getMessage() );
+			}
+
+		}
+
+	}
+
+	public Object getByIndex( int keyIndex ) {
         return super.get( getKey( keyIndex ) );
 	}
 
