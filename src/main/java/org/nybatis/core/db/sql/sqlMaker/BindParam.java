@@ -70,12 +70,11 @@ public class BindParam {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append( "{" );
+		sb.append( "{" ).append( "key:" ).append( key );
 
-		if( key  != null  ) sb.append( "key:" ).append( key ).append( ", " );
-		if( type != null  ) sb.append( "type:" ).append( type ).append( ", " );
-		if( value != null ) sb.append( "value:" ).append( value ).append( ", " );
-		if( out == true   ) sb.append( "out:y" );
+		if( type  != null ) sb.append( ", " ).append( "type:" ).append( type );
+		if( value != null ) sb.append( ", " ).append( "value:" ).append( value );
+		if( out == true   ) sb.append( ", " ).append( "out:y" );
 
 		sb.append( "}" );
 

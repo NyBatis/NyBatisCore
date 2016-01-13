@@ -223,16 +223,7 @@ public class Reflector {
      */
     @SuppressWarnings( "unchecked" )
     public <T> T clone( T object ) {
-    	try {
-
-    		Object target = object.getClass().newInstance();
-    		copy( object, target );
-
-    		return (T) target;
-
-    	} catch( InstantiationException | IllegalAccessException e ) {
-    		throw new ClassCastException( e );
-        }
+		return new Cloner().deepClone( object );
     }
 
     /**

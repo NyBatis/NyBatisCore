@@ -46,14 +46,14 @@ public class ForEachSqlElement extends SqlElement {
 		return DbUtils.getParameterBindedValue( open, param );
 	}
 
-	private Map clone( Map param ) {
-		Map newMap = new HashMap();
+	private NMap clone( Map param ) {
+		NMap newMap = new NMap();
 		newMap.putAll( param );
 		return newMap;
 	}
 
 	@Override
-    public String toString( Map param ) throws SqlParseException {
+    public String toString( NMap param ) throws SqlParseException {
 
 		boolean isSingleParameter = param.containsKey( Const.db.PARAMETER_SINGLE );
 
@@ -80,7 +80,7 @@ public class ForEachSqlElement extends SqlElement {
 
 			if( TypeUtil.isPrimitive(loopParam) ) {
 
-				Map localParam = clone( templateParam );
+				NMap localParam = clone( templateParam );
 
 				localParam.put( paramKey, loopParam );
 				if( indexKeyOn ) localParam.put( indexKey, i );
@@ -171,7 +171,7 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	public String getSqlTemplate( Map param, boolean isSingleParameter ) throws SqlParseException {
+	public String getSqlTemplate( NMap param, boolean isSingleParameter ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 

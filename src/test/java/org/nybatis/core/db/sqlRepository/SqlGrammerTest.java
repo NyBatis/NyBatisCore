@@ -2,9 +2,11 @@ package org.nybatis.core.db.sqlRepository;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.sql.repository.SqlRepository;
+import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -224,7 +226,24 @@ public class SqlGrammerTest {
 
 	}
 
+	@Test
+	public void nestedForLoop() {
+
+		String json = FileUtil.readFrom( Const.path.getConfigDatabase() +  "/grammer/NestedLoopTestParameter.json" );
+
+		NMap param = new NMap( json );
+
+//		param = new NMap();
+
+		getQueryResolver( "Grammer.nestedForLoop", param );
+
+
+
+	}
+
+
 	private String getSql( String sqlId, NMap param ) {
+
 
 		String sql = SqlRepository.get( sqlId ).getText( param );
 
@@ -234,6 +253,29 @@ public class SqlGrammerTest {
 		NLogger.debug( param );
 
 		return sql;
+
+	}
+
+	private QueryResolver getQueryResolver( String sqlId, NMap param ) {
+
+		String sql = SqlRepository.get( sqlId ).getText( param );
+
+		String line = "----------------------------------------------------------";
+		NLogger.debug( line );
+		NLogger.debug( sql );
+
+		QueryResolver queryResolver = new QueryResolver( sql, param );
+
+		NLogger.debug( line );
+		NLogger.debug( queryResolver.getDebugSql() );
+		NLogger.debug( line );
+		NLogger.debug( queryResolver.getSql() );
+		NLogger.debug( line );
+		NLogger.debug( queryResolver.getBindParams() );
+		NLogger.debug( line );
+
+		return queryResolver;
+
 
 	}
 

@@ -28,9 +28,7 @@ public class ExpressionSpliter {
 			currC = expression.charAt( i );
 			
 			try {
-				
 				nextC = expression.charAt( i + 1 );
-				
 			} catch( StringIndexOutOfBoundsException e ) {
 				nextC = ' ';
 			}
@@ -125,9 +123,7 @@ public class ExpressionSpliter {
 						writeBuffer( result );
 						
 						if( nextC == '=' ) {
-							
 							result.add( "<=" );
-							
 							i ++;
 							
 						} else {
@@ -142,9 +138,7 @@ public class ExpressionSpliter {
 						writeBuffer( result );
 						
 						if( nextC == '=' ) {
-							
 							result.add( ">=" );
-							
 							i ++;
 							
 						} else {
@@ -178,15 +172,13 @@ public class ExpressionSpliter {
 
 					// &&
 					case '&' :
-						
-						if( nextC == '&' ) {
-							i ++;
-							writeBuffer( result );
-							result.add( "&&" );
-							continue;
-						}
-						
-						break;
+
+						if( nextC == '&' ) i++;
+
+						writeBuffer( result );
+						result.add( "&&" );
+
+						continue;
 
 					// ||
 					case '|' :

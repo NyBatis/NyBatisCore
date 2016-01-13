@@ -12,6 +12,8 @@
     <appender-ref ref="console" />
   </logger>
 
+  <!--<logger name="com.jayway.jsonpath.internal.path.CompiledPath" level="off" />-->
+
   <logger name="specific.test.log" level="trace">
     <appender-ref ref="console" />
   </logger>
