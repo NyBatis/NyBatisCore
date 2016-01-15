@@ -2,9 +2,9 @@ package org.nybatis.core.db.sql.sqlNode.element;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
-import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -13,8 +13,6 @@ import org.nybatis.core.util.TypeUtil;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.nybatis.core.conf.Const.db.LOOP_PARAM_PREFIX;
 
 public class ForEachSqlElement extends SqlElement {
 
@@ -36,83 +34,70 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	private String getDelimeter( Map param ) {
-		return DbUtils.getParameterBindedValue( delimeter, param );
-	}
-
-	private String getClose( Map param ) {
-		return DbUtils.getParameterBindedValue( close, param );
-	}
-
-	private String getOpen( Map param ) {
-		return DbUtils.getParameterBindedValue( open, param );
-	}
-
-	private NMap clone( Map param ) {
-		NMap newMap = new NMap();
-		newMap.putAll( param );
-		return newMap;
-	}
-
 	@Override
-    public String toString( NMap param ) throws SqlParseException {
+    public String toString( QueryParameter inputParam ) throws SqlParseException {
 
-		Object val = getValue( param );
-
-		if( ! TypeUtil.isList(val)  ) return "";
-
-		List params = TypeUtil.toList( val );
-
-		if( params.size() == 0 ) return "";
-
-		boolean delimiterOn = StringUtil.isNotEmpty( getDelimeter(param) );
+		boolean delimiterOn = StringUtil.isNotEmpty( getDelimeter( inputParam ) );
 		boolean indexKeyOn  = StringUtil.isNotEmpty( indexKey );
 
-		NMap tempParam = clone( param );
+		List params = getParams( inputParam );
 
-		StringBuilder loopSql = new StringBuilder();
+		StringBuilder sql = new StringBuilder();
 
 		for( int i = 0, iCnt = params.size() - 1; i <= iCnt; i++ ) {
 
-			Object localParam = params.get( i );
-
-			tempParam.put( makeLoopParamKey( paramKey ), localParam );
-
-			if( indexKeyOn )
-				tempParam.put( indexKey, i );
-
-			String newSql = getSqlTemplate( tempParam );
-
-			String targetKey = String.format( "%s[%d]", paramKey, i );
-			newSql = bindLoopParam( newSql, paramKey, targetKey );
+			QueryParameter param = clone( inputParam ).setForEachInnerParam( paramKey, params.get(i) );
 
 			if( indexKeyOn ) {
-				String indexKeyTarget = String.format( "%s[%d].%s", paramKey, i, indexKey );
-				String indexNewSql = bindLoopParam( newSql, indexKey, indexKeyTarget );
-
-				if( indexNewSql.length() != newSql.length() ) {
-					param.put( indexKeyTarget, i );
-				}
-
+				param.put( indexKey, i );
 			}
 
-			loopSql.append( newSql );
+			String innerSql = getInnerSql( param );
 
-			if( delimiterOn && i != iCnt && ! StringUtil.isBlank(newSql) ) {
-				loopSql.append( ' ' ).append( getDelimeter( param ) ).append( ' ' );
+			String targetKey = String.format( "%s[%d]", paramKey, i );
+			innerSql = convertKeyToJsonPath( innerSql, paramKey, targetKey );
+
+			if( indexKeyOn ) {
+				innerSql = setIndexKey( innerSql, i, inputParam );
+			}
+
+			sql.append( innerSql );
+
+			if( delimiterOn && i != iCnt && ! StringUtil.isBlank(innerSql) ) {
+				sql.append( ' ' ).append( getDelimeter( inputParam ) ).append( ' ' );
 			}
 
 		}
 
-		if( StringUtil.isBlank(loopSql) ) {
-			return loopSql.toString();
+		if( StringUtil.isBlank(sql) ) {
+			return sql.toString();
 		} else {
-			return String.format( "%s %s %s", getOpen( param ), loopSql, getClose( param ) );
+			return String.format( "%s %s %s", getOpen( inputParam ), sql, getClose( inputParam ) );
 		}
 
 	}
 
-	private String bindLoopParam( String sql, String sourceKey, String targetKey ) {
+	private String setIndexKey( String sql, int index, QueryParameter inputParam ) {
+
+		if( StringUtil.isEmpty( indexKey ) ) return sql;
+
+		String targetKey = String.format( "%s[%d].%s", paramKey, index, indexKey );
+
+		int beforeSize = sql.length();
+
+		sql = convertKeyToJsonPath( sql, indexKey, targetKey );
+
+		int afterSize = sql.length();
+
+		if( beforeSize != afterSize ) {
+			inputParam.put( targetKey, index );
+		}
+
+		return sql;
+
+	}
+
+	private String convertKeyToJsonPath( String sql, String sourceKey, String targetKey ) {
 		return sql.replaceAll( String.format( "#\\{%s(\\..+?)?\\}", sourceKey ), String.format( "#{%s$1}", targetKey ) );
 	}
 
@@ -147,7 +132,25 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	public String getSqlTemplate( NMap param ) throws SqlParseException {
+	private String getDelimeter( Map param ) {
+		return StringUtil.bindParam( delimeter, param );
+	}
+
+	private String getClose( Map param ) {
+		return StringUtil.bindParam( close, param );
+	}
+
+	private String getOpen( Map param ) {
+		return StringUtil.bindParam( open, param );
+	}
+
+	private QueryParameter clone( Map param ) {
+		QueryParameter newMap = new QueryParameter();
+		newMap.putAll( param );
+		return newMap;
+	}
+
+	public String getInnerSql( QueryParameter param ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 
@@ -165,63 +168,23 @@ public class ForEachSqlElement extends SqlElement {
 		return param.containsKey( Const.db.PARAMETER_SINGLE );
 	}
 
+	private List getParams( QueryParameter inputParam ) {
+		Object value = getValue( inputParam );
+		return TypeUtil.toList( value );
+	}
 
+	private Object getValue( QueryParameter param ) {
 
-	private Object getValue( NMap param ) {
-
-		Object val = getValue( param, paramKey );
+		Object val = param.get( paramKey );
 
 		if( val == null && hasSingleParameter(param) ) {
 			String modifiedParamKey = paramKey.replaceFirst( "^.+?(\\..+?)?$", String.format( "%s%1", Const.db.PARAMETER_SINGLE ) );
-			val = getValue( param, modifiedParamKey );
+			val = param.get( modifiedParamKey );
 		}
 
 		return val;
 
 	}
 
-	private Object getValue( NMap param, String paramKey ) {
-
-		try {
-			return param.getByJsonPath( getLoopParamKey( paramKey ) );
-		} catch( JsonPathNotFoundException e ) {
-			try {
-				return param.getByJsonPath( paramKey );
-			} catch( JsonPathNotFoundException e1 ) {
-				return null;
-			}
-		}
-
-	}
-
-	private String makeLoopParamKey( String paramKey ) {
-		return LOOP_PARAM_PREFIX + paramKey.replaceAll( "\\.", "::" );
-	}
-
-	private String getLoopParamKey( String paramKey ) {
-
-		StringBuilder sb = new StringBuilder();
-
-		sb.append( LOOP_PARAM_PREFIX );
-
-		String[] split = paramKey.split( "\\." );
-
-		int iCnt = split.length;
-
-		for( int i = 0; i < iCnt; i++ ) {
-
-			sb.append( split[i] );
-
-			if( i < iCnt - 2 ) {
-				sb.append( "::" );
-			} else if( i < iCnt - 1 ) {
-				sb.append( "." );
-			}
-
-		}
-
-		return sb.toString();
-
-	}
 
 }

@@ -265,7 +265,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         return this;
     }
 
-    public NList addRow( Map<?, ?> data ) {
+    public NList addRow( Map data ) {
         addRow( new NMap( data ) ) ;
         return this;
     }

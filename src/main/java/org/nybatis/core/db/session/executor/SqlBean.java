@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
@@ -20,10 +21,10 @@ import java.util.Map;
 
 public class SqlBean {
 
-	private SqlNode       sqlNode       = null;
-	private SqlProperties properties    = null;
-	private NMap          sqlParam      = null;
-	private Object        inputParam    = null;
+	private SqlNode        sqlNode       = null;
+	private SqlProperties  properties    = null;
+	private QueryParameter sqlParam      = null;
+	private Object         inputParam    = null;
 
 	private QueryResolver queryResolver = null;
 
@@ -52,8 +53,7 @@ public class SqlBean {
 	public SqlBean init( SqlProperties properties ) {
 
 		this.properties = properties.merge( sqlNode.getProperties() );
-
-		this.sqlParam   = DbUtils.getParameterMergedWithGlobalParam( inputParam );
+		this.sqlParam   = new QueryParameter( inputParam ).addGlobalParameters();
 
 		if( properties.isPageSql() ) {
 			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );

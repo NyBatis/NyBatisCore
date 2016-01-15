@@ -35,11 +35,13 @@ public class QueryParameterTest {
 
         QueryParameter parameter = new QueryParameter( map );
 
-        System.out.printf( "val : %s\n", parameter.getValue( "id" ) );
+
+
+        System.out.printf( "val : %s\n", parameter.get( "id" ) );
 //        System.out.printf( "val : %s\n", parameter.getValue( null ) );
-        System.out.printf( "val : %s\n", parameter.getValue( "id.name" ) );
-        System.out.printf( "val : %s\n", parameter.getValue( "id.job[1]" ) );
-        System.out.printf( "val : %s\n", parameter.getValue( "id.job[3]" ) );
+        System.out.printf( "val : %s\n", parameter.get( "id.name" ) );
+        System.out.printf( "val : %s\n", parameter.get( "id.job[1]" ) );
+        System.out.printf( "val : %s\n", parameter.get( "id.job[3]" ) );
 
     }
 }
