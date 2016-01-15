@@ -1,21 +1,19 @@
 package org.nybatis.core.model;
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
+import org.nybatis.core.reflection.Reflector;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import com.jayway.jsonpath.JsonPath;
-import com.jayway.jsonpath.PathNotFoundException;
-import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
-import org.nybatis.core.reflection.Reflector;
 
 /**
  * Single Data
@@ -23,11 +21,9 @@ import org.nybatis.core.reflection.Reflector;
  * @author nayasis
  *
  */
-public class NMap extends LinkedHashMap<Object, Object> {
+public class NMap extends LinkedHashMap {
 
 	private static final long serialVersionUID = 3398423628018291863L;
-
-	private boolean isChanged = false;
 
 	private boolean ignoreCastingError = true;
 
@@ -209,24 +205,12 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getBigInt( getKey( keyIndex ) );
 	}
 
-	public Object put( Object key ) {
-		isChanged = true;
-		return put( key, null );
+	public void put( Object key ) {
+		put( key, null );
 	}
 
-	public Object put( Object key, Object value ) {
-		isChanged = true;
-		return super.put( key, value );
-	}
-
-	public Object putIfAbsent( Object key, Object value ) {
-		isChanged = true;
-		return super.putIfAbsent( key, value );
-	}
-
-	public void putAll( Map<?, ?> map ) {
-		isChanged = true;
-		super.putAll( map );
+	public <T> T getAs( Object key ) {
+		return castType( get( key ) );
 	}
 
 	/**
@@ -237,14 +221,16 @@ public class NMap extends LinkedHashMap<Object, Object> {
 	 * @return value(s) extracted by json path
 	 * @throws JsonPathNotFoundException
 	 */
-	public Object getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
+	public <T> T getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
+
+		Object val;
 
 		if( containsKey( jsonPath ) ) {
-			return get( jsonPath );
+			val = get( jsonPath );
 		} else {
 
 			try {
-				return JsonPath.read( this, jsonPath );
+				val =  JsonPath.read( this, jsonPath );
 			} catch( PathNotFoundException e ) {
 				throw new JsonPathNotFoundException( e.getMessage() );
 			} catch( IllegalArgumentException e ) {
@@ -253,13 +239,19 @@ public class NMap extends LinkedHashMap<Object, Object> {
 
 		}
 
+		return castType( val );
+
 	}
 
-	public Object getByIndex( int keyIndex ) {
-        return super.get( getKey( keyIndex ) );
+	private <T> T castType( Object val ) {
+		return val == null ? null : (T) val;
 	}
 
-	public Object getKey( int index ) {
+	public <T> T getByIndex( int keyIndex ) {
+        return castType( super.get( getKey( keyIndex ) ) );
+	}
+
+	public <T> T getKey( int index ) {
 
         int maxIndex = super.size() - 1;
 
@@ -271,7 +263,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
             iterator.next();
         }
 
-        return iterator.next();
+        return castType( iterator.next() );
 
 	}
 
@@ -321,15 +313,6 @@ public class NMap extends LinkedHashMap<Object, Object> {
     public int getValueHash() {
 		return new Reflector().toJson(this, false, true).hashCode();
 	}
-
-	public boolean isChanged() {
-		return isChanged;
-	}
-
-	public void setChanged( boolean changed ) {
-		isChanged = changed;
-	}
-
 
 
 }

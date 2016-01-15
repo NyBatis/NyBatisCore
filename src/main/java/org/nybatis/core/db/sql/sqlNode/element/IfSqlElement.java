@@ -1,19 +1,21 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.Node;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.constant.implement.BooleanValueNode;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.constant.implement.NumericValueNode;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.constant.implement.StringValueNode;
+import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.variable.VariableNode;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.parser.ExpressionParser;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.parser.PostfixCalculator;
 import org.nybatis.core.exception.unchecked.SqlParseException;
-import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class IfSqlElement extends SqlElement {
 
@@ -25,7 +27,6 @@ public class IfSqlElement extends SqlElement {
 		this.testExpression = StringUtil.trim( testExpression );
 
 		if( StringUtil.isEmpty( testExpression ) ) {
-
 			testCondition.add( new BooleanValueNode( true ) );
 
 		} else {
@@ -38,9 +39,7 @@ public class IfSqlElement extends SqlElement {
 				testCondition.add( new BooleanValueNode( true ) );
 
 			} else {
-
 				PostfixCalculator calculator = new PostfixCalculator();
-
 				testCondition = calculator.getPostfix( nodes );
 
 			}
@@ -56,7 +55,7 @@ public class IfSqlElement extends SqlElement {
 	}
 
 	@Override
-    public String toString( NMap param ) throws SqlParseException {
+    public String toString( QueryParameter param ) throws SqlParseException {
 		return isTrue( param ) ? super.toString( param ) : "";
 	}
 
@@ -83,11 +82,11 @@ public class IfSqlElement extends SqlElement {
 
 	}
 
-    public boolean isTrue( Map param ) throws SqlParseException {
+    public boolean isTrue( QueryParameter param ) throws SqlParseException {
 
 		PostfixCalculator calculator = new PostfixCalculator();
 
-		Node result = calculator.calculate( testCondition, param );
+		Node result = calculator.calculate( testCondition, toCalculateParam(param) );
 
 //		NLogger.trace( "expression : {}, param : {}, result : {}", testExpression, param, result );
 
@@ -103,6 +102,21 @@ public class IfSqlElement extends SqlElement {
 		} else {
 			return false;
 		}
+
+	}
+
+	private Map toCalculateParam( QueryParameter param ) {
+
+		Map calcParam = new HashMap<>();
+
+		for( Node node : testCondition ) {
+			if( node instanceof VariableNode ) {
+				String key = node.toVariableNode().getKey();
+				calcParam.put( key, param.get( key ) );
+			}
+		}
+
+		return calcParam;
 
 	}
 

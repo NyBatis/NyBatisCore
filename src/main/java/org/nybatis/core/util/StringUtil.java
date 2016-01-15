@@ -19,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -143,6 +145,44 @@ public class StringUtil {
 
 	public static boolean isNotBlank( Object value ) {
 		return ! isBlank( value );
+	}
+
+	/**
+	 * Bind parameter at mark '#{...}' in text<br>
+	 *
+	 * <pre>
+	 * NMap parameter = new NMap( "{'name':'abc', 'age':'2'}" );
+	 *
+	 * StringUtil.bindParam( "1", parameter )               --> 1
+	 * StringUtil.bindParam( "#{name}", parameter )         --> abc
+	 * StringUtil.bindParam( "PRE #{age} POST", parameter ) --> PRE 2 POST
+	 * </pre>
+	 *
+	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
+	 *                 key of value is inner text of '#{..}' pattern.
+	 * @param parameter parameter contains key and value
+	 * @return
+	 */
+	public static String bindParam( Object value, Map parameter ) {
+
+		Pattern pattern = Pattern.compile( "#\\{(.+?)\\}" );
+
+		Matcher matcher = pattern.matcher( nvl(value) );
+
+		StringBuffer sb = new StringBuffer();
+
+		while( matcher.find() ) {
+
+			String key = matcher.group().replaceAll( "#\\{(.+?)\\}", "$1" );
+			String val = StringUtil.nvl( parameter.get( key ) );
+
+			matcher.appendReplacement( sb, val );
+		}
+
+		matcher.appendTail( sb );
+
+		return sb.toString();
+
 	}
 
 	/**
@@ -593,6 +633,15 @@ public class StringUtil {
     	return sb.toString();
 
     }
+
+	public static String join( Stack<?> stack, String delimeter ) {
+
+		List list = new ArrayList<>();
+		list.addAll( stack );
+
+		return join( list, delimeter );
+
+	}
 
     /**
      * 문자열을 구분자로 끊어 목록으로 변환한다.

@@ -1,17 +1,17 @@
 package org.nybatis.core.db.sqlRepository;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.model.NMap;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.io.IOException;
+import java.nio.file.Paths;
 
 import static org.testng.Assert.fail;
 
@@ -32,7 +32,7 @@ public class SqlRepositoryTest {
     @Test
 	public void readTest() throws IOException, ParseException {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "id", "1" );
 
@@ -49,7 +49,7 @@ public class SqlRepositoryTest {
     @Test
     public void refValidTest() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "id", "1" );
 
@@ -69,7 +69,7 @@ public class SqlRepositoryTest {
     @Test( expectedExceptions = SqlConfigurationException.class )
     public void refInalidTest() {
 
-    	NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
     	param.put( "id", "1" );
 

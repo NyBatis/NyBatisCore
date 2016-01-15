@@ -26,7 +26,7 @@ public class QueryResolver {
     private   Map<String, BindParam>  bindParams  = new HashMap<>();
 
     public QueryResolver( String sql, NMap param ) {
-        Assertion.isNotEmpty( sql, "SQL must not be empty." );
+        Assertion.isNotEmpty( sql, "SQL is empty." );
     	originalSql = sql;
         String dynamicSql = makeDynamicSql( sql, param );
         makeSql( dynamicSql, param );
@@ -138,15 +138,8 @@ public class QueryResolver {
             try {
                 Object val = getValue( param, key );
                 newQuery.append( val );
-            } catch( JsonPathNotFoundException e1 ) {
-
-                try {
-                    Object val = getValue( param, Const.db.LOOP_PARAM_PREFIX + key );
-                    newQuery.append( val );
-                } catch( JsonPathNotFoundException e2 ) {
-                    newQuery.append( String.format( "${%s}", key ) );
-                }
-
+            } catch( JsonPathNotFoundException e ) {
+                newQuery.append( String.format( "${%s}", key ) );
             }
 
             previousStartIndex = endIndex + 1;

@@ -3,6 +3,7 @@ package org.nybatis.core.db.sql.sqlNode;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.RootSqlElement;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
@@ -42,14 +43,14 @@ public class SqlNode {
 	/**
 	 * @return sql string
 	 */
-	public String getText( NMap param ) {
+	public String getText( QueryParameter param ) {
 		return getText( param, false, false );
 	}
 
 	/**
 	 * @return sql string
 	 */
-    public String getText( NMap param, boolean isPage, boolean isCount ) {
+    public String getText( QueryParameter param, boolean isPage, boolean isCount ) {
 
     	try {
 

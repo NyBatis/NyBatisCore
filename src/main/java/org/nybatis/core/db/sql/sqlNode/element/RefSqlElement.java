@@ -1,12 +1,10 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
-import java.util.Map;
-
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
-import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
 public class RefSqlElement extends SqlElement {
@@ -30,8 +28,8 @@ public class RefSqlElement extends SqlElement {
 		}
 	}
 
-	@SuppressWarnings( "rawtypes" )
-    public String toString( NMap param ) {
+	@Override
+    public String toString( QueryParameter param ) {
 
 		if( referenceSqlId == null ) return "";
 

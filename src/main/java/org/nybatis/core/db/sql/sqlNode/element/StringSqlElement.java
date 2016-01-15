@@ -1,5 +1,6 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -13,7 +14,7 @@ public class StringSqlElement extends SqlElement {
 	}
 
 	@Override
-    public String toString( NMap param ) {
+    public String toString( QueryParameter param ) {
 		return text;
     }
 

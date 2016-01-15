@@ -2,6 +2,7 @@ package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
@@ -156,8 +157,7 @@ public class OrmSessionProperties {
 
     private NMap setParameter( String prefix, Object parameter ) {
 
-        NMap params = DbUtils.toNMapParameter( parameter );
-
+        NMap params    = new QueryParameter( parameter );
         NMap newParams = new NMap();
 
         for( Object key : params.keySet() ) {

@@ -1,5 +1,6 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
@@ -102,7 +103,7 @@ public class CaseSqlElement extends SqlElement {
 
 	}
 
-	public String toString( NMap param ) throws SqlParseException {
+	public String toString( QueryParameter param ) throws SqlParseException {
 		sortElseElementToLast();
 
 //		NLogger.trace( "case :\n{}", super.toString( param ) );
