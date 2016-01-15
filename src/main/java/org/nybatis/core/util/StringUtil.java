@@ -1063,7 +1063,7 @@ public class StringUtil {
 	 * @param pattern 정규식 (capture 될 문자열을 반드시 ( ) 로 감싸주어야 함)
 	 * @return 패턴에 해당하는 문자열
 	 */
-	public static List<String> capturePatterns( String value, String pattern ) {
+	public static List<String> capturePatterns( Object value, String pattern ) {
 
 		List<String> result = new ArrayList<>();
 
@@ -1071,7 +1071,7 @@ public class StringUtil {
 
 	    Pattern p = Pattern.compile( pattern );
 
-	    Matcher matcher = p.matcher( value );
+	    Matcher matcher = p.matcher( nvl(value) );
 
 	    while( matcher.find() ) {
 	        for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
