@@ -156,7 +156,7 @@ public class OrmSessionProperties {
 
     private NMap setParameter( String prefix, Object parameter ) {
 
-        NMap params = DbUtils.toNRowParameter( parameter );
+        NMap params = DbUtils.toNMapParameter( parameter );
 
         NMap newParams = new NMap();
 

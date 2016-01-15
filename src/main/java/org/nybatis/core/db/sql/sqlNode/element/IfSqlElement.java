@@ -12,6 +12,7 @@ import org.nybatis.core.db.sql.sqlNode.expressionLanguage.node.constant.implemen
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.parser.ExpressionParser;
 import org.nybatis.core.db.sql.sqlNode.expressionLanguage.parser.PostfixCalculator;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
 public class IfSqlElement extends SqlElement {
@@ -55,7 +56,7 @@ public class IfSqlElement extends SqlElement {
 	}
 
 	@Override
-    public String toString( Map param ) throws SqlParseException {
+    public String toString( NMap param ) throws SqlParseException {
 		return isTrue( param ) ? super.toString( param ) : "";
 	}
 
