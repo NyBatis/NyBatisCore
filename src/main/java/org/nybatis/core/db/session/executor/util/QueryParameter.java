@@ -6,30 +6,21 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.model.NMap;
 
+import static org.nybatis.core.conf.Const.db.LOOP_PARAM_PREFIX;
+
 /**
  * @author 1002159
  * @since 2016-01-07
  */
-public class QueryParameter {
-
-    NMap param = new NMap();
+public class QueryParameter extends NMap {
 
     public QueryParameter( Object value ) {
         init( value );
     }
 
-    public QueryParameter( String key, Object value ) {
-
-        NMap newValue = new NMap();
-        newValue.put( key, value );
-
-        init( newValue );
-
-    }
-
     private void init( Object value ) {
 
-        param.clear();
+        clear();
 
         if( value == null ) return;
 
@@ -38,29 +29,55 @@ public class QueryParameter {
             NMap singleParam = new NMap();
             singleParam.put( Const.db.PARAMETER_SINGLE, value );
 
-            param.fromBean( singleParam );
+            fromBean( singleParam );
 
         } else {
-            param.fromBean( value );
+            fromBean( value );
         }
 
     }
 
-    public Object getValue( String key ) throws JsonPathNotFoundException {
+    public Object get( String key ) {
 
-        if( param.containsKey( key ) ) {
-            return param.get( key );
-        } else {
-
+        try {
+            return getByJsonPath( getLoopParamKey( key ) );
+        } catch( JsonPathNotFoundException e ) {
             try {
-                return JsonPath.read( param, key );
-            } catch( PathNotFoundException e ) {
-                throw new JsonPathNotFoundException( e.getMessage() );
-            } catch( IllegalArgumentException e ) {
-                throw new JsonPathNotFoundException( e.getMessage() );
+                return getByJsonPath( key );
+            } catch( JsonPathNotFoundException e1 ) {
+                return null;
+            }
+        }
+
+    }
+
+    private String makeLoopParamKey( String paramKey ) {
+        return LOOP_PARAM_PREFIX + paramKey.replaceAll( "\\.", "::" );
+    }
+
+    private String getLoopParamKey( String paramKey ) {
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append( LOOP_PARAM_PREFIX );
+
+        String[] split = paramKey.split( "\\." );
+
+        int iCnt = split.length;
+
+        for( int i = 0; i < iCnt; i++ ) {
+
+            sb.append( split[i] );
+
+            if( i < iCnt - 2 ) {
+                sb.append( "::" );
+            } else if( i < iCnt - 1 ) {
+                sb.append( "." );
             }
 
         }
+
+        return sb.toString();
 
     }
 

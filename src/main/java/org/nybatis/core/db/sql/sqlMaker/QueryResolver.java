@@ -25,13 +25,11 @@ public class QueryResolver {
     private   Map<String, BindStruct> bindStructs = new HashMap<>();
     private   Map<String, BindParam>  bindParams  = new HashMap<>();
 
-
-    public QueryResolver() {}
-
     public QueryResolver( String sql, NMap param ) {
         Assertion.isNotEmpty( sql, "SQL must not be empty." );
     	originalSql = sql;
-    	makeSql( makeDynamicSql(sql, param), param );
+        String dynamicSql = makeDynamicSql( sql, param );
+        makeSql( dynamicSql, param );
     }
 
     public String getSql() {
@@ -140,8 +138,15 @@ public class QueryResolver {
             try {
                 Object val = getValue( param, key );
                 newQuery.append( val );
-            } catch( JsonPathNotFoundException e ) {
-                newQuery.append( String.format( "${%s}", key ) );
+            } catch( JsonPathNotFoundException e1 ) {
+
+                try {
+                    Object val = getValue( param, Const.db.LOOP_PARAM_PREFIX + key );
+                    newQuery.append( val );
+                } catch( JsonPathNotFoundException e2 ) {
+                    newQuery.append( String.format( "${%s}", key ) );
+                }
+
             }
 
             previousStartIndex = endIndex + 1;
@@ -273,42 +278,6 @@ public class QueryResolver {
         }
 
         return value;
-
-    }
-
-    public static String makeLoopSql( String sql, String sourceKey, String targetKey ) {
-
-        StringBuilder sb = new StringBuilder();
-
-        int previousStartIndex = 0;
-
-        while( true ) {
-
-            int startIndex = getParamStartIndex( sql, '#', previousStartIndex );
-
-            if( startIndex == -1 ) break;
-
-            int endIndex = getParamEndIndex( sql, startIndex + 2 );
-
-            String key = sql.substring( startIndex + 2, endIndex );
-
-            String prevPhrase = sql.substring( previousStartIndex, startIndex );
-
-            sb.append( prevPhrase );
-
-            if( key.equals(sourceKey) ) {
-                sb.append( "#{" ).append( targetKey ).append( "}" );
-            } else {
-                sb.append( "#{" ).append( key ).append( "}" );
-            }
-
-            previousStartIndex = endIndex + 1;
-
-        }
-
-        sb.append( sql.substring( previousStartIndex ) );
-
-        return sb.toString();
 
     }
 

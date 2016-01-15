@@ -268,22 +268,22 @@ WHERE rownum &lt;= 10
   FROM    TABLE_SAMPLE A
   <if test="#{user} != empty" >
   JOIN  (
-    <foreach key="#{user}" indexKey="#{index}">
+    <foreach key="#{user}" indexKey="#{indexA}">
       --------------------------------------------
       1. SELECT #{user.name} AS user_name FROM DUAL
       1. SELECT #{user.age}  AS user_age  FROM DUAL
       --------------------------------------------
-      <foreach key="#{user.dept}" indexKey="#{index}">
+      <foreach key="#{user.dept}" indexKey="#{indexB}">
         2. SELECT #{user.dept.name} AS user_dept_name FROM DUAL
         --------------------------------------------
-        <foreach key="#{user.dept.subDept}" indexKey="#{index}">
+        <foreach key="#{user.dept.subDept}" indexKey="#{indexC}">
           <if test="#{user.dept.subDept.name} NOT LIKE '3-1' ">
           3. SELECT #{user.dept.subDept.name} AS dept FROM DUAL
           </if>
         </foreach>
         --------------------------------------------
       </foreach>
-      <foreach key="#{user.dept.subDept}" indexKey="#{index}">
+      <foreach key="#{user.dept.subDept}" indexKey="#{indexB}">
         2. SELECT #{user.dept.subDept.name} AS dept FROM DUAL
       </foreach>
     </foreach>
