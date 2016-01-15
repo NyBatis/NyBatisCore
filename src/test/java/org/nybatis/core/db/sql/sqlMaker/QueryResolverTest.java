@@ -110,27 +110,6 @@ public class QueryResolverTest {
         
     }
 
-    @Test
-    public void loopSqlTemplateTest() {
-
-        String sql = "names LIKE '%' || #{names} || '%' OR names LIKE '%' || #{index} || '%'  -- #{index}";
-
-        QueryResolver queryResolver = new QueryResolver();
-
-        NLogger.debug( sql );
-
-        String sql01 = QueryResolver.makeLoopSql( sql, "names", "names_0_NybatisLoopNode" );
-        NLogger.debug( sql01 );
-
-        assertEquals( sql01, "names LIKE '%' || #{names_0_NybatisLoopNode} || '%' OR names LIKE '%' || #{index} || '%'  -- #{index}" );
-
-        String sql02 = QueryResolver.makeLoopSql( sql, "index", "index_0_NybatisLoopNode" );
-        NLogger.debug( sql02 );
-
-        assertEquals( sql02, "names LIKE '%' || #{names} || '%' OR names LIKE '%' || #{index_0_NybatisLoopNode} || '%'  -- #{index}" );
-
-    }
-
     public void forEach() {
 
 

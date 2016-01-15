@@ -4,15 +4,17 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.TypeUtil;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.nybatis.core.conf.Const.db.LOOP_PARAM_PREFIX;
 
 public class ForEachSqlElement extends SqlElement {
 
@@ -55,62 +57,43 @@ public class ForEachSqlElement extends SqlElement {
 	@Override
     public String toString( NMap param ) throws SqlParseException {
 
-		boolean isSingleParameter = param.containsKey( Const.db.PARAMETER_SINGLE );
+		Object val = getValue( param );
 
-		String paramKey = isSingleParameter ? Const.db.PARAMETER_SINGLE : this.paramKey;
+		if( ! TypeUtil.isList(val)  ) return "";
 
-		if( ! TypeUtil.isList(param.get(paramKey))  ) return "";
+		List params = TypeUtil.toList( val );
 
-		List loopParams = TypeUtil.toList( param.get(paramKey) );
+		if( params.size() == 0 ) return "";
 
-		if( loopParams.size() == 0 ) return "";
+		boolean delimiterOn = StringUtil.isNotEmpty( getDelimeter(param) );
+		boolean indexKeyOn  = StringUtil.isNotEmpty( indexKey );
 
-		boolean delimiterOn = ! StringUtil.isEmpty( getDelimeter( param ) );
-		boolean indexKeyOn  = ! StringUtil.isEmpty( indexKey );
-
-		Map templateParam = clone( param );
+		NMap tempParam = clone( param );
 
 		StringBuilder loopSql = new StringBuilder();
 
-		for( int i = 0, iCnt = loopParams.size() - 1; i <= iCnt; i++ ) {
+		for( int i = 0, iCnt = params.size() - 1; i <= iCnt; i++ ) {
 
-			Object loopParam = loopParams.get( i );
+			Object localParam = params.get( i );
 
-			String newSql;
+			tempParam.put( makeLoopParamKey( paramKey ), localParam );
 
-			if( TypeUtil.isPrimitive(loopParam) ) {
+			if( indexKeyOn )
+				tempParam.put( indexKey, i );
 
-				NMap localParam = clone( templateParam );
+			String newSql = getSqlTemplate( tempParam );
 
-				localParam.put( paramKey, loopParam );
-				if( indexKeyOn ) localParam.put( indexKey, i );
-
-				newSql = getSqlTemplate( localParam, isSingleParameter );
-
-				String targetKey = String.format( "%s[%d]", paramKey, i );
-				newSql = bindLoopParam( newSql, paramKey, targetKey, loopParam, param );
-
-			} else {
-
-				NMap localParam = DbUtils.toNRowParameter( loopParam, paramKey );
-
-				if( indexKeyOn )
-					localParam.put( indexKey, i );
-
-				newSql = getSqlTemplate( localParam, isSingleParameter );
-
-				for( Object sourceKey : localParam.keySet() ) {
-
-					String targetKey = String.format( "%s[%d].%s", paramKey, i, ((String)sourceKey).replace(paramKey + ".", "") );
-					newSql = bindLoopParam( newSql, (String)sourceKey, targetKey, localParam.get( sourceKey ), param );
-
-				}
-
-			}
+			String targetKey = String.format( "%s[%d]", paramKey, i );
+			newSql = bindLoopParam( newSql, paramKey, targetKey );
 
 			if( indexKeyOn ) {
 				String indexKeyTarget = String.format( "%s[%d].%s", paramKey, i, indexKey );
-				newSql = bindLoopParam( newSql, indexKey, indexKeyTarget, i, param );
+				String indexNewSql = bindLoopParam( newSql, indexKey, indexKeyTarget );
+
+				if( indexNewSql.length() != newSql.length() ) {
+					param.put( indexKeyTarget, i );
+				}
+
 			}
 
 			loopSql.append( newSql );
@@ -129,17 +112,10 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	private String bindLoopParam( String sql, String sourceKey, String targetKey, Object value, Map originalParameter ) {
-
-		String newSql = QueryResolver.makeLoopSql( sql, sourceKey, targetKey );
-
-		if( ! sql.equals( newSql ) ) {
-			originalParameter.put( targetKey, value );
-		}
-
-		return newSql;
-
+	private String bindLoopParam( String sql, String sourceKey, String targetKey ) {
+		return sql.replaceAll( String.format( "#\\{%s(\\..+?)?\\}", sourceKey ), String.format( "#{%s$1}", targetKey ) );
 	}
+
 
 	private void toString( StringBuilder buffer, SqlElement node, int depth ) {
 
@@ -171,17 +147,80 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	public String getSqlTemplate( NMap param, boolean isSingleParameter ) throws SqlParseException {
+	public String getSqlTemplate( NMap param ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 
 		sqlTemplate = QueryResolver.makeDynamicSql( sqlTemplate, param );
 
-		if( isSingleParameter ) {
-			sqlTemplate = sqlTemplate.replaceAll( "#\\{.+?\\}", String.format("#{%s}", Const.db.PARAMETER_SINGLE) );
+		if( hasSingleParameter(param) ) {
+			sqlTemplate = sqlTemplate.replaceAll( "#\\{.+?(\\[.+?\\])?(\\..+?)?\\}", String.format("#{%s$1$2}", Const.db.PARAMETER_SINGLE) );
 		}
 
 		return sqlTemplate;
+
+	}
+
+	private boolean hasSingleParameter( NMap param ) {
+		return param.containsKey( Const.db.PARAMETER_SINGLE );
+	}
+
+
+
+	private Object getValue( NMap param ) {
+
+		Object val = getValue( param, paramKey );
+
+		if( val == null && hasSingleParameter(param) ) {
+			String modifiedParamKey = paramKey.replaceFirst( "^.+?(\\..+?)?$", String.format( "%s%1", Const.db.PARAMETER_SINGLE ) );
+			val = getValue( param, modifiedParamKey );
+		}
+
+		return val;
+
+	}
+
+	private Object getValue( NMap param, String paramKey ) {
+
+		try {
+			return param.getByJsonPath( getLoopParamKey( paramKey ) );
+		} catch( JsonPathNotFoundException e ) {
+			try {
+				return param.getByJsonPath( paramKey );
+			} catch( JsonPathNotFoundException e1 ) {
+				return null;
+			}
+		}
+
+	}
+
+	private String makeLoopParamKey( String paramKey ) {
+		return LOOP_PARAM_PREFIX + paramKey.replaceAll( "\\.", "::" );
+	}
+
+	private String getLoopParamKey( String paramKey ) {
+
+		StringBuilder sb = new StringBuilder();
+
+		sb.append( LOOP_PARAM_PREFIX );
+
+		String[] split = paramKey.split( "\\." );
+
+		int iCnt = split.length;
+
+		for( int i = 0; i < iCnt; i++ ) {
+
+			sb.append( split[i] );
+
+			if( i < iCnt - 2 ) {
+				sb.append( "::" );
+			} else if( i < iCnt - 1 ) {
+				sb.append( "." );
+			}
+
+		}
+
+		return sb.toString();
 
 	}
 

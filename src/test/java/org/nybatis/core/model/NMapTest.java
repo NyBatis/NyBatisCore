@@ -220,6 +220,8 @@ public class NMapTest {
 			throw new BizException( "Expected : {}", "No results for path: $['null']" );
 		} catch( JsonPathNotFoundException e ) {}
 
+		NLogger.debug( map.getByJsonPath( "id[0]" ) );
+
 	}
 
 }
