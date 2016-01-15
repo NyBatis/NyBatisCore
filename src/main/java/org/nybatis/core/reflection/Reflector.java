@@ -39,8 +39,6 @@ import org.nybatis.core.validation.Validator;
  */
 public class Reflector {
 
-	private static NObjectMapper objectMapper = new NObjectMapper();
-
     /**
      * 객체에 선언된 field 목록을 가져온다.
      *
@@ -223,16 +221,7 @@ public class Reflector {
      */
     @SuppressWarnings( "unchecked" )
     public <T> T clone( T object ) {
-    	try {
-
-    		Object target = object.getClass().newInstance();
-    		copy( object, target );
-
-    		return (T) target;
-
-    	} catch( InstantiationException | IllegalAccessException e ) {
-    		throw new ClassCastException( e );
-        }
+		return new Cloner().deepClone( object );
     }
 
     /**
@@ -419,7 +408,13 @@ public class Reflector {
 
     }
 
-	public String toJson( Object fromBean, boolean prettyPrint ) {
+	private NObjectMapper objectMapper() {
+		return new NObjectMapper( false );
+	}
+
+	public String toJson( Object fromBean, boolean prettyPrint, boolean sort ) {
+
+		NObjectMapper objectMapper = new NObjectMapper( sort );
 
 		ObjectWriter writer = prettyPrint ? objectMapper.writerWithDefaultPrettyPrinter() : objectMapper.writer();
 
@@ -431,13 +426,18 @@ public class Reflector {
 
 	}
 
+	public String toJson( Object fromBean, boolean prettyPrint ) {
+		return toJson( fromBean, prettyPrint, false );
+
+	}
+
 	public String toJson( Object fromBean ) {
 		return toJson( fromBean, false );
 	}
 
     public Map<String, Object> toMapFromJson( String fromJson ) {
         try {
-			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJson ), new TypeReference<HashMap<String, Object>>() {} );
+			Map<String, Object> stringObjectMap = objectMapper().readValue( getContent( fromJson ), new TypeReference<HashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
@@ -456,7 +456,7 @@ public class Reflector {
 
 	public <T> T toBeanFromJson( String fromJsonString, Class<T> toClass ) {
     	try {
-    		return objectMapper.readValue( getContent( fromJsonString ), toClass );
+    		return objectMapper().readValue( getContent( fromJsonString ), toClass );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
     	} catch( IOException e ) {
@@ -466,7 +466,7 @@ public class Reflector {
 
 	public <T> List<T> toListFromJson( String fromJson, TypeReference typeReference ) {
 		try {
-			return objectMapper.readValue( getArrayContent(fromJson), typeReference );
+			return objectMapper().readValue( getArrayContent(fromJson), typeReference );
 		} catch( JsonParseException e ) {
 			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
 		} catch( IOException e ) {
@@ -487,17 +487,17 @@ public class Reflector {
 	}
 
 	public <T> T toBeanFromMap( Map<?, ?> fromMap, Class<T> toClass ) {
-		return objectMapper.convertValue( fromMap, toClass );
+		return objectMapper().convertValue( fromMap, toClass );
 	}
 
 	public <T> T toBeanFromBean( Object fromBean, Class<T> toClass ) {
-		return objectMapper.convertValue( fromBean, toClass );
+		return objectMapper().convertValue( fromBean, toClass );
 
 	}
 
     @SuppressWarnings( "unchecked" )
     public <K, V> Map<K, V> toMapFromBean( Object fromBean ) {
-    	return objectMapper.convertValue( fromBean, Map.class );
+    	return objectMapper().convertValue( fromBean, Map.class );
 	}
 
     public NMap toNMapFromBean( Object fromBean ) {

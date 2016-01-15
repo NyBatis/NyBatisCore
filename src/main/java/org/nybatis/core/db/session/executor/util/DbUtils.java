@@ -6,8 +6,6 @@ import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.TypeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -21,7 +19,7 @@ public class DbUtils {
 
     public static NMap getParameterMergedWithGlobalParam( Object parameter ) {
 
-		NMap newParam = toNRowParameter( parameter );
+		NMap newParam = toNMapParameter( parameter );
 
 		newParam.putAll( GlobalSqlParameter.getThreadLocalParameters() );
 
@@ -29,12 +27,7 @@ public class DbUtils {
 
 	}
 
-	@SuppressWarnings( { "rawtypes" } )
-    public static NMap toNRowParameter( Object parameter ) {
-		return toNRowParameter( parameter, null );
-	}
-
-	public static NMap toNRowParameter( Object parameter, String parentKey ) {
+	public static NMap toNMapParameter( Object parameter ) {
 
 		NMap param = new NMap();
 
@@ -42,12 +35,8 @@ public class DbUtils {
 
 		if( isPrimitive(parameter) ) {
 
-			if( parentKey == null ) {
-				parentKey = Const.db.PARAMETER_SINGLE;
-			}
-
 			NMap singleParam = new NMap( );
-			singleParam.put( parentKey, parameter );
+			singleParam.put( Const.db.PARAMETER_SINGLE, parameter );
 
 			param.fromBean( singleParam );
 
@@ -55,27 +44,8 @@ public class DbUtils {
 
 		} else {
 
-			if( parentKey == null ) {
-				parentKey = "";
-			} else {
-				parentKey = parentKey + ".";
-			}
-
 			NMap tempParam = new NMap();
 			tempParam.fromBean( parameter );
-
-			for( Object key : tempParam.keySet() ) {
-
-				Object val = tempParam.get( key );
-
-				if( isPrimitive(val) ) {
-					param.put( parentKey + key, val );
-				} else {
-					NMap newVal = toNRowParameter( val, parentKey + key );
-					param.putAll( newVal );
-				}
-
-			}
 
 		}
 

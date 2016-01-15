@@ -3,6 +3,7 @@ package org.nybatis.core.db.sql.sqlNode.element;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.ElementText;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class GroupSqlElement extends SqlElement {
 	}
 
 	@Override
-    public String toString( Map param ) throws SqlParseException {
+    public String toString( NMap param ) throws SqlParseException {
 
 		List<StringBuilder> paragraph = getParagraph( param );
 
@@ -38,7 +39,7 @@ public class GroupSqlElement extends SqlElement {
 
 	}
 
-	private List<StringBuilder> getParagraph( Map param ) {
+	private List<StringBuilder> getParagraph( NMap param ) {
 
 		boolean delimiterOff = StringUtil.isEmpty( delimeter );
 

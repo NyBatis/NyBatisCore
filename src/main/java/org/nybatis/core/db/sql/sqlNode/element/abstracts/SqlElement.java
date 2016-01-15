@@ -9,13 +9,14 @@ import org.nybatis.core.db.sql.sqlNode.element.ElseSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.IfSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.WhenSqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 
 
 public abstract class SqlElement {
 
     protected List<SqlElement> children = new ArrayList<>();
 
-	public String toString( Map param ) throws SqlParseException {
+	public String toString( NMap param ) throws SqlParseException {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -35,7 +36,7 @@ public abstract class SqlElement {
 		return children;
 	}
 
-	protected List<ElementText> toStringList( Map param ) {
+	protected List<ElementText> toStringList( NMap param ) {
 
 		List<ElementText> list = new ArrayList<>();
 

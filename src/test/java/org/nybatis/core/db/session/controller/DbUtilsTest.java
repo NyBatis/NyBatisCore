@@ -23,7 +23,7 @@ public class DbUtilsTest {
         vo.children.add( getSampleVo() );
         vo.children.add( getSampleVo() );
 
-        NMap nMap = DbUtils.toNRowParameter( vo );
+        NMap nMap = DbUtils.toNMapParameter( vo );
 
         NLogger.debug( nMap );
 

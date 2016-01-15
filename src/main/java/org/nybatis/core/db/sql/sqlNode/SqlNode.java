@@ -6,6 +6,7 @@ import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.db.sql.sqlNode.element.RootSqlElement;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 import org.nybatis.core.xml.node.Node;
@@ -41,14 +42,14 @@ public class SqlNode {
 	/**
 	 * @return sql string
 	 */
-	public String getText( Map<?,?> param ) {
+	public String getText( NMap param ) {
 		return getText( param, false, false );
 	}
 
 	/**
 	 * @return sql string
 	 */
-    public String getText( Map<?,?> param, boolean isPage, boolean isCount ) {
+    public String getText( NMap param, boolean isPage, boolean isCount ) {
 
     	try {
 

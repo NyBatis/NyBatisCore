@@ -69,8 +69,9 @@ public class NLoggerConfigLoader {
 			    "</encoder>" +
 			  "</appender> " + 
 			  "<root level=\"trace\">" +
-			    "<appender-ref ref=\"console\" />" + 
-			  "</root>" + 
+			    "<appender-ref ref=\"console\" />" +
+			  "</root>" +
+			  "<logger name=\"com.jayway.jsonpath.internal.path.CompiledPath\" level=\"off\" additivity=\"false\" />" +
 			"</configuration>";
 
 	}

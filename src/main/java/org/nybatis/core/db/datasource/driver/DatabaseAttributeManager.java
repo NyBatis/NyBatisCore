@@ -88,8 +88,8 @@ public class DatabaseAttributeManager {
     static {
 
         add( new DatabaseAttribute("oracle", "oracle\\.jdbc\\.driver" )
-            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (" )
-            .setPageSqlPost( ") NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
