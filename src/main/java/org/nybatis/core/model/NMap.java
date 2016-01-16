@@ -86,7 +86,7 @@ public class NMap extends LinkedHashMap {
 	 * @return Json string
 	 */
 	public String toJson() {
-		return toJson(false);
+		return toJson( false );
 	}
 
 	public <T> T toBean( Class<T> klass ) {
@@ -166,7 +166,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	public NDate getNDateByIndex( int keyIndex ) {
-		return  getNDate( getKey(keyIndex) );
+		return  getNDate( getKey( keyIndex ) );
 	}
 
 	public Date getDate( Object key ) {
@@ -213,6 +213,10 @@ public class NMap extends LinkedHashMap {
 		return castType( get( key ) );
 	}
 
+	private <T> T castType( Object val ) {
+		return val == null ? null : (T) val;
+	}
+
 	/**
 	 * Get value by json path
 	 *
@@ -221,9 +225,9 @@ public class NMap extends LinkedHashMap {
 	 * @return value(s) extracted by json path
 	 * @throws JsonPathNotFoundException
 	 */
-	public <T> T getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
+	public Object getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
 
-		Object val;
+		Object val = null;
 
 		if( containsKey( jsonPath ) ) {
 			val = get( jsonPath );
@@ -239,19 +243,15 @@ public class NMap extends LinkedHashMap {
 
 		}
 
-		return castType( val );
+		return val;
 
 	}
 
-	private <T> T castType( Object val ) {
-		return val == null ? null : (T) val;
+	public Object getByIndex( int keyIndex ) {
+        return super.get( getKey( keyIndex ) );
 	}
 
-	public <T> T getByIndex( int keyIndex ) {
-        return castType( super.get( getKey( keyIndex ) ) );
-	}
-
-	public <T> T getKey( int index ) {
+	public Object getKey( int index ) {
 
         int maxIndex = super.size() - 1;
 
@@ -263,7 +263,7 @@ public class NMap extends LinkedHashMap {
             iterator.next();
         }
 
-        return castType( iterator.next() );
+        return iterator.next();
 
 	}
 
