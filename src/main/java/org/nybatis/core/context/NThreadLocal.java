@@ -9,7 +9,13 @@ import java.util.Observer;
 import java.util.Set;
 
 /**
- * ThreadLocal
+ * Nybatis ThreadLocal
+ *
+ * <pre>
+ *     It is simple static pool.
+ *     The value made in thread local stored it with thread local's unique key issued by {@link ThreadRoot}.
+ *     The unique key to distinguish thread local is consisted with UUID.
+ * </pre>
  *
  * @author nayasis@gmail.com
  *
@@ -18,26 +24,26 @@ public final class NThreadLocal {
 
 	private static NThreadLocalWatcher watcher = new NThreadLocalWatcher();
 
-	private static Map<String, Map<String, Object>> threadLocal = new HashMap<>();
+	private static Map<String, Map<String, Object>> staticPool = new HashMap<>();
 
 	private NThreadLocal() {}
 
 	private static Object lock = new Object();
 
 	/**
-	 * <code>{@link #initialize}</code> 초기화 작업시 같이 실행될 Observer를 등록한다.
+	 * add observer to run with when <code>{@link #clear()}</code> is called
 	 *
-	 * @param observer
+	 * @param observer observer
 	 */
 	public static void addObserver( Observer observer ) {
 		watcher.addObserver( observer );
 	}
 
 	/**
-	 * key 값으로 저장된 object를 가져온다.
+	 * Get value by key
 	 *
-	 * @param key key
-	 * @return key key로 저장된 object
+	 * @param key key to distingush value
+	 * @return value to store
 	 */
 	public static Object get( String key ) {
 		return getThreadLocal().get( key );
@@ -46,40 +52,40 @@ public final class NThreadLocal {
 	private static Map<String, Object> getThreadLocal() {
 
 		synchronized( lock ) {
-			if( ! threadLocal.containsKey(ThreadRoot.getKey()) ) {
-				threadLocal.put( ThreadRoot.getKey(), new HashMap<>() );
+			if( ! staticPool.containsKey(ThreadRoot.getKey()) ) {
+				staticPool.put( ThreadRoot.getKey(), new HashMap<>() );
 			}
 			lock.notifyAll();
         }
 
-		return threadLocal.get( ThreadRoot.getKey() );
+		return staticPool.get( ThreadRoot.getKey() );
 
 	}
 
 	/**
-	 * key 값으로 object를 저장한다.
+	 * Store value
 	 *
-	 * @param key   key
-	 * @param value 저장할 값
+	 * @param key   key to distingush value
+	 * @param value value to store
 	 */
 	public static void set( String key, Object value ) {
 		getThreadLocal().put( key, value );
 	}
 
 	/**
-	 * key 값으로 저장된 object를 삭제한다.
+	 * Remove value by key
 	 *
-	 * @param key key
+	 * @param key key key to distingush value
 	 */
 	public static void remove( String key ) {
 		getThreadLocal().remove( key );
 	}
 
 	/**
-	 * key 값으로 저장된 object가 존재하는지 여부를 확인한다.
+	 * Check whether key is exist.
 	 *
-	 * @param key key
-	 * @return key key로 저장된 object 존재여부
+	 * @param key key to distingush value
+	 * @return true if key is exist.
 	 */
 	public static boolean containsKey( String key ) {
 		return getThreadLocal().containsKey( key );
@@ -97,7 +103,7 @@ public final class NThreadLocal {
 		watcher.notifyObservers();
 
 		synchronized( lock ) {
-			threadLocal.remove( ThreadRoot.getKey() );
+			staticPool.remove( ThreadRoot.getKey() );
 			lock.notifyAll();
         }
 
@@ -111,7 +117,7 @@ public final class NThreadLocal {
 	 * @return keys stored in thread local
 	 */
 	public static List<String> keyList() {
-		return new ArrayList<String>( keySet() );
+		return new ArrayList<>( keySet() );
 	}
 
 	/**
@@ -130,6 +136,15 @@ public final class NThreadLocal {
 	 */
 	public static Collection<Object> values() {
 		return getThreadLocal().values();
+	}
+
+	/**
+	 * Get static pool
+	 *
+	 * @return static pool to store indivisual thread local ( 'Key' is the unique key to distinguish indivisual thread local. )
+	 */
+	public static Map<String, Map<String, Object>> getStaticPool() {
+		return staticPool;
 	}
 
 }

@@ -37,10 +37,11 @@ public class ForEachSqlElement extends SqlElement {
 	@Override
     public String toString( QueryParameter inputParam ) throws SqlParseException {
 
-		boolean delimiterOn = StringUtil.isNotEmpty( getDelimeter( inputParam ) );
-		boolean indexKeyOn  = StringUtil.isNotEmpty( indexKey );
+		boolean delimiterOn    = StringUtil.isNotEmpty( getDelimeter( inputParam ) );
+		boolean indexKeyOn     = StringUtil.isNotEmpty( indexKey );
+		boolean hasSingleParam = hasSingleParameter( inputParam );
 
-		List params = getParams( inputParam );
+		List params = getParams( inputParam, hasSingleParam );
 
 		StringBuilder sql = new StringBuilder();
 
@@ -56,6 +57,7 @@ public class ForEachSqlElement extends SqlElement {
 
 			String targetKey = String.format( "%s[%d]", paramKey, i );
 			innerSql = convertKeyToJsonPath( innerSql, paramKey, targetKey );
+			innerSql = bindSingleParamKey( innerSql, hasSingleParam );
 
 			if( indexKeyOn ) {
 				innerSql = setIndexKey( innerSql, i, inputParam );
@@ -150,17 +152,11 @@ public class ForEachSqlElement extends SqlElement {
 		return newMap;
 	}
 
-	public String getInnerSql( QueryParameter param ) throws SqlParseException {
+	private String getInnerSql( QueryParameter param ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 
-		sqlTemplate = QueryResolver.makeDynamicSql( sqlTemplate, param );
-
-		if( hasSingleParameter(param) ) {
-			sqlTemplate = sqlTemplate.replaceAll( "#\\{.+?(\\[.+?\\])?(\\..+?)?\\}", String.format("#{%s$1$2}", Const.db.PARAMETER_SINGLE) );
-		}
-
-		return sqlTemplate;
+		return QueryResolver.makeDynamicSql( sqlTemplate, param );
 
 	}
 
@@ -168,17 +164,17 @@ public class ForEachSqlElement extends SqlElement {
 		return param.containsKey( Const.db.PARAMETER_SINGLE );
 	}
 
-	private List getParams( QueryParameter inputParam ) {
-		Object value = getValue( inputParam );
+	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
+		Object value = getValue( inputParam, hasSingleParam );
 		return TypeUtil.toList( value );
 	}
 
-	private Object getValue( QueryParameter param ) {
+	private Object getValue( QueryParameter param, boolean hasSingleParam ) {
 
 		Object val = param.get( paramKey );
 
-		if( val == null && hasSingleParameter(param) ) {
-			String modifiedParamKey = paramKey.replaceFirst( "^.+?(\\..+?)?$", String.format( "%s%1", Const.db.PARAMETER_SINGLE ) );
+		if( val == null && hasSingleParam ) {
+			String modifiedParamKey = paramKey.replaceFirst( "^.+?(\\..+?)?$", String.format( "%s$1", Const.db.PARAMETER_SINGLE ) );
 			val = param.get( modifiedParamKey );
 		}
 
@@ -186,5 +182,14 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
+	private String bindSingleParamKey( String sql, boolean hasSingleParam ) {
+
+		if( hasSingleParam ) {
+			return sql.replaceAll( "#\\{.+?(\\[.+?\\])?(\\..+?)?\\}", String.format( "#{%s$1$2}", Const.db.PARAMETER_SINGLE) );
+		} else {
+			return sql;
+		}
+
+	}
 
 }
