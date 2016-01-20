@@ -54,9 +54,9 @@ public class DatabaseAttributeManager {
 
         String className = realConnection.getClass().getName();
 
-        NLogger.trace( "--------------------------------------" );
+        NLogger.trace( "---------------------------------------------------------------------" );
         NLogger.trace( "Connection class name : {}", className );
-        NLogger.trace( "--------------------------------------" );
+        NLogger.trace( "---------------------------------------------------------------------" );
 
         for( DatabaseAttribute attribute : driverRepository.values() ) {
             if( attribute.isMatched( className ) ) {
