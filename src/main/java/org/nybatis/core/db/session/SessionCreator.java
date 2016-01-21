@@ -14,6 +14,11 @@ import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
+/**
+ * Session Creator
+ *
+ * @author nayasis@gmail.com
+ */
 public class SessionCreator {
 
 	public SqlSession createSqlSession( String token, String environmentId ) {
@@ -69,8 +74,6 @@ public class SessionCreator {
 	public <T> OrmSession<T> createSeperateOrmSession( String environmentId, String tableName, Class<T> domainClass ) {
 		return createOrmSession( TransactionToken.createToken(), environmentId, tableName, domainClass );
 	}
-
-
 
 
 }

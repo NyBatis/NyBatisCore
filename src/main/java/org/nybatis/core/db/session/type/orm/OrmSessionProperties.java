@@ -2,6 +2,7 @@ package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
@@ -97,29 +98,36 @@ public class OrmSessionProperties {
 
         if( StringUtil.isBlank(where) ) return;
 
-        int currentWhereIndex = wheres.size();
-
-        String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
-
-        NMap inputParam = setParameter( prefix, parameter );
-
-
-        where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
-
-        String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
-
         if( parameter == null ) {
-            inputParam.put( singleParamKey, null );
-        }
 
-        if( inputParam.containsKey(singleParamKey) ) {
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s}", singleParamKey) );
+            where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
 
         } else {
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format( "#{%s$1}", prefix ) );
-        }
 
-        userParameter.putAll( inputParam );
+            int currentWhereIndex = wheres.size();
+
+            String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
+
+            NMap inputParam = setParameter( prefix, parameter );
+
+            where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
+
+            String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
+
+            if( parameter == null ) {
+                inputParam.put( singleParamKey, null );
+            }
+
+            if( inputParam.containsKey(singleParamKey) ) {
+                where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s}", singleParamKey) );
+
+            } else {
+                where = where.replaceAll( "#\\{(.*?)\\}", String.format( "#{%s$1}", prefix ) );
+            }
+
+            userParameter.putAll( inputParam );
+
+        }
 
         this.wheres.add( String.format( "AND ( %s )", where ) );
 
@@ -149,8 +157,7 @@ public class OrmSessionProperties {
 
     private NMap setParameter( String prefix, Object parameter ) {
 
-        NMap params = DbUtils.toNRowParameter( parameter );
-
+        NMap params    = new QueryParameter( parameter );
         NMap newParams = new NMap();
 
         for( Object key : params.keySet() ) {

@@ -111,7 +111,7 @@ public class SqlSessionSqliteTest {
 
 		}
 
-		sqlSession.batchSql( sqlList ).execute( 10 );
+		sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
 
 		case10_select();
 
@@ -140,7 +140,7 @@ public class SqlSessionSqliteTest {
 
 		}
 
-		sqlSession.batchSql( "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", parameters ).execute( 10 );
+		sqlSession.batchSql( "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", parameters ).setTransactionSize( 10 ).execute();
 
 		case10_select();
 
@@ -323,7 +323,7 @@ public class SqlSessionSqliteTest {
 
 		sqlList.add( 13, sql );
 
-		sqlSession.batchSql( sqlList ).execute( 10 );
+		sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
 
 	}
 

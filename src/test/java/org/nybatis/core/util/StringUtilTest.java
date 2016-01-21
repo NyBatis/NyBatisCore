@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.log.NLogger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -164,6 +165,13 @@ public class StringUtilTest {
 		assertEquals( StringUtil.isTrue( "n" ), false );
 		assertEquals( StringUtil.isTrue( "No" ), false );
 		assertEquals( StringUtil.isTrue( "another" ), false );
+
+	}
+
+	@Test
+	public void regTest() {
+
+		System.out.println( "#{name.value[1]}".replaceAll( "#\\{.+?(\\..+?)?\\}", String.format("#{%s$1}", Const.db.PARAMETER_SINGLE) ) );
 
 	}
 

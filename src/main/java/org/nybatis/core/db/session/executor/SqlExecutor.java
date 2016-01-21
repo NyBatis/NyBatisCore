@@ -188,12 +188,12 @@ public class SqlExecutor {
 					throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
 				}
 			case 1 :
-				return new Reflector().toBeanFromBean( result.getBy(0), returnType );
+				return new Reflector().toBeanFromBean( result.getByIndex( 0 ), returnType );
 
 		}
 
 		if( DbUtils.isPrimitive( returnType ) ) {
-			return new Reflector().toBeanFromBean( result.getBy(0), returnType );
+			return new Reflector().toBeanFromBean( result.getByIndex( 0 ), returnType );
 		} else {
 			return result.toBean( returnType );
 		}
@@ -298,7 +298,7 @@ public class SqlExecutor {
 		if( isPrimitiveReturn ) {
 
 			for( NMap row : resultSet ) {
-				result.add( (T) new PrimitiveConverter(row.getBy(0)).cast(returnType) );
+				result.add( (T) new PrimitiveConverter(row.getByIndex( 0 )).cast(returnType) );
 			}
 
 		} else {
@@ -345,7 +345,7 @@ public class SqlExecutor {
 			if( result == null || result.size() == 0 ) {
 				converter = new PrimitiveConverter();
 			} else {
-				converter = new PrimitiveConverter( result.getBy(0) );
+				converter = new PrimitiveConverter( result.getByIndex( 0 ) );
 			}
 
 			return (T) converter.cast( returnType );

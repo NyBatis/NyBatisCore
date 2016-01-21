@@ -1,5 +1,6 @@
 package org.nybatis.core.util;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
@@ -11,6 +12,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -85,6 +87,13 @@ public class FileUtilTest {
 
 //		Files.copy( Paths.get("d:/download/temp/a"), Paths.get("d:/download/temp/b"), new CopyOption[] { StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING } );
 
+	}
+
+	@Test @Ignore
+	public void copyDir() {
+		String source = "e:\\download\\_testaa";
+		String target = "\\\\NAS\\emul\\image\\Apple2\\_testaa";
+		FileUtil.copy( source, target, true );
 	}
 
 }

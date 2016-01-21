@@ -29,26 +29,19 @@ import org.nybatis.core.db.annotation.NotSupportCache;
 public interface BatchExecutor {
 
 	/**
-	 * Execute statement in batch mode without commit process.
-	 *
-	 * <br/><br/>
-	 * if it called, Transaction is activate automatically
-	 *
-	 * @param transactionSize  size to commit execution
-	 * @return affected count by execute (insert, update, delete ... )
-	 */
-	@NotSupportCache
-	int execute( Integer transactionSize );
-
-	/**
-	 * Execute statement in batch mode without commit process.
-	 *
-	 * <br/><br/>
-	 * if it called, Transaction is activate automatically
+	 * Execute statement in batch mode.
 	 *
 	 * @return affected count by execute (insert, update, delete ... )
 	 */
 	@NotSupportCache
 	int execute();
+
+	/**
+	 * Set transaction size. if it is defined, batch excution is committed automatically.
+	 *
+	 * @param size  size to commit execution
+	 * @return self instance
+	 */
+	BatchExecutor setTransactionSize( Integer size );
 
 }

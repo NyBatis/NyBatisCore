@@ -10,8 +10,19 @@ import java.util.List;
  */
 public interface OrmBatchExecutor<T> {
 
+    /**
+     * Set transaction size
+     *
+     * @param size  size to commit execution
+     * @return self instance
+     */
     OrmBatchExecutor<T> setTransactionSize( int size );
 
+    /**
+     *
+     * @param parameters
+     * @return
+     */
     int insert( List<?> parameters );
 
     int update( List<?> parameters );

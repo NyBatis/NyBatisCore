@@ -38,7 +38,7 @@ public class ResultsetController {
 			toList( resultSet, new RowHandler() {
                 @SuppressWarnings( "unchecked" )
                 public void handle( NMap row ) {
-                	list.add( (T) new PrimitiveConverter(row.getBy(0)).cast(returnType) );
+                	list.add( (T) new PrimitiveConverter(row.getByIndex( 0 )).cast(returnType) );
 				}
 			} );
 

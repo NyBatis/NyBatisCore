@@ -1,10 +1,14 @@
 package org.nybatis.core.db.sqlRepository;
 
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.SqlRepository;
+import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -37,7 +41,7 @@ public class SqlGrammerTest {
     @Test
 	public void readTest() throws IOException, ParseException {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "id", "2" );
 
@@ -54,7 +58,7 @@ public class SqlGrammerTest {
     @Test
     public void refValidTest() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "id", "1" );
 
@@ -73,7 +77,7 @@ public class SqlGrammerTest {
     @Test( expectedExceptions = SqlConfigurationException.class )
     public void refInalidTest() {
 
-    	NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
     	param.put( "id", "1" );
 
@@ -94,7 +98,7 @@ public class SqlGrammerTest {
 	@Test
 	public void forEach() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "age", 39 );
 		param.put( "names", Arrays.asList("hwasu", "hwajong") );
@@ -109,7 +113,7 @@ public class SqlGrammerTest {
 	@Test
 	public void forEachPrimitiveParam() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "names", Arrays.asList("hwasu", "hwajong") );
 
@@ -123,7 +127,7 @@ public class SqlGrammerTest {
 	@Test
 	public void forEachAttributeFromParam() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "names", Arrays.asList("hwasu", "hwajong") );
 		param.put( "AND", "AND MERONG" );
@@ -139,7 +143,7 @@ public class SqlGrammerTest {
 	@Test
 	public void forEachForVoParam() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		param.put( "age", 39 );
 
@@ -161,7 +165,7 @@ public class SqlGrammerTest {
 	@Test
 	public void groupTest() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 //		param.put( "name", "google" );
 		param.put( "age", "36" );
@@ -178,7 +182,7 @@ public class SqlGrammerTest {
 	@Test
 	public void ifElse() {
 
-		NMap param = new NMap();
+		QueryParameter param = new QueryParameter();
 
 		String sql = null;
 
@@ -224,7 +228,37 @@ public class SqlGrammerTest {
 
 	}
 
-	private String getSql( String sqlId, NMap param ) {
+	@Test
+	public void nestedForLoop() {
+
+		String json = FileUtil.readFrom( Const.path.getConfigDatabase() +  "/grammer/NestedLoopTestParameter.json" );
+
+		QueryParameter param = new QueryParameter();
+
+		param.fromJson( json );
+
+//		param = new NMap();
+
+		getQueryResolver( "Grammer.nestedForLoop", param );
+
+	}
+
+	@Test
+	public void nestedForLoopAboutSingleParameter() throws JsonPathNotFoundException {
+
+		String json = FileUtil.readFrom( Const.path.getConfigDatabase() +  "/grammer/NestedLoopTestParameter.json" );
+
+		NMap map = new NMap( json );
+
+		QueryParameter param = new QueryParameter( map.getByJsonPath("user") );
+
+		getQueryResolver( "Grammer.nestedForLoop", param );
+
+	}
+
+
+	private String getSql( String sqlId, QueryParameter param ) {
+
 
 		String sql = SqlRepository.get( sqlId ).getText( param );
 
@@ -234,6 +268,29 @@ public class SqlGrammerTest {
 		NLogger.debug( param );
 
 		return sql;
+
+	}
+
+	private QueryResolver getQueryResolver( String sqlId, QueryParameter param ) {
+
+		String sql = SqlRepository.get( sqlId ).getText( param );
+
+		String line = "----------------------------------------------------------";
+		NLogger.debug( line );
+		NLogger.debug( sql );
+
+		QueryResolver queryResolver = new QueryResolver( sql, param );
+
+		NLogger.debug( ">> getDebugSql " + line );
+		NLogger.debug( queryResolver.getDebugSql() );
+		NLogger.debug( ">> getSql " + line );
+		NLogger.debug( queryResolver.getSql() );
+		NLogger.debug( ">> getBindParam " + line );
+		NLogger.debug( queryResolver.getBindParams() );
+		NLogger.debug( line );
+
+		return queryResolver;
+
 
 	}
 

@@ -1,4 +1,4 @@
-package org.nybatis.core.gui;
+package org.nybatis.ui;
 
 import java.awt.DisplayMode;
 import java.awt.GraphicsDevice;

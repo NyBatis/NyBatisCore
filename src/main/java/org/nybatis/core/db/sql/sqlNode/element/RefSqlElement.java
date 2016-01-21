@@ -1,7 +1,6 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
-import java.util.Map;
-
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
@@ -29,8 +28,8 @@ public class RefSqlElement extends SqlElement {
 		}
 	}
 
-	@SuppressWarnings( "rawtypes" )
-    public String toString( Map param ) {
+	@Override
+    public String toString( QueryParameter param ) {
 
 		if( referenceSqlId == null ) return "";
 

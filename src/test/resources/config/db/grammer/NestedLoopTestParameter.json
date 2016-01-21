@@ -1,0 +1,52 @@
+{
+  "user" : [
+    {
+      "name" : "Hwasu",
+      "age"  : 40,
+      "dept" : [
+        {
+          "name" : "1st dept",
+          "subDept" : [
+            { "name" : "1-1st sub dept", "location" : "Seoul" },
+            { "name" : "1-2nd sub dept", "location" : "Pusan" }
+          ]
+        },
+        {
+          "name" : "2nd dept",
+          "subDept" : [
+            { "name" : "2-1st sub dept", "location" : "Newyork" },
+            { "name" : "2-2nd sub dept", "location" : "Tokyo" }
+          ]
+        }
+      ]
+    },
+    {
+      "name" : "Hwajong",
+      "age"  : 38,
+      "dept" : [
+        {
+          "name" : "3rd dept",
+          "subDept" : [
+            { "name" : "3-1st sub dept", "location" : "Madrid" },
+            { "name" : "3-2nd sub dept", "location" : "Paris" }
+          ]
+        },
+        {
+          "name" : "4th dept",
+          "subDept" : [
+            { "name" : "4-1st sub dept", "location" : "Berlin" },
+            { "name" : "4-2nd sub dept", "location" : "MexicoCity" }
+          ]
+        }
+      ]
+    }
+  ],
+
+  "condition" : {
+    "limit" : {
+      "age" : 30
+    }
+  }
+
+
+}
