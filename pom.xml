@@ -191,7 +191,7 @@ OR
               <message>Nybatis artifacts for ${project.version}</message>            <!-- git commit message -->
               <noJekyll>true</noJekyll>                                              <!-- disable webpage processing -->
               <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-              <branch>refs/origin/master</branch>                                    <!-- remote branch name -->
+              <branch>refs/heads/master</branch>                                     <!-- remote branch name -->
               <repositoryName>UnofficialMavenRepository</repositoryName>             <!-- github repo name -->
               <repositoryOwner>nayasis</repositoryOwner>                             <!-- github username  -->
             </configuration>
