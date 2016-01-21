@@ -11,7 +11,7 @@ import org.nybatis.core.model.NDate;
 
 public class NObjectMapper extends ObjectMapper {
 
-	public NObjectMapper() {
+	public NObjectMapper( boolean sort ) {
 
 		configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true ); // 문자열 구분기호를 " 뿐만 아니라 ' 도 허용
 		configure( SerializationFeature.FAIL_ON_EMPTY_BEANS, false ); // Bean 이 null 일 경우 허용
@@ -19,6 +19,9 @@ public class NObjectMapper extends ObjectMapper {
 		configure( DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false ); // 대상객체에 매핑할 field가 없을 경우도 허용
 		configure( DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false );
 		configure( MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, true ); // private 변수라도 강제로 매핑
+		configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
+
+		configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, sort );
 
 		registerCustomDeserializer();
 

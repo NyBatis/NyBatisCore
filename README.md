@@ -2,11 +2,13 @@
 
 ## Introduction
 
-NyBatis is Persistent Data Mapper Framework for Relation DataBase and abbreviation is Nextgeneration of Your Batis.
+NyBatis is Persistent Data Mapper Framework for Relation DataBase.
+ 
+The name of **NyBatis** is abbreviation of **Nextgeneration of Your Batis.**
 
 Nowaday general trend is JPA or Hibernate and many people think that Data Mapper Framework is old and not easy.
 
-I agree JPA is very brilliant solution but believe that there is no silver bullet. DMF(Data Mapper Framework) is also appropriate in some business.
+I agree JPA is very brilliant solution but believe that there is no silver bullet. DMF(Data Mapper Framework) is also appropriate in some business application.
 
 I admire MyBatis but it's feature is gradually outdated and nothing to happy for novice developer.
 So I develop this an alternative for IBatis or MyBatis. 
@@ -15,6 +17,57 @@ Focus of NyBatis is simple and easy. Many feature to be determined by developer 
 
 I confess my lazy. I developed it on circumstance with Java 8 so NyBatis is **only supports Java 8**.
 NyBatis also can be used in spring, struts and so on But it still doesn't have simple configruation to apply with above popular framework yet. 
+
+
+## Maven ##
+
+This project has JARs deployed to the Unofficial Github private repository.
+
+Add repository to **pom.xml**.
+
+```
+<repositories>
+<repository>
+  <id>UnofficialNybatisMavenRepository</id>
+  <url>https://github.com/nayasis/UnofficialMavenRepository/raw/master/</url>
+</repository>
+</repositories>
+```
+
+And add the following dependency to **pom.xml**.
+
+```
+<dependency>
+  <groupId>org.nybatis</groupId>
+  <artifactId>NyBatisCore</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
+
+## Configuration ##
+
+Default configuration file path is below.
+
+```
+/resources/config/db/config.xml
+```
+
+And load like below.
+
+```
+DatabaseConfigurator.build();
+```
+
+Also configuration path is changable.
+```
+DatabaseConfigurator.build( "/home/user/config/yourConfiguration.xml" );
+```
+
+And it is possible to load from your application running directory.
+
+```
+DatabaseConfigurator.build( Const.path.getRoot() + "/yourConfiguration.xml" );
+```
 
 
 ## Example ##

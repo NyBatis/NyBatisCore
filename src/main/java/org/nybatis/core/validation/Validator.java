@@ -161,6 +161,16 @@ public class Validator {
     }
 
     /**
+     * 문자열이 양의 정수로 구성되어있는지 여부를 확인한다.
+     * @param value 검사할 문자열
+     * @return 검사결과
+     */
+    public static boolean isPositiveFixedNumber( String value ) {
+        if( ! isFixedNumber( value ) ) return false;
+        return Long.parseLong( value ) >= 0;
+    }
+
+    /**
      * 수치자료인지 여부를 확인한다. (소수점을 포함하는 경우에도 체크 가능)
      *
      * @param value 검사할 문자열

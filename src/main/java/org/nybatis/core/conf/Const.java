@@ -245,11 +245,13 @@ public class Const {
 		public static final String ORM_SQL_DELETE                = ".delete";
 		public static final String ORM_SQL_DELETE_PK             = ".delete.record";
 
+
 		public static final int    DEFAULT_CACHE_FLUSH_CYCLE     = Integer.MAX_VALUE;
 		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;
 
 		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "-DEFAULT_TABLE_NAME";
 		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "-DEFAULT_ENVIRONMENT_ID";
+		public static final String PARAMETER_INNER_FOR_EACH      = "NyBatisInnerParamForEach";
 		public static final String PARAMETER_SINGLE              = "NybatisSingleParameter";
 		public static final String PARAMETER_DATABASE            = "nybatis.database";
 
@@ -259,6 +261,8 @@ public class Const {
 
 		public static final String LOG_SQL                       = "nybatis.sql";
 		public static final String LOG_BATCH                     = "nybatis.batch";
+
+
 
 	}
 

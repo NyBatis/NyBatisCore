@@ -4,18 +4,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.ElseIfSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.ElseSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.IfSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.WhenSqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 
 
 public abstract class SqlElement {
 
     protected List<SqlElement> children = new ArrayList<>();
 
-	public String toString( Map param ) throws SqlParseException {
+	public String toString( QueryParameter param ) throws SqlParseException {
 
 		StringBuilder sb = new StringBuilder();
 
@@ -35,7 +37,7 @@ public abstract class SqlElement {
 		return children;
 	}
 
-	protected List<ElementText> toStringList( Map param ) {
+	protected List<ElementText> toStringList( QueryParameter param ) {
 
 		List<ElementText> list = new ArrayList<>();
 
@@ -71,7 +73,7 @@ public abstract class SqlElement {
 		return element instanceof IfSqlElement;
 	}
 
-	private boolean getIfSeriesResult( SqlElement element, Map param ) {
+	private boolean getIfSeriesResult( SqlElement element, QueryParameter param ) {
 
 		if( ! isIfSeries(element) ) return false;
 

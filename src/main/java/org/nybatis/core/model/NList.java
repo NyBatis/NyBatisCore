@@ -265,7 +265,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         return this;
     }
 
-    public NList addRow( Map<?, ?> data ) {
+    public NList addRow( Map data ) {
         addRow( new NMap( data ) ) ;
         return this;
     }
@@ -337,7 +337,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @return key에 해당하는 List
      */
     @SuppressWarnings( { "unchecked", "rawtypes" } )
-    public List toList( String key ) {
+    public <T> List<T> toList( String key ) {
 
     	List result = new ArrayList<>();
 
@@ -584,7 +584,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     private Object getKey( int keyIndex ) {
 
-        Assertion.isTrue( keyIndex < 0 || keyIndex >= keySize(), new IndexOutOfBoundsException( String.format( "Index[%d] is out of bounds from 0 to %d", keyIndex, keySize() ) ) );
+        Assertion.isTrue( 0 <= keyIndex &&  keyIndex <= keySize(), new IndexOutOfBoundsException( String.format( "Index[%d] is out of bounds from 0 to %d", keyIndex, keySize() ) ) );
 
         Iterator<Object> iterator = header.keySet().iterator();
 

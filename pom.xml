@@ -25,7 +25,6 @@
    - StopWatcher
    - ExcelFileUtil
      this module will run when including following optinal dependency
-
 <![CDATA[
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -41,7 +40,6 @@ OR
       <version>2.6.12</version>
     </dependency>
 ]]>
-
   </description>
 
   <properties>
@@ -49,24 +47,20 @@ OR
     <maven.compiler.target>1.8</maven.compiler.target>
     <jdk.version>1.8</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
   </properties>
 
-  <distributionManagement>
-    <repository>
-      <id>team-store-snapshots</id>
-      <name>Store Maven Repository - Snapshots</name>
-      <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
-    </repository>
-  </distributionManagement>
-
-  <!--<distributionManagement>-->
-    <!--<repository>-->
-      <!--<id>internal.repo</id>-->
-      <!--<name>Temporary Staging Repository</name>-->
-      <!--<url>file://${project.build.directory}/mvn-repo</url>-->
-    <!--</repository>-->
-  <!--</distributionManagement>-->
+  <developers>
+    <developer>
+      <name>Jung Hwasu</name>
+      <email>nayasis@gmail.com</email>
+      <id>nayasis</id>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
 
   <repositories>
     <repository>
@@ -81,20 +75,26 @@ OR
 
   <dependencies>
 
+    <!-- basic -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>1.1.3</version>
     </dependency>
     <dependency>
-      <groupId>uk.com.robust-it</groupId>
-      <artifactId>cloning</artifactId>
-      <version>1.9.0</version>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.4.6</version>
+    </dependency>
+    <dependency>
+      <groupId>uk.com.robust-it</groupId>
+      <artifactId>cloning</artifactId>
+      <version>1.9.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>2.1.0</version>
     </dependency>
 
     <!-- Zip Handler -->
@@ -146,5 +146,67 @@ OR
     </dependency>
 
   </dependencies>
+
+  <profiles>
+    <!-- local nexus distribution -->
+    <profile>
+      <id>localNexus</id>
+      <activation>
+        <property>
+          <name>!github</name>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>team-store-snapshots</id>
+          <name>Store Maven Repository - Snapshots</name>
+          <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
+        </repository>
+      </distributionManagement>
+    </profile>
+    <!-- github distribution -->
+    <profile>
+      <id>github</id>
+      <activation>
+        <property>
+          <name>github</name>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>internal.repo</id>
+          <name>Temporary Staging Repository</name>
+          <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.github</groupId>
+            <artifactId>site-maven-plugin</artifactId>
+            <version>0.11</version>
+            <configuration>
+              <merge>true</merge>
+              <includes><include>**/*</include></includes>
+              <message>Nybatis artifacts for ${project.version}</message>            <!-- git commit message -->
+              <noJekyll>true</noJekyll>                                              <!-- disable webpage processing -->
+              <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+              <branch>refs/heads/master</branch>                                     <!-- remote branch name -->
+              <repositoryName>UnofficialMavenRepository</repositoryName>             <!-- github repo name -->
+              <repositoryOwner>nayasis</repositoryOwner>                             <!-- github username  -->
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>site</goal>
+                </goals>
+                <phase>deploy</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>

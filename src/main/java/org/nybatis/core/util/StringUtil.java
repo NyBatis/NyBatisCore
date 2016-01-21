@@ -1,5 +1,10 @@
 package org.nybatis.core.util;
 
+import org.nybatis.core.exception.unchecked.ClassNotExistException;
+import org.nybatis.core.exception.unchecked.EncodingException;
+import org.nybatis.core.exception.unchecked.IoException;
+
+import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,16 +19,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-
-import javax.xml.bind.DatatypeConverter;
-
-import org.nybatis.core.exception.unchecked.EncodingException;
-import org.nybatis.core.exception.unchecked.ClassNotExistException;
-import org.nybatis.core.exception.unchecked.IoException;
 
 
 /**
@@ -61,9 +62,7 @@ public class StringUtil {
 		int result = 0;
 
 		for( int i = 0, iCnt = val.length(); i < iCnt; i++ ) {
-
 			result += CharacterUtil.getLength( val.charAt( i ) );
-
 		}
 
 		return result;
@@ -146,6 +145,44 @@ public class StringUtil {
 
 	public static boolean isNotBlank( Object value ) {
 		return ! isBlank( value );
+	}
+
+	/**
+	 * Bind parameter at mark '#{...}' in text<br>
+	 *
+	 * <pre>
+	 * NMap parameter = new NMap( "{'name':'abc', 'age':'2'}" );
+	 *
+	 * StringUtil.bindParam( "1", parameter )               --> 1
+	 * StringUtil.bindParam( "#{name}", parameter )         --> abc
+	 * StringUtil.bindParam( "PRE #{age} POST", parameter ) --> PRE 2 POST
+	 * </pre>
+	 *
+	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
+	 *                 key of value is inner text of '#{..}' pattern.
+	 * @param parameter parameter contains key and value
+	 * @return
+	 */
+	public static String bindParam( Object value, Map parameter ) {
+
+		Pattern pattern = Pattern.compile( "#\\{(.+?)\\}" );
+
+		Matcher matcher = pattern.matcher( nvl(value) );
+
+		StringBuffer sb = new StringBuffer();
+
+		while( matcher.find() ) {
+
+			String key = matcher.group().replaceAll( "#\\{(.+?)\\}", "$1" );
+			String val = StringUtil.nvl( parameter.get( key ) );
+
+			matcher.appendReplacement( sb, val );
+		}
+
+		matcher.appendTail( sb );
+
+		return sb.toString();
+
 	}
 
 	/**
@@ -254,11 +291,7 @@ public class StringUtil {
      * @return
      */
     private static boolean hasHangulJongsung( String string ) {
-
-		if( isEmpty(string) ) return false;
-
-    	return CharacterUtil.hasHangulJongsung( string.charAt( string.length() - 1 ) );
-
+    	return isNotEmpty( string ) && CharacterUtil.hasHangulJongsung( string.charAt( string.length() - 1 ) );
     }
 
     private static boolean hasHangulJosa( String string, char c ) {
@@ -347,7 +380,6 @@ public class StringUtil {
             result[ i ] = padChar;
         }
 
-
         return new String( result );
 
     }
@@ -360,11 +392,7 @@ public class StringUtil {
      * @return NVL 문자열
      */
     public static String nvl( Object val ) {
-
-    	if( val == null ) return  "";
-
-    	return val.toString();
-
+    	return ( val == null ) ? "" : val.toString();
     }
 
     /**
@@ -375,11 +403,7 @@ public class StringUtil {
      * @return NVL 문자열
      */
     public static String nvl( Object val, Object nvlValue ) {
-
-    	if( val == null ) return  nvl( nvlValue );
-
-    	return val.toString();
-
+    	return ( val == null ) ? nvl( nvlValue ) : val.toString();
     }
 
 
@@ -610,6 +634,15 @@ public class StringUtil {
 
     }
 
+	public static String join( Stack<?> stack, String delimeter ) {
+
+		List list = new ArrayList<>();
+		list.addAll( stack );
+
+		return join( list, delimeter );
+
+	}
+
     /**
      * 문자열을 구분자로 끊어 목록으로 변환한다.
      *
@@ -755,7 +788,7 @@ public class StringUtil {
 	 */
 	public static String compressEnter( Object value ) {
 		if( isEmpty(value) ) return "";
-		return value.toString().replaceAll( " *[\n\r]", "\n" ).replaceAll( "[\n\r]+", "\n" ).trim();
+		return value.toString().replaceAll( " *[\n\r]", "\n" ).replaceAll( "[\n\r]+", "\n" );
 	}
 
     /**
@@ -817,20 +850,32 @@ public class StringUtil {
 
     }
 
-    public static String encodeUrl( Object text ) {
+	/**
+	 * encode URL
+	 * @param url url to encode
+	 * @return encoded URL
+	 * @throws EncodingException
+	 */
+    public static String encodeUrl( Object url ) throws EncodingException {
 
     	try {
-			return URLEncoder.encode( nvl(text), "UTF-8" );
+			return URLEncoder.encode( nvl(url), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
 
     }
 
-    public static String decodeUrl( Object text ) {
+	/**
+	 * decode URL
+	 * @param url url to decode
+	 * @return decoded URL
+	 * @throws EncodingException
+	 */
+    public static String decodeUrl( Object url ) throws EncodingException {
 
     	try {
-    		return URLDecoder.decode( nvl( text ), "UTF-8" );
+    		return URLDecoder.decode( nvl( url ), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
@@ -1054,16 +1099,15 @@ public class StringUtil {
 	 *  ----------------------------------------------------------------
 	 *
 	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   --> []
-	 *
 	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) --> ['.', '.', '.']
 	 *
 	 * </pre>
 	 *
 	 * @param value 검사할 문자열
-	 * @param pattern 정규식
+	 * @param pattern 정규식 (capture 될 문자열을 반드시 ( ) 로 감싸주어야 함)
 	 * @return 패턴에 해당하는 문자열
 	 */
-	public static List<String> capturePatterns( String value, String pattern ) {
+	public static List<String> capturePatterns( Object value, String pattern ) {
 
 		List<String> result = new ArrayList<>();
 
@@ -1071,7 +1115,7 @@ public class StringUtil {
 
 	    Pattern p = Pattern.compile( pattern );
 
-	    Matcher matcher = p.matcher( value );
+	    Matcher matcher = p.matcher( value.toString() );
 
 	    while( matcher.find() ) {
 	        for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
@@ -1083,12 +1127,22 @@ public class StringUtil {
 
 	}
 
+	/**
+	 * Converts all of the characters in value to lower case
+	 *
+	 * @param value value to convert
+	 * @return the String, converted to lowercase.
+	 */
 	public static String toLowerCase( Object value ) {
-
 		return nvl( value ).toLowerCase();
-
 	}
 
+	/**
+	 * Converts all of the characters in value to upper case
+	 *
+	 * @param value value to convert
+	 * @return the String, converted to uppercase.
+	 */
 	public static String toUpperCase( Object value ) {
 		return nvl( value ).toUpperCase();
 	}

@@ -1,5 +1,10 @@
 package org.nybatis.core.model;
 
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
+import org.nybatis.core.reflection.Reflector;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
@@ -9,9 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
-
-import org.nybatis.core.reflection.Reflector;
 
 /**
  * Single Data
@@ -19,11 +21,9 @@ import org.nybatis.core.reflection.Reflector;
  * @author nayasis
  *
  */
-public class NMap extends LinkedHashMap<Object, Object> {
+public class NMap extends LinkedHashMap {
 
 	private static final long serialVersionUID = 3398423628018291863L;
-
-	private boolean isChanged = false;
 
 	private boolean ignoreCastingError = true;
 
@@ -32,16 +32,24 @@ public class NMap extends LinkedHashMap<Object, Object> {
 	}
 
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
-    public NMap( Map vo ) {
-		super( vo );
+    public NMap( Map value ) {
+		super( value );
 	}
 
-	public NMap( Object vo ) {
-		fromBean( vo );
-	}
+	/**
+	 * Constructor
+	 *
+	 * @param value if value is String (or StringBuffer or StringBuilder), init map with json parser.
+	 *              if value is Entity, init map with Bean Parser.
+	 */
+	public NMap( Object value ) {
 
-	public NMap( String json ) {
-	    fromJson( json );
+		if( value instanceof String || value instanceof StringBuffer || value instanceof StringBuilder ) {
+			fromJson( value.toString() );
+		} else {
+			fromBean( value );
+		}
+
 	}
 
 	public NMap ignoreCastingError( boolean ignore ) {
@@ -78,7 +86,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 	 * @return Json string
 	 */
 	public String toJson() {
-		return toJson(false);
+		return toJson( false );
 	}
 
 	public <T> T toBean( Class<T> klass ) {
@@ -101,15 +109,15 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter(key).toInt();
 	}
 
-	public int getIntBy( int keyIndex ) {
+	public int getIntByIndex( int keyIndex ) {
 		return getInt( getKey( keyIndex ) );
 	}
 
 	public short getShort( Object key ) {
-		return getConverter( key).toShort();
+		return getConverter(key).toShort();
 	}
 
-	public short getShortBy( int keyIndex ) {
+	public short getShortByIndex( int keyIndex ) {
 		return getShort( getKey( keyIndex ) );
 	}
 
@@ -117,7 +125,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key).toChar();
 	}
 
-	public char getCharBy( int keyIndex ) {
+	public char getCharByIndex( int keyIndex ) {
 		return getChar( getKey( keyIndex ) );
 	}
 
@@ -125,7 +133,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key).toLong();
 	}
 
-	public long getLongBy( int keyIndex ) {
+	public long getLongByIndex( int keyIndex ) {
 		return getLong( getKey( keyIndex ) );
 	}
 
@@ -133,7 +141,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key).toFloat();
 	}
 
-	public float getFloatBy( int keyIndex ) {
+	public float getFloatByIndex( int keyIndex ) {
 		return getFloat( getKey( keyIndex ) );
 	}
 
@@ -141,7 +149,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key ).toBoolean();
 	}
 
-	public Boolean getBooleanBy( int keyIndex ) {
+	public Boolean getBooleanByIndex( int keyIndex ) {
 		return getBoolean( getKey( keyIndex ) );
 	}
 
@@ -149,12 +157,16 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key).toByte();
 	}
 
-	public Byte getByteBy( int keyIndex ) {
+	public Byte getByteByIndex( int keyIndex ) {
 		return getByte( getKey( keyIndex ) );
 	}
 
 	public NDate getNDate( Object key ) {
-		return getConverter( key).toNDate();
+		return getConverter(key).toNDate();
+	}
+
+	public NDate getNDateByIndex( int keyIndex ) {
+		return  getNDate( getKey( keyIndex ) );
 	}
 
 	public Date getDate( Object key ) {
@@ -165,11 +177,15 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key ).toCalendar();
 	}
 
+	public Calendar getCalenderByIndex( int keyIndex ) {
+		return getCalender( getKey( keyIndex ) );
+	}
+
 	public double getDouble( Object key ) {
 		return getConverter( key ).toDouble();
 	}
 
-	public double getDoubleBy( int keyIndex ) {
+	public double getDoubleByIndex( int keyIndex ) {
 		return getDouble( getKey( keyIndex ) );
 	}
 
@@ -177,7 +193,7 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key ).toBigDecimal();
 	}
 
-	public BigDecimal getBigDecimalBy( int keyIndex ) {
+	public BigDecimal getBigDecimalByIndex( int keyIndex ) {
 		return getBigDecimal( getKey( keyIndex ) );
 	}
 
@@ -185,31 +201,53 @@ public class NMap extends LinkedHashMap<Object, Object> {
 		return getConverter( key ).toBigInt();
 	}
 
-	public BigInteger getBigIntBy( int keyIndex ) {
+	public BigInteger getBigIntByIndex( int keyIndex ) {
 		return getBigInt( getKey( keyIndex ) );
 	}
 
-	public Object put( Object key ) {
-		isChanged = true;
-		return put( key, null );
+	public void put( Object key ) {
+		put( key, null );
 	}
 
-	public Object put( Object key, Object value ) {
-		isChanged = true;
-		return super.put( key, value );
+	public <T> T getAs( Object key ) {
+		return castType( get( key ) );
 	}
 
-	public Object putIfAbsent( Object key, Object value ) {
-		isChanged = true;
-		return super.putIfAbsent( key, value );
+	private <T> T castType( Object val ) {
+		return val == null ? null : (T) val;
 	}
 
-	public void putAll( Map<?, ?> map ) {
-		isChanged = true;
-		super.putAll( map );
+	/**
+	 * Get value by json path
+	 *
+	 * @param jsonPath json path
+	 * @see https://github.com/jayway/JsonPath
+	 * @return value(s) extracted by json path
+	 * @throws JsonPathNotFoundException
+	 */
+	public Object getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
+
+		Object val = null;
+
+		if( containsKey( jsonPath ) ) {
+			val = get( jsonPath );
+		} else {
+
+			try {
+				val =  JsonPath.read( this, jsonPath );
+			} catch( PathNotFoundException e ) {
+				throw new JsonPathNotFoundException( e.getMessage() );
+			} catch( IllegalArgumentException e ) {
+				throw new JsonPathNotFoundException( e.getMessage() );
+			}
+
+		}
+
+		return val;
+
 	}
 
-	public Object getBy( int keyIndex ) {
+	public Object getByIndex( int keyIndex ) {
         return super.get( getKey( keyIndex ) );
 	}
 
@@ -263,27 +301,18 @@ public class NMap extends LinkedHashMap<Object, Object> {
 
 		return result.toDebugString( showHeader, true );
 
+
 	}
 
 	/**
 	 * get hashcode for value. <br/><br/>
 	 *
-	 * It only re-sort first level keys.
-	 * so, if data has various reculsive unsorted map, result may be inaccuracy. <br/>
-	 *
 	 * @return hashcode for value
 	 */
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
     public int getValueHash() {
-		return new Reflector().toJson(new TreeMap(this)).hashCode();
+		return new Reflector().toJson(this, false, true).hashCode();
 	}
 
-	public boolean isChanged() {
-		return isChanged;
-	}
-
-	public void setChanged( boolean changed ) {
-		isChanged = changed;
-	}
 
 }

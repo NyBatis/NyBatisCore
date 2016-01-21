@@ -13,14 +13,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Administrator
+ * Batch Executor Implements
+ *
+ * @author nayasis@gmail.com
  * @since 2015-09-13
  */
 public class BatchExecutorImpl implements BatchExecutor {
 
-    SqlSessionImpl sqlSession;
-    SqlNode        sqlNode;
-    List<Object>   parameters;
+    private SqlSessionImpl sqlSession;
+    private SqlNode        sqlNode;
+    private List<Object>   parameters;
+    private Integer        transactionSize = null;
 
     public BatchExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
@@ -63,27 +66,25 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     @Override
-    public int execute( Integer transactionSize ) {
-        return executeBatch( transactionSize );
-    }
-
-    @Override
     public int execute() {
-        return executeBatch( null );
-    }
 
-    private int executeBatch( Integer bufferSize ) {
         try {
             if( sqlNode == null ) {
-                return new BatchStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( parameters, bufferSize );
+                return new BatchStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( parameters, transactionSize );
             } else {
-                return new BatchPreparedStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( sqlNode, parameters, bufferSize );
+                return new BatchPreparedStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( sqlNode, parameters, transactionSize );
             }
         } finally {
             sqlSession.initProperties();
             parameters = new ArrayList<>();
         }
 
+    }
+
+    @Override
+    public BatchExecutor setTransactionSize( Integer size ) {
+        transactionSize = size;
+        return this;
     }
 
 }

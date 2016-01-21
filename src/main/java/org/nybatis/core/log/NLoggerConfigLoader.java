@@ -64,13 +64,14 @@ public class NLoggerConfigLoader {
 		return
 			"<configuration>" + 
 			  "<appender name=\"console\" class=\"ch.qos.logback.core.ConsoleAppender\">" + 
-			    "<encoder class=\"nayasis.common.log.layout.NLoggerPatternLayoutEncoder\">" +
+			    "<encoder class=\"org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder\">" +
 				  "<pattern>%d{HH:mm:ss.SSS} %-5level %35(\\(%F:%L\\))</pattern>" +
 			    "</encoder>" +
 			  "</appender> " + 
 			  "<root level=\"trace\">" +
-			    "<appender-ref ref=\"console\" />" + 
-			  "</root>" + 
+			    "<appender-ref ref=\"console\" />" +
+			  "</root>" +
+			  "<logger name=\"com.jayway.jsonpath.internal.path.CompiledPath\" level=\"off\" additivity=\"false\" />" +
 			"</configuration>";
 
 	}

@@ -65,16 +65,13 @@ public class ExpressionParser {
 			int status = isKeyword( result, currNodeString, nextNodeString );
 			
 			if( status < 0 ) {
-				
 				if( isNumericValue(result, currNodeString) ) continue;
-				
 				throw new SqlParseException( getErrorMessage( "unknown keyword : ", expressionNodes, i ) );
 				
 			} else {
 				i += status;
 			}
 
-			
 		}
 
 		checkBraceClosed( result, expressionNodes );
@@ -241,15 +238,12 @@ public class ExpressionParser {
 			Node node = nodes.get( i );
 
 			if( node instanceof OpenBraceNode ) {
-
 				braceIndex.push( i );
 
 			} else if( node instanceof CloseBraceNode ) {
 
 				try {
-
 					braceIndex.pop();
-
 				} catch( EmptyStackException e ) {
 					throw new SqlParseException( getErrorMessage( "brace is not opened : ", expression, i ) );
 

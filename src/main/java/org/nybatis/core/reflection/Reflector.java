@@ -32,14 +32,15 @@ import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 /**
- * Reflection을 처리하는 유틸 클래스
+ * Reflection Utility
  *
- * @author 정화수
+ * @author nayasis@gmail.com
  *
  */
 public class Reflector {
 
-	private static NObjectMapper objectMapper = new NObjectMapper();
+	private static NObjectMapper objectMapper       = new NObjectMapper( false );
+	private static NObjectMapper objectMapperSorted = new NObjectMapper( true );
 
     /**
      * 객체에 선언된 field 목록을 가져온다.
@@ -106,15 +107,17 @@ public class Reflector {
      * @param field 객체에 선언된 field
      * @return field에 담겨있는 값
      */
-    public Object getFieldValueFrom( Object bean, Field field ) {
+    public <T> T getFieldValueFrom( Object bean, Field field ) {
 
         field.setAccessible( true );
 
         try {
-            return field.get( bean );
+
+			Object val = field.get( bean );
+			return val == null ? null : (T) val;
 
         } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new ReflectiveException( e );
         }
 
     }
@@ -127,17 +130,16 @@ public class Reflector {
      * @return field에 담겨있는 값
      * @throws ReflectiveOperationException field 접근 실패시
      */
-    public Object getFieldValueFrom( Object bean, String fieldName ) {
+    public <T> T getFieldValueFrom( Object bean, String fieldName ) {
 
         try {
 
             Field field = bean.getClass().getDeclaredField( fieldName );
-            field.setAccessible( true );
 
-            return field.get( bean );
+			return getFieldValueFrom( bean, field );
 
         } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new ReflectiveException( e );
         }
 
 
@@ -222,16 +224,7 @@ public class Reflector {
      */
     @SuppressWarnings( "unchecked" )
     public <T> T clone( T object ) {
-    	try {
-
-    		Object target = object.getClass().newInstance();
-    		copy( object, target );
-
-    		return (T) target;
-
-    	} catch( InstantiationException | IllegalAccessException e ) {
-    		throw new ClassCastException( e );
-        }
+		return new Cloner().deepClone( object );
     }
 
     /**
@@ -418,9 +411,11 @@ public class Reflector {
 
     }
 
-	public String toJson( Object fromBean, boolean prettyPrint ) {
+	public String toJson( Object fromBean, boolean prettyPrint, boolean sort ) {
 
-		ObjectWriter writer = prettyPrint ? objectMapper.writerWithDefaultPrettyPrinter() : objectMapper.writer();
+		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
+
+		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
 
 		try {
 			return writer.writeValueAsString( fromBean );
@@ -430,16 +425,21 @@ public class Reflector {
 
 	}
 
+	public String toJson( Object fromBean, boolean prettyPrint ) {
+		return toJson( fromBean, prettyPrint, false );
+
+	}
+
 	public String toJson( Object fromBean ) {
 		return toJson( fromBean, false );
 	}
 
-    public Map<String, Object> toMapFromJson( String fromJsonString ) {
+    public Map<String, Object> toMapFromJson( String fromJson ) {
         try {
-			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJsonString ), new TypeReference<HashMap<String, Object>>() {} );
+			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( fromJson ), new TypeReference<HashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
         } catch( JsonParseException e ) {
-            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
+            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
         } catch( IOException e ) {
             throw new JsonIOException( e );
         }
@@ -463,15 +463,27 @@ public class Reflector {
     	}
     }
 
-    public List<Map<String,Object>> toListFromJson( String fromJsonString ) {
-    	try {
-    		return objectMapper.readValue( getArrayContent(fromJsonString), new TypeReference<List<HashMap<String,Object>>>() {} );
-        } catch( JsonParseException e ) {
-            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJsonString );
-    	} catch( IOException e ) {
-    		throw new JsonIOException( e );
-    	}
+	public <T> List<T> toListFromJson( String fromJson, TypeReference typeReference ) {
+		try {
+			return objectMapper.readValue( getArrayContent(fromJson), typeReference );
+		} catch( JsonParseException e ) {
+			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), fromJson );
+		} catch( IOException e ) {
+			throw new JsonIOException( e );
+		}
+	}
+
+    public List<Map<String,Object>> toListFromJsonAsMap( String fromJson ) {
+    	return toListFromJson( fromJson, new TypeReference<List<HashMap<String,Object>>>() {}  );
     }
+
+	public List toListFromJson( String fromJson ) {
+		return toListFromJson( fromJson, new TypeReference<List>() {}  );
+	}
+
+	public List toListFromJsonAsString( String fromJson ) {
+		return toListFromJson( fromJson, new TypeReference<List<String>>() {}  );
+	}
 
 	public <T> T toBeanFromMap( Map<?, ?> fromMap, Class<T> toClass ) {
 		return objectMapper.convertValue( fromMap, toClass );
