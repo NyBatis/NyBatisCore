@@ -25,7 +25,6 @@
    - StopWatcher
    - ExcelFileUtil
      this module will run when including following optinal dependency
-
 <![CDATA[
     <dependency>
       <groupId>org.apache.poi</groupId>
@@ -41,7 +40,6 @@ OR
       <version>2.6.12</version>
     </dependency>
 ]]>
-
   </description>
 
   <properties>
@@ -53,21 +51,16 @@ OR
     <skipTests>true</skipTests>
   </properties>
 
-  <distributionManagement>
-    <repository>
-      <id>team-store-snapshots</id>
-      <name>Store Maven Repository - Snapshots</name>
-      <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
-    </repository>
-  </distributionManagement>
-
-  <!--<distributionManagement>-->
-    <!--<repository>-->
-      <!--<id>internal.repo</id>-->
-      <!--<name>Temporary Staging Repository</name>-->
-      <!--<url>file://${project.build.directory}/mvn-repo</url>-->
-    <!--</repository>-->
-  <!--</distributionManagement>-->
+  <developers>
+    <developer>
+      <name>Jung Hwasu</name>
+      <email>nayasis@gmail.com</email>
+      <id>nayasis</id>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
 
   <repositories>
     <repository>
@@ -82,6 +75,7 @@ OR
 
   <dependencies>
 
+    <!-- basic -->
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
@@ -153,33 +147,66 @@ OR
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>com.github.github</groupId>
-        <artifactId>site-maven-plugin</artifactId>
-        <version>0.11</version>
-        <configuration>
-          <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-          <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-          <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-          <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-          <merge>true</merge>
-          <includes><include>**/*</include></includes>
-          <repositoryName>YOUR-REPOSITORY-NAME</repositoryName>      <!-- github repo name -->
-          <repositoryOwner>YOUR-GITHUB-USERNAME</repositoryOwner>    <!-- github username  -->
-        </configuration>
-        <executions>
-          <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
-          <execution>
-            <goals>
-              <goal>site</goal>
-            </goals>
-            <phase>deploy</phase>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+  <profiles>
+    <!-- local nexus distribution -->
+    <profile>
+      <id>localNexus</id>
+      <activation>
+        <property>
+          <name>!github</name>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>team-store-snapshots</id>
+          <name>Store Maven Repository - Snapshots</name>
+          <url>http://mvn.skplanet.com/content/repositories/team-store-snapshots/</url>
+        </repository>
+      </distributionManagement>
+    </profile>
+    <!-- github distribution -->
+    <profile>
+      <id>github</id>
+      <activation>
+        <property>
+          <name>github</name>
+        </property>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>internal.repo</id>
+          <name>Temporary Staging Repository</name>
+          <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.github</groupId>
+            <artifactId>site-maven-plugin</artifactId>
+            <version>0.11</version>
+            <configuration>
+              <merge>true</merge>
+              <includes><include>**/*</include></includes>
+              <message>Nybatis artifacts for ${project.version}</message>            <!-- git commit message -->
+              <noJekyll>true</noJekyll>                                              <!-- disable webpage processing -->
+              <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+              <branch>refs/origin/master</branch>                                    <!-- remote branch name -->
+              <repositoryName>UnofficialMavenRepository</repositoryName>             <!-- github repo name -->
+              <repositoryOwner>nayasis</repositoryOwner>                             <!-- github username  -->
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>site</goal>
+                </goals>
+                <phase>deploy</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
