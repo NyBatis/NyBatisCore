@@ -14,12 +14,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.nybatis.core.exception.unchecked.ClassCastException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.exception.unchecked.ReflectiveException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
@@ -411,11 +414,16 @@ public class Reflector {
 
     }
 
-	public String toJson( Object fromBean, boolean prettyPrint, boolean sort ) {
+	public String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
 
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
+		if( ignoreNull ) {
+			mapper.setSerializationInclusion( Include.NON_NULL );
+		}
+
 		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
+
 
 		try {
 			return writer.writeValueAsString( fromBean );
@@ -426,7 +434,7 @@ public class Reflector {
 	}
 
 	public String toJson( Object fromBean, boolean prettyPrint ) {
-		return toJson( fromBean, prettyPrint, false );
+		return toJson( fromBean, prettyPrint, false, false );
 
 	}
 
