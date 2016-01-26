@@ -311,7 +311,7 @@ public class NMap extends LinkedHashMap {
 	 */
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
     public int getValueHash() {
-		return new Reflector().toJson(this, false, true).hashCode();
+		return new Reflector().toJson(this, false, true, false).hashCode();
 	}
 
 
