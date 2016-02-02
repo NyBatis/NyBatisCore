@@ -6,6 +6,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
 
@@ -51,6 +52,9 @@ public class DatabaseConfigurator {
 			}
 
 		}
+
+		// Delete temporary thread local key
+		NThreadLocal.clear();
 
 	}
 
