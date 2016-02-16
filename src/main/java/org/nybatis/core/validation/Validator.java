@@ -2,6 +2,7 @@ package org.nybatis.core.validation;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -9,6 +10,7 @@ import java.util.regex.Pattern;
 
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.model.NDate;
+import org.nybatis.core.util.TypeUtil;
 
 /**
  * 값의 정합성을 확인하는 클래스
@@ -58,31 +60,31 @@ public class Validator {
         return value == null;
     }
 
-    /**
-     * 문자열에 값이 없는지 여부를 확인한다.
-     *
-     * @param value 검사할 문자열
-     * @return 검사결과
-     */
-    public static boolean isEmpty( String value ) {
-        return value == null || value.length() == 0;
-    }
-
     public static boolean isBlank( String value ) {
     	return value == null || value.length() == 0 || value.trim().length() == 0;
     }
 
-	public static boolean isEmpty( Collection<?> collection ) {
-		return ( collection == null || collection.isEmpty() );
-	}
+    public static boolean isEmpty( Object value ) {
 
-	public static boolean isEmpty( Map<?, ?> map ) {
-		return ( map == null || map.isEmpty() );
-	}
+        if( value == null ) return false;
 
-	public static boolean isEmpty( Object[] array ) {
-		return ( array == null || array.length == 0 );
-	}
+        if( value instanceof String ) {
+            return ( (String) value ).length() == 0;
+        } else if( value instanceof StringBuffer ) {
+            return ( (StringBuffer) value ).length() == 0;
+        } else if( value instanceof StringBuilder ) {
+            return ( (StringBuilder) value ).length() == 0;
+        } else if( value instanceof Map ) {
+            return ( (Map) value ).isEmpty();
+        } else if( value instanceof Collection ) {
+            return ( (Collection) value ).isEmpty();
+        } else if( TypeUtil.isArray(value) ) {
+            return ( (Object[]) value).length == 0;
+        }
+
+        return false;
+
+    }
 
     /**
      * 정규식을 이용해 문자열을 검사한다.
