@@ -288,7 +288,7 @@ public class PrimitiveConverter {
 	}
 
 	public <T> T toBean( Class<T> klass ) {
-		return new Reflector().toBeanFromMap( toMap(), klass );
+		return new Reflector().toBeanFrom( toMap(), klass );
 	}
 
 	@SuppressWarnings( "unchecked" )
