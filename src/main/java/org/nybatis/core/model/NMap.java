@@ -67,7 +67,7 @@ public class NMap extends LinkedHashMap {
 	}
 
     public NMap fromBean( Object bean ) {
-		super.putAll( new Reflector().toMapFromBean( bean ) );
+		super.putAll( new Reflector().toMapFrom( bean ) );
 	    return this;
 	}
 
@@ -90,7 +90,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	public <T> T toBean( Class<T> klass ) {
-		return new Reflector().toBeanFromMap( this, klass );
+		return new Reflector().toBeanFrom( this, klass );
 	}
 
 	private PrimitiveConverter getConverter( Object key ) {

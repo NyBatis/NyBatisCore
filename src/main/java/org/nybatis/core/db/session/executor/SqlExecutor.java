@@ -188,12 +188,12 @@ public class SqlExecutor {
 					throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
 				}
 			case 1 :
-				return new Reflector().toBeanFromBean( result.getByIndex( 0 ), returnType );
+				return new Reflector().toBeanFrom( result.getByIndex( 0 ), returnType );
 
 		}
 
 		if( DbUtils.isPrimitive( returnType ) ) {
-			return new Reflector().toBeanFromBean( result.getByIndex( 0 ), returnType );
+			return new Reflector().toBeanFrom( result.getByIndex( 0 ), returnType );
 		} else {
 			return result.toBean( returnType );
 		}

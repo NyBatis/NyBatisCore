@@ -154,7 +154,7 @@ public abstract class ConnectionHandler {
 	}
 
 	private <T> T unwrapProxy( T instance ) {
-		return new Reflector().unwrapProxyBean(instance);
+		return new Reflector().unwrapProxy( instance );
 	}
 
 }

@@ -38,21 +38,21 @@ public class ProxyDataSource {
 
 	private DataSource invoke( DataSource dataSource ) {
 
-		return new Reflector().makeProxyBean( dataSource, new Class<?>[] { DataSource.class }, new MethodInvocator() {
-			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+		return new Reflector().wrapProxy( dataSource, new Class<?>[] {DataSource.class}, new MethodInvocator() {
+            public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
-				switch( method.getName() ) {
+                switch( method.getName() ) {
 
-	    			case "getConnection" :
-	    				Connection connection = (Connection) method.invoke( dataSource, arguments );
-	    				return new ProxyConnection( connection ).getConnection();
+                    case "getConnection":
+                        Connection connection = (Connection) method.invoke( dataSource, arguments );
+                        return new ProxyConnection( connection ).getConnection();
 
-	    		}
+                }
 
-				return method.invoke( dataSource, arguments );
+                return method.invoke( dataSource, arguments );
 
-			}
-        });
+            }
+        } );
 
 	}
 

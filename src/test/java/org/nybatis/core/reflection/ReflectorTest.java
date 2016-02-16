@@ -12,6 +12,8 @@ import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings( "rawtypes" )
 public class ReflectorTest {
@@ -35,10 +37,10 @@ public class ReflectorTest {
 
 		NLogger.debug( reflector.getFieldReport( p1 ) );
 
-		Person p2 = reflector.toBeanFromMap( map1, Person.class );
+		Person p2 = reflector.toBeanFrom( map1, Person.class );
 		NLogger.debug( reflector.getFieldReport( p2 ) );
 
-		Map map2 = reflector.toMapFromBean( p2 );
+		Map map2 = reflector.toMapFrom( p2 );
 
 		NLogger.debug( map2 );
 
@@ -99,7 +101,7 @@ public class ReflectorTest {
 
 		NLogger.debug( "fromVo : {}", reflector.toJson( fromVo ) );
 
-		Map map = reflector.toMapFromBean( fromVo );
+		Map map = reflector.toMapFrom( fromVo );
 
 		NLogger.debug( new NMap( map ).toDebugString() );
 
@@ -111,7 +113,7 @@ public class ReflectorTest {
 
 		assertEquals( expectedMap, map, "convert bean to map" );
 
-		ToVo bean = reflector.toBeanFromMap( map, ToVo.class );
+		ToVo bean = reflector.toBeanFrom( map, ToVo.class );
 
 		NLogger.debug( bean );
 
@@ -123,7 +125,7 @@ public class ReflectorTest {
 	}
 
 	@Test
-	public void mergeTest() {
+	public void mergeMapTest() {
 
 		NMap fromNMap = new NMap();
 
@@ -137,6 +139,10 @@ public class ReflectorTest {
 		reflector.merge( fromNMap, toVo );
 
 		NLogger.debug( "after\n{}", toVo );
+
+		assertEquals( toVo.age, 40 );
+		assertEquals( toVo.name, "hwasu" );
+		assertNotNull( toVo.birth );
 
 	}
 
@@ -152,6 +158,58 @@ public class ReflectorTest {
 		List arrayFromJson = reflector.toListFromJson( json );
 
 		assertEquals( arrayFromJson, array );
+
+	}
+
+	@Test
+	public void copyTest() {
+
+		Person person = new Person();
+
+		person.firstName = "Hwasu";
+		person.lastName  = "Jung";
+
+		person.phone = new PhoneNumber( 0, "Phone-111-222-333" );
+		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
+
+		Person clone = new Person();
+		reflector.copy( person, clone );
+
+		System.out.println( clone );
+
+		PersonAnother another = new PersonAnother();
+
+		another.prefix = "testPrefix";
+
+		reflector.copy( person, another );
+
+		System.out.println( another );
+
+	}
+
+	@Test
+	public void mergeBeanTest() {
+
+		Person person = new Person();
+
+		person.firstName = "Hwasu";
+		person.lastName  = "Jung";
+
+		person.phone = new PhoneNumber( 0, "Phone-111-222-333" );
+		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
+
+		PersonAnother another = new PersonAnother();
+
+		another.prefix = "testPrefix";
+
+		reflector.merge( person, another );
+
+		System.out.println( another );
+
+		assertEquals( another.lastName, "Jung" );
+		assertEquals( another.prefix, "testPrefix" );
+		assertEquals( another.lastName, "Jung" );
+		assertTrue( another.fax.equals( person.fax ) );
 
 	}
 
