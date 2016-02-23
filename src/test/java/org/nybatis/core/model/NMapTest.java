@@ -1,13 +1,20 @@
 package org.nybatis.core.model;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.nybatis.core.exception.unchecked.BizException;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.log.NLogger;
@@ -221,6 +228,29 @@ public class NMapTest {
 		} catch( JsonPathNotFoundException e ) {}
 
 		NLogger.debug( map.getByJsonPath( "id[0]" ) );
+
+	}
+
+	@Test
+	public void dateConvertion() {
+
+		NMap param = new NMap();
+
+		NDate ndate = new NDate();
+		Date  date  = new Date();
+
+		param.put( "ndate", ndate );
+		param.put( "date",  date  );
+
+		NMap convertedMap = new NMap().fromBean( param );
+		NLogger.debug( convertedMap );
+
+		DateBean dateBean = convertedMap.toBean( DateBean.class );
+
+		NLogger.debug( dateBean );
+
+		assertTrue( ndate.equals( dateBean.ndate ) );
+		assertTrue( date.equals( dateBean.date ) );
 
 	}
 

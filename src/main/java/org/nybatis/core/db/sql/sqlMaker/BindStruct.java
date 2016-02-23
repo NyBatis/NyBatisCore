@@ -1,9 +1,11 @@
 package org.nybatis.core.db.sql.sqlMaker;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.StringUtil;
 
 public class BindStruct {
@@ -104,7 +106,7 @@ public class BindStruct {
 
         	List<String> temp = new ArrayList<>();
 
-        	for( Object e : (List<?>) value ) {
+        	for( Object e : (List) value ) {
         		temp.add( toDebugParam(e) );
         	}
 
@@ -124,13 +126,14 @@ public class BindStruct {
 
             if( inQuot ) {
                 return value.toString();
-
             } else {
                 return String.format( "'%s'", value );
-
             }
 
-        }
+        } else if( value instanceof Date ) {
+			String dateString = new NDate( (Date) value ).toString( "YYYY-MM-DD HH:MI:SS" );
+			return String.format( "TO_DATE( '%s','%s')", dateString, "YYYY-MM-DD HH24:MI:SS" );
+		}
 
         return value.toString();
 
