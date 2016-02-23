@@ -26,7 +26,7 @@ public class Validator {
      * @return 날짜 정상여부
      */
     public static boolean isDate( String value ) {
-        return isDate( value, "YYYY-MM-DD" );
+        return isDate( value, null );
     }
 
     /**
@@ -39,11 +39,8 @@ public class Validator {
     public static boolean isDate( String value, String format ) {
 
         try {
-
-            NDate date = new NDate( value, format );
-
-            return value.equalsIgnoreCase( date.toString(format) );
-
+            new NDate( value, format );
+            return true;
         } catch ( ParseException e ) {
             return false;
         }
@@ -66,7 +63,7 @@ public class Validator {
 
     public static boolean isEmpty( Object value ) {
 
-        if( value == null ) return false;
+        if( value == null ) return true;
 
         if( value instanceof String ) {
             return ( (String) value ).length() == 0;

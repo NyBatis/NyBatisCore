@@ -671,7 +671,7 @@ public class Reflector {
 		return new NMap( toMapFrom( object ) );
 	}
 
-	private boolean isString( Object object ) {
+	private static boolean isString( Object object ) {
 		return object != null &&
 				( object instanceof String || object instanceof StringBuffer || object instanceof  StringBuilder );
 	}
@@ -705,6 +705,16 @@ public class Reflector {
 		}
 
 		return (T) ((NInvocationHandler) invocationHandler).getOriginalInstance();
+
+	}
+
+	public static boolean isJsonDate( Object value ) {
+
+		if( ! isString(value) ) return false;
+
+		String val = value.toString();
+
+		return Validator.isMatched( val, "\\d{4}-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.\\d{3}[+-]([0-1][0-9]|2[0-4])[0-5][0-9]" );
 
 	}
 
