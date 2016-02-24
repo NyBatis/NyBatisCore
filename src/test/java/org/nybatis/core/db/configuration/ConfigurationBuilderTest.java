@@ -1,25 +1,23 @@
 package org.nybatis.core.db.configuration;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.sql.DataSource;
-
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.configuration.builder.ConfigurationBuilder;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.log.NLogger;
 import org.testng.annotations.Test;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class ConfigurationBuilderTest {
 
 	@Test
 	public void test() {
 
-		new ConfigurationBuilder( new File( Const.path.getConfigDatabase() + "/config.xml") );
+		new ConfigurationBuilder().readFrom( Const.path.getConfigDatabase() + "/config.xml" );
 
 		try {
 

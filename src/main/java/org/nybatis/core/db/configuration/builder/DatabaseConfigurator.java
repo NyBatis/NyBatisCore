@@ -24,34 +24,35 @@ public class DatabaseConfigurator {
 	 * First it builds from given path itself.<br>
 	 * but if given path dose not exist, it will build from basepath({@link Const.path.getConfigDatabase}) + given path.
 	 *
-	 * @param filePath given configuration path
+	 * @param filePath 	given configuration path
+	 * @param reload  	reload configuration
 	 */
-	public static void build( String filePath ) {
+	public static void build( String filePath, boolean reload ) {
 
 		filePath = Const.profile.getFileName( filePath );
 
-		if( FileUtil.isExist( filePath ) ) {
-			new ConfigurationBuilder( filePath );
+		if( FileUtil.isNotExist(filePath) ) {
 
-		} else {
 
 			try {
 
 				String modifiedPath = Paths.get( Const.path.getConfigDatabase(), filePath ).toString();
 
-				if( FileUtil.isExist(modifiedPath) ) {
-					new ConfigurationBuilder( modifiedPath );
-					return;
+				if( FileUtil.isNotExist( modifiedPath ) ) {
+					NLogger.error( "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath, modifiedPath );
+					filePath = null;
 				}
 
-				NLogger.error( "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath, modifiedPath );
+				filePath = modifiedPath;
 
 			} catch( InvalidPathException e ) {
-				NLogger.error( e, "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath );
-
+				NLogger.error( e, "Database configuration file is not exist.\n\t - in [{}]", filePath );
+				filePath = null;
 			}
 
 		}
+
+		new ConfigurationBuilder().readFrom( filePath, reload );
 
 		// Delete temporary thread local key
 		NThreadLocal.clear();
@@ -63,15 +64,38 @@ public class DatabaseConfigurator {
 	 *
 	 * default path is DatabaseConfigurationPath({@link Const.path.getConfigDatabase})
 	 *
+	 * @param reload  	reload configuration
 	 */
-	public static void build() {
+	public static void build( boolean reload ) {
 
 		List<Path> confLists = FileUtil.getList( Const.path.getConfigDatabase(), true, false, 0, "*.xml" );
 
 		for( Path confPath : confLists ) {
-			build( confPath.toString() );
+			build( confPath.toString(), reload );
 		}
 
+	}
+
+	/**
+	 * Build Database Configration from given path<br><br>
+	 *
+	 * First it builds from given path itself.<br>
+	 * but if given path dose not exist, it will build from basepath({@link Const.path.getConfigDatabase}) + given path.
+	 *
+	 * @param filePath given configuration path
+	 */
+	public static void build( String filePath ) {
+		build( filePath, false );
+	}
+
+	/**
+	 * Build All Database Configration from files in dafault path<br><br>
+	 *
+	 * default path is DatabaseConfigurationPath({@link Const.path.getConfigDatabase})
+	 *
+	 */
+	public static void build() {
+		build( false );
 	}
 
 }

@@ -114,7 +114,7 @@ public class SqlRepository {
 	}
 
 	private void readFromFile( File file, String datasourceId ) {
-		NLogger.debug( "configurate sql (datasourceId: {}, sqlFile: {})", datasourceId, file );
+		NLogger.trace( "configurate sql (datasourceId: {}, sqlFile: {})", datasourceId, file );
 		new SqlFileReader( file, datasourceId ).read();
 	}
 

@@ -252,6 +252,8 @@ public class NMapTest {
 		assertTrue( ndate.equals( dateBean.ndate ) );
 		assertTrue( date.equals( dateBean.date ) );
 
+		System.out.println( ">>> " + Integer.MAX_VALUE );
+
 	}
 
 }
