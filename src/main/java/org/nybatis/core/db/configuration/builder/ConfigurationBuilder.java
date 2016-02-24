@@ -2,10 +2,11 @@ package org.nybatis.core.db.configuration.builder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.log.NLogger;
@@ -16,30 +17,38 @@ import org.nybatis.core.xml.node.Node;
 
 public class ConfigurationBuilder {
 
-	private static Set<String> buildChecker = new HashSet<>();
+	private static Set<String> loadedFiles = new HashSet<>();
 
-	public ConfigurationBuilder( File file ) {
-		readFrom( file );
+	public void readFrom( String file ) {
+		readFrom( Paths.get(file), false );
 	}
 
-	public ConfigurationBuilder( String file ) {
-		readFrom( new File(file) );
+	public void readFrom( String file, boolean reload ) {
+		readFrom( Paths.get( file ), reload );
 	}
 
-	private boolean isBuildDone( File file ) {
-		if( file == null ) return true;
-		return buildChecker.contains( file.toString() );
+	public void readFrom( Path path ) {
+		readFrom( path, false );
 	}
 
-	private void readFrom( File file ) {
+	public void readFrom( Path path, boolean reload ) {
+		if( path == null ) return;
+		readFrom( path.toFile(), reload );
+	}
 
-		if( isBuildDone(file) ) return;
+	public void readFrom( File file ) {
+		readFrom( file, false );
+	}
+
+	public void readFrom( File file, boolean reload ) {
+
+		if( reload == false && isLoaded(file) ) return;
 
 		NLogger.debug( "load database configuration from [{}]", file );
 
 		try {
 
-			synchronized( buildChecker ) {
+			synchronized( loadedFiles ) {
 
 				NXml xmlReader = new NXmlDeformed( file );
 
@@ -64,7 +73,7 @@ public class ConfigurationBuilder {
 
 				cacheBuilder.checkEachSqlCache();
 
-				buildChecker.add( file.toString() );
+				loadedFiles.add( file.toString() );
 
             }
 
@@ -74,5 +83,11 @@ public class ConfigurationBuilder {
         }
 
 	}
+
+	private boolean isLoaded( File file ) {
+		if( file == null ) return true;
+		return loadedFiles.contains( file.toString() );
+	}
+
 
 }

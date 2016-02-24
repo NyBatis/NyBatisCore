@@ -57,8 +57,16 @@ public class Validator {
         return value == null;
     }
 
+    public static boolean isNotNull( Object value ) {
+        return ! isNull( value );
+    }
+
     public static boolean isBlank( String value ) {
     	return value == null || value.length() == 0 || value.trim().length() == 0;
+    }
+
+    public static boolean isNotBlank( String value ) {
+        return ! isBlank( value );
     }
 
     public static boolean isEmpty( Object value ) {
@@ -81,6 +89,10 @@ public class Validator {
 
         return false;
 
+    }
+
+    public static boolean isNotEmpty( Object value ) {
+        return ! isEmpty( value );
     }
 
     /**
@@ -329,24 +341,24 @@ public class Validator {
     }
 
     /**
-     * Let you replace null with another value.
+     * Let you replace null (or empty)  with another value.
      *
-     * if value is null, examine null value.
-     * if nullValue is null, examine next another nullValue.
-     * if it is not null in another nullValues, it returns as result.
+     * if value is null or empty, examine replaceValue.
+     * if replaceValue is null, examine next anotherReplaceValue.
+     * if anotherReplaceValue is not null, it is returned as result.
      *
-     * @param value             value to examine not null.
-     * @param nullValue         other value to examine not null.
-     * @param anotherNullValue  another values to examine not null.
+     * @param value                value to examine not null or not empty.
+     * @param replaceValue         other value to examine not null.
+     * @param anotherReplaceValue  another values to examine not null.
      * @return not null value from begin with.
      */
-    public static <T> T nvl( T value, T nullValue, T... anotherNullValue ) {
+    public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {
 
-        if( value     != null ) return value;
-        if( nullValue != null ) return nullValue;
+        if( isNotEmpty(value) )    return value;
+        if( isNotNull(replaceValue) ) return replaceValue;
 
-        for( T val : anotherNullValue ) {
-            if( val != null ) return val;
+        for( T val : anotherReplaceValue ) {
+            if( isNotNull( val ) ) return val;
         }
 
         return null;
