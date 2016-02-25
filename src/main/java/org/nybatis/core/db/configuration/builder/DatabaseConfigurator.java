@@ -33,7 +33,6 @@ public class DatabaseConfigurator {
 
 		if( FileUtil.isNotExist(filePath) ) {
 
-
 			try {
 
 				String modifiedPath = Paths.get( Const.path.getConfigDatabase(), filePath ).toString();

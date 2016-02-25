@@ -1,14 +1,13 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.util.TypeUtil;
+import org.nybatis.core.util.Types;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,7 +165,7 @@ public class ForEachSqlElement extends SqlElement {
 
 	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
 		Object value = getValue( inputParam, hasSingleParam );
-		return TypeUtil.toList( value );
+		return Types.toList( value );
 	}
 
 	private Object getValue( QueryParameter param, boolean hasSingleParam ) {

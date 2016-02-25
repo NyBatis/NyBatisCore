@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Type Check Util
+ * Type Check Utility
  *
  * @author nayasis@gmail.com
  * @since 2015-08-20
  */
-public class TypeUtil {
+public class Types {
 
     public static boolean isMap( Class klass ) {
         return ( klass != null && ClassUtil.getTopSuperClass( klass ) == AbstractMap.class );
@@ -69,7 +69,7 @@ public class TypeUtil {
             } else if( object instanceof NList ) {
                 result = ((NList) object).toList();
             } else if( object.getClass().isArray() ) {
-                result = Arrays.asList( object );
+                result = Arrays.asList( (Object[]) object );
             }
 
         }

@@ -2,7 +2,6 @@ package org.nybatis.core.validation;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -10,7 +9,7 @@ import java.util.regex.Pattern;
 
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.model.NDate;
-import org.nybatis.core.util.TypeUtil;
+import org.nybatis.core.util.Types;
 
 /**
  * 값의 정합성을 확인하는 클래스
@@ -83,7 +82,7 @@ public class Validator {
             return ( (Map) value ).isEmpty();
         } else if( value instanceof Collection ) {
             return ( (Collection) value ).isEmpty();
-        } else if( TypeUtil.isArray(value) ) {
+        } else if( Types.isArray( value ) ) {
             return ( (Object[]) value).length == 0;
         }
 

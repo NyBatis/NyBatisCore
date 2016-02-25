@@ -1,16 +1,12 @@
 package org.nybatis.core.db.session.executor.util;
 
 import org.nybatis.core.model.NDate;
-import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.util.TypeUtil;
+import org.nybatis.core.util.Types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class DbUtils {
 
@@ -47,7 +43,7 @@ public class DbUtils {
 		if( klass == Calendar.class   ) return true;
 		if( klass == NDate.class      ) return true;
 		if( klass == Object.class     ) return true;
-		return TypeUtil.isArray( klass );
+		return Types.isArray( klass );
 
 	}
 
