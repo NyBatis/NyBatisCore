@@ -2,69 +2,68 @@ package org.nybatis.core.db.sql.mapper;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Types;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.nybatis.core.model.NDate;
-import org.nybatis.core.util.TypeUtil;
+import org.nybatis.core.util.Types;
 
 public enum SqlType {
 
-	BIT                    ( Types.BIT                    , "BIT"                     ),
-	TINYINT                ( Types.TINYINT                , "TINYINT"                 ),
-	SMALLINT               ( Types.SMALLINT               , "SMALLINT"                ),
-	INTEGER                ( Types.INTEGER                , "INTEGER"                 ),
-	INT                    ( Types.INTEGER                , "INT"                     ), // shortcut for INTEGER
-	BIGINT                 ( Types.BIGINT                 , "BIGINT"                  ),
-	FLOAT                  ( Types.FLOAT                  , "FLOAT"                   ),
-	REAL                   ( Types.REAL                   , "REAL"                    ),
-	DOUBLE                 ( Types.DOUBLE                 , "DOUBLE"                  ),
-	NUMERIC                ( Types.NUMERIC                , "NUMERIC"                 ),
-	DECIMAL                ( Types.DECIMAL                , "DECIMAL"                 ),
-	CHAR                   ( Types.CHAR                   , "CHAR"                    ),
-	VARCHAR                ( Types.VARCHAR                , "VARCHAR"                 ),
-	LONGVARCHAR            ( Types.LONGVARCHAR            , "LONGVARCHAR"             ),
-	DATE                   ( Types.DATE                   , "DATE"                    ),
-	TIME                   ( Types.TIME                   , "TIME"                    ),
-	TIMESTAMP              ( Types.TIMESTAMP              , "TIMESTAMP"               ),
-	BINARY                 ( Types.BINARY                 , "BINARY"                  ),
-	ARRAY                  ( Types.ARRAY                  , "ARRAY"                   ),
-	LIST                   ( 9001                         , "LIST"                    ),
-	BLOB                   ( Types.BLOB                   , "BLOB"                    ),
-	BLOB_BOXED             ( 9002                         , "BLOB_BOXED"              ), // shortcut for Byte[]
-	CLOB                   ( Types.CLOB                   , "CLOB"                    ),
-	BOOLEAN                ( Types.BOOLEAN                , "BOOLEAN"                 ),
-	NULL                   ( Types.NULL                   , "NULL"                    ),
+	BIT                     ( java.sql.Types.BIT                     , "BIT"                     )  ,
+	TINYINT                 ( java.sql.Types.TINYINT                 , "TINYINT"                 )  ,
+	SMALLINT                ( java.sql.Types.SMALLINT                , "SMALLINT"                )  ,
+	INTEGER                 ( java.sql.Types.INTEGER                 , "INTEGER"                 )  ,
+	INT                     ( java.sql.Types.INTEGER                 , "INT"                     )  , // shortcut for INTEGER
+	BIGINT                  ( java.sql.Types.BIGINT                  , "BIGINT"                  )  ,
+	FLOAT                   ( java.sql.Types.FLOAT                   , "FLOAT"                   )  ,
+	REAL                    ( java.sql.Types.REAL                    , "REAL"                    )  ,
+	DOUBLE                  ( java.sql.Types.DOUBLE                  , "DOUBLE"                  )  ,
+	NUMERIC                 ( java.sql.Types.NUMERIC                 , "NUMERIC"                 )  ,
+	DECIMAL                 ( java.sql.Types.DECIMAL                 , "DECIMAL"                 )  ,
+	CHAR                    ( java.sql.Types.CHAR                    , "CHAR"                    )  ,
+	VARCHAR                 ( java.sql.Types.VARCHAR                 , "VARCHAR"                 )  ,
+	LONGVARCHAR             ( java.sql.Types.LONGVARCHAR             , "LONGVARCHAR"             )  ,
+	DATE                    ( java.sql.Types.DATE                    , "DATE"                    )  ,
+	TIME                    ( java.sql.Types.TIME                    , "TIME"                    )  ,
+	TIMESTAMP               ( java.sql.Types.TIMESTAMP               , "TIMESTAMP"               )  ,
+	BINARY                  ( java.sql.Types.BINARY                  , "BINARY"                  )  ,
+	ARRAY                   ( java.sql.Types.ARRAY                   , "ARRAY"                   )  ,
+	LIST                    ( 9001                                   , "LIST"                    )  ,
+	BLOB                    ( java.sql.Types.BLOB                    , "BLOB"                    )  ,
+	BLOB_BOXED              ( 9002                                   , "BLOB_BOXED"              )  , // shortcut for Byte[]
+	CLOB                    ( java.sql.Types.CLOB                    , "CLOB"                    )  ,
+	BOOLEAN                 ( java.sql.Types.BOOLEAN                 , "BOOLEAN"                 )  ,
+	NULL                    ( java.sql.Types.NULL                    , "NULL"                    )  ,
 
-	SYS_REFCURSOR          ( -10                          , "SYS_REFCURSOR"           ), // shortcut for oracle cursor
-	CURSOR                 ( -10                          , "CURSOR"                  ), // shortcut for oracle cursor
-	RESULT_SET             ( -10                          , "RESULTSET"               ), // shortcut for oracle cursor
-	RS                     ( -10                          , "RS"                      ), // shortcut for oracle cursor
-	ORACLE_RESULT_SET      ( -10                          , "ORACLE_RESULTSET"        ), // shortcut for oracle cursor
+	SYS_REFCURSOR           ( -10                                    , "SYS_REFCURSOR"           )  , // shortcut for oracle cursor
+	CURSOR                  ( -10                                    , "CURSOR"                  )  , // shortcut for oracle cursor
+	RESULT_SET              ( -10                                    , "RESULTSET"               )  , // shortcut for oracle cursor
+	RS                      ( -10                                    , "RS"                      )  , // shortcut for oracle cursor
+	ORACLE_RESULT_SET       ( -10                                    , "ORACLE_RESULTSET"        )  , // shortcut for oracle cursor
 
 	// struct
-	REF                    ( Types.REF                    , "REF"                     ),
-	STRUCT                 ( Types.STRUCT                 , "STRUCT"                  ),
+	REF                     ( java.sql.Types.REF                     , "REF"                     )  ,
+	STRUCT                  ( java.sql.Types.STRUCT                  , "STRUCT"                  )  ,
 
 	// not figured out
-	VARBINARY              ( Types.VARBINARY              , "VARBINARY"               ),
-	LONGVARBINARY          ( Types.LONGVARBINARY          , "LONGVARBINARY"           ),
-	OTHER                  ( Types.OTHER                  , "OTHER"                   ),
-	JAVA_OBJECT            ( Types.JAVA_OBJECT            , "JAVA_OBJECT"             ),
-	DISTINCT               ( Types.DISTINCT               , "DISTINCT"                ),
-	REF_CURSOR             ( Types.REF_CURSOR             , "REF_CURSOR"              ),
-	DATALINK               ( Types.DATALINK               , "DATALINK"                ),
-	ROWID                  ( Types.ROWID                  , "ROWID"                   ),
-	NCHAR                  ( Types.NCHAR                  , "NCHAR"                   ),
-	NVARCHAR               ( Types.NVARCHAR               , "NVARCHAR"                ),
-	LONGNVARCHAR           ( Types.LONGNVARCHAR           , "LONGNVARCHAR"            ),
-	NCLOB                  ( Types.NCLOB                  , "NCLOB"                   ),
-	SQLXML                 ( Types.SQLXML                 , "SQLXML"                  ),
-	TIME_WITH_TIMEZONE     ( Types.TIME_WITH_TIMEZONE     , "TIME_WITH_TIMEZONE"      ),
-	TIMESTAMP_WITH_TIMEZONE( Types.TIMESTAMP_WITH_TIMEZONE, "TIMESTAMP_WITH_TIMEZONE" );
+	VARBINARY               ( java.sql.Types.VARBINARY               , "VARBINARY"               )  ,
+	LONGVARBINARY           ( java.sql.Types.LONGVARBINARY           , "LONGVARBINARY"           )  ,
+	OTHER                   ( java.sql.Types.OTHER                   , "OTHER"                   )  ,
+	JAVA_OBJECT             ( java.sql.Types.JAVA_OBJECT             , "JAVA_OBJECT"             )  ,
+	DISTINCT                ( java.sql.Types.DISTINCT                , "DISTINCT"                )  ,
+	REF_CURSOR              ( java.sql.Types.REF_CURSOR              , "REF_CURSOR"              )  ,
+	DATALINK                ( java.sql.Types.DATALINK                , "DATALINK"                )  ,
+	ROWID                   ( java.sql.Types.ROWID                   , "ROWID"                   )  ,
+	NCHAR                   ( java.sql.Types.NCHAR                   , "NCHAR"                   )  ,
+	NVARCHAR                ( java.sql.Types.NVARCHAR                , "NVARCHAR"                )  ,
+	LONGNVARCHAR            ( java.sql.Types.LONGNVARCHAR            , "LONGNVARCHAR"            )  ,
+	NCLOB                   ( java.sql.Types.NCLOB                   , "NCLOB"                   )  ,
+	SQLXML                  ( java.sql.Types.SQLXML                  , "SQLXML"                  )  ,
+	TIME_WITH_TIMEZONE      ( java.sql.Types.TIME_WITH_TIMEZONE      , "TIME_WITH_TIMEZONE"      )  ,
+	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ;
 
 	private final int    code;
 	private final String name;
@@ -136,8 +135,8 @@ public enum SqlType {
 		if( klass == Date.class          ) return SqlType.DATE;
 		if( klass == Calendar.class      ) return SqlType.DATE;
 		if( klass == NDate.class         ) return SqlType.DATE;
-		if( TypeUtil.isMap( klass )      ) return SqlType.JAVA_OBJECT;
-		if( TypeUtil.isArray( klass )    ) return SqlType.LIST;
+		if( Types.isMap( klass )         ) return SqlType.JAVA_OBJECT;
+		if( Types.isArray( klass )       ) return SqlType.LIST;
 
 		return SqlType.VARCHAR;
 
