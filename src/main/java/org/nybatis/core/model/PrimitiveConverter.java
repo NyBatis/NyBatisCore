@@ -284,11 +284,11 @@ public class PrimitiveConverter {
 	}
 
 	public Map<String, Object> toMap() {
-		return new Reflector().toMapFromJson( nvlVal );
+		return Reflector.toMapFromJson( nvlVal );
 	}
 
 	public <T> T toBean( Class<T> klass ) {
-		return new Reflector().toBeanFrom( toMap(), klass );
+		return Reflector.toBeanFrom( toMap(), klass );
 	}
 
 	@SuppressWarnings( "unchecked" )

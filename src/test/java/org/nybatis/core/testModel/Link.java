@@ -155,7 +155,7 @@ public class Link {
 	}
 
 	public Link clone() {
-		return new Reflector().clone( this );
+		return Reflector.clone( this );
 	}
 
 	public Integer getId() {
@@ -243,7 +243,7 @@ public class Link {
 	}
 
 	public String toString() {
-		return new Reflector().getFieldReport( this );
+		return Reflector.toString( this );
 	}
 
 }

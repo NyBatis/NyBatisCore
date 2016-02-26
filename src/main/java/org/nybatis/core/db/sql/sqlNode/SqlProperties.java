@@ -258,7 +258,7 @@ public class SqlProperties {
 	}
 
 	public SqlProperties clone() {
-		return new Reflector().clone( this );
+		return Reflector.clone( this );
 	}
 
 	private boolean isTrue( Boolean value ) {

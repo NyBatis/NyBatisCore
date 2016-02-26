@@ -18,29 +18,27 @@ import static org.testng.Assert.assertTrue;
 @SuppressWarnings( "rawtypes" )
 public class ReflectorTest {
 
-	Reflector reflector = new Reflector();
-
 	@Test
 	public void simpleTest() {
 
-		NLogger.debug( reflector.toJson( makeTestPerson(), true ) );
+		NLogger.debug( Reflector.toJson( makeTestPerson(), true ) );
 
-		String json = reflector.toJson( makeTestPerson(), false );
+		String json = Reflector.toJson( makeTestPerson(), false );
 
 		assertEquals( "{\"firstName\":\"Hwasu\",\"lastName\":\"Jung\",\"phone\":{\"code\":2,\"number\":\"322-3493\"},\"fax\":{\"code\":9999,\"number\":\"00100\"},\"phoneList\":[]}", json );
 
-        Map map1 = reflector.toMapFromJson( json );
+        Map map1 = Reflector.toMapFromJson( json );
 
 		NLogger.debug( map1 );
 
-		Person p1 = reflector.toBeanFromJson( json, Person.class );
+		Person p1 = Reflector.toBeanFromJson( json, Person.class );
 
-		NLogger.debug( reflector.getFieldReport( p1 ) );
+		NLogger.debug( Reflector.toString( p1 ) );
 
-		Person p2 = reflector.toBeanFrom( map1, Person.class );
-		NLogger.debug( reflector.getFieldReport( p2 ) );
+		Person p2 = Reflector.toBeanFrom( map1, Person.class );
+		NLogger.debug( Reflector.toString( p2 ) );
 
-		Map map2 = reflector.toMapFrom( p2 );
+		Map map2 = Reflector.toMapFrom( p2 );
 
 		NLogger.debug( map2 );
 
@@ -88,7 +86,7 @@ public class ReflectorTest {
 
 		NLogger.debug( jsonText );
 
-		Map<String, Object> map = new Reflector().toMapFromJson(jsonText);
+		Map<String, Object> map = Reflector.toMapFromJson( jsonText );
 
 		NLogger.debug( map      );
 
@@ -99,9 +97,9 @@ public class ReflectorTest {
 
 		FromVo fromVo = new FromVo( "Hwasu", 39, "1977-01-22" );
 
-		NLogger.debug( "fromVo : {}", reflector.toJson( fromVo ) );
+		NLogger.debug( "fromVo : {}", Reflector.toJson( fromVo ) );
 
-		Map map = reflector.toMapFrom( fromVo );
+		Map map = Reflector.toMapFrom( fromVo );
 
 		NLogger.debug( new NMap( map ).toDebugString() );
 
@@ -113,7 +111,7 @@ public class ReflectorTest {
 
 		assertEquals( expectedMap, map, "convert bean to map" );
 
-		ToVo bean = reflector.toBeanFrom( map, ToVo.class );
+		ToVo bean = Reflector.toBeanFrom( map, ToVo.class );
 
 		NLogger.debug( bean );
 
@@ -136,7 +134,7 @@ public class ReflectorTest {
 
 		NLogger.debug( "before\n{}", fromNMap );
 
-		reflector.merge( fromNMap, toVo );
+		Reflector.merge( fromNMap, toVo );
 
 		NLogger.debug( "after\n{}", toVo );
 
@@ -151,11 +149,11 @@ public class ReflectorTest {
 
 		List array = Arrays.asList( "A", "B", "C", "D", "E", 99 );
 
-		String json = reflector.toJson( array );
+		String json = Reflector.toJson( array );
 
 		assertEquals( json, "[\"A\",\"B\",\"C\",\"D\",\"E\",99]" );
 
-		List arrayFromJson = reflector.toListFromJson( json );
+		List arrayFromJson = Reflector.toListFromJson( json );
 
 		assertEquals( arrayFromJson, array );
 
@@ -173,7 +171,7 @@ public class ReflectorTest {
 		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
 
 		Person clone = new Person();
-		reflector.copy( person, clone );
+		Reflector.copy( person, clone );
 
 		System.out.println( clone );
 
@@ -181,7 +179,7 @@ public class ReflectorTest {
 
 		another.prefix = "testPrefix";
 
-		reflector.copy( person, another );
+		Reflector.copy( person, another );
 
 		System.out.println( another );
 
@@ -202,7 +200,7 @@ public class ReflectorTest {
 
 		another.prefix = "testPrefix";
 
-		reflector.merge( person, another );
+		Reflector.merge( person, another );
 
 		System.out.println( another );
 

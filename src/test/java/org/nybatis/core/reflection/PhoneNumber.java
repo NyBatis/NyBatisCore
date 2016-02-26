@@ -15,7 +15,7 @@ public class PhoneNumber {
 	}
 
 	public String toString() {
-		return new Reflector().toJson( this );
+		return Reflector.toJson( this );
 	}
 
 //	public boolean equals( Object value ) {

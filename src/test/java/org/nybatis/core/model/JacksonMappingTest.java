@@ -26,7 +26,7 @@ public class JacksonMappingTest {
 		}
 
 		public String toString() {
-			return new Reflector().getFieldReport( this );
+			return Reflector.toString( this );
 		}
 
 	}

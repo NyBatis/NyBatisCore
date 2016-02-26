@@ -72,7 +72,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
         if( StringUtil.isEmpty(json) ) return this;
 
-        List<Map<String, Object>> maps = new Reflector().toListFromJson( json );
+        List<Map<String, Object>> maps = Reflector.toListFromJson( json );
 
         for( Map map : maps ) {
             addRow( map );
@@ -704,7 +704,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @see java.lang.Object#clone()
      */
     public NList clone() {
-        return new Reflector().clone(NList.this);
+        return Reflector.clone(NList.this);
     }
 
     /**

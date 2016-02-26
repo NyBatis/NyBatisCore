@@ -48,7 +48,7 @@ public class NybatisTest {
     }
 
     public String toString() {
-        return new Reflector().getFieldReport( this );
+        return Reflector.toString( this );
     }
 
 }

@@ -378,7 +378,7 @@ public class NTree<T> implements Serializable {
      * @see java.lang.Object#clone()
      */
     public NTree<T> clone() {
-        return new Reflector().clone( this );
+        return Reflector.clone( this );
     }
 
     public NList toNList() {

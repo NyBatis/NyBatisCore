@@ -35,7 +35,7 @@ public class SelectKeyExecutor {
         Object inputParams = sqlBean.getInputParams();
 
         if( inputParams != null && ! DbUtils.isPrimitive( inputParams.getClass() ) && selectKeys.size() != 0 ) {
-            new Reflector().merge( selectKeys, inputParams );
+            Reflector.merge( selectKeys, inputParams );
         }
 
     }

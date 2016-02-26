@@ -49,7 +49,7 @@ public class Reflector {
 	 * @param bean bean to extract fields
 	 * @return fields
 	 */
-    public List<Field> getFieldsFrom( Object bean ) {
+    public static List<Field> getFieldsFrom( Object bean ) {
 
     	List<Field> result = new ArrayList<>();
 
@@ -74,7 +74,7 @@ public class Reflector {
 	 * @param bean bean to extract methods
 	 * @return methods
 	 */
-    public List<Method> getMethodsFrom( Object bean ) {
+    public static List<Method> getMethodsFrom( Object bean ) {
 
     	List<Method> result = new ArrayList<>();
 
@@ -94,7 +94,7 @@ public class Reflector {
 	 * @param bean bean to extract field names
 	 * @return field names
 	 */
-    public List<String> getFieldNamesFrom( Object bean ) {
+    public static List<String> getFieldNamesFrom( Object bean ) {
 
     	List<Field>  from = getFieldsFrom( bean );
     	List<String> to   = new ArrayList<>( from.size() );
@@ -116,7 +116,7 @@ public class Reflector {
 	 * @return	value
 	 * @throws ReflectiveOperationException	fail on access field
 	 */
-    public <T> T getFieldValueFrom( Object bean, Field field ) {
+    public static <T> T getFieldValueFrom( Object bean, Field field ) {
 
         field.setAccessible( true );
 
@@ -140,7 +140,7 @@ public class Reflector {
 	 * @return	value
 	 * @throws ReflectiveOperationException	fail on access field
 	 */
-    public <T> T getFieldValueFrom( Object bean, String fieldName ) {
+    public static <T> T getFieldValueFrom( Object bean, String fieldName ) {
 
         try {
             Field field = bean.getClass().getDeclaredField( fieldName );
@@ -159,7 +159,7 @@ public class Reflector {
 	 * @param value		value to set on field
 	 * @throws ReflectiveOperationException	fail on access field
 	 */
-    public void setFieldValueTo( Object bean, Field field, Object value ) {
+    public static void setFieldValueTo( Object bean, Field field, Object value ) {
 
         field.setAccessible( true );
 
@@ -179,7 +179,7 @@ public class Reflector {
 	 * @param value		value to set on field
 	 * @throws ReflectiveOperationException	fail on access field
 	 */
-    public void setFieldValueTo( Object bean, String fieldName, Object value ) {
+    public static void setFieldValueTo( Object bean, String fieldName, Object value ) {
 
         Field field;
 
@@ -202,7 +202,7 @@ public class Reflector {
 	 * @param bean	target bean to inspect
 	 * @return fields information paired with key and value
 	 */
-    public Map<String, Object> getFields( Object bean ) {
+    public static Map<String, Object> getFields( Object bean ) {
 
         Map<String, Object> result = new HashMap<String, Object>();
 
@@ -230,7 +230,7 @@ public class Reflector {
 	 * @return a clone of object
 	 */
     @SuppressWarnings( "unchecked" )
-    public <T> T clone( T object ) {
+    public static <T> T clone( T object ) {
 		return new Cloner().deepClone( object );
     }
 
@@ -240,7 +240,7 @@ public class Reflector {
 	 * @param source	bean as source
 	 * @param target	bean as target
 	 */
-    public void copy( Object source, Object target ) {
+    public static void copy( Object source, Object target ) {
 
 		if( source == null || target == null ) return;
 
@@ -259,7 +259,7 @@ public class Reflector {
 	 * @param fromBean  jsonString, Map or bean as source
 	 * @param toBean	Map or bean as target
 	 */
-    public void merge( Object fromBean, Object toBean ) {
+    public static void merge( Object fromBean, Object toBean ) {
 
     	if( fromBean == null || toBean == null ) return;
 
@@ -280,7 +280,7 @@ public class Reflector {
 	 * @param bean    instance to inspect
 	 * @return report of fields' value
 	 */
-    public String getFieldReport( Object bean ) {
+    public static String toString( Object bean ) {
 
     	NList result = new NList();
 
@@ -324,7 +324,7 @@ public class Reflector {
 	 * @param ignoreNull	whether or not to ignore null value
 	 * @return json text
 	 */
-	public String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
+	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
 
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
@@ -349,7 +349,7 @@ public class Reflector {
 	 * @param prettyPrint	whether or not to make json text pretty
 	 * @return json text
 	 */
-	public String toJson( Object fromBean, boolean prettyPrint ) {
+	public static String toJson( Object fromBean, boolean prettyPrint ) {
 		return toJson( fromBean, prettyPrint, false, false );
 
 	}
@@ -360,7 +360,7 @@ public class Reflector {
 	 * @param fromBean		instance to convert as json data
 	 * @return json text
 	 */
-	public String toJson( Object fromBean ) {
+	public static String toJson( Object fromBean ) {
 		return toJson( fromBean, false );
 	}
 
@@ -386,7 +386,7 @@ public class Reflector {
 	 * @param object	json string, Map or bean
 	 * @return map with flattern key
 	 */
-	public Map<String, Object> toMapWithFlattenKey( Object object ) {
+	public static Map<String, Object> toMapWithFlattenKey( Object object ) {
 
 		Map<String, Object> map = new HashMap<>();
 
@@ -398,7 +398,7 @@ public class Reflector {
 
 	}
 
-	private void flattenKeyRecursivly( String currentPath, Object json, Map result ) {
+	private static void flattenKeyRecursivly( String currentPath, Object json, Map result ) {
 
 		if( json instanceof Map ) {
 
@@ -446,7 +446,7 @@ public class Reflector {
 	 * @param object	json string, Map or bean
 	 * @return map with flattern key
 	 */
-	public Map<String, Object> toMapWithUnflattenKey( Object object ) {
+	public static Map<String, Object> toMapWithUnflattenKey( Object object ) {
 
 		Map<String, Object> map = new HashMap<>();
 
@@ -462,7 +462,7 @@ public class Reflector {
 
 	}
 
-	private void unflattenKeyRecursivly( String jsonPath, Object value, Map result ) {
+	private static void unflattenKeyRecursivly( String jsonPath, Object value, Map result ) {
 
 		String path  = jsonPath.replaceFirst( "\\[.*\\]", "" ).replaceFirst( "\\..*?$", "" );
 		String index = jsonPath.replaceFirst(  "^(" + path + ")\\[(.*?)\\](.*?)$", "$2" );
@@ -514,7 +514,7 @@ public class Reflector {
 
 	}
 
-	private void setValueToListInJson( String key, int idx, Object value, Map json ) {
+	private static void setValueToListInJson( String key, int idx, Object value, Map json ) {
 
 		if( ! json.containsKey( key ) ) {
 			json.put( key, new ArrayList<>() );
@@ -535,11 +535,11 @@ public class Reflector {
 	}
 
 
-	private String getContent( String fromJsonString ) {
+	private static String getContent( String fromJsonString ) {
 		return StringUtil.isEmpty( fromJsonString ) ? "{}" : fromJsonString;
 	}
 
-	private String getArrayContent( String fromJsonString ) {
+	private static String getArrayContent( String fromJsonString ) {
 		return StringUtil.isEmpty( fromJsonString ) ? "[]" : fromJsonString;
 	}
 
@@ -550,7 +550,7 @@ public class Reflector {
 	 * @param <T>		return type
 	 * @return	bean filled by object's value
 	 */
-	public <T> T toBeanFrom( Object object, Class<T> toClass ) {
+	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
 
 		if( isString( object ) ) {
 			return toBeanFromJson( object.toString(), toClass );
@@ -567,7 +567,7 @@ public class Reflector {
 	 * @param <T>			return type
 	 * @return bean filled by json value
 	 */
-	public <T> T toBeanFromJson( String jsonString, Class<T> toClass ) {
+	public static <T> T toBeanFromJson( String jsonString, Class<T> toClass ) {
     	try {
     		return objectMapper.readValue( getContent( jsonString ), toClass );
         } catch( JsonParseException e ) {
@@ -591,7 +591,7 @@ public class Reflector {
 	 * @param <T> return type
 	 * @return List
 	 */
-	public <T> List<T> toListFromJsonAs( String jsonString, TypeReference typeReference ) {
+	public static <T> List<T> toListFromJsonAs( String jsonString, TypeReference typeReference ) {
 		try {
 			return objectMapper.readValue( getArrayContent(jsonString), typeReference );
 		} catch( JsonParseException e ) {
@@ -606,7 +606,7 @@ public class Reflector {
 	 * @param jsonString	json text
 	 * @return List
 	 */
-    public List<Map<String,Object>> toListFromJsonAsMap( String jsonString ) {
+    public static List<Map<String,Object>> toListFromJsonAsMap( String jsonString ) {
     	return toListFromJsonAs( jsonString, new TypeReference<List<HashMap<String, Object>>>() {} );
     }
 
@@ -616,7 +616,7 @@ public class Reflector {
 	 * @param jsonString json text
 	 * @return List
 	 */
-	public List toListFromJson( String jsonString ) {
+	public static List toListFromJson( String jsonString ) {
 		return toListFromJsonAs( jsonString, new TypeReference<List>() {} );
 	}
 
@@ -625,7 +625,7 @@ public class Reflector {
 	 * @param jsonString	json text
 	 * @return List
 	 */
-	public List<String> toListFromJsonAsString( String jsonString ) {
+	public static List<String> toListFromJsonAsString( String jsonString ) {
 		return toListFromJsonAs( jsonString, new TypeReference<List<String>>() {} );
 	}
 
@@ -634,7 +634,7 @@ public class Reflector {
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @return	Map filled by object's value
 	 */
-	public Map<String, Object> toMapFrom( Object object ) {
+	public static Map<String, Object> toMapFrom( Object object ) {
 
 		if( object == null ) return new HashMap<>();
 
@@ -651,7 +651,7 @@ public class Reflector {
 	 * @param jsonString	json text
 	 * @return	Map filled by object's value
 	 */
-	public Map<String, Object> toMapFromJson( String jsonString ) {
+	public static Map<String, Object> toMapFromJson( String jsonString ) {
 		try {
 			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<HashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
@@ -667,7 +667,7 @@ public class Reflector {
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @return	NMap filled by object's value
 	 */
-	public NMap toNMapFrom( Object object ) {
+	public static NMap toNMapFrom( Object object ) {
 		return new NMap( toMapFrom( object ) );
 	}
 
@@ -684,7 +684,7 @@ public class Reflector {
 	 * @param methodInvocator	method invocator
 	 * @return	proxy bean to wrap
 	 */
-    public <T> T wrapProxy( T beanToWrapProxy, Class<?>[] interfaces, MethodInvocator methodInvocator ) {
+    public static <T> T wrapProxy( T beanToWrapProxy, Class<?>[] interfaces, MethodInvocator methodInvocator ) {
     	return (T) Proxy.newProxyInstance( beanToWrapProxy.getClass().getClassLoader(), interfaces, new NInvocationHandler( beanToWrapProxy, methodInvocator ) );
     }
 
@@ -694,7 +694,7 @@ public class Reflector {
 	 * @return	original bean
 	 * @throws ClassCastException if beanToUnwrapProxy is not proxy bean.
 	 */
-	public <T> T unwrapProxy( T beanToUnwrapProxy ) {
+	public static <T> T unwrapProxy( T beanToUnwrapProxy ) {
 
 		if( beanToUnwrapProxy == null || ! Proxy.isProxyClass( beanToUnwrapProxy.getClass() ) ) return beanToUnwrapProxy;
 
@@ -708,6 +708,11 @@ public class Reflector {
 
 	}
 
+	/**
+	 * Check json date format (yyyyMMdd'T'hh24:mi:ss.SSSZ)
+	 * @param value value to check
+	 * @return true if value is json date format
+	 */
 	public static boolean isJsonDate( Object value ) {
 
 		if( ! isString(value) ) return false;
