@@ -193,7 +193,7 @@ public class ProxyConnection {
 
 	private Connection invokeConnection( Connection connection ) {
 
-		return new Reflector().wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
+		return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
 			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
 				resetLastUsedTime( method.getName() );
@@ -237,7 +237,7 @@ public class ProxyConnection {
 
 		poolStatement.add( (Statement) statement );
 
-        return new Reflector().wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, new MethodInvocator() {
+        return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, new MethodInvocator() {
 			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
 				resetLastUsedTime( method.getName() );
@@ -272,7 +272,7 @@ public class ProxyConnection {
 
     	poolResultset.add( resultSet );
 
-    	return new Reflector().wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, new MethodInvocator() {
+    	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, new MethodInvocator() {
 			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
 				resetLastUsedTime( method.getName() );

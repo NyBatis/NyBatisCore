@@ -38,7 +38,7 @@ public class ProxyDataSource {
 
 	private DataSource invoke( DataSource dataSource ) {
 
-		return new Reflector().wrapProxy( dataSource, new Class<?>[] {DataSource.class}, new MethodInvocator() {
+		return Reflector.wrapProxy( dataSource, new Class<?>[] {DataSource.class}, new MethodInvocator() {
             public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
                 switch( method.getName() ) {

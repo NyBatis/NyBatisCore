@@ -13,7 +13,7 @@ public class PersonAnother {
 	public List<PhoneNumber> phoneList = new ArrayList<>();
 	
 	public String toString() {
-		return new Reflector().getFieldReport( this );
+		return Reflector.toString( this );
 	}
 
 	

@@ -144,7 +144,7 @@ public class OrmSessionProperties {
     }
 
     public OrmSessionProperties clone() {
-        return new Reflector().clone( this );
+        return Reflector.clone( this );
     }
 
     public void setEntityParameter( Object parameter ) {

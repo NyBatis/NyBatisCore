@@ -117,19 +117,19 @@ public class NMapTest {
 //		System.out.println( nrow01.hashCode() );
 		System.out.println( nrow01 );
 		System.out.println( nrow01.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow01)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow01)) );
 		System.out.println( nrow01.getValueHash() );
 		System.out.println( "-----------------------------------------");
 //		System.out.println( nrow02.hashCode() );
 		System.out.println( nrow02 );
 		System.out.println( nrow02.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow02)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow02)) );
 		System.out.println( nrow02.getValueHash() );
 		System.out.println( "-----------------------------------------");
 //		System.out.println( nrow02.hashCode() );
 		System.out.println( nrow03 );
 		System.out.println( nrow03.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow03)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow03)) );
 		System.out.println( nrow03.getValueHash() );
 
 		Object t = "1";

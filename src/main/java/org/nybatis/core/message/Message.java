@@ -124,7 +124,7 @@ public class Message {
             map.put( key, get(key) );
         }
 
-        contents.append( new Reflector().toJson( map ) );
+        contents.append( Reflector.toJson( map ) );
         contents.append( "\n" );
 
         return contents.toString();

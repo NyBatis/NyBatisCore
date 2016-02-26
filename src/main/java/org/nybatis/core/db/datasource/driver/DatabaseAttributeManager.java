@@ -49,7 +49,7 @@ public class DatabaseAttributeManager {
 
     private static DatabaseAttribute get( Connection connection ) throws SQLException {
 
-        Connection realConnection = new Reflector().unwrapProxy( connection );
+        Connection realConnection = Reflector.unwrapProxy( connection );
 
         String className = realConnection.getClass().getName();
 
