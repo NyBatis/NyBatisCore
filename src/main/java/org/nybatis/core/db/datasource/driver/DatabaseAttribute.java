@@ -70,7 +70,7 @@ public class DatabaseAttribute {
      * @return if matched with pattern, return true
      */
     public boolean isMatched( String driverName ) {
-        return Validator.isFinded( driverName, patternToMatchClassName );
+        return Validator.isFound( driverName, patternToMatchClassName );
     }
 
     public boolean enableToGetParameterType() {
