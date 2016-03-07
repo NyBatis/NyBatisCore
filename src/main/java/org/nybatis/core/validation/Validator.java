@@ -125,7 +125,7 @@ public class Validator {
      * @param pattern 정규식
      * @return 패턴 존재여부
      */
-    public static boolean isFinded( String value, String pattern ) {
+    public static boolean isFound( String value, String pattern ) {
 
     	if( value == null || pattern == null ) return false;
 
@@ -148,7 +148,7 @@ public class Validator {
      *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
      * @return 패턴 존재여부
      */
-    public static boolean isFinded( String value, String pattern, int flags ) {
+    public static boolean isFound( String value, String pattern, int flags ) {
 
     	if( value == null || pattern == null ) return false;
 
