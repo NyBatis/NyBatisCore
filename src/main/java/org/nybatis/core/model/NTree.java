@@ -25,14 +25,28 @@ public class NTree<T> implements Serializable {
     private NTree<T>       parent   = null;
     private List<NTree<T>> children = new ArrayList<>();
 
+    /**
+     * default contructor
+     */
     public NTree() {}
 
-    public NTree( T data ) {
-        this.data = data;
+    /**
+     * constructor
+     *
+     * @param value default value
+     */
+    public NTree( T value ) {
+        this.data = value;
     }
 
-    private NTree( NTree<T> parent, T data ) {
-        this( data );
+    /**
+     * constructor
+     *
+     * @param parent    parent tree
+     * @param value     default value to set in current tree
+     */
+    private NTree( NTree<T> parent, T value ) {
+        this( value );
         this.parent = parent;
     }
 
@@ -99,7 +113,7 @@ public class NTree<T> implements Serializable {
     }
 
     /**
-     * Merge tree to leaf node. <br>
+     * Connect tree to leaf node. <br>
      * If value of leaf node is equal to value of attched tree's root node, attched tree's root node is omitted.
      *
      * <pre>
@@ -129,10 +143,10 @@ public class NTree<T> implements Serializable {
      *
      * </pre>
      * 
-     * @param tree tree to merge
+     * @param tree tree to connect
      * @return self instance
      */
-    public NTree mergeTree( NTree<T> tree ) {
+    public NTree connect( NTree<T> tree ) {
 
         if( tree == null || ! tree.hasChildren() ) return this;
 
@@ -149,11 +163,21 @@ public class NTree<T> implements Serializable {
         return this;
         
     }
-    
+
+    /**
+     * get value
+     *
+     * @return value
+     */
     public T getValue() {
         return data;
     }
 
+    /**
+     * get all values contained in tree
+     *
+     * @return values
+     */
     public Set<T> getValues() {
 
         Set<T> values = new HashSet<>();
@@ -166,15 +190,30 @@ public class NTree<T> implements Serializable {
 
     }
 
+    /**
+     * set value
+     *
+     * @param value value to set
+     */
     public void setValue( T value ) {
         data = value;
     }
 
+    /**
+     * get children
+     *
+     * @return children
+     */
     public List<NTree<T>> getChildren() {
         return children;
     }
 
-    public List<T> getChildrenValue() {
+    /**
+     * get values in child branches
+     *
+     * @return values
+     */
+    public List<T> getChildValues() {
         List<T> list = new ArrayList<>();
         for( NTree<T> tree : children ) {
             list.add( tree.getValue() );
@@ -182,6 +221,11 @@ public class NTree<T> implements Serializable {
         return list;
     }
 
+    /**
+     * check if tree has children
+     *
+     * @return true if tree has chidren
+     */
     public boolean hasChildren() {
         return children.size() > 0;
     }
@@ -264,9 +308,13 @@ public class NTree<T> implements Serializable {
     }
 
     /**
-     * Reverse NTree
+     * Reverse tree nodes
      *
-     * @return NTree that hierachy is reversed
+     * <pre>
+     * Tree has many branches so reversed hierachies must be a multitude. not be one.
+     * </pre>
+     *
+     * @return NTree lists their hierachy is reversed
      */
     public List<NTree<T>> reverse() {
 
@@ -308,10 +356,19 @@ public class NTree<T> implements Serializable {
 
     }
 
+    /**
+     * get parent branch
+     *
+     * @return parent branch
+     */
     public NTree<T> getParent() {
         return parent;
     }
 
+    /**
+     * check if parent branch is existing.
+     * @return
+     */
     public boolean hasParent() {
         return parent != null;
     }
@@ -427,7 +484,7 @@ public class NTree<T> implements Serializable {
         return result;
     }
 
-    public void toList( NTree<T> source, List<Leaf<T>>repository, int depth ) {
+    private void toList( NTree<T> source, List<Leaf<T>>repository, int depth ) {
 
         depth++;
 
