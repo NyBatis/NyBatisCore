@@ -438,6 +438,35 @@ public class NTree<T> implements Serializable {
         return Reflector.clone( this );
     }
 
+    /**
+     * make tree hierachy information from vertical to horizontal.
+     * it is used for excel export
+     *
+     * <pre>
+     * ---------------------
+     * ROOT
+     *   A
+     *   B
+     *     1
+     *     2
+     *     3
+     *       A1
+     * ---------------------
+     *
+     * converted like below.
+     *
+     * ---------------------
+     * 0     | 1  | 2 | 3
+     * ---------------------
+     * ROOT  | A  |   |
+     * ROOT  | B  | 1 |
+     * ROOT  | B  | 2 |
+     * ROOT  | B  | 3 | A1
+     *---------------------
+     * </pre>
+     *
+     * @return data for excel export
+     */
     public NList toNList() {
 
         List<Queue<T>> repository = new ArrayList<>();
