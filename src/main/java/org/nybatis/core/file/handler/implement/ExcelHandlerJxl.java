@@ -1,7 +1,11 @@
 package org.nybatis.core.file.handler.implement;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -26,19 +30,13 @@ import org.nybatis.core.validation.Validator;
 public class ExcelHandlerJxl extends ExcelHandler {
 
     @Override
-    public void writeTo( File excelFile, Map<String, NList> data ) throws IoException {
-
-		excelFile = FileUtil.makeFile( excelFile );
-
-		if( FileUtil.isNotExist(excelFile) ) {
-			throw new IoException( "ExcelFile[{}] to write is not exist.", excelFile );
-		}
+    public void writeTo( OutputStream outputStream, Map<String, NList> data ) throws IoException {
 
         WritableWorkbook workbook = null;
 
         try {
 
-            workbook = Workbook.createWorkbook( excelFile );
+            workbook = Workbook.createWorkbook( outputStream );
 
             for( String sheetName : data.keySet() ) {
                 writeTo( workbook, sheetName, data.get(sheetName) );
@@ -47,7 +45,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
             workbook.write();
 
         } catch( IOException | WriteException e ) {
-        	throw new IoException( e, "Error on writing excel file[{}].", excelFile );
+            throw new IoException( e, "Error on writing excel to output stream." );
 
         } finally {
 
@@ -57,6 +55,22 @@ public class ExcelHandlerJxl extends ExcelHandler {
                 } catch( WriteException | IOException e ) {}
             }
 
+        }
+
+    }
+
+
+    @Override
+    public void writeTo( File excelFile, Map<String, NList> data ) throws IoException {
+
+		excelFile = FileUtil.makeFile( excelFile );
+
+        FileOutputStream fos = getFileOutputStream( excelFile );
+
+        try {
+            writeTo( fos, data );
+        } catch( IoException e ) {
+        	throw new IoException( e.getCause(), "Error on writing excel file[{}].", excelFile );
         }
 
     }
@@ -95,7 +109,6 @@ public class ExcelHandlerJxl extends ExcelHandler {
 
         }
 
-
     }
 
     @Override
@@ -124,34 +137,65 @@ public class ExcelHandlerJxl extends ExcelHandler {
         } );
     }
 
+    @Override
+    public NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+        return readFrom( inputStream, ( workbook, result ) -> {
+            result.put( sheetName, readFrom( workbook, sheetName ) );
+        } ).get( sheetName );
+    }
+
+    @Override
+    public NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+        return readFrom( inputStream, ( workbook, result ) -> {
+            Sheet sheet = workbook.getSheet( 0 );
+            if( sheet != null ) {
+                result.put( "FirstSheet", readFrom( workbook, sheet.getName() ) );
+            }
+        } ).get( 0 );
+    }
+
+    @Override
+    public Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+        return readFrom( inputStream, ( workbook, result ) -> {
+            for( String sheetName : workbook.getSheetNames() ) {
+                result.put( sheetName, readFrom(workbook, sheetName) );
+            }
+        } );
+    }
+
     private interface Reader {
         void read( Workbook workbook, Map<String,NList> result );
     }
 
-    private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
+    private Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
 
-        if( FileUtil.isNotExist(excelFile) ) {
-            throw new IoException( "ExcelFile[{}] to read is not exist.", excelFile );
-        }
-
-        Map<String, NList> result = new LinkedHashMap<>();
-
-        Workbook workBook = null;
+        Map<String, NList> result   = new LinkedHashMap<>();
+        Workbook           workBook = null;
 
         try {
 
-            workBook = Workbook.getWorkbook( excelFile );
-
+            workBook = Workbook.getWorkbook( inputStream );
             reader.read( workBook, result );
-
             return result;
 
         } catch( IOException | BiffException e ) {
-            throw new IoException( e, "Error on reading excel file[{}].", excelFile );
+            throw new IoException( e, "Error on reading excel data from input stream." );
         } finally {
             if( workBook != null ) {
                 workBook.close();
             }
+        }
+
+    }
+
+    private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
+
+        FileInputStream inputStream = getInputStream( excelFile );
+
+        try {
+            return readFrom( inputStream, reader );
+        } catch( IoException e ) {
+            throw new IoException( e.getCause(), "Error on reading excel file[{}].", excelFile );
         }
 
     }

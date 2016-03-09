@@ -1,6 +1,8 @@
 package org.nybatis.core.file;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 import org.nybatis.core.exception.unchecked.IoException;
@@ -202,6 +204,77 @@ public class ExcelUtil {
 	 */
 	public static NList readFirstSheetFrom( String excelFile ) throws IoException {
 		return readFirstSheetFrom( new File( excelFile ) );
+	}
+
+
+	// -----
+
+	/**
+	 * Write data to excel file
+	 *
+	 * @param outputStream output stream to write data
+	 * @param data      key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( OutputStream outputStream, Map<String, NList> worksheets ) throws IoException {
+		getHandler().writeTo( outputStream, worksheets );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param outputStream output stream to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param worksheet		grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public static void writeTo( OutputStream outputStream, String sheetName, NList worksheet ) throws IoException {
+		getHandler().writeTo( outputStream, sheetName, worksheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param outputStream output stream to write data
+	 * @param worksheet grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( OutputStream outputStream, NList worksheet ) throws IoException {
+		getHandler().writeTo( outputStream, worksheet );
+	}
+
+	/**
+	 * Read data from excel file
+	 *
+	 * @param inputStream input stream to read data
+	 * @param sheetName		sheet name of excel file to read
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public static NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+		return getHandler().readFrom( inputStream, sheetName );
+	}
+
+	/**
+	 * Read all sheets from excel file
+	 *
+	 * @param inputStream input stream to read data
+	 * @return key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+	public static Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+		return getHandler().readFrom( inputStream );
+	}
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param inputStream input stream to read data
+	 * @return grid data from first sheet
+	 * @throws IoException file I/O exception
+	 */
+	public static NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+		return getHandler().readFirstSheetFrom( inputStream );
 	}
 
 }
