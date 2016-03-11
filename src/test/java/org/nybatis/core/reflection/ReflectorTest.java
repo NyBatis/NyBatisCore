@@ -31,7 +31,7 @@ public class ReflectorTest {
 
 		NLogger.debug( map1 );
 
-		Person p1 = Reflector.toBeanFromJson( json, Person.class );
+		Person p1 = Reflector.toBeanFrom( json, Person.class );
 
 		NLogger.debug( Reflector.toString( p1 ) );
 
