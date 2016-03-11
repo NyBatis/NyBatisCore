@@ -22,7 +22,6 @@ public class User {
     private String name;
 
     @ExcelHeader( "주소" )
-    @JsonIgnore
     private String address;
 
     public User() {}

@@ -38,18 +38,14 @@ public class ExcelHandlerTest {
         NLogger.debug( "2. converted excel data" );
         NLogger.debug( excelData );
 
-        User user = Reflector.toBeanFrom( "{\"name\":\"Jung Hwasu\",\"id\":\"1\"}", User.class );
-
-        NLogger.debug( user );
-
-        List<User> users = toBeanFromExcelNList( excelData, User.class );
+        List<User> users = excelHandler.toBeanFromExcelNList( excelData, User.class );
 
         NLogger.debug( "3. excel data -> bean" );
         NLogger.debug( users );
 
     }
 
-    protected <T> List<T> toBeanFromExcelNList( NList fromList, Class<T> toClass ) throws JsonIOException {
+    private <T> List<T> toBeanFromExcelNList( NList fromList, Class<T> toClass ) throws JsonIOException {
 
         List<T> list = new ArrayList<>();
 
@@ -61,18 +57,9 @@ public class ExcelHandlerTest {
 
             String json = map.toJson();
 
-            UserForExcelReader userForExcelReader = Reflector.toBeanFrom( json, UserForExcelReader.class );
-
-            NLogger.debug( "json : {}\n", json );
-            NLogger.debug( userForExcelReader );
-
-
             try {
 
                 T bean = excelMapper.readValue( json, toClass );
-
-                NLogger.debug( bean );
-
                 list.add( bean );
 
             } catch( IOException e ) {
