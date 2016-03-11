@@ -1,22 +1,10 @@
 package org.nybatis.core.reflection;
 
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.lang.reflect.UndeclaredThrowableException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.rits.cloning.Cloner;
 import org.nybatis.core.exception.unchecked.ClassCastException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.exception.unchecked.ReflectiveException;
@@ -26,11 +14,20 @@ import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
-
-import com.rits.cloning.Cloner;
 import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
+
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Reflection Utility
@@ -567,11 +564,11 @@ public class Reflector {
 	 * @param <T>			return type
 	 * @return bean filled by json value
 	 */
-	public static <T> T toBeanFromJson( String jsonString, Class<T> toClass ) {
+	private static <T> T toBeanFromJson( String jsonString, Class<T> toClass ) {
     	try {
     		return objectMapper.readValue( getContent( jsonString ), toClass );
         } catch( JsonParseException e ) {
-            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
+			throw new JsonIOException( "JsonParseException : {}\n\t- json string :\n{}\n\t- target class : {}", e.getMessage(), jsonString, toClass );
     	} catch( IOException e ) {
     		throw new JsonIOException( e );
     	}
@@ -653,7 +650,7 @@ public class Reflector {
 	 */
 	public static Map<String, Object> toMapFromJson( String jsonString ) {
 		try {
-			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<HashMap<String, Object>>() {} );
+			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<LinkedHashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
 		} catch( JsonParseException e ) {
 			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );

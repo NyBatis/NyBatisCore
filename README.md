@@ -25,7 +25,7 @@ This project has JARs deployed to the Unofficial Github private repository.
 
 Add repository to **pom.xml**.
 
-```
+```xml
 <repositories>
 <repository>
   <id>UnofficialNybatisMavenRepository</id>
@@ -36,7 +36,7 @@ Add repository to **pom.xml**.
 
 And add the following dependency to **pom.xml**.
 
-```
+```xml
 <dependency>
   <groupId>org.nybatis</groupId>
   <artifactId>NyBatisCore</artifactId>
@@ -48,24 +48,24 @@ And add the following dependency to **pom.xml**.
 
 Default configuration file path is below.
 
-```
+```java
 /resources/config/db/config.xml
 ```
 
 And load like below.
 
-```
+```java
 DatabaseConfigurator.build();
 ```
 
 Also configuration path is changable.
-```
+```java
 DatabaseConfigurator.build( "/home/user/config/yourConfiguration.xml" );
 ```
 
 And it is possible to load from your application running directory.
 
-```
+```java
 DatabaseConfigurator.build( Const.path.getRoot() + "/yourConfiguration.xml" );
 ```
 
@@ -77,7 +77,7 @@ DatabaseConfigurator.build( Const.path.getRoot() + "/yourConfiguration.xml" );
 SQL is written as XML in file like MyBatis. but SQL id decided only with **<font color="blue">FileName</font><font color="red">.</font><font color="green">id</font>**
 
 
-```
+```xml
 User.xml
 
 <mapper>
@@ -98,7 +98,7 @@ User.xml
 
 Java code is like below.
 
-```
+```java
 SqlSession session = SessionManager.openSession();
 
 Map param = new HashMap();
@@ -110,7 +110,7 @@ List<Map> list = session.sqlId( "User.mapper", param ).list().select();
 
 Or 
 
-```
+```java
 public class User {
    public String name;
    public int    age;
@@ -132,7 +132,7 @@ XML SQL only contains <font color="red">id</font> and <font color="red">query</f
 
 SQL also can be injected in NyBatis like Spring JDBC template.
 
-```
+```java
 session.sql( "UPDATE USER SET age = #{age} WHERE name = #{name}", param ).execute();
 ```
 
@@ -147,7 +147,7 @@ Another tip is that you can write '<' charater in XML :)
 NyBatis supports simple ORM mechanism.
 
 
-```
+```java
 @Table( "TB_DEV_USER" )
 public class User {
    public String name;
@@ -171,7 +171,7 @@ session.insert( user );
 
 List data also can be retrived.
 
-```
+```java
 OrmSession session = SessionManager.openOrmSession( User.class );
 
 List<User> list = session.list().setPage( 10, 50 ).select();
@@ -182,7 +182,7 @@ int count = session.list().count();
 
 Dynamic condition can be written like below.
 
-```
+```java
 OrmSession session = SessionManager.openOrmSession( User.class );
 
 List<User> list01 = session.list()
@@ -208,7 +208,7 @@ List<User> list03 = session.list()
 
 NyBatis supports mass data manifulation mode like addBatch in JDBC.
  
-```
+```java
 List<User> users = ...
 
 // In SqlSession
@@ -235,7 +235,7 @@ Using Spring Jdbc template or Pure jdbc statement or Interface query of MyBatis.
 
 In NyBatis, you can run **sql script** to make preliminary data easily in test code.  
  
-```
+```java
 SqlSession sqlSession = SessionManager.openSession();
 sqlSession.sql( "INSERT INTO USER ( name, age ) VALUES ( 'test', '20' )" ).execute();
 

@@ -3,10 +3,12 @@ package org.nybatis.core.file.handler.implement;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -85,8 +87,12 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		Sheet    sheet    = workbook.createSheet( sheetName );
 		Row      row      = sheet.createRow( idxRow++ );
 
+		CellStyle headerStyle = getHeaderStyle( workbook );
+
 		for( String alias : data.getAliases() ) {
-			row.createCell( idxColumn++ ).setCellValue( alias );
+			Cell cell = row.createCell( idxColumn++ );
+			cell.setCellValue( alias );
+			cell.setCellStyle( headerStyle );
 		}
 
 		for( NMap nrow : data ) {
@@ -112,6 +118,18 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 			}
 
 		}
+
+	}
+
+	private CellStyle getHeaderStyle( Workbook workbook ) {
+
+		CellStyle headerStyle = workbook.createCellStyle();
+		Font headerFont  = workbook.createFont();
+
+		headerFont.setBold( true );
+		headerStyle.setFillBackgroundColor( HSSFColor.GREY_40_PERCENT.index );
+		headerStyle.setFont( headerFont );
+		return headerStyle;
 
 	}
 
