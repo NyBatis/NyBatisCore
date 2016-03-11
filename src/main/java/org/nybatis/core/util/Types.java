@@ -22,8 +22,16 @@ public class Types {
         return ( klass != null && ClassUtil.getTopSuperClass( klass ) == AbstractMap.class );
     }
 
+    public static boolean isNotMap( Class klass ) {
+        return ! isNotMap( klass );
+    }
+
     public static boolean isMap( Object object ) {
         return object != null && isMap( object.getClass() );
+    }
+
+    public static boolean isNotMap( Object object ) {
+        return ! isNotMap( object );
     }
 
     public static boolean isList( Class klass ) {
@@ -32,8 +40,16 @@ public class Types {
         return superClass == AbstractCollection.class || superClass == NList.class;
     }
 
+    public static boolean isNotList( Class klass ) {
+        return ! isNotList( klass );
+    }
+
     public static boolean isList( Object object ) {
         return object != null && isList( object.getClass() );
+    }
+
+    public static boolean isNotList( Object object ) {
+        return ! isNotList( object );
     }
 
     public static boolean isArray( Class klass ) {
@@ -41,16 +57,32 @@ public class Types {
         return isList( klass ) || klass.isArray();
     }
 
+    public static boolean isNotArray( Class klass ) {
+        return ! isArray( klass );
+    }
+
     public static boolean isArray( Object object ) {
         return object != null && isArray( object.getClass() );
+    }
+
+    public static boolean isNotArray( Object object ) {
+        return ! isArray( object );
     }
 
     public static boolean isPrimitive( Class klass ) {
         return new PrimitiveConverter().isPrimitive( klass );
     }
 
+    public static boolean isNotPrimitive( Class klass ) {
+        return ! isPrimitive( klass );
+    }
+
     public static boolean isPrimitive( Object object ) {
         return object == null || isPrimitive( object.getClass() );
+    }
+
+    public static boolean isNotPrimitive( Object object ) {
+        return ! isPrimitive( object );
     }
 
     public static List toList( Object object ) {

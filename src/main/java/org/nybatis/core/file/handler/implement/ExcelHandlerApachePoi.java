@@ -16,7 +16,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.nybatis.core.exception.unchecked.ExcelNoHeadException;
 import org.nybatis.core.exception.unchecked.IoException;
-import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
@@ -24,10 +23,6 @@ import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,45 +32,20 @@ import java.util.Map;
 public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
-	public void writeTo( OutputStream outputStream, Map<String, NList> data ) throws IoException  {
-		Workbook workbook = new XSSFWorkbook();
-		try {
-			writeTo( outputStream, workbook, data );
-		} catch( IoException e ) {
-			throw new IoException( e.getCause(), "Error on writing excel in output stream." );
-		}
-	}
+	protected void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws IoException {
 
-	@Override
-	public void writeTo( File excelFile, Map<String, NList> data ) throws IoException {
-
-		excelFile = FileUtil.makeFile( excelFile );
-
-		FileOutputStream fos = getFileOutputStream( excelFile );
-
-		try {
-			Workbook workbook = ( "xls".equalsIgnoreCase(FileUtil.getExtention(excelFile )) ) ? new HSSFWorkbook() : new XSSFWorkbook();
-			writeTo( fos, workbook, data );
-
-		} catch( IoException e ) {
-			throw new IoException( e.getCause(), "Error on writing excel file[{}].", excelFile );
-		} finally {
-			try { if( fos != null ) fos.close(); } catch( IOException e ) {}
-		}
-
-	}
-
-	private void writeTo( OutputStream outputStream, Workbook workbook, Map<String, NList> data ) {
+		Workbook workbook = isXlsx ? new XSSFWorkbook() : new HSSFWorkbook();
 
 		try {
 			for( String sheetName : data.keySet() ) {
-				writeTo( workbook, sheetName, data.get(sheetName) );
+				writeTo( workbook, sheetName, data.get( sheetName ) );
 			}
 			workbook.write( outputStream );
 		} catch( IOException e ) {
-			throw new IoException( e );
+			throw new IoException( e  );
 		} finally {
 			try { workbook.close(); } catch( IOException e ) {}
+			try { if( outputStream != null ) outputStream.close(); } catch( IOException e ) {}
 		}
 
 	}
@@ -84,8 +54,8 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 		int idxColumn = 0, idxRow = 0;
 
-		Sheet    sheet    = workbook.createSheet( sheetName );
-		Row      row      = sheet.createRow( idxRow++ );
+		Sheet sheet = workbook.createSheet( sheetName );
+		Row   row   = sheet.createRow( idxRow++ );
 
 		CellStyle headerStyle = getHeaderStyle( workbook );
 
@@ -159,39 +129,11 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		} );
 	}
 
-
-	@Override
-	public NList readFrom( File excelFile, String sheetName ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
-            result.put( sheetName, readFrom( workbook, workbook.getSheetIndex( sheetName ) ) );
-        } ).get( sheetName );
-	}
-
-	@Override
-	public NList readFirstSheetFrom( File excelFile ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
-			Sheet sheet = workbook.getSheetAt( 0 );
-			if( sheet != null ) {
-				result.put( "FirstSheet", readFrom( workbook, 0 ) );
-			}
-		} ).get( 0 );
-	}
-
-
-	@Override
-	public Map<String, NList> readFrom( File excelFile ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
-			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
-				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
-			}
-		} );
-	}
-
 	private interface Reader {
 		void read( Workbook workbook, Map<String,NList> result );
 	}
 
-	private Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
+	public Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
 
 		Map<String, NList> result = new LinkedHashMap<>();
 
@@ -210,18 +152,6 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		}
 
 		return result;
-
-	}
-
-	private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
-
-		FileInputStream inputStream = getInputStream( excelFile );
-
-		try {
-			return readFrom( inputStream, reader );
-		} catch( IoException e ) {
-			throw new IoException( e.getCause(), "Error on reading excel file[{}].", excelFile );
-		}
 
 	}
 

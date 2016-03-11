@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
+import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.file.annotation.ExcelReadAnnotationInspector;
 import org.nybatis.core.file.annotation.ExcelWriteAnnotationInspector;
 import org.nybatis.core.model.NList;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +45,86 @@ public abstract class ExcelHandler {
 	}
 
 	/**
+	 * Write excel data to output stream
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param data			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public void writeTo( OutputStream outputStream, String sheetName, NList data ) throws IoException {
+		writeTo( outputStream, sheetName, data, true );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param excelFile		excel file to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param data			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public void writeTo( OutputStream outputStream, String sheetName, List<?> data ) throws IoException {
+		writeTo( outputStream, sheetName, toExcelNListFromBean(data) );
+	}
+
+	/**
+	 * Write excel data to output stream in sheet named 'Sheet1'
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param data      	grid data
+	 * @throws IoException file I/O exception
+	 */
+	public void writeTo( OutputStream outputStream, NList data ) throws IoException {
+		writeTo( outputStream, DEFAULT_SHEET_NAME, data, true );
+	}
+
+	/**
+	 * Write excel data to output stream in sheet named 'Sheet1'
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param data      	grid data
+	 * @throws IoException file I/O exception
+	 */
+	public void writeTo( OutputStream outputStream, List<?> data ) throws IoException {
+		writeTo( outputStream, DEFAULT_SHEET_NAME, toExcelNListFromBean(data), true );
+	}
+
+	private void writeTo( OutputStream outputStream, String sheetName, NList data, boolean isXlsx ) throws IoException {
+		if( outputStream == null ) return;
+		Map<String, NList> worksheets = new HashMap<>();
+		worksheets.put( sheetName, data );
+		writeNListTo( outputStream, worksheets, isXlsx );
+	}
+
+	/**
+	 * Write excel data to output stream
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param data      	key is sheetName and value is grid data.<br>
+	 *                      value type is allowed only List or NList.
+	 * @throws IoException file I/O exception
+	 */
+	public void writeTo( OutputStream outputStream, Map<String, ?> data ) throws IoException {
+		writeNListTo( outputStream, toNList(data), true );
+	}
+
+	/**
+	 *
+	 * Write excel data to output stream
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param data      	key is sheetName and value is grid data.
+	 * @param isXlsx		excel file type ( true : xlsx, false : xls )
+	 * @throws IoException file I/O exception
+	 */
+	protected abstract void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws IoException;
+
+	private boolean isXlsx( File file ) {
+		return "xlsx".equalsIgnoreCase( FileUtil.getExtention(file) );
+	}
+
+	/**
 	 * Write data to excelFile
 	 *
 	 * @param excelFile		excel file to write data
@@ -51,9 +133,19 @@ public abstract class ExcelHandler {
 	 * @throws IoException	File I/O Exception
 	 */
 	public void writeTo( File excelFile, String sheetName, NList data ) throws IoException {
-		Map<String, NList> worksheets = new HashMap<>();
-		worksheets.put( sheetName, data );
-		writeTo( excelFile, worksheets );
+		write( excelFile, outputStream -> writeTo( outputStream, sheetName, data, isXlsx(excelFile) ) );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param excelFile		excel file to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param data			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public void writeTo( File excelFile, String sheetName, List<?> data )  throws IoException {
+		writeTo( excelFile, sheetName, toExcelNListFromBean(data) );
 	}
 
 	/**
@@ -68,13 +160,27 @@ public abstract class ExcelHandler {
 	}
 
 	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param excelFile excel file to write
+	 * @param data      grid data
+	 * @throws IoException file I/O exception
+	 */
+	public void writeTo( File excelFile, List<?> data ) throws IoException {
+		writeTo( excelFile, toExcelNListFromBean(data) );
+	}
+
+	/**
 	 * Write data to excel file
 	 *
 	 * @param excelFile excel file to write data
-	 * @param data      key is sheetName and value is grid data.
+	 * @param data      key is sheetName and value is grid data.<br>
+	 *                  value type is allowed only List or NList.
 	 * @throws IoException file I/O exception
 	 */
-	public abstract void writeTo( File excelFile, Map<String, NList> data ) throws IoException;
+	public void writeTo( File excelFile, Map<String, ?> data ) throws IoException {
+		write( excelFile, outputStream -> writeNListTo( outputStream, toNList( data ), isXlsx( excelFile ) ) );
+	}
 
 	/**
 	 * Read sheet from excel file
@@ -84,16 +190,47 @@ public abstract class ExcelHandler {
 	 * @return grid data
 	 * @throws IoException  File I/O Exception
 	 */
-	public abstract NList readFrom( File excelFile, String sheetName ) throws IoException;
+	public NList readFrom( File excelFile, String sheetName ) throws IoException {
+		return (NList) read( excelFile, inputStream -> readFrom( inputStream, sheetName ) );
+	}
+
+	/**
+	 * Read sheet from excel file
+	 *
+	 * @param excelFile		excel file to read
+	 * @param sheetName		sheet name of excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFrom( File excelFile, String sheetName, Class<T> toClass ) throws IoException {
+		NList list = readFrom( excelFile, sheetName );
+		return toBeanFromExcelNList( list, toClass );
+	}
 
 	/**
 	 * Read first sheet from excel file
 	 *
-	 * @param excelFile excel file to read
+	 * @param excelFile 	excel file to read
 	 * @return grid data from first sheet
 	 * @throws IoException file I/O exception
 	 */
-	public abstract NList readFirstSheetFrom( File excelFile ) throws IoException;
+	public NList readFirstSheetFrom( File excelFile ) throws IoException {
+		return (NList) read( excelFile, inputStream -> readFirstSheetFrom( inputStream ) );
+	}
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param excelFile 	excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFirstSheetFrom( File excelFile, Class<T> toClass ) throws IoException {
+		NList list = readFirstSheetFrom( excelFile );
+		return toBeanFromExcelNList( list, toClass );
+	}
 
 	/**
 	 * Read all sheets from excel file
@@ -102,41 +239,22 @@ public abstract class ExcelHandler {
 	 * @return key is sheetName and value is grid data.
 	 * @throws IoException file I/O exception
 	 */
-	public abstract Map<String, NList> readFrom( File excelFile ) throws IoException;
-
-	/**
-	 * Write data to excelFile
-	 *
-	 * @param outputStream	output stream to write data
-	 * @param sheetName		sheet name of excel file to write
-	 * @param data			grid data
-	 * @throws IoException	File I/O Exception
-	 */
-	public void writeTo( OutputStream outputStream, String sheetName, NList data ) throws IoException {
-		Map<String, NList> worksheets = new HashMap<>();
-		worksheets.put( sheetName, data );
-		writeTo( outputStream, worksheets );
+	public Map<String, NList> readFrom( File excelFile ) throws IoException {
+		return (Map<String, NList>) read( excelFile, inputStream -> readFrom( inputStream ) );
 	}
 
 	/**
-	 * Write data to excel file in sheet named 'Sheet1'
+	 * Read all sheet from input stream
 	 *
-	 * @param outputStream	output stream to write data
-	 * @param data      grid data
-	 * @throws IoException file I/O exception
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
 	 */
-	public void writeTo( OutputStream outputStream, NList data ) throws IoException {
-		writeTo( outputStream, DEFAULT_SHEET_NAME, data );
+	public <T> Map<String, List<T>> readFrom( File excelFile, Class<T> toClass ) throws IoException {
+		Map<String, NList> sheets = readFrom( excelFile );
+		return toBeanList( sheets, toClass );
 	}
-
-	/**
-	 * Write data to excel file
-	 *
-	 * @param outputStream	output stream to write data
-	 * @param data      key is sheetName and value is grid data.
-	 * @throws IoException file I/O exception
-	 */
-	public abstract void writeTo( OutputStream outputStream, Map<String, NList> data ) throws IoException;
 
 	/**
 	 * Read sheet from excel file
@@ -149,13 +267,40 @@ public abstract class ExcelHandler {
 	public abstract NList readFrom( InputStream inputStream, String sheetName ) throws IoException;
 
 	/**
-	 * Read first sheet from excel file
+	 * Read sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param sheetName		sheet name of excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFrom( InputStream inputStream, String sheetName, Class<T> toClass ) throws IoException {
+		NList list = readFrom( inputStream, sheetName );
+		return toBeanFromExcelNList( list, toClass );
+	}
+
+	/**
+	 * Read first sheet from input stream
 	 *
 	 * @param inputStream	input stream to read data
 	 * @return grid data from first sheet
 	 * @throws IoException file I/O exception
 	 */
 	public abstract NList readFirstSheetFrom( InputStream inputStream ) throws IoException;
+
+	/**
+	 * Read sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+		NList list = readFirstSheetFrom( inputStream );
+		return toBeanFromExcelNList( list, toClass );
+	}
 
 	/**
 	 * Read all sheets from excel file
@@ -165,6 +310,19 @@ public abstract class ExcelHandler {
 	 * @throws IoException file I/O exception
 	 */
 	public abstract Map<String, NList> readFrom( InputStream inputStream ) throws IoException;
+
+	/**
+	 * Read all sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> Map<String, List<T>> readFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+		Map<String, NList> sheets = readFrom( inputStream );
+		return toBeanList( sheets, toClass );
+	}
 
     protected String toExcelText( Object object ) {
 
@@ -180,7 +338,7 @@ public abstract class ExcelHandler {
 
     }
 
-	protected FileInputStream getInputStream( File excelFile ) {
+	private FileInputStream getInputStream( File excelFile ) {
 		try {
 			return new FileInputStream( excelFile );
 		} catch( FileNotFoundException e ) {
@@ -188,11 +346,12 @@ public abstract class ExcelHandler {
 		}
 	}
 
-	protected FileOutputStream getFileOutputStream( File excelFile ) {
+	private FileOutputStream getOutputStream( File excelFile ) {
 		try {
+			FileUtil.makeFile( excelFile );
 			return new FileOutputStream( excelFile );
 		} catch( FileNotFoundException e ) {
-			throw new IoException( "ExcelFile[{}] to write is not exist.", excelFile );
+			throw new IoException( e, "ExcelFile({}) to write is not found.", excelFile );
 		}
 	}
 
@@ -242,8 +401,83 @@ public abstract class ExcelHandler {
 	}
 
 	private boolean hasRow( List<?> list ) {
-		if( Validator.isEmpty(list) ) return false;
-		return ! Types.isPrimitive( list.get(0) );
+		return Validator.isNotEmpty( list ) && Types.isNotPrimitive( list.get(0) );
 	}
+
+	private Map<String, NList> toNList( Map<String, ?> data ) {
+
+		Map<String, NList> sheets = new LinkedHashMap<>();
+
+		if( Validator.isNotEmpty(data) ) {
+			for( String sheetName : data.keySet() ) {
+
+				Object sheet = data.get( sheetName );
+
+				if( sheet == null ) continue;
+
+				if( sheet instanceof NList ) {
+					sheets.put( sheetName, (NList) sheet );
+				} else if( sheet instanceof List ) {
+					sheets.put( sheetName, toExcelNListFromBean( (List<?>) sheet ) );
+				} else if( Types.isArray( sheet ) ) {
+					sheets.put( sheetName, toExcelNListFromBean( Types.toList(sheet) ) );
+				}
+
+			}
+		}
+
+		return sheets;
+
+	}
+
+	private <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {
+
+		Map<String, List<T>> sheets = new LinkedHashMap<>();
+
+		if( Validator.isNotEmpty(data) ) {
+			for( String sheet : data.keySet() ) {
+				sheets.put( sheet, toBeanFromExcelNList(data.get( sheet ), toClass ) );
+			}
+		}
+
+		return sheets;
+
+	}
+
+	//----------- annonymous interface
+
+	private Object read( File excelFile, Reader reader ) {
+
+		FileInputStream inputStream = getInputStream( excelFile );
+
+		try {
+			return reader.read( inputStream );
+		} catch( IoException e ) {
+			throw new IoException( e.getCause(), "Error on reading excel file({})", excelFile );
+		}
+
+	}
+
+	private interface Reader {
+		Object read( InputStream inputStream );
+	}
+
+	private void write( File excelFile, Writer reader ) {
+
+		FileOutputStream outputStream = getOutputStream( excelFile );
+
+		try {
+			reader.write( outputStream );
+		} catch( IoException e ) {
+			FileUtil.delete( excelFile );
+			throw new IoException( e.getCause(), "Error on writing excel file({})", excelFile );
+		}
+
+	}
+
+	private interface Writer {
+		void write( OutputStream outputStream );
+	}
+
 
 }
