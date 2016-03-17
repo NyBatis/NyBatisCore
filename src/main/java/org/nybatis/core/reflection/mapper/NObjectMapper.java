@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.nybatis.core.model.NDate;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+import java.util.Date;
 
 
 public class NObjectMapper extends ObjectMapper {
@@ -20,21 +22,29 @@ public class NObjectMapper extends ObjectMapper {
 		configure( DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false );
 		configure( MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, true ); // private 변수라도 강제로 매핑
 		configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
-
 		configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, sort );
 
+		setDefaultFilter();
 		registerCustomDeserializer();
 
 	}
 
 	private void registerCustomDeserializer() {
 
-		SimpleModule module = new SimpleModule( "NDateDeserializer" );
+		SimpleModule module = new SimpleModule( "DateSerializer" );
 
-		module.addDeserializer( NDate.class, new NDateDeserializer() );
+		module.addSerializer(   Date.class,  new DateSerializer()   );
+		module.addDeserializer( Date.class,  new DateDeserializer() );
 
 		registerModule( module );
 
+	}
+
+	/**
+	 * Prevent error when pojo with @JsonFilter annotation is parsed.
+	 */
+	private void setDefaultFilter() {
+		setFilters( new SimpleFilterProvider().setFailOnUnknownId(false) );
 	}
 
 }

@@ -6,7 +6,6 @@ import org.nybatis.core.reflection.Reflector;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -50,7 +49,7 @@ public class DatabaseAttributeManager {
 
     private static DatabaseAttribute get( Connection connection ) throws SQLException {
 
-        Connection realConnection = new Reflector().unwrapProxyBean( connection );
+        Connection realConnection = Reflector.unwrapProxy( connection );
 
         String className = realConnection.getClass().getName();
 

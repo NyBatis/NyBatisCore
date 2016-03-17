@@ -1,13 +1,14 @@
 package org.nybatis.core.file.handler.implement;
 
-import jxl.read.biff.BiffException;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.Font;
 import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -15,7 +16,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.nybatis.core.exception.unchecked.ExcelNoHeadException;
 import org.nybatis.core.exception.unchecked.IoException;
-import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
@@ -23,36 +23,29 @@ import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
-	public void writeTo( File excelFile, Map<String, NList> data ) throws IoException {
+	protected void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws IoException {
 
-		excelFile = FileUtil.makeFile( excelFile );
+		Workbook workbook = isXlsx ? new XSSFWorkbook() : new HSSFWorkbook();
 
-		if( FileUtil.isNotExist(excelFile) ) {
-			throw new IoException( "ExcelFile[{}] to write is not exist.", excelFile );
-		}
-
-		Workbook workbook = ( "xls".equalsIgnoreCase(FileUtil.getExtention(excelFile )) ) ? new HSSFWorkbook() : new XSSFWorkbook();
-
-		for( String sheetName : data.keySet() ) {
-			writeTo( workbook, sheetName, data.get(sheetName) );
-		}
-
-		try (
-			FileOutputStream fos = new FileOutputStream( excelFile )
-		) {
-			workbook.write( fos );
+		try {
+			for( String sheetName : data.keySet() ) {
+				writeTo( workbook, sheetName, data.get( sheetName ) );
+			}
+			workbook.write( outputStream );
 		} catch( IOException e ) {
-			throw new IoException( e, "Error on writing excel file[{}].", excelFile );
+			throw new IoException( e  );
+		} finally {
+			try { workbook.close(); } catch( IOException e ) {}
+			try { if( outputStream != null ) outputStream.close(); } catch( IOException e ) {}
 		}
 
 	}
@@ -61,11 +54,15 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 		int idxColumn = 0, idxRow = 0;
 
-		Sheet    sheet    = workbook.createSheet( sheetName );
-		Row      row      = sheet.createRow( idxRow++ );
+		Sheet sheet = workbook.createSheet( sheetName );
+		Row   row   = sheet.createRow( idxRow++ );
+
+		CellStyle headerStyle = getHeaderStyle( workbook );
 
 		for( String alias : data.getAliases() ) {
-			row.createCell( idxColumn++ ).setCellValue( alias );
+			Cell cell = row.createCell( idxColumn++ );
+			cell.setCellValue( alias );
+			cell.setCellStyle( headerStyle );
 		}
 
 		for( NMap nrow : data ) {
@@ -94,19 +91,28 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	}
 
+	private CellStyle getHeaderStyle( Workbook workbook ) {
+
+		CellStyle headerStyle = workbook.createCellStyle();
+		Font headerFont  = workbook.createFont();
+
+		headerFont.setBold( true );
+		headerStyle.setFillBackgroundColor( HSSFColor.GREY_40_PERCENT.index );
+		headerStyle.setFont( headerFont );
+		return headerStyle;
+
+	}
+
 	@Override
-	public NList readFrom( File excelFile, String sheetName ) throws IoException {
-		return readFrom( excelFile, new Reader() {
-			@Override
-			public void read( Workbook workbook, Map<String, NList> result ) {
-				result.put( sheetName, readFrom( workbook, workbook.getSheetIndex( sheetName ) ) );
-			}
+	public NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+		return readFrom( inputStream, ( workbook, result ) -> {
+			result.put( sheetName, readFrom( workbook, workbook.getSheetIndex( sheetName ) ) );
 		} ).get( sheetName );
 	}
 
 	@Override
-	public NList readFirstSheetFrom( File excelFile ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
+	public NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+		return readFrom( inputStream, ( workbook, result ) -> {
 			Sheet sheet = workbook.getSheetAt( 0 );
 			if( sheet != null ) {
 				result.put( "FirstSheet", readFrom( workbook, 0 ) );
@@ -114,10 +120,9 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		} ).get( 0 );
 	}
 
-
 	@Override
-	public Map<String, NList> readFrom( File excelFile ) throws IoException {
-		return readFrom( excelFile, ( workbook, result ) -> {
+	public Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+		return readFrom( inputStream, ( workbook, result ) -> {
 			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
 				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
 			}
@@ -128,29 +133,27 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		void read( Workbook workbook, Map<String,NList> result );
 	}
 
-	private Map<String, NList> readFrom( File excelFile, Reader reader ) throws IoException {
+	public Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
 
 		Map<String, NList> result = new LinkedHashMap<>();
 
 		try (
-				FileInputStream fis      = new FileInputStream( excelFile );
-				Workbook        workbook = new HSSFWorkbook( fis )
+				Workbook workbook = new HSSFWorkbook( inputStream )
 		) {
 
 			try {
 				reader.read( workbook, result );
 			} catch( ExcelNoHeadException e ) {
-				NLogger.trace( "Excel Sheet (file:{}, sheet:{}) has no header", excelFile, e.getMessage() );
+				NLogger.trace( "Excel Sheet (sheet:{}) has no header", e.getMessage() );
 			}
 
 		} catch( IOException e ) {
-			throw new IoException( e, "Error on reading excel file[{}].", excelFile );
+			throw new IoException( e, "Error on reading excel data from input stream." );
 		}
 
 		return result;
 
 	}
-
 
 	private NList readFrom( Workbook workbook, int sheetIndex ) {
 
@@ -181,11 +184,8 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 				String key = header.getString( idxColumn );
 
 				switch( cell.getCellType() ) {
-
 					case Cell.CELL_TYPE_FORMULA :
-
 						if( StringUtil.isNotEmpty( cell ) ) {
-
 							switch( evaluator.evaluateFormulaCell(cell) ) {
 								case Cell.CELL_TYPE_NUMERIC :
 									data.put( key, getNumericCellValue(cell) );
@@ -197,17 +197,13 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 									data.put( key, cell.getStringCellValue() );
 									break;
 							}
-
 						} else {
 							data.put( key, cell.getStringCellValue() );
 						}
-
 						break;
-
 					case Cell.CELL_TYPE_NUMERIC :
 						data.put( key, getNumericCellValue(cell) );
 						break;
-
 					case Cell.CELL_TYPE_BOOLEAN :
 						data.put( key, cell.getBooleanCellValue() );
 						break;
@@ -215,7 +211,6 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 						data.put( key, cell.getStringCellValue() );
 
 				}
-
 
 			}
 
@@ -240,11 +235,8 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		}
 
     	for( int i = 0, iCnt = row.getPhysicalNumberOfCells(); i < iCnt; i++ ) {
-
     		Cell cell = row.getCell( i );
-
     		result.put( i, cell.getStringCellValue() );
-
     	}
 
     	return result;
@@ -256,30 +248,24 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		double val = cell.getNumericCellValue();
 
 		if( isCellDateFormatted(cell) ) {
-
 			String dateFormat = cell.getCellStyle().getDataFormatString();
-
 			return new CellDateFormatter(dateFormat).format( HSSFDateUtil.getJavaDate(val) );
 
 		} else {
 
 			long fixedVal = (long) val;
-
 			if( val - fixedVal == 0 ) {
-
 				if( fixedVal < Integer.MAX_VALUE ) {
 					return (int) fixedVal;
 				} else {
 					return fixedVal;
 				}
-
 			} else {
 				return cell.getNumericCellValue();
 			}
 		}
 
     }
-
 
     private boolean isCellDateFormatted( Cell cell ) {
 

@@ -63,7 +63,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     @Override
     public int merge( Object parameter ) {
 
-        T param = new Reflector().toBeanFromBean( parameter, domainClass );
+        T param = Reflector.toBeanFrom( parameter, domainClass );
 
         if( selectMap(param).size() == 0 ) {
             return insert( parameter );

@@ -202,8 +202,8 @@ public class NListTest {
 		NList dummyData = getDummyData();
 		NLogger.debug( dummyData );
 
-        String jsonFromRaw  = new Reflector().toJson( dummyData );
-        String jsonFromList = new Reflector().toJson( dummyData.toList() );
+        String jsonFromRaw  = Reflector.toJson( dummyData );
+        String jsonFromList = Reflector.toJson( dummyData.toList() );
 
         assertEquals( jsonFromList, jsonFromRaw );
 

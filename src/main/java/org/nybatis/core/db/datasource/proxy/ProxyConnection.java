@@ -193,43 +193,43 @@ public class ProxyConnection {
 
 	private Connection invokeConnection( Connection connection ) {
 
-		return new Reflector().makeProxyBean( connection, new Class<?>[] { Connection.class }, new MethodInvocator() {
+		return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
 			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
 				resetLastUsedTime( method.getName() );
 
 				switch( method.getName() ) {
 
-	    			case "close" :
-	    				releaseResource();
+					case "close":
+						releaseResource();
 
-	    				if( runnable != null ) {
-	    					runnable.run();
-	    					return null;
-	    				}
+						if( runnable != null ) {
+							runnable.run();
+							return null;
+						}
 
-	    				break;
+						break;
 
-	    			case "createStatement"  :
-	    			case "prepareStatement" :
-	    			case "prepareCall"      :
-	    				return invokeStatement( method.invoke(connection, arguments) );
+					case "createStatement":
+					case "prepareStatement":
+					case "prepareCall":
+						return invokeStatement( method.invoke( connection, arguments ) );
 
-	    			case "releaseSavepoint" :
-	    				if( arguments != null && arguments[0] == RELEASE_RESOURCE ) {
-	    					releaseResource();
-	    					return null;
-	    				}
+					case "releaseSavepoint":
+						if( arguments != null && arguments[0] == RELEASE_RESOURCE ) {
+							releaseResource();
+							return null;
+						}
 
-	    				break;
+						break;
 
-	    		}
+				}
 
 				return method.invoke( connection, arguments );
 
 			}
 
-        });
+		} );
 
 	}
 
@@ -237,14 +237,14 @@ public class ProxyConnection {
 
 		poolStatement.add( (Statement) statement );
 
-        return new Reflector().makeProxyBean( statement, new Class<?>[] { Statement.class, PreparedStatement.class, CallableStatement.class }, new MethodInvocator() {
+        return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, new MethodInvocator() {
 			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
 				resetLastUsedTime( method.getName() );
 
 				switch( method.getName() ) {
 
-					case "getObject" :
+					case "getObject":
 
 						Object returnValue = method.invoke( statement, arguments );
 
@@ -254,9 +254,9 @@ public class ProxyConnection {
 
 						return returnValue;
 
-					case "executeQuery"     :
-					case "getGeneratedKeys" :
-					case "getResultSet"     :
+					case "executeQuery":
+					case "getGeneratedKeys":
+					case "getResultSet":
 						ResultSet rs = (ResultSet) method.invoke( statement, arguments );
 						return invokeResultSet( rs );
 
@@ -264,7 +264,7 @@ public class ProxyConnection {
 
 				return method.invoke( statement, arguments );
 			}
-		});
+		} );
 
 	}
 
@@ -272,28 +272,28 @@ public class ProxyConnection {
 
     	poolResultset.add( resultSet );
 
-    	return new Reflector().makeProxyBean( resultSet, new Class<?>[] { ResultSet.class }, new MethodInvocator() {
-    		public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+    	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, new MethodInvocator() {
+			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
 
-    			resetLastUsedTime( method.getName() );
+				resetLastUsedTime( method.getName() );
 
-    			switch( method.getName() ) {
+				switch( method.getName() ) {
 
-    				case "getObject" :
+					case "getObject":
 
-    					Object returnValue = method.invoke( resultSet, arguments );
+						Object returnValue = method.invoke( resultSet, arguments );
 
-    					if( returnValue instanceof ResultSet ) {
-    						poolResultset.add( (ResultSet) returnValue );
-    					}
+						if( returnValue instanceof ResultSet ) {
+							poolResultset.add( (ResultSet) returnValue );
+						}
 
-    					return returnValue;
+						return returnValue;
 
-    			}
+				}
 
-    			return method.invoke( resultSet, arguments );
-    		}
-    	});
+				return method.invoke( resultSet, arguments );
+			}
+		} );
 
     }
 

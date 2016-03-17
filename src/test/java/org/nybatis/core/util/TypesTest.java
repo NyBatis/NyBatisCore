@@ -10,7 +10,7 @@ import java.util.List;
  * @author nayasis@gmail.com
  * @since 2015-08-20
  */
-public class TypeUtilTest {
+public class TypesTest {
 
     @Test
     public void isArray() {
@@ -22,7 +22,7 @@ public class TypeUtilTest {
         list.add( "C" );
         list.add( "D" );
 
-        Assert.assertEquals( true, TypeUtil.isArray( list ) );
+        Assert.assertEquals( true, Types.isArray( list ) );
 
     }
 

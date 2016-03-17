@@ -20,7 +20,7 @@ public class SqlSessionMariaTest {
 
 	    StopWatcher watcher = new StopWatcher();
 
-	    new ConfigurationBuilder( Const.path.getConfigDatabase() + "/config.xml" );
+	    new ConfigurationBuilder().readFrom( Const.path.getConfigDatabase() + "/config.xml" );
 
 	    NLogger.debug( "Configuration Read End : {}ms", watcher.elapsedMiliSeconds() );
 //	    NLogger.debug( new SqlRepository().toString() );

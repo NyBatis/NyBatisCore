@@ -31,7 +31,7 @@ public class QueryParameterTest {
                 "}";
 
 
-        Map<String, Object> map = new Reflector().toMapFromJson( json );
+        Map<String, Object> map = Reflector.toMapFromJson( json );
 
         QueryParameter parameter = new QueryParameter( map );
 

@@ -619,6 +619,7 @@ public class Node {
 	}
 
 	public List<Node> getChildNodes( String xpath ) {
+		if( getChildSize() == 0 ) return new ArrayList<>();
 		return getChildNodesFrom( new DocumentHandler().getNodes( node, xpath ) );
 	}
 
