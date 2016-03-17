@@ -19,7 +19,7 @@ public class OracleStatementController {
     }
 
     private <T> T unwrapProxy( T instance ) {
-        return new Reflector().unwrapProxyBean(instance);
+        return Reflector.unwrapProxy( instance );
     }
 
 }

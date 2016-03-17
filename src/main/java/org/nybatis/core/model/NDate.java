@@ -1,13 +1,16 @@
 package org.nybatis.core.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.exception.unchecked.ParseException;
+import org.nybatis.core.reflection.mapper.NDateDeserializer;
+import org.nybatis.core.reflection.mapper.NDateSerializer;
+import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.reflection.mapper.NDateSerializer;
-import org.nybatis.core.util.StringUtil;
 
 /**
  * represents a specific instant in time with millisecond precision
@@ -15,15 +18,18 @@ import org.nybatis.core.util.StringUtil;
  * @author nayasis@gmail.com
  */
 @JsonSerialize( using = NDateSerializer.class )
+@JsonDeserialize( using = NDateDeserializer.class )
 public class NDate {
 
 	public static final NDate MIN_DATE = new NDate( "0000-01-01" );
-	public static final NDate MAX_DATE = new NDate( "9999-12-31 23:59:59.999", "YYYY-MM-DD HH:MI:SS.FFF" );
+	public static final NDate MAX_DATE = new NDate( "9999-12-31 23:59:59.999" );
 
     private Calendar currentTime = Calendar.getInstance();
 
     private static final String DEFAULT_OUTPUT_FORMAT = "YYYY-MM-DD HH:MI:SS";
-    private static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmss";
+    private static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmssSSS";
+
+    public static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     /**
      * 현재 시간을 기준으로 기본 날짜 객체를 생성한다.
@@ -127,7 +133,6 @@ public class NDate {
      * NDate date = new NDate();
      *
      * date.setDate( "2011-12-24 23:10:45", "YYYY-MM-DD HH:MI:SS" );
-     * date.setDate( "2011.12.24 23:10:45", "YYYY-MM-DD HH:MI:SS" ); -> 포맷 중간의 구분자가 달라도 처리 가능
      * </pre>
      *
      * @param date 날짜
@@ -141,14 +146,17 @@ public class NDate {
             return;
         }
 
-        String pattern = getDefaultFormat( format, true );
+        boolean isNullFormat = Validator.isEmpty( format );
 
-        String numString = StringUtil.extractNumber( date );
+        String pattern = getDefaultFormat( format, isNullFormat );
 
-        int maxLength = Math.min( pattern.length(), numString.length() );
+        String numString = isNullFormat ? StringUtil.extractNumber( date ) : date;
 
-        pattern   = pattern.substring( 0, maxLength );
-        numString = numString.substring( 0, maxLength );
+        if( isNullFormat ) {
+            int maxLength = Math.min( pattern.length(), numString.length() );
+            pattern   = pattern.substring( 0, maxLength );
+            numString = numString.substring( 0, maxLength );
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat( pattern );
 
@@ -249,11 +257,11 @@ public class NDate {
         if( format == null || format.length() == 0 ) return DEFAULT_INPUT_FORMAT;
 
         // UI 프레임워크와 형식을 일치시키기 위해 포맷 변형
-        format = format.toUpperCase()
+        format = format
         	.replaceAll( "YYYY", "yyyy" )
-            .replaceAll( "DD",   "dd"   )
-            .replaceAll( "MI",   "mm"   )
-            .replaceAll( "SS",   "ss"   )
+            .replaceAll( "([^D])DD([^D]|$)", "$1dd$2" )
+            .replaceAll( "MI",     "mm"   )
+            .replaceAll( "([^S])SS([^S]|$)", "$1ss$2" )
             .replaceAll( "F",    "S"    );
 
         if( stripYn ) format = format.replaceAll( "[^y|M|d|H|m|s|S]", "" );
@@ -585,20 +593,19 @@ public class NDate {
         return new NDate( toDate() );
     }
 
-    /**
-     * 날짜가 같은지 여부를 확인한다.
-     *
-     * @param date 검사할 날짜객체
-     * @return 동일여부
-     */
-    public boolean equals( NDate date ) {
+    @Override
+    public boolean equals( Object object ) {
 
-        if ( this == date ) return true;
+        if( object == null ) return false;
+        if( this == object ) return true;
 
-        if ( date instanceof NDate ) {
-
-            if( date.toDate().equals(toDate()) ) return true;
-
+        if( object instanceof NDate ) {
+            NDate nDate = (NDate) object;
+            return currentTime.equals( nDate.currentTime );
+        } else if( object instanceof Date ) {
+            return toDate().equals( object );
+        } else if( object instanceof Calendar ) {
+            return currentTime.equals( object );
         }
 
         return false;

@@ -12,33 +12,33 @@ import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings( "rawtypes" )
 public class ReflectorTest {
 
-	Reflector reflector = new Reflector();
-
 	@Test
 	public void simpleTest() {
 
-		NLogger.debug( reflector.toJson( makeTestPerson(), true ) );
+		NLogger.debug( Reflector.toJson( makeTestPerson(), true ) );
 
-		String json = reflector.toJson( makeTestPerson(), false );
+		String json = Reflector.toJson( makeTestPerson(), false );
 
 		assertEquals( "{\"firstName\":\"Hwasu\",\"lastName\":\"Jung\",\"phone\":{\"code\":2,\"number\":\"322-3493\"},\"fax\":{\"code\":9999,\"number\":\"00100\"},\"phoneList\":[]}", json );
 
-        Map map1 = reflector.toMapFromJson( json );
+        Map map1 = Reflector.toMapFromJson( json );
 
 		NLogger.debug( map1 );
 
-		Person p1 = reflector.toBeanFromJson( json, Person.class );
+		Person p1 = Reflector.toBeanFrom( json, Person.class );
 
-		NLogger.debug( reflector.getFieldReport( p1 ) );
+		NLogger.debug( Reflector.toString( p1 ) );
 
-		Person p2 = reflector.toBeanFromMap( map1, Person.class );
-		NLogger.debug( reflector.getFieldReport( p2 ) );
+		Person p2 = Reflector.toBeanFrom( map1, Person.class );
+		NLogger.debug( Reflector.toString( p2 ) );
 
-		Map map2 = reflector.toMapFromBean( p2 );
+		Map map2 = Reflector.toMapFrom( p2 );
 
 		NLogger.debug( map2 );
 
@@ -86,7 +86,7 @@ public class ReflectorTest {
 
 		NLogger.debug( jsonText );
 
-		Map<String, Object> map = new Reflector().toMapFromJson(jsonText);
+		Map<String, Object> map = Reflector.toMapFromJson( jsonText );
 
 		NLogger.debug( map      );
 
@@ -97,9 +97,9 @@ public class ReflectorTest {
 
 		FromVo fromVo = new FromVo( "Hwasu", 39, "1977-01-22" );
 
-		NLogger.debug( "fromVo : {}", reflector.toJson( fromVo ) );
+		NLogger.debug( "fromVo : {}", Reflector.toJson( fromVo ) );
 
-		Map map = reflector.toMapFromBean( fromVo );
+		Map map = Reflector.toMapFrom( fromVo );
 
 		NLogger.debug( new NMap( map ).toDebugString() );
 
@@ -111,7 +111,7 @@ public class ReflectorTest {
 
 		assertEquals( expectedMap, map, "convert bean to map" );
 
-		ToVo bean = reflector.toBeanFromMap( map, ToVo.class );
+		ToVo bean = Reflector.toBeanFrom( map, ToVo.class );
 
 		NLogger.debug( bean );
 
@@ -123,7 +123,7 @@ public class ReflectorTest {
 	}
 
 	@Test
-	public void mergeTest() {
+	public void mergeMapTest() {
 
 		NMap fromNMap = new NMap();
 
@@ -134,9 +134,13 @@ public class ReflectorTest {
 
 		NLogger.debug( "before\n{}", fromNMap );
 
-		reflector.merge( fromNMap, toVo );
+		Reflector.merge( fromNMap, toVo );
 
 		NLogger.debug( "after\n{}", toVo );
+
+		assertEquals( toVo.age, 40 );
+		assertEquals( toVo.name, "hwasu" );
+		assertNotNull( toVo.birth );
 
 	}
 
@@ -145,13 +149,65 @@ public class ReflectorTest {
 
 		List array = Arrays.asList( "A", "B", "C", "D", "E", 99 );
 
-		String json = reflector.toJson( array );
+		String json = Reflector.toJson( array );
 
 		assertEquals( json, "[\"A\",\"B\",\"C\",\"D\",\"E\",99]" );
 
-		List arrayFromJson = reflector.toListFromJson( json );
+		List arrayFromJson = Reflector.toListFromJson( json );
 
 		assertEquals( arrayFromJson, array );
+
+	}
+
+	@Test
+	public void copyTest() {
+
+		Person person = new Person();
+
+		person.firstName = "Hwasu";
+		person.lastName  = "Jung";
+
+		person.phone = new PhoneNumber( 0, "Phone-111-222-333" );
+		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
+
+		Person clone = new Person();
+		Reflector.copy( person, clone );
+
+		System.out.println( clone );
+
+		PersonAnother another = new PersonAnother();
+
+		another.prefix = "testPrefix";
+
+		Reflector.copy( person, another );
+
+		System.out.println( another );
+
+	}
+
+	@Test
+	public void mergeBeanTest() {
+
+		Person person = new Person();
+
+		person.firstName = "Hwasu";
+		person.lastName  = "Jung";
+
+		person.phone = new PhoneNumber( 0, "Phone-111-222-333" );
+		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
+
+		PersonAnother another = new PersonAnother();
+
+		another.prefix = "testPrefix";
+
+		Reflector.merge( person, another );
+
+		System.out.println( another );
+
+		assertEquals( another.lastName, "Jung" );
+		assertEquals( another.prefix, "testPrefix" );
+		assertEquals( another.lastName, "Jung" );
+		assertTrue( another.fax.equals( person.fax ) );
 
 	}
 

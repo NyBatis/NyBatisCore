@@ -1,6 +1,9 @@
 package org.nybatis.core.file;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.List;
 import java.util.Map;
 
 import org.nybatis.core.exception.unchecked.IoException;
@@ -61,7 +64,7 @@ public class ExcelUtil {
 		}
 
 		if( excelHandler == null ) {
-			throw new IoException( "There is no excel libaray like ApachePoi or Jxl." );
+			throw new NoClassDefFoundError( "There is no excel libaray like ApachePoi or Jxl." );
 		}
 
 		return excelHandler;
@@ -72,11 +75,12 @@ public class ExcelUtil {
 	 * Write data to excel file
 	 *
 	 * @param excelFile excel file to write data
-	 * @param data      key is sheetName and value is grid data.
+	 * @param sheets    key is sheetName and value is grid data.<br>
+	 *                  value type is allowed only List or NList.
 	 * @throws IoException file I/O exception
 	 */
-	public static void writeTo( File excelFile, Map<String, NList> worksheets ) throws IoException {
-		getHandler().writeTo( excelFile, worksheets );
+	public static void writeTo( File excelFile, Map<String, ?> sheets ) throws IoException {
+		getHandler().writeTo( excelFile, sheets );
 	}
 
 	/**
@@ -84,33 +88,57 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
-	 * @param worksheet		grid data
+	 * @param sheet			grid data
 	 * @throws IoException	File I/O Exception
 	 */
-	public static void writeTo( File excelFile, String sheetName, NList worksheet ) throws IoException {
-		getHandler().writeTo( excelFile, sheetName, worksheet );
+	public static void writeTo( File excelFile, String sheetName, NList sheet ) throws IoException {
+		getHandler().writeTo( excelFile, sheetName, sheet );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param excelFile		excel file to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param sheet			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public static void writeTo( File excelFile, String sheetName, List<?> sheet ) throws IoException {
+		getHandler().writeTo( excelFile, sheetName, sheet );
 	}
 
 	/**
 	 * Write data to excel file in sheet named 'Sheet1'
 	 *
 	 * @param excelFile excel file to write
-	 * @param worksheet grid data
+	 * @param sheet grid data
 	 * @throws IoException file I/O exception
 	 */
-	public static void writeTo( File excelFile, NList worksheet ) throws IoException {
-		getHandler().writeTo( excelFile, worksheet );
+	public static void writeTo( File excelFile, NList sheet ) throws IoException {
+		getHandler().writeTo( excelFile, sheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param excelFile excel file to write
+	 * @param sheet grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( File excelFile, List sheet ) throws IoException {
+		getHandler().writeTo( excelFile, sheet );
 	}
 
 	/**
 	 * Write data to excel file
 	 *
-	 * @param excelFile  excel file to write data
-	 * @param worksheets key is sheetName and value is grid data.
+	 * @param excelFile excel file to write data
+	 * @param sheets	key is sheetName and value is grid data.<br>
+	 *                  value type is allowed only List or NList.
 	 * @throws IoException file I/O exception
 	 */
-	public static void writeTo( String excelFile, Map<String, NList> worksheets ) throws IoException {
-	    writeTo( new File( excelFile ), worksheets );
+	public static void writeTo( String excelFile, Map<String, ?> sheets ) throws IoException {
+	    writeTo( new File( excelFile ), sheets );
 	}
 
 	/**
@@ -118,22 +146,45 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
-	 * @param worksheet		grid data
+	 * @param sheet			grid data
 	 * @throws IoException	File I/O Exception
 	 */
-	public static void writeTo( String excelFile, String sheetName, NList worksheet ) throws IoException {
-		writeTo( new File( excelFile ), sheetName, worksheet );
+	public static void writeTo( String excelFile, String sheetName, NList sheet ) throws IoException {
+		writeTo( new File( excelFile ), sheetName, sheet );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param excelFile		excel file to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param sheet			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public static void writeTo( String excelFile, String sheetName, List sheet ) throws IoException {
+		writeTo( new File( excelFile ), sheetName, sheet );
 	}
 
 	/**
 	 * Write data to excel file in sheet named 'Sheet1'
 	 *
 	 * @param excelFile excel file to write
-	 * @param worksheet grid data
+	 * @param sheet grid data
 	 * @throws IoException file I/O exception
 	 */
-	public static void writeTo( String excelFile, NList worksheet ) throws IoException {
-		writeTo( new File( excelFile ), worksheet );
+	public static void writeTo( String excelFile, NList sheet ) throws IoException {
+		writeTo( new File( excelFile ), sheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param excelFile excel file to write
+	 * @param sheet grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( String excelFile, List sheet ) throws IoException {
+		writeTo( new File( excelFile ), sheet );
 	}
 
 	/**
@@ -149,6 +200,19 @@ public class ExcelUtil {
     }
 
 	/**
+	 * Read data from excel file
+	 *
+	 * @param excelFile		excel file to read
+	 * @param sheetName		sheet name of excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public static <T> List<T> readFrom( File excelFile, String sheetName, Class<T> toClass ) throws IoException {
+		return getHandler().readFrom( excelFile, sheetName, toClass );
+	}
+
+	/**
 	 * Read all sheets from excel file
 	 *
 	 * @param excelFile excel file to read.
@@ -160,6 +224,18 @@ public class ExcelUtil {
     }
 
 	/**
+	 * Read data from excel file
+	 *
+	 * @param excelFile		excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public static <T> Map<String, List<T>> readFrom( File excelFile, Class<T> toClass ) throws IoException {
+		return getHandler().readFrom( excelFile, toClass );
+	}
+
+	/**
 	 * Read first sheet from excel file
 	 *
 	 * @param excelFile excel file to read
@@ -168,6 +244,18 @@ public class ExcelUtil {
 	 */
 	public static NList readFirstSheetFrom( File excelFile ) throws IoException {
 		return getHandler().readFirstSheetFrom( excelFile );
+	}
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param excelFile		excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public static <T> List<T> readFirstSheetFrom( File excelFile, Class<T> toClass ) throws IoException {
+		return getHandler().readFirstSheetFrom( excelFile, toClass );
 	}
 
 	/**
@@ -183,6 +271,19 @@ public class ExcelUtil {
     }
 
 	/**
+	 * Read sheet from excel file
+	 *
+	 * @param excelFile		excel file to read
+	 * @param sheetName		sheet name of excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFrom( String excelFile, String sheetName, Class<T> toClass ) throws IoException {
+		return readFrom( new File(excelFile), sheetName, toClass );
+	}
+
+	/**
 	 * Read all sheets from excel file
 	 *
 	 * @param excelFile excel file to read.
@@ -194,6 +295,18 @@ public class ExcelUtil {
     }
 
 	/**
+	 * Read all sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> Map<String, List<T>> readFrom( String excelFile, Class<T> toClass ) throws IoException {
+		return readFrom( new File(excelFile), toClass );
+	}
+
+	/**
 	 * Read first sheet from excel file
 	 *
 	 * @param excelFile excel file to read
@@ -202,6 +315,150 @@ public class ExcelUtil {
 	 */
 	public static NList readFirstSheetFrom( String excelFile ) throws IoException {
 		return readFirstSheetFrom( new File( excelFile ) );
+	}
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param excelFile 	excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFirstSheetFrom( String excelFile, Class<T> toClass ) throws IoException {
+		return readFirstSheetFrom( new File(excelFile), toClass );
+	}
+
+
+	// -----
+
+	/**
+	 * Write data to excel file
+	 *
+	 * @param outputStream output stream to write data
+	 * @param sheets      	key is sheetName and value is grid data.<br>
+	 *                      value type is allowed only List or NList.
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( OutputStream outputStream, Map<String, ?> sheets ) throws IoException {
+		getHandler().writeTo( outputStream, sheets );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param outputStream 	output stream to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param sheet			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public static void writeTo( OutputStream outputStream, String sheetName, NList sheet ) throws IoException {
+		getHandler().writeTo( outputStream, sheetName, sheet );
+	}
+
+	/**
+	 * Write data to excelFile
+	 *
+	 * @param outputStream 	output stream to write data
+	 * @param sheetName		sheet name of excel file to write
+	 * @param sheet			grid data
+	 * @throws IoException	File I/O Exception
+	 */
+	public static void writeTo( OutputStream outputStream, String sheetName, List<?> sheet ) throws IoException {
+		getHandler().writeTo( outputStream, sheetName, sheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param sheet		grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( OutputStream outputStream, NList sheet ) throws IoException {
+		getHandler().writeTo( outputStream, sheet );
+	}
+
+	/**
+	 * Write data to excel file in sheet named 'Sheet1'
+	 *
+	 * @param outputStream	output stream to write data
+	 * @param sheet			grid data
+	 * @throws IoException file I/O exception
+	 */
+	public static void writeTo( OutputStream outputStream, List<?> sheet ) throws IoException {
+		getHandler().writeTo( outputStream, sheet );
+	}
+
+	/**
+	 * Read data from excel file
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param sheetName		sheet name of excel file to read
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public static NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+		return getHandler().readFrom( inputStream, sheetName );
+	}
+
+	/**
+	 * Read sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param sheetName		sheet name of excel file to read
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFrom( InputStream inputStream, String sheetName, Class<T> toClass ) throws IoException {
+		return getHandler().readFrom( inputStream, sheetName, toClass );
+	}
+
+	/**
+	 * Read all sheets from excel file
+	 *
+	 * @param inputStream	input stream to read data
+	 * @return key is sheetName and value is grid data.
+	 * @throws IoException file I/O exception
+	 */
+	public static Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+		return getHandler().readFrom( inputStream );
+	}
+
+	/**
+	 * Read all sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> Map<String, List<T>> readFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+		return getHandler().readFrom( inputStream, toClass );
+	}
+
+	/**
+	 * Read first sheet from excel file
+	 *
+	 * @param inputStream	input stream to read data
+	 * @return grid data from first sheet
+	 * @throws IoException file I/O exception
+	 */
+	public static NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+		return getHandler().readFirstSheetFrom( inputStream );
+	}
+
+	/**
+	 * Read sheet from input stream
+	 *
+	 * @param inputStream	input stream to read data
+	 * @param toClass		generic type of list's class
+	 * @return grid data
+	 * @throws IoException  File I/O Exception
+	 */
+	public <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+		return getHandler().readFirstSheetFrom( inputStream, toClass );
 	}
 
 }

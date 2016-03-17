@@ -96,6 +96,11 @@ OR
       <artifactId>json-path</artifactId>
       <version>2.1.0</version>
     </dependency>
+    <!--<dependency>-->
+      <!--<groupId>com.monitorjbl</groupId>-->
+      <!--<artifactId>json-view</artifactId>-->
+      <!--<version>0.10</version>-->
+    <!--</dependency>-->
 
     <!-- Zip Handler -->
     <dependency>

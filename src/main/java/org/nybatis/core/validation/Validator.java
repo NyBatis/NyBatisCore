@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.model.NDate;
+import org.nybatis.core.util.Types;
 
 /**
  * 값의 정합성을 확인하는 클래스
@@ -24,7 +25,7 @@ public class Validator {
      * @return 날짜 정상여부
      */
     public static boolean isDate( String value ) {
-        return isDate( value, "YYYY-MM-DD" );
+        return isDate( value, null );
     }
 
     /**
@@ -37,11 +38,8 @@ public class Validator {
     public static boolean isDate( String value, String format ) {
 
         try {
-
-            NDate date = new NDate( value, format );
-
-            return value.equalsIgnoreCase( date.toString(format) );
-
+            new NDate( value, format );
+            return true;
         } catch ( ParseException e ) {
             return false;
         }
@@ -58,31 +56,43 @@ public class Validator {
         return value == null;
     }
 
-    /**
-     * 문자열에 값이 없는지 여부를 확인한다.
-     *
-     * @param value 검사할 문자열
-     * @return 검사결과
-     */
-    public static boolean isEmpty( String value ) {
-        return value == null || value.length() == 0;
+    public static boolean isNotNull( Object value ) {
+        return ! isNull( value );
     }
 
     public static boolean isBlank( String value ) {
     	return value == null || value.length() == 0 || value.trim().length() == 0;
     }
 
-	public static boolean isEmpty( Collection<?> collection ) {
-		return ( collection == null || collection.isEmpty() );
-	}
+    public static boolean isNotBlank( String value ) {
+        return ! isBlank( value );
+    }
 
-	public static boolean isEmpty( Map<?, ?> map ) {
-		return ( map == null || map.isEmpty() );
-	}
+    public static boolean isEmpty( Object value ) {
 
-	public static boolean isEmpty( Object[] array ) {
-		return ( array == null || array.length == 0 );
-	}
+        if( value == null ) return true;
+
+        if( value instanceof String ) {
+            return ( (String) value ).length() == 0;
+        } else if( value instanceof StringBuffer ) {
+            return ( (StringBuffer) value ).length() == 0;
+        } else if( value instanceof StringBuilder ) {
+            return ( (StringBuilder) value ).length() == 0;
+        } else if( value instanceof Map ) {
+            return ( (Map) value ).isEmpty();
+        } else if( value instanceof Collection ) {
+            return ( (Collection) value ).isEmpty();
+        } else if( Types.isArray( value ) ) {
+            return ( (Object[]) value).length == 0;
+        }
+
+        return false;
+
+    }
+
+    public static boolean isNotEmpty( Object value ) {
+        return ! isEmpty( value );
+    }
 
     /**
      * 정규식을 이용해 문자열을 검사한다.
@@ -115,7 +125,7 @@ public class Validator {
      * @param pattern 정규식
      * @return 패턴 존재여부
      */
-    public static boolean isFinded( String value, String pattern ) {
+    public static boolean isFound( String value, String pattern ) {
 
     	if( value == null || pattern == null ) return false;
 
@@ -138,7 +148,7 @@ public class Validator {
      *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
      * @return 패턴 존재여부
      */
-    public static boolean isFinded( String value, String pattern, int flags ) {
+    public static boolean isFound( String value, String pattern, int flags ) {
 
     	if( value == null || pattern == null ) return false;
 
@@ -330,24 +340,24 @@ public class Validator {
     }
 
     /**
-     * Let you replace null with another value.
+     * Let you replace null (or empty)  with another value.
      *
-     * if value is null, examine null value.
-     * if nullValue is null, examine next another nullValue.
-     * if it is not null in another nullValues, it returns as result.
+     * if value is null or empty, examine replaceValue.
+     * if replaceValue is null, examine next anotherReplaceValue.
+     * if anotherReplaceValue is not null, it is returned as result.
      *
-     * @param value             value to examine not null.
-     * @param nullValue         other value to examine not null.
-     * @param anotherNullValue  another values to examine not null.
+     * @param value                value to examine not null or not empty.
+     * @param replaceValue         other value to examine not null.
+     * @param anotherReplaceValue  another values to examine not null.
      * @return not null value from begin with.
      */
-    public static <T> T nvl( T value, T nullValue, T... anotherNullValue ) {
+    public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {
 
-        if( value     != null ) return value;
-        if( nullValue != null ) return nullValue;
+        if( isNotEmpty(value) )    return value;
+        if( isNotNull(replaceValue) ) return replaceValue;
 
-        for( T val : anotherNullValue ) {
-            if( val != null ) return val;
+        for( T val : anotherReplaceValue ) {
+            if( isNotNull( val ) ) return val;
         }
 
         return null;

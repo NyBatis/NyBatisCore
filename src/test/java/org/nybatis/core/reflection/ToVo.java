@@ -20,7 +20,7 @@ public class ToVo {
 	}
 
 	public String toString() {
-		return new Reflector().getFieldReport( this );
+		return Reflector.toString( this );
 	}
 
 	public void setAge() {

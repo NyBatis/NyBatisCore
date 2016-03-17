@@ -67,9 +67,9 @@ public class NTreeTest {
         
         node3.append( "7" );
         
-        node.mergeTree( node1 );
-        node.mergeTree( node2 );
-        node.mergeTree( node3 );
+        node.connect( node1 );
+        node.connect( node2 );
+        node.connect( node3 );
         
         System.out.println( node );
         
@@ -89,7 +89,10 @@ public class NTreeTest {
 
         for( NTree<String> reversedNode : dummyNode.reverse() ) {
 
+            System.out.println( "--------------------------" );
             System.out.println( reversedNode );
+            System.out.println( "--------------------------" );
+            System.out.println( reversedNode.getLeafNodes().get( 0 ) );
 
         }
 

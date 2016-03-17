@@ -17,7 +17,7 @@ public class SampleVo {
     public List<SampleVo> children = new ArrayList<>();
 
 //    public String toString() {
-//        return new Reflector().getFieldReport( this );
+//        return Reflector.toString( this );
 //    }
 
 }

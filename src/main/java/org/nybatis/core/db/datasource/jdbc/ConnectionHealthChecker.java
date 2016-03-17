@@ -30,7 +30,7 @@ public class ConnectionHealthChecker {
 	public void run() {
 		if( datasourceProperties.isPingEnable() ) {
 			healthChecker.start();
-			NLogger.debug( "Connection HealthChecker is started." );
+			NLogger.trace( "Connection HealthChecker is started." );
 		}
 	}
 

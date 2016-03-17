@@ -31,7 +31,7 @@ public class DatasourceBuilder {
 			new DatasourceManager().setDefaultDatasourceId( environmentId );
 		}
 
-		NLogger.debug( "configurate datasource (id:{})", environmentId );
+		NLogger.trace( "configurate datasource (id:{})", environmentId );
 
 		setDatasource( environment );
 		setDatasourceJdbc( environment );

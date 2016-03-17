@@ -62,12 +62,12 @@ public class NMap extends LinkedHashMap {
 	}
 
     public NMap fromJson( String json ) {
-		super.putAll( new Reflector().toMapFromJson(json) );
+		super.putAll( Reflector.toMapFromJson(json) );
 	    return this;
 	}
 
     public NMap fromBean( Object bean ) {
-		super.putAll( new Reflector().toMapFromBean( bean ) );
+		super.putAll( Reflector.toMapFrom( bean ) );
 	    return this;
 	}
 
@@ -77,7 +77,7 @@ public class NMap extends LinkedHashMap {
 	 * @return Json string
 	 */
 	public String toJson( boolean prettyPrint ) {
-		return new Reflector().toJson( this, prettyPrint );
+		return Reflector.toJson( this, prettyPrint );
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	public <T> T toBean( Class<T> klass ) {
-		return new Reflector().toBeanFromMap( this, klass );
+		return Reflector.toBeanFrom( this, klass );
 	}
 
 	private PrimitiveConverter getConverter( Object key ) {
@@ -274,7 +274,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	public NMap clone() {
-		return new Reflector().clone( this );
+		return Reflector.clone( this );
 	}
 
 	public String toDebugString() {
@@ -311,7 +311,7 @@ public class NMap extends LinkedHashMap {
 	 */
 	@SuppressWarnings( { "rawtypes", "unchecked" } )
     public int getValueHash() {
-		return new Reflector().toJson(this, false, true).hashCode();
+		return Reflector.toJson(this, false, true, false).hashCode();
 	}
 
 
