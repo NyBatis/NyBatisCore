@@ -13,24 +13,30 @@ import org.nybatis.core.xml.node.Node;
 
 public class CacheBuilder {
 
-	public void setCache( Node cache, PropertiesBuilder propertiesBuilder ) {
+	private PropertyResolver prop = new PropertyResolver();
 
-		PropertiesBuilder prop = propertiesBuilder;
+	public CacheBuilder() {}
+
+	public CacheBuilder( PropertyResolver propertyResolver ) {
+		prop = propertyResolver;
+	}
+
+	public void setCache( Node cache ) {
 
 		String cacheId = prop.getAttrVal( cache, "id" );
 
 		if( StringUtil.isEmpty( cacheId ) ) {
-			NLogger.warn( "Cache element of database configuration has missed id.\n\n{}", cache );
+			NLogger.warn( "Cache element of database configuration has no id.\n\n{}", cache );
 			return;
 		}
 
 		// <cache id="fifo" class="nayasis.common.cache.fifoCache" size="512" flush="60_000">
 		CacheManager.registerCacheModel(
-				prop.getAttrVal(cache, "id"    ),
-				prop.getAttrVal(cache, "class" ),
-				prop.getAttrVal(cache, "size"  ),
-				prop.getAttrVal(cache, "flush" )
-			);
+			prop.getAttrVal(cache, "id"    ),
+			prop.getAttrVal(cache, "class" ),
+			prop.getAttrVal(cache, "size"  ),
+			prop.getAttrVal(cache, "flush" )
+		);
 
 	}
 
@@ -47,7 +53,7 @@ public class CacheBuilder {
 			cacheId,
 			klass.getName(),
 			String.valueOf( Const.db.DEFAULT_CACHE_CAPACITY    ),
-			String.valueOf( Const.db.DEFAULT_CACHE_FLUSH_CYCLE )
+			String.valueOf( Const.db.DEFAULT_CACHE_FLUSH_CYCLE_SECONDS )
 		);
 
 	}

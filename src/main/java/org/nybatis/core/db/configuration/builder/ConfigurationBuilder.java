@@ -54,20 +54,20 @@ public class ConfigurationBuilder {
 
 				Node root = xmlReader.getRoot();
 
-				PropertiesBuilder propertiesBuilder = new PropertiesBuilder( root.getChildElement("properties") );
+				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
 
-				CacheBuilder cacheBuilder = new CacheBuilder();
+				CacheBuilder cacheBuilder = new CacheBuilder( propertyResolver );
 
 				for( Node cache : root.getChildElements("cache") ) {
-					cacheBuilder.setCache( cache, propertiesBuilder );
+					cacheBuilder.setCache( cache );
 				}
 
 				cacheBuilder.setDefaultCache();
 
 				for( Node environment : root.getChildElements("environment") ) {
-					new DatasourceBuilder( environment, propertiesBuilder );
+					new EnvironmentBuilder( environment, propertyResolver );
 					try {
-						new SqlBuilder( environment, propertiesBuilder, FileUtil.getDirectory(file) );
+						new SqlBuilder( propertyResolver, FileUtil.getDirectory(file) ).setSql( environment );
 					} catch (FileNotFoundException e) {}
 				}
 

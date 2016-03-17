@@ -156,7 +156,7 @@ public class SqlProperties {
 	 * @return cache flush cycle (unit:seconds)
 	 */
 	public int getCacheFlushCycle() {
-		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE );
+		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE_SECONDS );
 	}
 
 	public boolean hasSpecificCacheCycle() {

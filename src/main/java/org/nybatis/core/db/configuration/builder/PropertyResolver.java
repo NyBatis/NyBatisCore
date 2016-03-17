@@ -9,11 +9,13 @@ import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
 
-public class PropertiesBuilder {
+public class PropertyResolver {
 
 	private NProperties properties = new NProperties();
 
-	public PropertiesBuilder( Node properties ) {
+	public PropertyResolver() {}
+
+	public PropertyResolver( Node properties ) {
 		setProperties(properties);
 	}
 
