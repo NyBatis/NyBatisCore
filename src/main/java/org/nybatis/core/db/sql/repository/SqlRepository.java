@@ -41,13 +41,28 @@ public class SqlRepository {
 		if( isExist( sqlId ) ) {
 
 			String environmentId = sqlNode.getEnvironmentId();
-			get( sqlId ).addEnvironmentId( environmentId );
 
-			if( xmlFile == null ) {
-				NLogger.trace( "Sql({}) has multiple environment({})", sqlId, environmentId );
+			// if sql id is duplicated, skip later one.
+			if( get(sqlId).containsEnvironmentId( environmentId ) ) {
+
+				if( xmlFile == null ) {
+					NLogger.warn( "Sql(id:{}) is duplicated. later sql will be ignored.\n\t\t>> {}", sqlId, sqlNode.getSqlSkeleton() );
+				} else {
+					NLogger.warn( "Sql(id:{}, file:{}) is duplicated.\n{}", sqlId, xmlFile.getPath(), sqlNode.getSqlSkeleton() );
+				}
+
 			} else {
-				NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile.getPath() );
+
+				get( sqlId ).addEnvironmentId( environmentId );
+
+				if( xmlFile == null ) {
+					NLogger.trace( "Sql({}) has multiple environment({})", sqlId, environmentId );
+				} else {
+					NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile.getPath() );
+				}
+
 			}
+
 
 		} else {
 			sqlRepository.put( sqlId, sqlNode );
@@ -86,7 +101,7 @@ public class SqlRepository {
 
 	}
 
-	public void readFrom( Path path, String datasourceId ) {
+	public void readFrom( Path path, String environmentId ) {
 
 		if( path == null ) return;
 
@@ -95,27 +110,27 @@ public class SqlRepository {
 		if( ! file.exists() ) return;
 
 		if( file.isDirectory() ) {
-			readFromDirectory( file, datasourceId );
+			readFromDirectory( file, environmentId );
 
 		} else if( file.isFile() ) {
-			readFromFile( file, datasourceId );
+			readFromFile( file, environmentId );
 		}
 
 	}
 
-	private void readFromDirectory( File directory, String datasourceId ) {
+	private void readFromDirectory( File directory, String environmentId ) {
 
 		List<Path> pathList = FileUtil.getList( directory.getAbsolutePath(), true, false, -1, "**.xml" );
 
 		for( Path path : pathList ) {
-			readFromFile( path.toFile(), datasourceId );
+			readFromFile( path.toFile(), environmentId );
 		}
 
 	}
 
-	private void readFromFile( File file, String datasourceId ) {
-		NLogger.trace( "configurate sql (datasourceId: {}, sqlFile: {})", datasourceId, file );
-		new SqlFileReader( file, datasourceId ).read();
+	private void readFromFile( File file, String environmentId ) {
+		NLogger.trace( "configurate sql (environmentId: {}, sqlFile: {})", environmentId, file );
+		new SqlFileReader( file, environmentId ).read();
 	}
 
 	public String toString() {

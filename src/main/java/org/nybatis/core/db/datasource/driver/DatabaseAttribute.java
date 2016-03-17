@@ -16,7 +16,7 @@ public class DatabaseAttribute {
     public static final String DATABASE_UNKOWN  = "unknown";
 
     private String  database                   = DATABASE_UNKOWN;
-    private String patternToMatchClassName     = "";
+    private String  patternToMatchClassName    = "";
 
     private boolean enableToGetParameterType   = true;
     private boolean enableToGetBLob            = true;
@@ -143,8 +143,8 @@ public class DatabaseAttribute {
                 " - name : [%s]\n" +
                 " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
-                " - pre : [%s]\n" +
-                " - post: [%s]"
+                " - pre :\n%s" +
+                " - post:\n%s\n"
                 ,
                 getDatabase(),
                 patternToMatchClassName,

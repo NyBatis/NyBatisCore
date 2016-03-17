@@ -12,16 +12,15 @@ import java.util.List;
 
 public class SqlBuilder {
 
-	private PropertiesBuilder prop;
-	private String            basePath;
+	private PropertyResolver prop = new PropertyResolver();
+	private String           basePath;
 
-	public SqlBuilder( Node environment, PropertiesBuilder propertiesBuilder, File basePath ) {
-		this.prop     = propertiesBuilder;
+	public SqlBuilder( PropertyResolver propertyResolver, File basePath ) {
+		this.prop     = propertyResolver;
 		this.basePath = basePath.getAbsolutePath();
-		setSql( environment );
 	}
 
-	private void setSql( Node environment) {
+	public void setSql( Node environment ) {
 
 		String environmentId = environment.getAttrIgnoreCase( "id" );
 

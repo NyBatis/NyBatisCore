@@ -105,7 +105,7 @@ public class JdbcDataSource implements DataSource {
 
 		proxyConnection = connectionPoolActive.push( proxyConnection );
 
-		NLogger.trace( ">> Get connection" );
+		NLogger.trace( "Get connection" );
 		logPoolStatus();
 
 		return proxyConnection.getConnection();
@@ -120,7 +120,7 @@ public class JdbcDataSource implements DataSource {
 		int idleCount   = connectionPoolIdle.size();
 		int total       = activeCount + idleCount;
 
-		NLogger.trace( ">> connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
+		NLogger.trace( "connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
 
 	}
 
@@ -175,7 +175,7 @@ public class JdbcDataSource implements DataSource {
 
 		}
 
-		NLogger.trace( ">> Release connection" );
+		NLogger.trace( "Release connection" );
 		logPoolStatus();
 
     }

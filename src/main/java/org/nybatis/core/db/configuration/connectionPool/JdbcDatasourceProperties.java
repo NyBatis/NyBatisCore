@@ -7,8 +7,8 @@ public class JdbcDatasourceProperties {
 	private boolean isPooled    = true;
 
 	private int     poolMin     = 1;
-	private int     poolMax     = 1;
-	private int     poolStep    = 1;
+	private int     poolMax     = 20;
+	private int     poolStep    = 5;
 
 	private boolean pingEnable  = false;
 	private String  pingQuery   = null;
