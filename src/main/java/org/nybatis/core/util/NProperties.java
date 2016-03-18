@@ -26,36 +26,28 @@ public class NProperties {
 
     public NProperties readFrom( File file ) throws IoException {
 
-		FileUtil.readFrom( file, new WorkerReadLine() {
+		FileUtil.readFrom( file, readLine -> {
 
-			@Override
-			public void execute( String readLine ) {
+            readLine = readLine.trim();
 
-				readLine = readLine.trim();
+            if( readLine.startsWith( "#" ) ) return;
 
-				if( readLine.startsWith( "#" ) ) return;
+            List<String> list = StringUtil.split( readLine, "=" );
 
-				List<String> list = StringUtil.split( readLine, "=" );
+            if( list.size() == 0 ) return;
 
-				if( list.size() == 0 ) return;
+            String key   = list.get( 0 ).trim();
+            String value = "";
 
-				String key = list.get( 0 ).trim();
-				String value = "";
+            if( list.size() > 1 ) {
+                list.remove( 0 );
+                value = StringUtil.join( list, "" ).trim();
+                value = StringUtil.unescape( value );
+            }
 
-				if( list.size() > 1 ) {
+            properties.put( key, value );
 
-					list.remove( 0 );
-
-					value = StringUtil.join( list, "" ).trim();
-
-					value = StringUtil.unescape( value );
-
-				}
-
-				properties.put( key, value );
-
-			}
-		} );
+        } );
 
 		return this;
 
