@@ -3,6 +3,7 @@ package org.nybatis.core.file;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,8 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.file.handler.implement.ExcelHandlerApachePoi;
 import org.nybatis.core.file.handler.implement.ExcelHandlerJxl;
+import org.nybatis.core.util.Types;
+import org.nybatis.core.validation.Validator;
 
 /**
  * Excel Utility to read or write
@@ -457,8 +460,29 @@ public class ExcelUtil {
 	 * @return grid data
 	 * @throws IoException  File I/O Exception
 	 */
-	public <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+	public static <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
 		return getHandler().readFirstSheetFrom( inputStream, toClass );
+	}
+
+	/**
+	 * Convert data to NList
+	 *
+	 * @param data data for excel
+	 * @return data as NList type
+	 */
+	public static Map<String, NList> toNList( Map<String, ?> data ) {
+		return getHandler().toNList( data );
+	}
+
+	/**
+	 * Convert data to bean list
+	 *
+	 * @param data data for excel
+	 * @param toClass generic type of list
+	 * @return data as toClass generic type
+	 */
+	public static <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {
+		return getHandler().toBeanList( data, toClass );
 	}
 
 }

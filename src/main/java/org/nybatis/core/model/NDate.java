@@ -26,8 +26,8 @@ public class NDate {
 
     private Calendar currentTime = Calendar.getInstance();
 
-    private static final String DEFAULT_OUTPUT_FORMAT = "YYYY-MM-DD HH:MI:SS";
-    private static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmssSSS";
+    public static final String DEFAULT_OUTPUT_FORMAT = "YYYY-MM-DD HH:MI:SS";
+    public static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmssSSS";
 
     public static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 

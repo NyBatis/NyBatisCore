@@ -1,11 +1,7 @@
 package org.nybatis.core.file.vo;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import org.nybatis.core.file.annotation.ExcelHeader;
-import org.nybatis.core.reflection.Reflector;
 
 /**
  * User Entity to convert as excel data

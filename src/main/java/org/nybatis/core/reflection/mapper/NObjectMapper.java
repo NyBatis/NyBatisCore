@@ -14,7 +14,14 @@ import java.util.Date;
 public class NObjectMapper extends ObjectMapper {
 
 	public NObjectMapper( boolean sort ) {
+		init( sort );
+		setDefaultFilter();
+		setCustomDeserializer();
+	}
 
+	protected NObjectMapper() {}
+
+	protected void init( boolean sort ) {
 		configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true ); // 문자열 구분기호를 " 뿐만 아니라 ' 도 허용
 		configure( SerializationFeature.FAIL_ON_EMPTY_BEANS, false ); // Bean 이 null 일 경우 허용
 		configure( SerializationFeature.WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS, true ); // char 배열을 문자로 강제 변환하지 않는다.
@@ -23,13 +30,9 @@ public class NObjectMapper extends ObjectMapper {
 		configure( MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS, true ); // private 변수라도 강제로 매핑
 		configure( DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true );
 		configure( SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, sort );
-
-		setDefaultFilter();
-		registerCustomDeserializer();
-
 	}
 
-	private void registerCustomDeserializer() {
+	protected void setCustomDeserializer() {
 
 		SimpleModule module = new SimpleModule( "DateSerializer" );
 
@@ -43,7 +46,7 @@ public class NObjectMapper extends ObjectMapper {
 	/**
 	 * Prevent error when pojo with @JsonFilter annotation is parsed.
 	 */
-	private void setDefaultFilter() {
+	protected void setDefaultFilter() {
 		setFilters( new SimpleFilterProvider().setFailOnUnknownId(false) );
 	}
 
