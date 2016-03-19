@@ -70,7 +70,7 @@ public class ResourceBundleTest {
 	@Test
 	public void catalogTest() throws IOException {
 
-    	List<Path> list = FileUtil.getList( Const.path.getConfigMessage(), true, false, -1, "*.properties" );
+    	List<Path> list = FileUtil.search( Const.path.getConfigMessage(), true, false, -1, "*.properties" );
 
     	Set<String> baseNames = new HashSet<>();
 

@@ -142,7 +142,7 @@ public class Message {
 
         try {
 
-        	List<Path> list = FileUtil.getList( Const.path.getConfigMessage(), true, false, -1, "**.prop" );
+        	List<Path> list = FileUtil.search( Const.path.getConfigMessage(), true, false, -1, "**.prop" );
 
         	Collections.sort( list );
 

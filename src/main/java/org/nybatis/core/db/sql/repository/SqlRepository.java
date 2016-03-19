@@ -120,7 +120,7 @@ public class SqlRepository {
 
 	private void readFromDirectory( File directory, String environmentId ) {
 
-		List<Path> pathList = FileUtil.getList( directory.getAbsolutePath(), true, false, -1, "**.xml" );
+		List<Path> pathList = FileUtil.search( directory.getAbsolutePath(), true, false, -1, "**.xml" );
 
 		for( Path path : pathList ) {
 			readFromFile( path.toFile(), environmentId );
