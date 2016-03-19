@@ -89,7 +89,7 @@ public class ZipFileHandler {
 
             basePath = fileOrDirectoryToCompress.getPath();
 
-            for( Path path : FileUtil.getList( fileOrDirectoryToCompress.getPath(), true, false, -1, "**.*" ) ) {
+            for( Path path : FileUtil.search( fileOrDirectoryToCompress.getPath(), true, false, -1, "**.*" ) ) {
                 fileList.add( path.toFile() );
             }
 
