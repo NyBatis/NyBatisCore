@@ -16,6 +16,7 @@ public class Column {
     private String  dataTypeName;
     private boolean nullable;
     private boolean pk;
+    private int     size;
 
     public String getKey() {
         return key;
@@ -29,6 +30,15 @@ public class Column {
         return StringUtil.toUncamel( key );
     }
 
+    /**
+     * get data type of column
+     *
+     * <pre>
+     *  it comapres with {@link java.sql.Types}
+     * </pre>
+     *
+     * @return column type
+     */
     public int getDataType() {
         return dataType;
     }
@@ -84,4 +94,11 @@ public class Column {
 
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize( int size ) {
+        this.size = size;
+    }
 }
