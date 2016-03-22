@@ -171,7 +171,9 @@ public class JdbcDataSource implements DataSource {
 				proxyConnection.rollback();
 			}
 
-			connectionPoolIdle.push( proxyConnection );
+			if( ! connectionPoolIdle.contains(proxyConnection) ) {
+				connectionPoolIdle.push( proxyConnection );
+			}
 
 		}
 
