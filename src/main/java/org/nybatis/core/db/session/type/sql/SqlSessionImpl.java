@@ -1,6 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
@@ -9,10 +8,13 @@ import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.BaseRuntimeException;
+import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.validation.Assertion;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.validation.Validator;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -123,20 +125,22 @@ public class SqlSessionImpl implements SqlSession {
 
         if( worker == null ) return this;
 
-        Connection conn = null;
+        Connection connection = null;
 
         try {
 
-            conn = TransactionManager.getConnection( token, properties.getStandAloneEnvironmentId() );
+            connection = TransactionManager.getConnection( token, properties.getStandAloneEnvironmentId() );
+
+            Connection protectedConnection = getProtectedConnection( connection );
 
             worker.setProperties( properties );
-            worker.setConnection( conn );
+            worker.setConnection( protectedConnection );
 
-            worker.execute( conn );
+            worker.execute( protectedConnection );
 
             if( properties.isAutocommit() ) {
                 NLogger.debug( "commit" );
-                conn.commit();
+                connection.commit();
             }
 
             return this;
@@ -146,23 +150,40 @@ public class SqlSessionImpl implements SqlSession {
 
         } finally {
 
-            if( conn != null ) {
+            if( connection != null ) {
                 try {
                     // It it not real releaseSavepoint !
                     // merely clear resources like Statement, PreparedStatement, CallableStatement and ResultSet occupied by connection
-                    conn.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
+                    connection.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
                 } catch( SQLException e ) {
                     NLogger.error( e );
                 }
 
                 if( ! TransactionManager.isBegun(token) ) {
-                    try { conn.close(); } catch( SQLException e ) {}
+                    try { connection.close(); } catch( SQLException e ) {}
                 }
             }
 
             initProperties();
 
         }
+
+    }
+
+    private Connection getProtectedConnection( Connection connection ) {
+
+        return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
+            public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+
+                if( "close".equals(method.getName()) ) {
+                    throw new DatabaseException( "connection's close method is not supprted in useConnection feature." );
+                }
+
+                return method.invoke( connection, arguments );
+
+            }
+
+        } );
 
     }
 
