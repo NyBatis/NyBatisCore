@@ -3,14 +3,12 @@ package org.nybatis.core.db.session.executor;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
-import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
-import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
@@ -113,7 +111,7 @@ public class SqlBean {
 	}
 
 	public String getEnvironmentId() {
-		return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getCompulsiveEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+		return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public String getSqlId() {
@@ -204,7 +202,7 @@ public class SqlBean {
 	}
 
 	private String getDatabase() {
-		return DatasourceManager.getAttributes( properties.getStandAloneEnvironmentId() ).getDatabase();
+		return DatasourceManager.getAttributes( properties.getRepresentativeEnvironmentId() ).getDatabase();
 	}
 
 }

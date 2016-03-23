@@ -12,7 +12,9 @@ import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
 
 /**
- * @author Administrator
+ * Session executor implements
+ *
+ * @author nayasis@gmail.com
  * @since 2015-09-12
  */
 public class SessionExecutorImpl implements SessionExecutor {
@@ -98,12 +100,6 @@ public class SessionExecutorImpl implements SessionExecutor {
     @Override
     public SessionExecutor setParameter( Object parameter ) {
         sqlBean.setParameter( parameter );
-        return this;
-    }
-
-    @Override
-    public SessionExecutor setAutoCommit( boolean enable ) {
-        sqlSession.getProperties().isAutocommit( enable );
         return this;
     }
 

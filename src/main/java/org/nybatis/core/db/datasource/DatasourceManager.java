@@ -2,7 +2,7 @@ package org.nybatis.core.db.datasource;
 
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
-import org.nybatis.core.db.datasource.jdbc.JdbcDataSource;
+import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 

@@ -67,7 +67,7 @@ public class DatabaseConfigurator {
 	 */
 	public static void build( boolean reload ) {
 
-		List<Path> confLists = FileUtil.getList( Const.path.getConfigDatabase(), true, false, 0, "*.xml" );
+		List<Path> confLists = FileUtil.search( Const.path.getConfigDatabase(), true, false, 0, "*.xml" );
 
 		for( Path confPath : confLists ) {
 			build( confPath.toString(), reload );

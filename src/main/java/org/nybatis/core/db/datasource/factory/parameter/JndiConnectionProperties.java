@@ -1,4 +1,4 @@
-package org.nybatis.core.db.configuration.connection;
+package org.nybatis.core.db.datasource.factory.parameter;
 
 import org.nybatis.core.util.StringUtil;
 

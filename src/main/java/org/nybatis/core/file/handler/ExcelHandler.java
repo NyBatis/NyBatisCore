@@ -9,6 +9,7 @@ import org.nybatis.core.file.annotation.ExcelReadAnnotationInspector;
 import org.nybatis.core.file.annotation.ExcelWriteAnnotationInspector;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.mapper.NObjectExcelMapper;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
 import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Validator;
@@ -34,15 +35,7 @@ import java.util.Map;
 public abstract class ExcelHandler {
 
 	private static final String DEFAULT_SHEET_NAME = "Sheet1";
-	private static NObjectMapper excelMapper  = null;
-
-	static {
-		excelMapper = new NObjectMapper( false );
-		excelMapper.setAnnotationIntrospectors(
-				new ExcelReadAnnotationInspector(),
-				new ExcelWriteAnnotationInspector()
-		);
-	}
+	private static NObjectExcelMapper excelMapper  = new NObjectExcelMapper( false );
 
 	/**
 	 * Write excel data to output stream
@@ -404,7 +397,13 @@ public abstract class ExcelHandler {
 		return Validator.isNotEmpty( list ) && Types.isNotPrimitive( list.get(0) );
 	}
 
-	private Map<String, NList> toNList( Map<String, ?> data ) {
+	/**
+	 * Convert data to NList
+	 *
+	 * @param data data for excel
+	 * @return data as NList type
+	 */
+	public Map<String, NList> toNList( Map<String, ?> data ) {
 
 		Map<String, NList> sheets = new LinkedHashMap<>();
 
@@ -430,7 +429,14 @@ public abstract class ExcelHandler {
 
 	}
 
-	private <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {
+	/**
+	 * Convert data to bean list
+	 *
+	 * @param data data for excel
+	 * @param toClass generic type of list
+	 * @return data as toClass generic type
+	 */
+	public <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {
 
 		Map<String, List<T>> sheets = new LinkedHashMap<>();
 

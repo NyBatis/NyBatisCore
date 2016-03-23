@@ -67,6 +67,17 @@ public class NTree<T> implements Serializable {
     }
 
     /**
+     * Append tree node
+     *
+     * @param tree tree node
+     * @return appended node
+     */
+    public NTree<T> append( NTree<T> tree ) {
+        children.add( tree );
+        return tree;
+    }
+
+    /**
      * Append tree to leaf node
      *
      * <pre>
@@ -100,7 +111,7 @@ public class NTree<T> implements Serializable {
      * @param tree tree to append
      * @return self instance
      */
-    public NTree appendTree( NTree<T> tree ) {
+    public NTree connectLeaf( NTree<T> tree ) {
 
         if( tree != null )  {
             for( NTree<T> branch : getLeafNodes() ) {

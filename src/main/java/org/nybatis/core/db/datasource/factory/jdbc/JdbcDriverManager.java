@@ -1,4 +1,4 @@
-package org.nybatis.core.db.datasource.jdbc;
+package org.nybatis.core.db.datasource.factory.jdbc;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
