@@ -81,15 +81,15 @@ public class JdbcDatasourceProperties {
 		return pingCycle;
 	}
 
-	public void setPingCycle( int second ) {
-		this.pingCycle = second * 1_000;
+	public void setPingCycle( int seconds ) {
+		this.pingCycle = seconds * 1_000;
 	}
 
-	public void setPingCycle( String second ) {
+	public void setPingCycle( String seconds ) {
 
 		try {
 
-			this.pingCycle = Integer.parseInt( second ) * 1_000;
+			this.pingCycle = Integer.parseInt( seconds ) * 1_000;
 
 		} catch( NumberFormatException e ) {}
 

@@ -146,14 +146,14 @@ public class SessionManager {
 	 * @param id environment id to run sql with it forcibly.
 	 */
 	public static void setCompulsiveEnvironment( String id ) {
-		GlobalSqlParameter.setCompulsiveEnvironmentId( id );
+		GlobalSqlParameter.setEnvironmentId( id );
 	}
 
 	/**
 	 * Remove compulsive environment id setting.
 	 */
 	public static void removeCompulsiveEnvironment() {
-		GlobalSqlParameter.removeCompulsiveEnvironmentId();
+		GlobalSqlParameter.removeEnvironmentId();
 	}
 
 	/**

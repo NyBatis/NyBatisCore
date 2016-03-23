@@ -11,15 +11,14 @@ import org.nybatis.core.log.NLogger;
 
 public class GlobalSqlParameter {
 
-	private static final String SQL_PARAM              = GlobalSqlParameter.class.getName() + ".SQL_PARAM";
-	private static final String ENVIRONMENT_COMPULSIVE = GlobalSqlParameter.class.getName() + ".ENVIRONMENT_COMPULSIVE";
-	private static final String ENVIRONMENT_DEFAULT    = GlobalSqlParameter.class.getName() + ".ENVIRONMENT_DEFAULT";
+	private static final String SQL_PARAM            = GlobalSqlParameter.class.getName() + ".SQL_PARAM";
+	private static final String ENVIRONMENT          = GlobalSqlParameter.class.getName() + ".ENVIRONMENT";
+	private static final String ENVIRONMENT_DEFAULT  = GlobalSqlParameter.class.getName() + ".ENVIRONMENT_DEFAULT";
 
-	@SuppressWarnings( "unchecked" )
     private static Map<Object, Object> getMap() {
 
 		if( ! NThreadLocal.containsKey( SQL_PARAM ) ) {
-			NThreadLocal.set( SQL_PARAM, new HashMap<Object, Object>() );
+			NThreadLocal.set( SQL_PARAM, new HashMap<>() );
 		}
 
 		return (Map<Object, Object>) NThreadLocal.get( SQL_PARAM );
@@ -30,7 +29,6 @@ public class GlobalSqlParameter {
 		getMap().put( key, value );
 	}
 
-	@SuppressWarnings( { "rawtypes", "unchecked" } )
     public static void putAll( Map params ) {
 		getMap().putAll( params );
 	}
@@ -59,23 +57,23 @@ public class GlobalSqlParameter {
 		return getMap();
 	}
 
-	public static void setCompulsiveEnvironmentId( String id ) {
+	public static void setEnvironmentId( String id ) {
 
 		if( DatasourceManager.get( id ) == null ) {
 			NLogger.warn( "Environment(id:{}) is not exits.", id );
 			return;
 		}
 
-		NThreadLocal.set( ENVIRONMENT_COMPULSIVE, id );
+		NThreadLocal.set( ENVIRONMENT, id );
 
 	}
 
-	public static void removeCompulsiveEnvironmentId() {
-		NThreadLocal.set( ENVIRONMENT_COMPULSIVE, null );
+	public static void removeEnvironmentId() {
+		NThreadLocal.set( ENVIRONMENT, null );
 	}
 
-	public static String getCompulsiveEnvironmentId() {
-		return (String) NThreadLocal.get( ENVIRONMENT_COMPULSIVE );
+	public static String getEnvironmentId() {
+		return (String) NThreadLocal.get( ENVIRONMENT );
 	}
 
 	public static void setDefaultEnvironmentId( String id ) {

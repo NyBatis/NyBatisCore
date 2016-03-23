@@ -129,7 +129,7 @@ public class SqlSessionImpl implements SqlSession {
 
         try {
 
-            connection = TransactionManager.getConnection( token, properties.getStandAloneEnvironmentId() );
+            connection = TransactionManager.getConnection( token, properties.getRepresentativeEnvironmentId() );
 
             Connection protectedConnection = getProtectedConnection( connection );
 
@@ -137,11 +137,6 @@ public class SqlSessionImpl implements SqlSession {
             worker.setConnection( protectedConnection );
 
             worker.execute( protectedConnection );
-
-            if( properties.isAutocommit() ) {
-                NLogger.debug( "commit" );
-                connection.commit();
-            }
 
             return this;
 

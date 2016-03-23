@@ -1,4 +1,4 @@
-package org.nybatis.core.db.datasource.jdbc;
+package org.nybatis.core.db.datasource.factory.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.nybatis.core.db.configuration.connection.JdbcConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
 
@@ -47,13 +47,7 @@ public class JdbcUnpooledDataSource implements DataSource {
 
 		ProxyConnection proxyConnection = new ProxyConnection( connection );
 
-		proxyConnection.setRunner( new Runnable() {
-			public void run() {
-				proxyConnection.destroy();
-			}
-		});
-
-		return proxyConnection;
+		return proxyConnection.setRunner( () -> proxyConnection.destroy() );
 
 	}
 

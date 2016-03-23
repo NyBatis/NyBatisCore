@@ -1,8 +1,8 @@
 package org.nybatis.core.db;
 
-import org.nybatis.core.db.configuration.connection.JdbcConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
 import org.nybatis.core.db.datasource.DatasourceFactory;
-import org.nybatis.core.db.datasource.jdbc.JdbcDataSourceFactory;
+import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSourceFactory;
 import org.testng.annotations.Test;
 
 import javax.sql.DataSource;

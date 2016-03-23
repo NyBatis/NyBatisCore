@@ -167,14 +167,6 @@ public interface SessionExecutor {
 	SessionExecutor setParameter( Object parameter );
 
 	/**
-	 * Set true if statements should be auto commited forcedly when has been executed.
-	 *
-	 * @param yn whether or not of statement to be commited.
-	 * @return self instance
-	 */
-	SessionExecutor setAutoCommit( boolean yn );
-
-	/**
 	 * Disable statements cache functionality.
 	 *
 	 * @return self instance
