@@ -12,7 +12,6 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -48,21 +47,21 @@ public class FileUtilTest {
 
 		List<Path> list;
 
-		list = FileUtil.getList( Const.path.getRoot(), true, false, -1, "**/*.xml" );
+		list = FileUtil.search( Const.path.getRoot(), true, false, -1, "**/*.xml" );
 		printFiles(list);
 		Assert.assertTrue( list.size() > 0 );
 
-		list = FileUtil.getList( Const.path.getRoot() + "/config/db", true, false, 0, "*" );
+		list = FileUtil.search( Const.path.getRoot() + "/config/db", true, false, 0, "*" );
 		printFiles(list);
 //		Assert.assertTrue( list.size() == 1 );
 
-		list = FileUtil.getList( Const.path.getRoot() + "/config/db", true, false, 0, "**.*" );
+		list = FileUtil.search( Const.path.getRoot() + "/config/db", true, false, 0, "**.*" );
 		printFiles(list);
 
-		list = FileUtil.getList( Const.path.getRoot() + "/config/db", true, false, 1, "*.xml" );
+		list = FileUtil.search( Const.path.getRoot() + "/config/db", true, false, 1, "*.xml" );
 		printFiles( list );
 
-		list = FileUtil.getList( Const.path.getRoot() + "/config/db", true, false, 1, "**.xml" );
+		list = FileUtil.search( Const.path.getRoot() + "/config/db", true, false, 1, "**.xml" );
 		printFiles( list );
 
 //		Assert.assertTrue( list.size() == 1 );

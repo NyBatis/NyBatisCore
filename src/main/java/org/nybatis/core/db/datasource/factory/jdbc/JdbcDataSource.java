@@ -1,4 +1,4 @@
-package org.nybatis.core.db.datasource.jdbc;
+package org.nybatis.core.db.datasource.factory.jdbc;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -10,7 +10,7 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
-import org.nybatis.core.db.configuration.connection.JdbcConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
@@ -105,7 +105,7 @@ public class JdbcDataSource implements DataSource {
 
 		proxyConnection = connectionPoolActive.push( proxyConnection );
 
-		NLogger.trace( ">> Get connection" );
+		NLogger.trace( "Get connection" );
 		logPoolStatus();
 
 		return proxyConnection.getConnection();
@@ -120,7 +120,7 @@ public class JdbcDataSource implements DataSource {
 		int idleCount   = connectionPoolIdle.size();
 		int total       = activeCount + idleCount;
 
-		NLogger.trace( ">> connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
+		NLogger.trace( "connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
 
 	}
 
@@ -144,17 +144,11 @@ public class JdbcDataSource implements DataSource {
 
 		ProxyConnection proxyConnection = new ProxyConnection( connection );
 
-		proxyConnection.setRunner( new Runnable() {
-			public void run() {
-				pushConnection( proxyConnection );
-			}
-		});
-
-		return proxyConnection;
+		return proxyConnection.setRunner( () -> giveBackConnectionToPool( proxyConnection ) );
 
 	}
 
-	private synchronized void pushConnection( ProxyConnection proxyConnection ) {
+	private synchronized void giveBackConnectionToPool( ProxyConnection proxyConnection ) {
 
 		connectionPoolActive.remove( proxyConnection );
 
@@ -171,11 +165,13 @@ public class JdbcDataSource implements DataSource {
 				proxyConnection.rollback();
 			}
 
-			connectionPoolIdle.push( proxyConnection );
+			if( ! connectionPoolIdle.contains(proxyConnection) ) {
+				connectionPoolIdle.push( proxyConnection );
+			}
 
 		}
 
-		NLogger.trace( ">> Release connection" );
+		NLogger.trace( "Release connection" );
 		logPoolStatus();
 
     }

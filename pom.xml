@@ -5,8 +5,8 @@
   <artifactId>NyBatisCore</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>NyBatisCore</name>
-  <description>
-    NextGenetation your Batis
+  <description><![CDATA[
+    Nybatis Data Mapper Framework
 
 1. Logging
     based on logback but further simple
@@ -25,22 +25,20 @@
    - StopWatcher
    - ExcelFileUtil
      this module will run when including following optinal dependency
-<![CDATA[
+
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>3.11</version>
     </dependency>
-]]>
 OR
-<![CDATA[
     <dependency>
       <groupId>net.sourceforge.jexcelapi</groupId>
       <artifactId>jxl</artifactId>
       <version>2.6.12</version>
     </dependency>
-]]>
-  </description>
+
+]]></description>
 
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -96,11 +94,6 @@ OR
       <artifactId>json-path</artifactId>
       <version>2.1.0</version>
     </dependency>
-    <!--<dependency>-->
-      <!--<groupId>com.monitorjbl</groupId>-->
-      <!--<artifactId>json-view</artifactId>-->
-      <!--<version>0.10</version>-->
-    <!--</dependency>-->
 
     <!-- Zip Handler -->
     <dependency>

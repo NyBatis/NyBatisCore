@@ -1,4 +1,4 @@
-package org.nybatis.core.db.datasource.jdbc;
+package org.nybatis.core.db.datasource.factory.jdbc;
 
 import java.util.Stack;
 import java.util.UUID;
@@ -38,7 +38,7 @@ public class ConnectionHealthChecker {
 
 		for( ProxyConnection connection : idleConnectionPool ) {
 
-			if( connection.getElapsedMiliSecondsSinceLastUsed() <= datasourceProperties.getPingCycle() ) continue;
+			if( connection.getElpasedTimeAfterLastUsed() <= datasourceProperties.getPingCycle() ) continue;
 			if( connection.ping(datasourceProperties.getPingQuery()) == false ) {
 				connection.destroy();
 			}

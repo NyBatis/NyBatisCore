@@ -207,7 +207,7 @@ public class SqlSessionTest {
 
 		NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );
 
-		GlobalSqlParameter.setCompulsiveEnvironmentId( "oracle" );
+		GlobalSqlParameter.setEnvironmentId( "oracle" );
 
 		try {
 			NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );

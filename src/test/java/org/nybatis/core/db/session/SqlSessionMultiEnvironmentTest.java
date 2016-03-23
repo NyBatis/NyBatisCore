@@ -137,7 +137,7 @@ public class SqlSessionMultiEnvironmentTest {
 		Assert.assertEquals( session.sqlId( "Sqlite03.selectForMultiEnvironmentTest" ).select().get( "listId" ), "LIST03" );
 
 		// Affected by compulsiveEnvironment setting
-		GlobalSqlParameter.setCompulsiveEnvironmentId( "sqlite02" );
+		GlobalSqlParameter.setEnvironmentId( "sqlite02" );
 
 		Assert.assertEquals( session.sqlId( "Sqlite03.selectForMultiEnvironmentTest" ).select().get( "listId" ), "LIST02" );
 

@@ -55,27 +55,10 @@ public class SqlExecutor {
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
 
 			if( NLogger.isTraceEnabled() ) {
-				NLogger.trace( ">> transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
-			}
-
-			boolean autoCommitConnection = conn.getAutoCommit();
-			boolean autoCommitTemporary  = sqlBean.getProperties().isAutocommit();
-			boolean autoCommitForce      = autoCommitConnection == false && autoCommitTemporary == true;
-
-			if( autoCommitForce ) {
-				conn.setAutoCommit( true );
+				NLogger.trace( "transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
 			}
 
 			sqlHandler.run( sqlBean, conn );
-
-			if( ( autoCommitConnection || autoCommitTemporary ) && TransactionManager.isBegun(token) ) {
-				TransactionManager.commit( token );
-				NLogger.trace( "auto-committed" );
-			}
-
-			if( autoCommitForce ) {
-				conn.setAutoCommit( false );
-			}
 
 		} catch( SQLException e ) {
 
@@ -95,8 +78,6 @@ public class SqlExecutor {
 	}
 
 	private void executeQuery( SqlBean sqlBean, RowHandler rowHandler, Integer rowFetchSize ) {
-
-		sqlBean.getProperties().isAutocommit( false );
 
 		execute( sqlBean, ( injectedSqlBean, connection ) -> {
 
@@ -204,7 +185,6 @@ public class SqlExecutor {
 
 		if( isCacheEnable && ! isCacheClear) {
 
-			@SuppressWarnings( "unchecked" )
             NList cacheValue = (NList) getCache( "selectList" );
 
 			if( cacheValue != null ) {
@@ -285,8 +265,6 @@ public class SqlExecutor {
 
 	}
 
-
-	@SuppressWarnings( "unchecked" )
     public <T> List<T> selectList( Class<T> returnType ) {
 
 		List<NMap> resultSet = selectList();
@@ -333,7 +311,6 @@ public class SqlExecutor {
 
 	}
 
-	@SuppressWarnings( "unchecked" )
     public <T> T select( Class<T> returnType ) {
 
 		NMap result = select();

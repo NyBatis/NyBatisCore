@@ -41,7 +41,7 @@ public class NTreeTest {
         System.out.println( "------------------------------" );
         System.out.println( anotherNode );
         System.out.println( "------------------------------");
-        System.out.println( node.appendTree( anotherNode ) );
+        System.out.println( node.connectLeaf( anotherNode ) );
         System.out.println( "------------------------------");
         System.out.println( node );
         

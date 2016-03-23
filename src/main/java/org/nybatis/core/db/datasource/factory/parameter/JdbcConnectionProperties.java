@@ -1,4 +1,4 @@
-package org.nybatis.core.db.configuration.connection;
+package org.nybatis.core.db.datasource.factory.parameter;
 
 import org.nybatis.core.util.StringUtil;
 
@@ -8,8 +8,8 @@ public class JdbcConnectionProperties {
 	private String  url;
 	private String  userName;
 	private String  userPassword;
-	private boolean autoCommit = false;
-	private int     timeout    = 10; // seconds
+	private boolean autoCommit     = false;
+	private int     timeoutSeconds = 10;
 
 	public String getDriverName() {
 		return driverName;
@@ -63,7 +63,7 @@ public class JdbcConnectionProperties {
 	 * @return seconds
 	 */
 	public int getTimeout() {
-	    return timeout;
+	    return timeoutSeconds;
     }
 
 	/**
@@ -72,34 +72,30 @@ public class JdbcConnectionProperties {
 	 * @return nano time
 	 */
 	public int getNanoTimeout() {
-		return timeout * 1_000_000_000;
+		return timeoutSeconds * 1_000_000_000;
 	}
 
-	public void setTimeout( int second ) {
-	    this.timeout = second;
+	/**
+	 * set timeout
+	 *
+	 * @param seconds seconds
+	 */
+	public void setTimeout( int seconds ) {
+	    this.timeoutSeconds = seconds;
     }
 
-	public void setTimeout( String second ) {
-
+	/**
+	 * set timeout
+	 * @param seconds seconds
+	 */
+	public void setTimeout( String seconds ) {
 		try {
-
-			this.timeout = Integer.parseInt( second );
-
+			this.timeoutSeconds = Integer.parseInt( seconds );
 		} catch( NumberFormatException e ) {}
-
 	}
 
-//	/**
-//	 * Getter for the connection group (based on driverName + url + userId + userPassword)
-//	 *
-//	 * @return connection group
-//	 */
-//	public int getConnectionGroup() {
-//		return String.format( "%s-%s-%s-%s", driverName, url, userId, userPassword ).hashCode();
-//	}
-
 	public String toString() {
-		return String.format( "DriverName : %s, Url : %s, AutoCommit : %s, ConnectionTimeOut : %s", driverName, url, autoCommit, timeout );
+		return String.format( "DriverName : %s, Url : %s, AutoCommit : %s, ConnectionTimeOut : %s", driverName, url, autoCommit, timeoutSeconds );
 	}
 
 }

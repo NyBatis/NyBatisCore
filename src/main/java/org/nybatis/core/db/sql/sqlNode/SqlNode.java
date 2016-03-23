@@ -131,8 +131,16 @@ public class SqlNode {
 		);
     }
 
+	public String getSqlSkeleton() {
+		return structuredSql.toString();
+	}
+
 	public void setMainId( String mainId ) {
 		structuredSql.setMainId( mainId );
+	}
+
+	public boolean containsEnvironmentId( String environmentId ) {
+		return environmentIds.contains( environmentId );
 	}
 
 }

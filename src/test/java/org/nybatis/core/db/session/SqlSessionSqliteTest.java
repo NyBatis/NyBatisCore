@@ -25,10 +25,10 @@ import java.util.Map;
 public class SqlSessionSqliteTest {
 
 	public static final String TABLE_NAME     = "NYBATIS_TEST";
-	public static final String ENVIRONMENT_ID = "sqlite";
+	public static final String ENVIRONMENT_ID = "sqlite03";
 
 	private SqlSession getSession() {
-		return SessionManager.openSeperateSession( ENVIRONMENT_ID );
+		return SessionManager.openSession( ENVIRONMENT_ID );
 	}
 
 	@BeforeClass
@@ -137,10 +137,11 @@ public class SqlSessionSqliteTest {
 
 			parameters.add( param );
 
-
 		}
 
-		sqlSession.batchSql( "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", parameters ).setTransactionSize( 10 ).execute();
+		String sql = "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )";
+
+		sqlSession.batchSql( sql, parameters ).setTransactionSize( 10 ).execute();
 
 		case10_select();
 
@@ -262,6 +263,8 @@ public class SqlSessionSqliteTest {
 
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 
+		NLogger.debug( ">>> [{}]", sqlSession.sql( SQL_SELECT, param ).select( Map.class ) );
+
 		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
 
 	}
@@ -292,7 +295,7 @@ public class SqlSessionSqliteTest {
 
 	}
 
-	@Test( sequential = true )
+	@Test( sequential = true, expectedExceptions = SqlException.class )
 	public void case11_batchErrorLog() {
 
 		case10_initTable();
@@ -323,7 +326,13 @@ public class SqlSessionSqliteTest {
 
 		sqlList.add( 13, sql );
 
-		sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
+		try {
+			sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
+		} catch( Exception e ) {
+			NLogger.debug( e );
+			throw e;
+		}
+
 
 	}
 

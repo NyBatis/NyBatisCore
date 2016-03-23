@@ -1,4 +1,4 @@
-package org.nybatis.core.db.datasource.jndi;
+package org.nybatis.core.db.datasource.factory.jndi;
 
 import java.util.Properties;
 
@@ -7,7 +7,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import org.nybatis.core.db.configuration.connection.JndiConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JndiConnectionProperties;
 import org.nybatis.core.db.datasource.DatasourceFactory;
 import org.nybatis.core.db.datasource.proxy.ProxyDataSource;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;

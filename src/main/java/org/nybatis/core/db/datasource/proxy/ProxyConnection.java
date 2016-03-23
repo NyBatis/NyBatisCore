@@ -15,7 +15,12 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
 
-
+/**
+ * Proxy connection
+ *
+ * @author nayasis@gmail.com
+ * @since  2015-01-03
+ */
 public class ProxyConnection {
 
 	public static final Savepoint RELEASE_RESOURCE = new Savepoint() {
@@ -27,49 +32,45 @@ public class ProxyConnection {
 		}
 	};
 
-    private int             hashCode = 0;
     private Connection      realConnection;
     private Connection      proxyConnection;
-    private long            lastUsedTime;
+    private long            lastUsedTime; // nano time
     private Runnable        runnable;
-	private boolean         originalAutocommitStatus = false;
 
     private Set<Statement> poolStatement = new HashSet<>();
     private Set<ResultSet> poolResultset = new HashSet<>();
 
     public ProxyConnection( Connection connection ) {
 
-    	this.hashCode        = connection.hashCode();
     	this.realConnection  = connection;
     	this.proxyConnection = invokeConnection( connection );
-
-		try {
-			this.originalAutocommitStatus = connection.getAutoCommit();
-		} catch( SQLException e ) {}
 
 		resetLastUsedTime();
 
     }
 
-    public void setRunner( Runnable runner ) {
+    public ProxyConnection setRunner( Runnable runner ) {
     	this.runnable = runner;
+		return this;
     }
 
     public int hashCode() {
-        return hashCode;
+        return realConnection.hashCode();
     }
 
     public boolean equals( Object object ) {
-
-        if ( object instanceof ProxyConnection || object instanceof Connection ) {
-        	return hashCode == object.hashCode();
+        if ( object != null && (object instanceof ProxyConnection || object instanceof Connection) ) {
+        	return hashCode() == object.hashCode();
         }
-
         return false;
-
     }
 
-    public int getElapsedMiliSecondsSinceLastUsed() {
+	/**
+	 * get duration mili seconds from connection last used time
+	 *
+	 * @return mili seconds
+	 */
+    public int getElpasedTimeAfterLastUsed() {
         return (int) ( ( System.nanoTime() - lastUsedTime ) / 1_000_000 );
     }
 
@@ -83,13 +84,11 @@ public class ProxyConnection {
 
 			case "commit"           :
 			case "rollback"         :
-
 			case "executeQuery"     :
 			case "getGeneratedKeys" :
 			case "getResultSet"     :
 			case "execute"          :
 			case "executeUpdate"    :
-
 			case "next"             :
 
 				resetLastUsedTime();
@@ -116,14 +115,13 @@ public class ProxyConnection {
     }
 
     public boolean isClosed() {
-
     	if( realConnection == null ) return true;
     	try {
 	        return realConnection.isClosed();
         } catch( SQLException e ) {
+			NLogger.error( e );
 	        return false;
         }
-
     }
 
     public void destroy() {
@@ -157,20 +155,14 @@ public class ProxyConnection {
 
 		poolStatement.clear();
 
-		resetAutocommitStatus();
-
 	}
 
-	private void resetAutocommitStatus() {
-
-		try {
-			if( realConnection != null && realConnection.getAutoCommit() != originalAutocommitStatus ) {
-                realConnection.setAutoCommit( originalAutocommitStatus );
-            }
-		} catch( SQLException e ) {}
-
-	}
-
+	/**
+	 * send ping query to database
+	 *
+	 * @param pingSql ping query
+	 * @return ping query execution y/n
+	 */
 	public boolean ping( String pingSql ) {
 
 		if( isClosed() ) return false;
@@ -186,7 +178,6 @@ public class ProxyConnection {
         }
 
         resetLastUsedTime();
-
         return true;
 
 	}
@@ -201,14 +192,10 @@ public class ProxyConnection {
 				switch( method.getName() ) {
 
 					case "close":
+
 						releaseResource();
-
-						if( runnable != null ) {
-							runnable.run();
-							return null;
-						}
-
-						break;
+						if( runnable != null ) runnable.run();
+						return null;
 
 					case "createStatement":
 					case "prepareStatement":
@@ -237,34 +224,33 @@ public class ProxyConnection {
 
 		poolStatement.add( (Statement) statement );
 
-        return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, new MethodInvocator() {
-			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+        return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, ( proxy, method, arguments ) -> {
 
-				resetLastUsedTime( method.getName() );
+            resetLastUsedTime( method.getName() );
 
-				switch( method.getName() ) {
+            switch( method.getName() ) {
 
-					case "getObject":
+                case "getObject":
 
-						Object returnValue = method.invoke( statement, arguments );
+                    Object returnValue = method.invoke( statement, arguments );
 
-						if( returnValue instanceof ResultSet ) {
-							poolResultset.add( (ResultSet) returnValue );
-						}
+                    if( returnValue instanceof ResultSet ) {
+                        poolResultset.add( (ResultSet) returnValue );
+                    }
 
-						return returnValue;
+                    return returnValue;
 
-					case "executeQuery":
-					case "getGeneratedKeys":
-					case "getResultSet":
-						ResultSet rs = (ResultSet) method.invoke( statement, arguments );
-						return invokeResultSet( rs );
+                case "executeQuery":
+                case "getGeneratedKeys":
+                case "getResultSet":
+                    ResultSet rs = (ResultSet) method.invoke( statement, arguments );
+                    return invokeResultSet( rs );
 
-				}
+            }
 
-				return method.invoke( statement, arguments );
-			}
-		} );
+            return method.invoke( statement, arguments );
+
+        });
 
 	}
 
@@ -272,28 +258,27 @@ public class ProxyConnection {
 
     	poolResultset.add( resultSet );
 
-    	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, new MethodInvocator() {
-			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+    	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, ( proxy, method, arguments ) -> {
 
-				resetLastUsedTime( method.getName() );
+            resetLastUsedTime( method.getName() );
 
-				switch( method.getName() ) {
+            switch( method.getName() ) {
 
-					case "getObject":
+                case "getObject":
 
-						Object returnValue = method.invoke( resultSet, arguments );
+                    Object returnValue = method.invoke( resultSet, arguments );
 
-						if( returnValue instanceof ResultSet ) {
-							poolResultset.add( (ResultSet) returnValue );
-						}
+                    if( returnValue instanceof ResultSet ) {
+                        poolResultset.add( (ResultSet) returnValue );
+                    }
 
-						return returnValue;
+                    return returnValue;
 
-				}
+            }
 
-				return method.invoke( resultSet, arguments );
-			}
-		} );
+            return method.invoke( resultSet, arguments );
+
+        });
 
     }
 
