@@ -11,10 +11,10 @@ import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.event.NamingListener;
 import java.sql.BatchUpdateException;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -44,17 +44,12 @@ public abstract class AbstractBatchExecutor {
 
 		if( sqlNode != null ) {
 			properties = sqlNode.getProperties().merge( properties );
-			properties.setEnvironmentId( sqlNode.getEnvironmentId() );
+			if( Validator.isNotEmpty( sqlNode.getProperties().getEnvironmentId() ) ) {
+				properties.setEnvironmentId( sqlNode.getProperties().getEnvironmentId() );
+			}
 		}
 
-		if( commitCount != null && commitCount > 0 ) {
-			properties.isAutocommit( true );
-		} else {
-			properties.isAutocommit( false );
-			commitCount = null;
-		}
-
-		String environmentId = properties.getStandAloneEnvironmentId();
+		String environmentId = properties.getRepresentativeEnvironmentId();
 
 		Statements  statements  = getStatements().init( token, environmentId );
 		Logs        logs        = getLogs();
@@ -94,8 +89,8 @@ public abstract class AbstractBatchExecutor {
 
 			executeBatch( statements, logs );
 
-			if( properties.isAutocommit() ) {
-				TransactionManager.commit( token );
+			if( commitCount != null ) {
+				statements.commit();
 			}
 
 			statements.close();

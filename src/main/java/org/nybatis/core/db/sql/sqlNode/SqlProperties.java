@@ -25,7 +25,6 @@ public class SqlProperties {
 	 * Dynamic Properties
 	 */
 	private Boolean cacheClear       = null;
-	private Boolean autocommit       = null;
 	private Boolean countSql         = null;
 	private Integer pageSqlStart     = null;
 	private Integer pageSqlEnd       = null;
@@ -50,7 +49,6 @@ public class SqlProperties {
 
 	public void clear() {
 		cacheClear         = null;
-		autocommit         = null;
 		countSql           = null;
 		pageSqlStart       = null;
 		pageSqlEnd         = null;
@@ -62,32 +60,43 @@ public class SqlProperties {
 
 		SqlProperties newProperties = properties.clone();
 
-		if( environmentId      != null ) newProperties.environmentId = environmentId;
-		if( fetchSize          != null ) newProperties.fetchSize = fetchSize;
-		if( lobPrefetchSize    != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
-		if( cacheEnable        != null ) newProperties.cacheEnable = cacheEnable;
-		if( cacheId            != null ) newProperties.cacheId = cacheId;
-		if( cacheFlushCycle    != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
-		if( cacheClear         != null ) newProperties.cacheClear = cacheClear;
-		if( autocommit         != null ) newProperties.autocommit = autocommit;
-		if( countSql           != null ) newProperties.countSql = countSql;
-		if( pageSqlStart       != null ) newProperties.pageSqlStart = pageSqlStart;
-		if( pageSqlEnd         != null ) newProperties.pageSqlEnd = pageSqlEnd;
+		if( environmentId   != null ) newProperties.environmentId   = environmentId;
+		if( fetchSize       != null ) newProperties.fetchSize       = fetchSize;
+		if( lobPrefetchSize != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
+		if( cacheEnable     != null ) newProperties.cacheEnable     = cacheEnable;
+		if( cacheId         != null ) newProperties.cacheId         = cacheId;
+		if( cacheFlushCycle != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
+		if( cacheClear      != null ) newProperties.cacheClear      = cacheClear;
+		if( countSql        != null ) newProperties.countSql        = countSql;
+		if( pageSqlStart    != null ) newProperties.pageSqlStart    = pageSqlStart;
+		if( pageSqlEnd      != null ) newProperties.pageSqlEnd      = pageSqlEnd;
 
 		return newProperties;
 
-	}
-
-	public String getRawEnvironmentId() {
-		return environmentId;
 	}
 
 	public String getEnvironmentId() {
 		return environmentId;
 	}
 
-	public String getStandAloneEnvironmentId() {
-		return Validator.nvl( environmentId, GlobalSqlParameter.getCompulsiveEnvironmentId(), GlobalSqlParameter.getDefaultEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+	/**
+	 * get representative environment id.
+	 *
+	 * <pre>
+	 *
+	 * it can be determined like below. (priority is top to bottom.)
+	 *
+	 *   - the one whici sqlId is joined
+	 *   - the one which is assigned by SqlSession or OrmSession
+	 *   - GlobalSqlParameter's environment id
+	 *   - GlobalSqlParameer's default environment id
+	 *   - default environment's id
+	 * </pre>
+	 *
+	 * @return
+	 */
+	public String getRepresentativeEnvironmentId() {
+		return Validator.nvl( environmentId, GlobalSqlParameter.getEnvironmentId(), GlobalSqlParameter.getDefaultEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public void setEnvironmentId( String environmentId ) {
@@ -191,19 +200,6 @@ public class SqlProperties {
 		this.cacheClear = yn;
 	}
 
-	public boolean isAutocommit() {
-		return isTrue( autocommit );
-	}
-
-	public void isAutocommit( Boolean yn ) {
-		this.autocommit = yn;
-	}
-
-	public void isAutoCommit( String yn ) {
-		if( StringUtil.isEmpty(yn) ) return;
-		this.autocommit = "true".equalsIgnoreCase( yn ) || "y".equalsIgnoreCase( yn );
-	}
-
 	public Integer getPageSqlStart() {
 		return pageSqlStart;
 	}
@@ -247,10 +243,6 @@ public class SqlProperties {
 		if( isCacheEnable() ) {
 			sb.append( String.format(", cache:[%s]", getCacheId()) );
 			sb.append( String.format(", cacheFlushCycle:[%d]", getCacheFlushCycle()) );
-		}
-
-		if( isAutocommit() ) {
-			sb.append( ", autocommit" );
 		}
 
 		return sb.toString();

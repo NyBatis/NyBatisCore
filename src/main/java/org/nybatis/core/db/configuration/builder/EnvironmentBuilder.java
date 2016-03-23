@@ -1,12 +1,12 @@
 package org.nybatis.core.db.configuration.builder;
 
-import org.nybatis.core.db.configuration.connection.JdbcConnectionProperties;
-import org.nybatis.core.db.configuration.connection.JndiConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
+import org.nybatis.core.db.datasource.factory.parameter.JndiConnectionProperties;
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
 import org.nybatis.core.db.datasource.DatasourceFactory;
 import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.jdbc.JdbcDataSourceFactory;
-import org.nybatis.core.db.datasource.jndi.JndiDatasourceFactory;
+import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSourceFactory;
+import org.nybatis.core.db.datasource.factory.jndi.JndiDatasourceFactory;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
