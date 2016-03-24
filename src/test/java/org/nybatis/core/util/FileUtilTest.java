@@ -95,4 +95,9 @@ public class FileUtilTest {
 		FileUtil.copy( source, target, true );
 	}
 
+	@Test
+	public void isFile() {
+		Assert.assertFalse( FileUtil.isFile( "/d:/f제목 없음" ) );
+	}
+
 }
