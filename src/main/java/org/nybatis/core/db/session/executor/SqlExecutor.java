@@ -69,7 +69,7 @@ public class SqlExecutor {
 	        throw exception;
 
 		} catch( ClassCastException e ) {
-			throw new SqlException( "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
 
         } finally {
 			TransactionManager.releaseConnection( token, conn );
