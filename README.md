@@ -27,10 +27,10 @@ Add repository to **pom.xml**.
 
 ```xml
 <repositories>
-<repository>
-  <id>UnofficialNybatisMavenRepository</id>
-  <url>https://github.com/nayasis/UnofficialMavenRepository/raw/master/</url>
-</repository>
+  <repository>
+    <id>UnofficialNybatisMavenRepository</id>
+    <url>https://github.com/nayasis/UnofficialMavenRepository/raw/master/</url>
+  </repository>
 </repositories>
 ```
 
