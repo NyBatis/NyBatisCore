@@ -5,8 +5,13 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.util.Types;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Common Logger Printer
@@ -117,6 +122,16 @@ public class NLoggerPrinter {
 
 		if( format == null ) {
 			printLog( level, logger, null );
+
+		} else if( param.length == 0 ) {
+
+			if( format instanceof List ) {
+				printLog( level, logger, new NList( (List)format).toString() );
+			} else if( Types.isArray(format) ) {
+				printLog( level, logger, Arrays.deepToString( (Object[]) format ) );
+			} else {
+				printLog( level, logger, format.toString() );
+			}
 
 		} else {
 

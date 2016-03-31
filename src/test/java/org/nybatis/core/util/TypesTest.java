@@ -22,7 +22,7 @@ public class TypesTest {
         list.add( "C" );
         list.add( "D" );
 
-        Assert.assertEquals( true, Types.isArray( list ) );
+        Assert.assertEquals( true, Types.isArrayOrList( list ) );
 
     }
 

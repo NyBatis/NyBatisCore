@@ -83,7 +83,7 @@ public class Validator {
             return ( (Map) value ).isEmpty();
         } else if( value instanceof Collection ) {
             return ( (Collection) value ).isEmpty();
-        } else if( Types.isArray( value ) ) {
+        } else if( Types.isArrayOrList( value ) ) {
             return Array.getLength( value ) == 0;
         }
 
