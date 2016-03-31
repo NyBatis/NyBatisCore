@@ -29,8 +29,6 @@ public class DatabaseConfigurator {
 	 */
 	public static void build( String filePath, boolean reload ) {
 
-		filePath = Const.profile.getFileName( filePath );
-
 		if( FileUtil.isNotExist(filePath) ) {
 
 			try {

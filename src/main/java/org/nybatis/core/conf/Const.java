@@ -3,6 +3,7 @@ package org.nybatis.core.conf;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ public class Const {
 		 *     Const.profile.set( "local" )
 		 *
 		 *     Const.profile.getFileName( "/app/webapp/config.prop" )
-		 *     --> "/app/webapp/config<font color=red>-local</font>.prop"
+		 *     --> "/app/webapp/config<font color=red>.local</font>.prop"
 		 *
 		 * </pre>
 		 *
@@ -91,7 +92,11 @@ public class Const {
 		 */
 		public static String getFileName( String file ) {
 			if( StringUtil.isEmpty(name) || StringUtil.isBlank(file) ) return file;
-			return String.format( "%s-%s.%s", FileUtil.removeExtention(file), profile.name, FileUtil.getExtention(file) );
+			return String.format( "%s%s.%s",
+					FileUtil.removeExtention(file),
+					Validator.isEmpty(profile.name) ? "" : "-" + profile.name,
+					FileUtil.getExtention(file)
+			);
 		}
 
 	}
