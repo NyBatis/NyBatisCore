@@ -7,6 +7,7 @@ import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 import org.nybatis.core.xml.node.Node;
 
 public class PropertyResolver {
@@ -31,7 +32,7 @@ public class PropertyResolver {
 
 		String path = getPropValue( properties.getAttrIgnoreCase( "path" ) );
 
-		if( path != null ) {
+		if( Validator.isNotEmpty(path) ) {
 			try {
 	            this.properties.readFrom( new File( Const.path.getConfigDatabase() + "/" + path) );
             } catch( IoException e ) {
