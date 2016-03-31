@@ -51,7 +51,7 @@ public class Const {
 		private static String name = null;
 
 		static {
-			name = System.getProperty( "nayasis.common.profile" );
+			name = StringUtil.nvl( System.getProperty("nayasis.common.profile") );
 		}
 
 		/**

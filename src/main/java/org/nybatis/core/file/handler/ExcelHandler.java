@@ -5,12 +5,9 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.file.annotation.ExcelReadAnnotationInspector;
-import org.nybatis.core.file.annotation.ExcelWriteAnnotationInspector;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.mapper.NObjectExcelMapper;
-import org.nybatis.core.reflection.mapper.NObjectMapper;
 import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Validator;
 
@@ -418,7 +415,7 @@ public abstract class ExcelHandler {
 					sheets.put( sheetName, (NList) sheet );
 				} else if( sheet instanceof List ) {
 					sheets.put( sheetName, toExcelNListFromBean( (List<?>) sheet ) );
-				} else if( Types.isArray( sheet ) ) {
+				} else if( Types.isArrayOrList( sheet ) ) {
 					sheets.put( sheetName, toExcelNListFromBean( Types.toList(sheet) ) );
 				}
 
