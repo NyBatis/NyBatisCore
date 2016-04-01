@@ -8,7 +8,7 @@ import org.nybatis.core.db.session.executor.util.StatementController;
 import org.nybatis.core.db.session.handler.RowHandler;
 import org.nybatis.core.db.session.handler.SqlHandler;
 import org.nybatis.core.db.transaction.TransactionManager;
-import org.nybatis.core.exception.unchecked.ClassCastException;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
@@ -68,7 +68,7 @@ public class SqlExecutor {
 
 	        throw exception;
 
-		} catch( ClassCastException e ) {
+		} catch( ClassCastingException e ) {
 			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
 
         } finally {
@@ -166,7 +166,7 @@ public class SqlExecutor {
 				try {
 					return returnType.newInstance();
 				} catch( InstantiationException | IllegalAccessException e ) {
-					throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
+					throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
 				}
 			case 1 :
 				return Reflector.toBeanFrom( result.getByIndex( 0 ), returnType );
@@ -332,7 +332,7 @@ public class SqlExecutor {
 			try {
 	            return result == null ? returnType.newInstance() : result.toBean( returnType );
             } catch( InstantiationException | IllegalAccessException e ) {
-	            throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
+	            throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
             }
 
 		}

@@ -7,14 +7,14 @@ package org.nybatis.core.exception.unchecked;
  * @author 정화수
  *
  */
-public class ClassCastException extends BaseRuntimeException {
+public class ClassCastingException extends BaseRuntimeException {
 
     private static final long serialVersionUID = 6848966904417509380L;
 
     /**
      * Exception 생성자
      */
-    public ClassCastException() {
+    public ClassCastingException() {
         super();
     }
 
@@ -23,7 +23,7 @@ public class ClassCastException extends BaseRuntimeException {
      *
      * @param rootCause 원인이 되는 예외
      */
-    public ClassCastException( Throwable rootCause ) {
+    public ClassCastingException( Throwable rootCause ) {
         super( rootCause );
     }
     
@@ -33,7 +33,7 @@ public class ClassCastException extends BaseRuntimeException {
      * @param message   에러메세지(또는 메세지코드)
      * @param messageParam '@' 문자를 치환할 파라미터
      */
-    public ClassCastException( String message, Object... messageParam ) {
+    public ClassCastingException( String message, Object... messageParam ) {
         super( message, messageParam );
     }
 
@@ -44,7 +44,7 @@ public class ClassCastException extends BaseRuntimeException {
      * @param message 에러메세지(또는 메세지코드)
      * @param messageParam '@' 문자를 치환할 파라미터
      */
-    public ClassCastException( Throwable rootCause, String message, Object... messageParam ) {
+    public ClassCastingException( Throwable rootCause, String message, Object... messageParam ) {
     	super( rootCause, message, messageParam );
     }
 

@@ -2,7 +2,7 @@ package org.nybatis.core.util;
 
 import java.lang.reflect.Type;
 
-import org.nybatis.core.exception.unchecked.ClassCastException;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 
 
 /**
@@ -106,7 +106,7 @@ public class ClassUtil {
 		try {
 			return klass.newInstance();
 		} catch( InstantiationException | IllegalAccessException e ) {
-        	throw new ClassCastException( e );
+        	throw new ClassCastingException( e );
         }
 
 	}
