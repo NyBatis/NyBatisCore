@@ -172,6 +172,7 @@ public class ProxyConnection {
 	        stmt = realConnection.createStatement();
 	        stmt.executeQuery( pingSql );
         } catch( SQLException e ) {
+			NLogger.error( "{}\n\tPing SQL : [{}]", e, pingSql );
         	return false;
         } finally {
         	if( stmt != null ) try { stmt.close(); } catch( SQLException e ) {}
