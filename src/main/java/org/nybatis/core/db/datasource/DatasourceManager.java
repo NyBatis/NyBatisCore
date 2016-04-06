@@ -25,7 +25,7 @@ public class DatasourceManager {
 
 		DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
 
-		setPingQuery( datasource, databaseAttribute );
+		setPingQuery( datasource, databaseAttribute.getPingQuery() );
 
 		datasourceRepository.put( environmentId, datasource );
 		attributeRepository.put( environmentId, databaseAttribute );
@@ -34,9 +34,9 @@ public class DatasourceManager {
 
 	}
 
-	private void setPingQuery( DataSource datasource, DatabaseAttribute databaseAttribute ) {
+	private void setPingQuery( DataSource datasource, String pingSql ) {
 		if( datasource instanceof JdbcDataSource ) {
-			((JdbcDataSource) datasource).getDatasourceProperties().setPingQuery( databaseAttribute.getPingQuery() );
+			((JdbcDataSource) datasource).getDatasourceProperties().setPingQuery( pingSql );
 		}
 	}
 

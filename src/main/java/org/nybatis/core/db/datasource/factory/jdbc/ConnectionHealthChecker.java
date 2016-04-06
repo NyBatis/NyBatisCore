@@ -35,17 +35,12 @@ public class ConnectionHealthChecker {
 	}
 
 	private void pingConnection() {
-
 		for( ProxyConnection connection : idleConnectionPool ) {
-
 			if( connection.getElpasedTimeAfterLastUsed() <= datasourceProperties.getPingCycle() ) continue;
 			if( connection.ping(datasourceProperties.getPingQuery()) == false ) {
 				connection.destroy();
 			}
-
 		}
-
 	}
-
 
 }
