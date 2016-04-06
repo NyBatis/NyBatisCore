@@ -22,7 +22,7 @@ import java.util.List;
  */
 public class NLoggerPrinter {
 
-	Logger logger;
+	private Logger logger;
 
 	public NLoggerPrinter( Caller caller ) {
 		this( caller.getClassName() );
