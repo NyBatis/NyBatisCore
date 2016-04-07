@@ -19,8 +19,6 @@ public class NLoggerConfigLoader {
 
 	public void loadConfiguration( String filePath ) {
 
-		filePath = Const.profile.getFileName( filePath );
-
 		InputStream stream = getConfiguration( filePath );
 		
 		if( stream == null ) return;
@@ -80,7 +78,7 @@ public class NLoggerConfigLoader {
 
 		InputStream stream = null;
 		
-		File configurationFile = new File( filePath );
+		File configurationFile = new File( Const.profile.getFileName(filePath) );
 		
 		if( ! configurationFile.isFile() || ! configurationFile.canRead() ) {
 			
