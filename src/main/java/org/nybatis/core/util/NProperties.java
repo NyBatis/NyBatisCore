@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -122,6 +123,12 @@ public class NProperties {
 
 	public Properties getUnwrappedProperties() {
 		return properties;
+	}
+
+	public Map<String, Object> toMap() {
+		Map<String, Object> map = new HashMap<>();
+		properties.forEach( ( key, val ) -> map.put( StringUtil.nvl(key), val ) );
+		return map;
 	}
 
 }
