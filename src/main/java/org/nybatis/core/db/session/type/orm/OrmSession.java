@@ -38,7 +38,7 @@ public interface OrmSession<T> {
     int update( Object entity );
 
     /**
-     * Delete entity. If entity belongs to domain class, only PK records affected.
+     * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
      *
      * @param entity entity parameter to delete.
      * @return affected count
@@ -46,7 +46,7 @@ public interface OrmSession<T> {
     int delete( Object entity );
 
     /**
-     * Select entity. If entity belongs to domain class, only PK records affected.
+     * Select entity.
      *
      * @param entity entity parameter to select.
      * @return selected entity
@@ -54,7 +54,7 @@ public interface OrmSession<T> {
     T select( Object entity );
 
     /**
-     * Select entity as map data. If entity belongs to domain class, only PK records affected.
+     * Select entity as map data.
      *
      *
      * @param entity entity parameter to select.
