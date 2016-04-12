@@ -30,13 +30,6 @@ public class Validator {
     }
 
     /**
-     * 날짜가 정상인지를 확인한다.
-     *
-     * @param value 날짜
-     * @param format 날짜를 구성하는 포맷 ((예) YYYY-MM-DD HH:MI:SS)
-     * @return 날짜 정상여부
-     */
-    /**
      * check whether value is valid date format.
      *
      * @param value  date text
