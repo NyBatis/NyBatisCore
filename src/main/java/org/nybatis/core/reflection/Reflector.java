@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -261,18 +262,50 @@ public class Reflector {
 
     	if( fromBean == null || toBean == null ) return new HashMap();
 
-		Map fromMap = toMapWithFlattenKey( fromBean );
-		Map toMap   = toMapWithFlattenKey( toBean );
+		if ( fromBean instanceof Map && toBean instanceof Map ) {
+			return merge( (Map)fromBean, (Map)toBean );
+		}
 
-		toMap.putAll( fromMap );
+		Map fromMap = toMapFrom( fromBean );
+		Map toMap   = toMapFrom( toBean );
 
-		toMap = toMapWithUnflattenKey( toMap );
+		merge( fromMap, toMap );
 
 		copy( toMap, toBean );
 
 		return toMap;
 
     }
+
+	/**
+	 * Merge data between Map
+	 *
+	 * @param fromMap	Map to merge
+	 * @param toMap		Map to be merged
+	 * @return merged Map
+	 * @see https://gist.github.com/aslakhellesoy/3858814
+	 */
+	private static Map merge( Map fromMap, Map toMap ) {
+
+		if( fromMap == null || toMap == null ) return new HashMap();
+
+		for( Object key : fromMap.keySet() ) {
+			if ( fromMap.get(key) instanceof Map && toMap.get(key) instanceof Map ) {
+				Map fromChild = (Map) fromMap.get( key );
+				Map toChild   = (Map) toMap.get( key );
+				toMap.put( key, merge( fromChild, toChild ) );
+			} else if (fromMap.get(key) instanceof Collection && toMap.get(key) instanceof Collection) {
+				Collection toChild   = (Collection) toMap.get( key );
+				Collection fromChild = (Collection) fromMap.get( key );
+				fromChild.stream().filter( each -> ! toChild.contains( each ) ).forEach( toChild::add );
+			} else {
+				toMap.put( key, fromMap.get(key) );
+			}
+		}
+
+		return toMap;
+
+	}
 
 	/**
 	 * Get inspection result of fields within instance
