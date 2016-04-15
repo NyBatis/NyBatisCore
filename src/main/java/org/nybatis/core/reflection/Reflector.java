@@ -255,10 +255,11 @@ public class Reflector {
 	 *
 	 * @param fromBean  jsonString, Map or bean as source
 	 * @param toBean	Map or bean as target
+	 * @return merged Map
 	 */
-    public static void merge( Object fromBean, Object toBean ) {
+    public static Map merge( Object fromBean, Object toBean ) {
 
-    	if( fromBean == null || toBean == null ) return;
+    	if( fromBean == null || toBean == null ) return new HashMap();
 
 		Map fromMap = toMapWithFlattenKey( fromBean );
 		Map toMap   = toMapWithFlattenKey( toBean );
@@ -268,6 +269,8 @@ public class Reflector {
 		toMap = toMapWithUnflattenKey( toMap );
 
 		copy( toMap, toBean );
+
+		return toMap;
 
     }
 
