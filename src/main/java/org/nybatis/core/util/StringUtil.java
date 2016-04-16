@@ -1208,6 +1208,27 @@ public class StringUtil {
 	}
 
 	/**
+	 *
+	 * Check value is not true
+	 *
+	 * @param value value to determine
+	 *              <tr><td>true</td><td>false</td></tr>
+	 *              <tr><td>
+	 *                  <li>y</li>
+	 *                  <li>yes</li>
+	 *                  <li>t</li>
+	 *                  <li>true</li>
+	 *              </td><td>
+	 *                  <li>Null or empty</li>
+	 *                  <li>Not in 'Y' condition</li>
+	 *              </td></tr>
+	 * @return true if value is negative
+	 */
+	public static boolean isNotTrue( Object value ) {
+		return ! isTrue( value );
+	}
+
+	/**
 	 * Check one string is equals to other string
 	 *
 	 * @param one    string to compare

@@ -258,18 +258,30 @@ public class Reflector {
 	 * @param toBean	Map or bean as target
 	 * @return merged Map
 	 */
-    public static Map merge( Object fromBean, Object toBean ) {
+	public static Map merge( Object fromBean, Object toBean ) {
+		return merge( fromBean, toBean, true );
+	}
+
+	/**
+	 * Merge data in instance
+	 *
+	 * @param fromBean  jsonString, Map or bean as source
+	 * @param toBean	Map or bean as target
+	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
+	 * @return merged Map
+	 */
+    public static Map merge( Object fromBean, Object toBean, boolean strict ) {
 
     	if( fromBean == null || toBean == null ) return new HashMap();
 
 		if ( fromBean instanceof Map && toBean instanceof Map ) {
-			return merge( (Map)fromBean, (Map)toBean );
+			return merge( (Map)fromBean, (Map)toBean, strict );
 		}
 
 		Map fromMap = toMapFrom( fromBean );
 		Map toMap   = toMapFrom( toBean );
 
-		merge( fromMap, toMap );
+		merge( fromMap, toMap, strict );
 
 		copy( toMap, toBean );
 
@@ -282,25 +294,39 @@ public class Reflector {
 	 *
 	 * @param fromMap	Map to merge
 	 * @param toMap		Map to be merged
+	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
 	 * @return merged Map
-	 * @see https://gist.github.com/aslakhellesoy/3858814
 	 */
-	private static Map merge( Map fromMap, Map toMap ) {
+	private static Map merge( Map fromMap, Map toMap, boolean strict ) {
 
 		if( fromMap == null || toMap == null ) return new HashMap();
 
 		for( Object key : fromMap.keySet() ) {
-			if ( fromMap.get(key) instanceof Map && toMap.get(key) instanceof Map ) {
-				Map fromChild = (Map) fromMap.get( key );
-				Map toChild   = (Map) toMap.get( key );
-				toMap.put( key, merge( fromChild, toChild ) );
-			} else if (fromMap.get(key) instanceof Collection && toMap.get(key) instanceof Collection) {
-				Collection toChild   = (Collection) toMap.get( key );
-				Collection fromChild = (Collection) fromMap.get( key );
-				fromChild.stream().filter( each -> ! toChild.contains( each ) ).forEach( toChild::add );
+
+			Object fromValue = fromMap.get( key );
+			Object toValue   = toMap.get( key );
+
+			if( strict ) {
+				if( Validator.isNull(fromValue) ) continue;
 			} else {
-				toMap.put( key, fromMap.get(key) );
+				if( Validator.isEmpty(fromValue) ) continue;
 			}
+
+			if( ! toMap.containsKey(key) || toValue == null ) {
+				toMap.put( key, fromValue );
+
+			} else if( fromValue instanceof Map && toValue instanceof Map ) {
+				toMap.put( key, merge( (Map) fromValue, (Map) toValue, strict ) );
+
+			} else if( fromValue instanceof Collection && toValue instanceof Collection ) {
+				Collection toChild   = (Collection) toValue;
+				Collection fromChild = (Collection) fromValue;
+				fromChild.stream().filter( each -> ! toChild.contains( each ) ).forEach( toChild::add );
+
+			} else {
+				toMap.put( key, fromValue );
+			}
+
 		}
 
 		return toMap;
@@ -594,6 +620,29 @@ public class Reflector {
 	}
 
 	/**
+	 * Convert as bean from object
+	 * @param object		json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
+	 * @param typeReference	type to return
+	 * 	<pre>
+	 *	  Examples are below.
+	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
+	 *	    - new TypeReference<List<String>>() {}
+	 *	    - new TypeReference<List>() {}
+	 * 	</pre>
+	 * @param <T>		return type
+	 * @return	bean filled by object's value
+	 */
+	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
+
+		if( isString( object ) ) {
+			return toBeanFromJson( object.toString(), typeReference );
+		} else {
+			return objectMapper.convertValue( object, typeReference );
+		}
+
+	}
+
+	/**
 	 * Convert as bean from json text
 	 * @param jsonString	json text
 	 * @param toClass		class to return
@@ -609,6 +658,29 @@ public class Reflector {
     		throw new JsonIOException( e );
     	}
     }
+
+	/**
+	 * Convert as bean from json text
+	 * @param jsonString	json text
+	 * @param typeReference	type to return
+	 * 	<pre>
+	 *	  Examples are below.
+	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
+	 *	    - new TypeReference<List<String>>() {}
+	 *	    - new TypeReference<List>() {}
+	 * 	</pre>
+	 * @param <T>			return type
+	 * @return bean filled by json value
+	 */
+	private static <T> T toBeanFromJson( String jsonString, TypeReference<T> typeReference ) {
+		try {
+			return objectMapper.readValue( getContent( jsonString ), typeReference );
+		} catch( JsonParseException e ) {
+			throw new JsonIOException( "JsonParseException : {}\n\t- json string :\n{}", e.getMessage(), jsonString );
+		} catch( IOException e ) {
+			throw new JsonIOException( e );
+		}
+	}
 
 	/**
 	 * Convert as List from json text
