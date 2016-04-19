@@ -121,7 +121,7 @@ public class NLoggerPrinter {
 		if( ! logger.isEnabledFor( level ) ) return;
 
 		if( format == null ) {
-			printLog( level, logger, null );
+			printLog( level, logger, "null" );
 
 		} else if( param.length == 0 ) {
 

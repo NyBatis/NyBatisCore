@@ -3,24 +3,17 @@ package org.nybatis.core.util;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.IoException;
-import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.worker.WorkerReadLine;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 
 /**
  * Properties wrapper
@@ -32,19 +25,19 @@ public class NProperties {
 
 	public NProperties() {}
 
-	public NProperties( String filePath ) throws IoException {
+	public NProperties( String filePath ) throws UncheckedIOException {
 		this( filePath, StandardCharsets.UTF_8.toString() );
 	}
 
-	public NProperties( String filePath, String charset ) throws IoException {
+	public NProperties( String filePath, String charset ) throws UncheckedIOException {
 		readFrom( new File(Const.profile.getFileName(filePath)), charset );
 	}
 
-	public NProperties( File file ) throws IoException {
+	public NProperties( File file ) throws UncheckedIOException {
 		this( file,  StandardCharsets.UTF_8.toString() );
 	}
 
-	public NProperties( File file, String charset ) throws IoException {
+	public NProperties( File file, String charset ) throws UncheckedIOException {
 	    readFrom( file, charset );
 	}
 
@@ -52,16 +45,16 @@ public class NProperties {
 		append(properties);
 	}
 
-	public NProperties readFrom( File file ) throws IoException {
+	public NProperties readFrom( File file ) throws UncheckedIOException {
 		return readFrom( file, StandardCharsets.UTF_8.toString() );
 	}
 
-    public NProperties readFrom( File file, String charset ) throws IoException {
+    public NProperties readFrom( File file, String charset ) throws UncheckedIOException {
 
 		try {
 			properties.load( new BufferedReader( new InputStreamReader( new FileInputStream( file ), charset ) ));
 		} catch( IOException e ) {
-			throw new IoException( e );
+			throw new UncheckedIOException( e );
 		}
 
 		return this;

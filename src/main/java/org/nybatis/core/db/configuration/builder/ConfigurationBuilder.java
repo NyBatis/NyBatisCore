@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
@@ -78,7 +78,7 @@ public class ConfigurationBuilder {
             }
 
 
-		} catch( ParseException | IoException e ) {
+		} catch( ParseException | UncheckedIOException e ) {
 	        throw new ParseException( e, "Error on reading Database configuration file({})\n\t{}", file, e.getMessage() );
         }
 

@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.file.FileUtil;
@@ -150,7 +150,7 @@ public class Message {
         		loadPool( path.toString() );
         	}
 
-        } catch( IoException e ) {
+        } catch( UncheckedIOException e ) {
         	NLogger.error( e );
         }
 
@@ -163,7 +163,7 @@ public class Message {
      * @param filePath 메세지파일의 경로
      * @throws IOException
      */
-    public static void loadPool( String filePath ) throws IoException {
+    public static void loadPool( String filePath ) throws UncheckedIOException {
 
         Locale locale = getLocaleFrom( filePath );
 

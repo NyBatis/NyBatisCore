@@ -3,7 +3,7 @@ package org.nybatis.core.db.configuration.builder;
 import java.io.File;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
@@ -35,7 +35,7 @@ public class PropertyResolver {
 		if( Validator.isNotEmpty(path) ) {
 			try {
 	            this.properties.readFrom( new File( Const.path.getConfigDatabase() + "/" + path) );
-            } catch( IoException e ) {
+            } catch( UncheckedIOException e ) {
             	NLogger.error( e );
             }
 		}

@@ -5,7 +5,7 @@ import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveOutputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 
 import java.io.BufferedOutputStream;
@@ -59,7 +59,7 @@ public class ZipFileHandler {
 
             }
         } catch( IOException e ) {
-            throw new IoException( e );
+            throw new UncheckedIOException( e );
         }
 
     }
@@ -74,7 +74,7 @@ public class ZipFileHandler {
 
         } catch( IOException e ) {
 
-            throw new IoException( e );
+            throw new UncheckedIOException( e );
         }
 
     }
@@ -130,7 +130,7 @@ public class ZipFileHandler {
             }
 
         } catch( IOException e ) {
-            throw new IoException( e );
+            throw new UncheckedIOException( e );
         } finally {
             if( fis != null ) try { fis.close(); } catch( IOException e ) {}
             if( zos != null ) try { zos.closeArchiveEntry(); } catch( IOException e ) {}
@@ -152,7 +152,7 @@ public class ZipFileHandler {
 
         } catch( IOException e ) {
 
-            throw new IoException( e );
+            throw new UncheckedIOException( e );
         }
 
     }

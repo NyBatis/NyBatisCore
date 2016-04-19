@@ -19,7 +19,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SyntaxException;
 
@@ -311,7 +311,7 @@ public class DocumentHandler {
     	return readXml( is, ignoreDtd );
     }
 
-	public Document readXml( InputStream inputStream, boolean ignoreDtd ) throws ParseException, IoException {
+	public Document readXml( InputStream inputStream, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 
 		DocumentBuilder builder = getBuilder( ignoreDtd );
 
@@ -345,7 +345,7 @@ public class DocumentHandler {
 			throw new ParseException( e, e.getMessage() );
 
         } catch( IOException e ) {
-	        throw new IoException( e );
+	        throw new UncheckedIOException( e );
         } finally {
         	if( inputStream != null ) try { inputStream.close(); } catch (IOException e) {}
         }
