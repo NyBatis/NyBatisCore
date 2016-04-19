@@ -2,28 +2,28 @@ package org.nybatis.core.exception.unchecked;
 
 
 /**
- * {@link #IoException} Runtime Exception
+ * {@link #UncheckedIOException} Runtime Exception
  *
  * @author nayasis@gmail.com
  *
  */
-public class IoException extends BaseRuntimeException {
+public class UncheckedIOException extends BaseRuntimeException {
 
     private static final long serialVersionUID = 6848966904417509380L;
 
     /**
-     * Constructs an {@link #IoException} with no detail message.
+     * Constructs an {@link #UncheckedIOException} with no detail message.
      */
-    public IoException() {
+    public UncheckedIOException() {
         super();
     }
 
     /**
-     * Constructs an {@link #IoException} with detail cause.
+     * Constructs an {@link #UncheckedIOException} with detail cause.
      *
      * @param rootCause 원인이 되는 예외
      */
-    public IoException( Throwable rootCause ) {
+    public UncheckedIOException( Throwable rootCause ) {
         super( rootCause );
     }
     
@@ -33,7 +33,7 @@ public class IoException extends BaseRuntimeException {
      * @param message   에러메세지(또는 메세지코드)
      * @param messageParam '{}' 문자를 치환할 파라미터
      */
-    public IoException( String message, Object... messageParam ) {
+    public UncheckedIOException( String message, Object... messageParam ) {
         super( message, messageParam );
     }
 
@@ -44,7 +44,7 @@ public class IoException extends BaseRuntimeException {
      * @param message 에러메세지(또는 메세지코드)
      * @param messageParam '{}' 문자를 치환할 파라미터
      */
-    public IoException( Throwable rootCause, String message, Object... messageParam ) {
+    public UncheckedIOException( Throwable rootCause, String message, Object... messageParam ) {
     	super( rootCause, message, messageParam );
     }
 

@@ -2,7 +2,7 @@ package org.nybatis.core.util;
 
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -812,7 +812,7 @@ public class StringUtil {
     		result = DatatypeConverter.printBase64Binary( bos.toByteArray() );
 
     	} catch ( IOException e ) {
-    		throw new IoException( e );
+    		throw new UncheckedIOException( e );
 		}
 
         return result;
@@ -841,7 +841,7 @@ public class StringUtil {
     		vo = ois.readObject();
 
     	} catch (IOException e) {
-    		throw new IoException( e );
+    		throw new UncheckedIOException( e );
 		} catch ( ClassNotFoundException e) {
 			throw new ClassNotExistException( e );
 		}
@@ -936,7 +936,7 @@ public class StringUtil {
         	return out.toString( StandardCharsets.ISO_8859_1.toString() );
 
         } catch( IOException e ) {
-        	throw new IoException( e );
+        	throw new UncheckedIOException( e );
         }
 
 	}
@@ -969,7 +969,7 @@ public class StringUtil {
         	return sb.toString();
 
         } catch( IOException e ) {
-        	throw new IoException( e );
+        	throw new UncheckedIOException( e );
         }
 
 	}

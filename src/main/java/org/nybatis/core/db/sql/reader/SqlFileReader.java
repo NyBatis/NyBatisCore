@@ -3,7 +3,7 @@ package org.nybatis.core.db.sql.reader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.file.FileUtil;
@@ -54,7 +54,7 @@ public class SqlFileReader {
 
 			}
 
-		} catch( ParseException | IoException | SqlParseException | DatabaseConfigurationException e ) {
+		} catch( ParseException | UncheckedIOException | SqlParseException | DatabaseConfigurationException e ) {
 			NLogger.error( "Error on reading file({}).. {}", file, e );
 		}
 

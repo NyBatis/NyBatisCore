@@ -1,5 +1,6 @@
 package org.nybatis.core.util;
 
+import java.io.InputStream;
 import java.lang.reflect.Type;
 
 import org.nybatis.core.exception.unchecked.ClassCastingException;
@@ -31,7 +32,7 @@ public class ClassUtil {
 			className = className.substring( 0, invalidCharacterIndex );
 		}
 
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		ClassLoader classLoader = getClassLoader();
 
 		try {
 	        return classLoader.loadClass( className );
@@ -42,7 +43,16 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Class의 Generic 정보로서 가져온 Type을 이용해 Class를 구한다.
+	 * Get class loader
+	 *
+	 * @return get class loader in current thread.
+	 */
+	public static ClassLoader getClassLoader() {
+		return Thread.currentThread().getContextClassLoader();
+	}
+
+	/**
+	 * Get Class from Type like class's generic type.
 	 *
 	 * <pre>
 	 *
@@ -76,44 +86,30 @@ public class ClassUtil {
 	}
 
 	public static Class<?> getClass( Object object ) {
-
-	    if( object == null ) return null;
-
-	    return object.getClass();
-
+		return ( object == null ) ? null : object.getClass();
 	}
 
 	public static Class<?> getTopSuperClass( Class<?> klass ) {
-
 	    Class<?> superclass = klass.getSuperclass();
-
 	    if( superclass == null || superclass == Object.class ) return klass;
-
 	    return getTopSuperClass( superclass );
-
 	}
 
 	public static Class<?> getTopSuperClass( Object object ) {
-
-	    if( object == null ) return null;
-
-	    return getTopSuperClass( object.getClass() );
-
+	    return ( object == null ) ? null : getTopSuperClass( object.getClass() );
 	}
 
 	public static <T> T getInstance( Class<T> klass ) {
-
 		try {
 			return klass.newInstance();
 		} catch( InstantiationException | IllegalAccessException e ) {
         	throw new ClassCastingException( e );
         }
-
 	}
 
 	@SuppressWarnings( "unchecked" )
     public static <T> T getInstance( Type type ) throws ClassNotFoundException {
-		return (T) getInstance( getClass(type) );
+		return (T) getInstance( getClass( type ) );
 	}
 
 	/**
@@ -151,11 +147,18 @@ public class ClassUtil {
 	 * @return true if inspect instance is extended of implemented by found class
 	 */
 	public static boolean isExtendedBy( Object inspectInstance, Class<?> foundClass ) {
+		return ( inspectInstance == null ) ? false : isExtendedBy( inspectInstance.getClass(), foundClass );
+	}
 
-		if( inspectInstance == null ) return false;
-
-		return isExtendedBy( inspectInstance.getClass(), foundClass );
-
+	/**
+	 * Get resource as stream
+	 *
+	 * @param name	resource name
+	 * @return resource input stream
+	 */
+	public static InputStream getResourceAsStream( String name ) {
+		name = StringUtil.nvl( name ).replaceFirst( "^/", "" );
+		return getClassLoader().getResourceAsStream( name );
 	}
 
 }

@@ -12,7 +12,7 @@ import jxl.write.WritableCellFormat;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.model.NList;
 
@@ -25,7 +25,7 @@ import java.util.Map;
 public class ExcelHandlerJxl extends ExcelHandler {
 
     @Override
-    public void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws IoException {
+    public void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws UncheckedIOException {
 
         WritableWorkbook workbook = null;
 
@@ -40,7 +40,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
             workbook.write();
 
         } catch( IOException | WriteException e ) {
-            throw new IoException( e, "Error on writing excel to output stream." );
+            throw new UncheckedIOException( e, "Error on writing excel to output stream." );
 
         } finally {
 
@@ -94,14 +94,14 @@ public class ExcelHandlerJxl extends ExcelHandler {
     }
 
     @Override
-    public NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+    public NList readFrom( InputStream inputStream, String sheetName ) throws UncheckedIOException {
         return readFrom( inputStream, ( workbook, result ) -> {
             result.put( sheetName, readFrom( workbook, sheetName ) );
         } ).get( sheetName );
     }
 
     @Override
-    public NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+    public NList readFirstSheetFrom( InputStream inputStream ) throws UncheckedIOException {
         return readFrom( inputStream, ( workbook, result ) -> {
             Sheet sheet = workbook.getSheet( 0 );
             if( sheet != null ) {
@@ -111,7 +111,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
     }
 
     @Override
-    public Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+    public Map<String, NList> readFrom( InputStream inputStream ) throws UncheckedIOException {
         return readFrom( inputStream, ( workbook, result ) -> {
             for( String sheetName : workbook.getSheetNames() ) {
                 result.put( sheetName, readFrom(workbook, sheetName) );
@@ -123,7 +123,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
         void read( Workbook workbook, Map<String,NList> result );
     }
 
-    private Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
+    private Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws UncheckedIOException {
 
         Map<String, NList> result   = new LinkedHashMap<>();
         Workbook           workBook = null;
@@ -135,7 +135,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
             return result;
 
         } catch( IOException | BiffException e ) {
-            throw new IoException( e, "Error on reading excel data from input stream." );
+            throw new UncheckedIOException( e, "Error on reading excel data from input stream." );
         } finally {
             if( workBook != null ) {
                 workBook.close();
