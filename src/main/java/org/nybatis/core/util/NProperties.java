@@ -30,7 +30,7 @@ public class NProperties {
 	}
 
 	public NProperties( String filePath, String charset ) throws UncheckedIOException {
-		readFrom( new File(Const.profile.getFileName(filePath)), charset );
+		readFrom( new File(Const.profile.apply( filePath )), charset );
 	}
 
 	public NProperties( File file ) throws UncheckedIOException {

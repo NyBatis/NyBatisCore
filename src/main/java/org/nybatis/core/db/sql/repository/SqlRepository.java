@@ -7,11 +7,13 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.sql.reader.SqlFileReader;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.util.ClassUtil;
 
 /**
  * Sql Repository to store structured sql parsed from xml
@@ -34,7 +36,7 @@ public class SqlRepository {
 		put( sqlId, sqlNode, null );
 	}
 
-	public static void put( String sqlId, SqlNode sqlNode, File xmlFile ) {
+	public static void put( String sqlId, SqlNode sqlNode, String xmlFile ) {
 
 		if( sqlId == null || sqlNode == null ) return;
 
@@ -48,7 +50,7 @@ public class SqlRepository {
 				if( xmlFile == null ) {
 					NLogger.warn( "Sql(id:{}) is duplicated. later sql will be ignored.\n\t\t>> {}", sqlId, sqlNode.getSqlSkeleton() );
 				} else {
-					NLogger.warn( "Sql(id:{}, file:{}) is duplicated.\n{}", sqlId, xmlFile.getPath(), sqlNode.getSqlSkeleton() );
+					NLogger.warn( "Sql(id:{}, file:{}) is duplicated.\n{}", sqlId, xmlFile, sqlNode.getSqlSkeleton() );
 				}
 
 			} else {
@@ -58,7 +60,7 @@ public class SqlRepository {
 				if( xmlFile == null ) {
 					NLogger.trace( "Sql({}) has multiple environment({})", sqlId, environmentId );
 				} else {
-					NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile.getPath() );
+					NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile );
 				}
 
 			}
@@ -101,34 +103,23 @@ public class SqlRepository {
 
 	}
 
-	public void readFrom( Path path, String environmentId ) {
+	public void readFromDirectory( String directory, String environmentId ) {
 
-		if( path == null ) return;
-
-		File file = path.toFile();
-
-		if( ! file.exists() ) return;
-
-		if( file.isDirectory() ) {
-			readFromDirectory( file, environmentId );
-
-		} else if( file.isFile() ) {
-			readFromFile( file, environmentId );
+		if( FileUtil.isExist(directory) && ! directory.startsWith(Const.path.getBase())) {
+			List<Path> pathList = FileUtil.search( directory, true, false, -1, "**.xml" );
+			for( Path path : pathList ) {
+				readFromFile( path.toString(), environmentId );
+			}
+		} else {
+			List<String> resourceNames = ClassUtil.getResourceNames( directory + "/**.xml" );
+			for( String resourceName : resourceNames ) {
+				readFromFile( resourceName, environmentId );
+			}
 		}
 
 	}
 
-	private void readFromDirectory( File directory, String environmentId ) {
-
-		List<Path> pathList = FileUtil.search( directory.getAbsolutePath(), true, false, -1, "**.xml" );
-
-		for( Path path : pathList ) {
-			readFromFile( path.toFile(), environmentId );
-		}
-
-	}
-
-	private void readFromFile( File file, String environmentId ) {
+	public void readFromFile( String file, String environmentId ) {
 		NLogger.trace( "configurate sql (environmentId: {}, sqlFile: {})", environmentId, file );
 		new SqlFileReader( file, environmentId ).read();
 	}

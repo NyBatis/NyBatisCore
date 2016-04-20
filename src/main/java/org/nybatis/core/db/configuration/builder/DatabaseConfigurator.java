@@ -9,6 +9,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.util.ClassUtil;
 
 /**
  * Database Configuration Builder
@@ -28,6 +29,8 @@ public class DatabaseConfigurator {
 	 * @param reload  	reload configuration
 	 */
 	public static void build( String filePath, boolean reload ) {
+
+		filePath = FileUtil.nomalizeSeparator( filePath );
 
 		if( FileUtil.isNotExist(filePath) ) {
 
@@ -65,10 +68,12 @@ public class DatabaseConfigurator {
 	 */
 	public static void build( boolean reload ) {
 
-		List<Path> confLists = FileUtil.search( Const.path.getConfigDatabase(), true, false, 0, "*.xml" );
+		String dbConfDir = Const.path.toResourceName( Const.path.getConfigDatabase() );
 
-		for( Path confPath : confLists ) {
-			build( confPath.toString(), reload );
+		List<String> resourceNames = ClassUtil.getResourceNames( dbConfDir + "/*.xml" );
+
+		for( String resourceName : resourceNames ) {
+			new ConfigurationBuilder().readFrom( resourceName, reload );
 		}
 
 	}

@@ -30,7 +30,7 @@ public class SqlGrammerTest {
 
 	@BeforeClass
 	public void before() {
-		repository.readFrom( Paths.get( Const.path.getBase(), "/config/db/grammer" ), "testDbResource" );
+		repository.readFromDirectory( Paths.get( Const.path.getBase(), "/config/db/grammer" ).toString(), "testDbResource" );
 	}
 
 	@Test

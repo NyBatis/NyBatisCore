@@ -15,9 +15,9 @@ public class SqlBuilder {
 	private PropertyResolver prop = new PropertyResolver();
 	private String           basePath;
 
-	public SqlBuilder( PropertyResolver propertyResolver, File basePath ) {
+	public SqlBuilder( PropertyResolver propertyResolver, String basePath ) {
 		this.prop     = propertyResolver;
-		this.basePath = basePath.getAbsolutePath();
+		this.basePath = basePath;
 	}
 
 	public void setSql( Node environment ) {
@@ -38,9 +38,22 @@ public class SqlBuilder {
 	}
 
 	private void readSql( Node path, String environmentId ) {
+
 		String inputPath = prop.getPropValue(path.getText());
-        Path   realPath  = FileUtil.isExist( inputPath ) ? Paths.get( inputPath ) : Paths.get( basePath, inputPath );
-		new SqlRepository().readFrom( realPath, environmentId );
+		String realPath;
+
+		if( FileUtil.isExist(inputPath) ) {
+			realPath = inputPath;
+		} else {
+			realPath = FileUtil.getPath( basePath, inputPath );
+		}
+
+		if( realPath.endsWith(".xml") ) {
+			new SqlRepository().readFromFile( realPath, environmentId );
+		} else {
+			new SqlRepository().readFromDirectory( realPath, environmentId );
+		}
+
 	}
 
 }

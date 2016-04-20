@@ -487,7 +487,7 @@ public class NConfigulator {
     }
 
     private static void loadXml() {
-    	conf = new NXml( Paths.get(Const.path.getConfig(), Const.profile.getFileName( "common.xml" )), true );
+    	conf = new NXml( Paths.get(Const.path.getConfig(), Const.profile.apply( "common.xml" )), true );
     }
 
 	/**
