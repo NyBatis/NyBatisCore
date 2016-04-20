@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.file.FileUtil;
 
 /**
  * Properties wrapper
@@ -45,11 +46,23 @@ public class NProperties {
 		append(properties);
 	}
 
-	public NProperties readFrom( File file ) throws UncheckedIOException {
+	public NProperties readFrom( String file ) throws UncheckedIOException {
 		return readFrom( file, StandardCharsets.UTF_8.toString() );
 	}
 
-    public NProperties readFrom( File file, String charset ) throws UncheckedIOException {
+    public NProperties readFrom( String file, String charset ) throws UncheckedIOException {
+
+		try {
+			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( file ), charset ) ));
+		} catch( IOException e ) {
+			throw new UncheckedIOException( e );
+		}
+
+		return this;
+
+	}
+
+	public NProperties readFrom( File file, String charset ) throws UncheckedIOException {
 
 		try {
 			properties.load( new BufferedReader( new InputStreamReader( new FileInputStream( file ), charset ) ));
