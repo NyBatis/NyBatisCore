@@ -62,6 +62,10 @@ public class NProperties {
 
 	}
 
+	public NProperties readFrom( File file ) throws UncheckedIOException {
+		return readFrom( file, StandardCharsets.UTF_8.toString() );
+	}
+
 	public NProperties readFrom( File file, String charset ) throws UncheckedIOException {
 
 		try {
