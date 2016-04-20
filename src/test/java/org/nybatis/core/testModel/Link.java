@@ -144,7 +144,7 @@ public class Link {
 
 		try {
 
-			filePath = FileUtil.convertToRelativePath( Const.path.getBase(), filePath );
+			filePath = FileUtil.toRelativePath( Const.path.getBase(), filePath );
 
 		} catch( IllegalArgumentException | FileNotFoundException e ) {
 			NLogger.error( e );

@@ -13,15 +13,13 @@ import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
 
-import java.io.File;
-
 public class SqlFileReader {
 
-	private File         file;
+	private String       file;
 	private XmlSqlParser xmlParser;
 
-	public SqlFileReader( File file, String environmentId ) {
-		this.file      = file;
+	public SqlFileReader( String file, String environmentId ) {
+		this.file      = FileUtil.nomalizeSeparator( file );
 		this.xmlParser = new XmlSqlParser( environmentId );
 	}
 
@@ -31,7 +29,7 @@ public class SqlFileReader {
 
 		try {
 
-			NXml xmlReader = new NXmlDeformed( file );
+			NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom(file) );
 
 			for( Node node : xmlReader.getChildElements("sql") ) {
 
@@ -60,8 +58,12 @@ public class SqlFileReader {
 
 	}
 
-	private String getMainId( File file ) {
-		return FileUtil.removeExtention( file.getName() );
+	private String getMainId( String file ) {
+		int index = file.lastIndexOf( "/" );
+		if( index >= 0 ) {
+			file = file.substring( index + 1 );
+		}
+		return FileUtil.removeExtention( file );
 	}
 
 }

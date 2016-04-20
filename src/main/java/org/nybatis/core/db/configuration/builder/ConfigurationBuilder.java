@@ -1,46 +1,25 @@
 package org.nybatis.core.db.configuration.builder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.log.NLogger;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ConfigurationBuilder {
 
 	private static Set<String> loadedFiles = new HashSet<>();
 
 	public void readFrom( String file ) {
-		readFrom( Paths.get(file), false );
-	}
-
-	public void readFrom( String file, boolean reload ) {
-		readFrom( Paths.get( file ), reload );
-	}
-
-	public void readFrom( Path path ) {
-		readFrom( path, false );
-	}
-
-	public void readFrom( Path path, boolean reload ) {
-		if( path == null ) return;
-		readFrom( path.toFile(), reload );
-	}
-
-	public void readFrom( File file ) {
 		readFrom( file, false );
 	}
 
-	public void readFrom( File file, boolean reload ) {
+	public void readFrom( String file, boolean reload ) {
 
 		if( reload == false && isLoaded(file) ) return;
 
@@ -50,7 +29,7 @@ public class ConfigurationBuilder {
 
 			synchronized( loadedFiles ) {
 
-				NXml xmlReader = new NXmlDeformed( file );
+				NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom( file ) );
 
 				Node root = xmlReader.getRoot();
 
@@ -66,9 +45,7 @@ public class ConfigurationBuilder {
 
 				for( Node environment : root.getChildElements("environment") ) {
 					new EnvironmentBuilder( environment, propertyResolver );
-					try {
-						new SqlBuilder( propertyResolver, FileUtil.getDirectory(file) ).setSql( environment );
-					} catch (FileNotFoundException e) {}
+					new SqlBuilder( propertyResolver, getDirectory(file) ).setSql( environment );
 				}
 
 				cacheBuilder.checkEachSqlCache();
@@ -84,10 +61,14 @@ public class ConfigurationBuilder {
 
 	}
 
-	private boolean isLoaded( File file ) {
-		if( file == null ) return true;
-		return loadedFiles.contains( file.toString() );
+	private String getDirectory( String file ) {
+		int seperator = file.lastIndexOf( "/" );
+		return seperator < 0 ? file : file.substring( 0, seperator );
 	}
 
+	private boolean isLoaded( String file ) {
+		if( file == null ) return true;
+		return loadedFiles.contains( file );
+	}
 
 }

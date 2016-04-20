@@ -109,7 +109,7 @@ public class ZipFileHandler {
 
             for( File file : fileList ) {
 
-                String name = FileUtil.convertToRelativePath( basePath, file.getPath() );
+                String name = FileUtil.toRelativePath( basePath, file.getPath() );
 
                 ArchiveEntry entry = zos.createArchiveEntry( file, name );
 
