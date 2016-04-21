@@ -1,7 +1,6 @@
 package org.nybatis.core.db.configuration.builder;
 
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -32,13 +31,13 @@ public class DatabaseConfigurator {
 
 		filePath = FileUtil.nomalizeSeparator( filePath );
 
-		if( FileUtil.isNotExist(filePath) ) {
+		if( FileUtil.notExists( filePath ) ) {
 
 			try {
 
 				String modifiedPath = Paths.get( Const.path.getConfigDatabase(), filePath ).toString();
 
-				if( FileUtil.isNotExist( modifiedPath ) ) {
+				if( FileUtil.notExists( modifiedPath ) ) {
 					NLogger.error( "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath, modifiedPath );
 					filePath = null;
 				}

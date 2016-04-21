@@ -222,10 +222,10 @@ public class ClassUtil {
 	 * ** : ignore directory variation
 	 * *  : filename LIKE search
 	 *
-	 * 1. **.xml : searchDir 아래의 모든 디렉토리에 있는 파일 중 확장자가 xml로 끝나는 모든 파일
-	 * 2. *.xml  : searchDir 바로 1depth 아래 디렉토리에 있는 파일 중 확장자가 xml로 끝나는 모든 파일
-	 * 3. c:\home\*\*.xml : 'c:\home\ 바로 1 depth 아래의 하위 디렉토리에 있는 확장자가 xml로 끝나는 모든 파일
-	 * 4. c:\home\**\*.xml : 'c:\home\ 아래의 모든 하위 디렉토리에 있는 확장자가 xml로 끝나는 모든 파일
+	 * 1. **.xml           : all files having "xml" extension below searchDir and it's all sub directories.
+	 * 2. *.xml            : all files having "xml" extension in searchDir
+	 * 3. c:\home\*\*.xml  : all files having "xml" extension below 'c:\home\' and it's just 1 depth below directories.
+	 * 4. c:\home\**\*.xml : all files having "xml" extension below 'c:\home\' and it's all sub directories.
 	 *
 	 * 1. *  It matches zero , one or more than one characters. While matching, it will not cross directories boundaries.
 	 * 2. ** It does the same as * but it crosses the directory boundaries.
@@ -238,7 +238,6 @@ public class ClassUtil {
 	 * 2. *.* if file contains a dot, pattern will be matched.
 	 * 3. *.{java,txt} If file is either java or txt, path will be matched.
 	 * 4. abc.? matches a file which start with abc and it has extension with only single character.
-	 *
 	 * </pre>
 	 * @return
 	 */

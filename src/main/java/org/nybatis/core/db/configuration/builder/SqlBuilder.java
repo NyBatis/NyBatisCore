@@ -5,9 +5,6 @@ import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class SqlBuilder {
@@ -42,7 +39,7 @@ public class SqlBuilder {
 		String inputPath = prop.getPropValue(path.getText());
 		String realPath;
 
-		if( FileUtil.isExist(inputPath) ) {
+		if( FileUtil.exists( inputPath ) ) {
 			realPath = inputPath;
 		} else {
 			realPath = FileUtil.getPath( basePath, inputPath );
