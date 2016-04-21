@@ -1,6 +1,5 @@
 package org.nybatis.core.db.sql.repository;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Hashtable;
@@ -82,18 +81,6 @@ public class SqlRepository {
 
 	}
 
-//	public static void setCacheProperties( String sqlId, String cacheId, Integer flushCycle ) {
-//
-//		if( ! isExist(sqlId) ) return;
-//
-//		SqlProperties properties = getProperties( sqlId );
-//
-//		properties.setCacheId( cacheId );
-//		properties.setCacheFlushCycle( flushCycle );
-//		properties.isCacheEnable( true );
-//
-//	}
-
 	public static void setFetchSize( String sqlId, Integer fetchSize ) {
 
 		if( ! isExist(sqlId) ) return;
@@ -105,7 +92,7 @@ public class SqlRepository {
 
 	public void readFromDirectory( String directory, String environmentId ) {
 
-		if( FileUtil.isExist(directory) && ! directory.startsWith(Const.path.getBase())) {
+		if( FileUtil.exists( directory ) && ! directory.startsWith(Const.path.getBase())) {
 			List<Path> pathList = FileUtil.search( directory, true, false, -1, "**.xml" );
 			for( Path path : pathList ) {
 				readFromFile( path.toString(), environmentId );
