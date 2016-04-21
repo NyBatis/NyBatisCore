@@ -108,13 +108,8 @@ public class Const {
 	 */
 	public abstract static class path {
 
-		private static final String  root     = new ConstHelper().getRoot();
-		private static       String  base     = root;
-		private static       boolean runInJar = false;
-
-		static {
-			runInJar = ClassUtil.getClassLoader().getResource( "" ) == null;
-		}
+		private static final String  root = new ConstHelper().getRoot();
+		private static       String  base = root;
 
 		/**
 		 * Get NayasisCore's base path. <br><br>
@@ -208,15 +203,6 @@ public class Const {
         }
 
 		/**
-		 * Check current application is running in Jar package.
-		 *
-		 * @return true if current application is running in Jar package.
-		 */
-		public static boolean isRunInJar() {
-			return runInJar;
-		}
-
-		/**
 		 * Convert file path to resource path. <br>
 		 *
 		 * (remove base path from file path.)
@@ -225,7 +211,7 @@ public class Const {
 		 * @return resource path
 		 */
 		public static String toResourceName( String filePath ) {
-			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" );
+			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
 		}
 	}
 

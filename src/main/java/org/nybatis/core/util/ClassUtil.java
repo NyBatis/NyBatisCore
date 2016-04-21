@@ -2,7 +2,6 @@ package org.nybatis.core.util;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
-import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 
@@ -10,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URL;
-import java.net.URLDecoder;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
@@ -55,24 +54,6 @@ public class ClassUtil {
         } catch( ClassNotFoundException e ) {
         	throw new ClassNotFoundException( String.format( "Expected class name is [%s].", className ), e );
         }
-
-	}
-
-	/**
-	 * get root class in thread stack
-	 *
-	 * @return root class
-	 */
-	public static Class getRootClass() {
-
-		StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-		StackTraceElement   topElement = stackTrace[ stackTrace.length - 1 ];
-
-		try {
-			return ClassUtil.getClass( topElement.getClassName() );
-		} catch( ClassNotFoundException e ) {
-			throw new ClassNotExistException( e );
-		}
 
 	}
 
@@ -245,17 +226,12 @@ public class ClassUtil {
 
 		List<String> resourceNames = new ArrayList<>();
 
-		URL root;
+		if( isRunningInJar() ) {
 
-		if( Const.path.isRunInJar() ) {
-			root = getClassLoader().getResource( getRootClass().getName().replace( ".", "/" ) + ".class" );
-		} else {
-			root = getClassLoader().getResource( "" );
-		}
+			URLClassLoader urlClassLoader = (URLClassLoader) getClassLoader();
+			URL jarUrl = urlClassLoader.getURLs()[ 0 ];
 
-		if( "jar".equals( root.getProtocol() ) ) {
-
-			JarFile jar = getJarFile( root );
+			JarFile jar = getJarFile( jarUrl );
 
 			Set<PathMatcher> matchers = FileUtil.toPathMacher( toJarPattern( pattern ) );
 			boolean addAll = ( matchers.size() == 0 );
@@ -273,7 +249,7 @@ public class ClassUtil {
 				}
 			}
 
-		} else if( "file".equals( root.getProtocol() ) ) {
+		} else {
 
 			for( Path path : FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) ) ) {
 				String pathVal = FileUtil.nomalizeSeparator( path.toString() );
@@ -284,6 +260,15 @@ public class ClassUtil {
 
 		return resourceNames;
 
+	}
+
+	/**
+	 * Check if current application is running in Jar package.
+	 *
+	 * @return true if it is running in jar.
+	 */
+	public static boolean isRunningInJar() {
+		return getClassLoader() instanceof URLClassLoader;
 	}
 
 	private static String[] toFilePattern( String[] pattern ) {
@@ -302,15 +287,9 @@ public class ClassUtil {
 		return result;
 	}
 
-	private static JarFile getJarFile( URL root ) {
-		String jarPath = root.getPath().replaceFirst( "^file:", "" );
-		jarPath = jarPath.substring( 0, jarPath.indexOf( "!" ) );
-		return getJarFile( jarPath );
-	}
-
-	private static JarFile getJarFile( String jarPath ) {
+	private static JarFile getJarFile( URL url ) {
 		try {
-            return new JarFile( URLDecoder.decode( jarPath, "UTF-8" ) );
+            return new JarFile( url.getFile() );
         } catch( IOException e ) {
             throw new UncheckedIOException( e );
         }

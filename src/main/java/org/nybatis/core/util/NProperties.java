@@ -31,7 +31,7 @@ public class NProperties {
 	}
 
 	public NProperties( String filePath, String charset ) throws UncheckedIOException {
-		readFrom( new File(Const.profile.apply( filePath )), charset );
+		readFrom( filePath, charset );
 	}
 
 	public NProperties( File file ) throws UncheckedIOException {
@@ -53,7 +53,7 @@ public class NProperties {
     public NProperties readFrom( String file, String charset ) throws UncheckedIOException {
 
 		try {
-			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( file ), charset ) ));
+			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( Const.profile.apply(file) ), charset ) ));
 		} catch( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
@@ -67,15 +67,10 @@ public class NProperties {
 	}
 
 	public NProperties readFrom( File file, String charset ) throws UncheckedIOException {
-
-		try {
-			properties.load( new BufferedReader( new InputStreamReader( new FileInputStream( file ), charset ) ));
-		} catch( IOException e ) {
-			throw new UncheckedIOException( e );
+		if( FileUtil.isFile( file ) ) {
+			readFrom( file.getPath(), charset );
 		}
-
 		return this;
-
 	}
 
 	public String get( String key ) {
