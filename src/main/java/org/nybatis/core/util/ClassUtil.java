@@ -268,7 +268,7 @@ public class ClassUtil {
 	 * @return true if it is running in jar.
 	 */
 	public static boolean isRunningInJar() {
-		return getClassLoader() instanceof URLClassLoader;
+		return getClassLoader().getResource( "" ) == null;
 	}
 
 	private static String[] toFilePattern( String[] pattern ) {

@@ -53,7 +53,7 @@ public class NProperties {
     public NProperties readFrom( String file, String charset ) throws UncheckedIOException {
 
 		try {
-			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( Const.profile.apply(file) ), charset ) ));
+			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( file ), charset ) ));
 		} catch( IOException e ) {
 			throw new UncheckedIOException( e );
 		}
