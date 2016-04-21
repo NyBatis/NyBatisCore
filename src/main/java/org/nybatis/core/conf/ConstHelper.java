@@ -4,9 +4,9 @@ import org.nybatis.core.exception.unchecked.BaseRuntimeException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.ClassUtil;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
@@ -20,25 +20,15 @@ public class ConstHelper {
 	 * @return root directory
 	 */
 	public String getRoot() {
-		return FileUtil.nomalizeSeparator( getRootPath().toString() );
-	}
-
-	/**
-	 * get root path
-	 *
-	 * @return root path
-	 */
-	private Path getRootPath(){
 
 		URL root = ClassUtil.getClassLoader().getResource( "" );
 
 		try {
 			if( root != null ) {
-                return Paths.get( root.toURI() );
-            } else {
-				// if class is running in JAR.
-                return Paths.get( ClassUtil.getRootClass().getProtectionDomain().getCodeSource().getLocation().toURI() ).getParent();
-            }
+				return FileUtil.nomalizeSeparator( Paths.get( root.toURI() ) );
+			} else {
+				return FileUtil.nomalizeSeparator( new File(".").getAbsolutePath() ).replaceFirst( "/\\.$", "" );
+			}
 		} catch( URISyntaxException e ) {
 			throw new BaseRuntimeException( e );
 		}
