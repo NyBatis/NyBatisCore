@@ -9,7 +9,7 @@
   SELECT  *
   FROM    tb_dp_dataset_frame A
   WHERE   tenant_id = 'S02'
-  <if test="#{id} < 1">
+  <if test="#{id} &lt; 1">
   AND     dataset_id &lt; A.test
     <if test="#{id} > 3">
   AND   dataset_id > 1.2

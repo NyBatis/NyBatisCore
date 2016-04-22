@@ -122,15 +122,27 @@ public abstract class ConnectionHandler {
 	}
 
 	protected NList toList( ResultSet resultSet ) throws SQLException {
-		return new NList( toList( resultSet, NMap.class ) );
+		return toList( resultSet, true );
+	}
+
+	protected NList toList( ResultSet resultSet, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		return new NList( toList( resultSet, NMap.class, raiseErrorOnKeyDuplication ) );
 	}
 
 	protected <T> List<T> toList( ResultSet resultSet, Class<T> returnType ) throws SQLException {
-		return new ResultsetController( getEnvironmentId() ).toList( resultSet, returnType );
+		return toList( resultSet, returnType, true );
+	}
+
+	protected <T> List<T> toList( ResultSet resultSet, Class<T> returnType, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		return new ResultsetController( getEnvironmentId() ).toList( resultSet, returnType, raiseErrorOnKeyDuplication );
 	}
 
 	protected void toList( ResultSet resultSet, RowHandler rowHandler ) throws SQLException {
-		new ResultsetController( getEnvironmentId() ).toList( resultSet, rowHandler );
+		toList( resultSet, rowHandler, true );
+	}
+
+	protected void toList( ResultSet resultSet, RowHandler rowHandler, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		new ResultsetController( getEnvironmentId() ).toList( resultSet, rowHandler, raiseErrorOnKeyDuplication );
 	}
 
 	protected Statement unwrap( Statement statement ) {

@@ -10,7 +10,7 @@
   LIMIT 0, #{rowNum:int}
 </sql>
 
-<sql id="selectKey" fetch="50" cache="notRegistered" flush="60" autocommit="true" >
+<sql id="selectKey" fetch="50" cache="notRegistered" flush="60">
   <key id="listId">
     SELECT 'A001'
   </key>
@@ -30,7 +30,7 @@
   LIMIT 0, #{rowNum}
 </sql>
 
-<sql id="insert" autocommit="true" >
+<sql id="insert">
 INSERT
 INTO   PROD
 (

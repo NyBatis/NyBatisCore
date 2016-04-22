@@ -91,7 +91,7 @@ public class SqlExecutor {
 
             ResultSet rs = stmtHandler.executeQuery( preparedStatement );
 
-            new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler );
+            new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler, true );
 
         } );
 

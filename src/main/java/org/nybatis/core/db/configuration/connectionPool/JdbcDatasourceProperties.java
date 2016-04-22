@@ -4,6 +4,7 @@ import org.nybatis.core.util.StringUtil;
 
 public class JdbcDatasourceProperties {
 
+	private String  id          = "";
 	private boolean isPooled    = true;
 
 	private int     poolMin     = 1;
@@ -13,6 +14,12 @@ public class JdbcDatasourceProperties {
 	private boolean pingEnable  = false;
 	private String  pingQuery   = null;
 	private int     pingCycle   = 60_000;   // mili-sec
+
+	public JdbcDatasourceProperties() {}
+
+	public JdbcDatasourceProperties( String id ) {
+		this.id = id;
+	}
 
 	public int getPoolMin() {
 		return poolMin;
@@ -119,4 +126,11 @@ public class JdbcDatasourceProperties {
 		this.isPooled = StringUtil.isEmpty( isPooled ) || StringUtil.isTrue( isPooled );
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public void setId( String id ) {
+		this.id = id;
+	}
 }

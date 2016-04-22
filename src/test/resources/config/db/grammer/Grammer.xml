@@ -184,6 +184,29 @@ WHERE rownum &lt;= 10
     ORDER BY title
   </sql>
 
+  <sql id="applyVariousDatabse">
+    <if test="#{nybatis.database} == 'sqlite'">
+      CREATE TABLE IF NOT EXISTS TB_CONFIG (
+        `console_type` TEXT,
+        `game_path`    TEXT,
+        `scan_depth`   INTEGER DEFAULT 0,
+        `option`       TEXT    DEFAULT '{}',
+        `cover_file`   TEXT,
+        PRIMARY KEY( console_type )
+      )
+    </if>
+    <else>
+      CREATE TABLE TB_CONFIG (
+      `console_type` TEXT,
+      `game_path`    TEXT,
+      `scan_depth`   INTEGER DEFAULT 0,
+      `option`       TEXT    DEFAULT '{}',
+      `cover_file`   TEXT,
+      PRIMARY KEY( console_type )
+      )
+    </else>
+  </sql>
+
   <sql id="group">
     UPDATE TABLE_SAMPLE
     <group open="SET /* OPEN */" close=" /* CLOSE */" delimeter=",">
