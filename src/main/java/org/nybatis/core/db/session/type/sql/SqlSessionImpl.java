@@ -1,6 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
@@ -9,14 +8,12 @@ import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.BaseRuntimeException;
 import org.nybatis.core.exception.unchecked.DatabaseException;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.validation.Validator;
 
 import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -144,21 +141,7 @@ public class SqlSessionImpl implements SqlSession {
             throw new BaseRuntimeException( e );
 
         } finally {
-
-            if( connection != null ) {
-                try {
-                    // It it not real releaseSavepoint !
-                    // merely clear resources like Statement, PreparedStatement, CallableStatement and ResultSet occupied by connection
-                    connection.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
-                } catch( SQLException e ) {
-                    NLogger.error( e );
-                }
-
-                if( ! TransactionManager.isBegun(token) ) {
-                    try { connection.close(); } catch( SQLException e ) {}
-                }
-            }
-
+            TransactionManager.releaseConnection( token, connection );
             initProperties();
 
         }

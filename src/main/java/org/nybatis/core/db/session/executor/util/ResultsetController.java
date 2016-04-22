@@ -27,7 +27,11 @@ public class ResultsetController {
 		this.environmentId = environmentId;
 	}
 
-    public <T> List<T> toList( ResultSet resultSet, Class<T> returnType ) throws SQLException {
+	public <T> List<T> toList( ResultSet resultSet, Class<T> returnType ) throws SQLException {
+		return toList( resultSet, returnType, true );
+	}
+
+    public <T> List<T> toList( ResultSet resultSet, Class<T> returnType, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
 		List<T> list = new ArrayList<>();
 
@@ -40,7 +44,7 @@ public class ResultsetController {
                 public void handle( NMap row ) {
                 	list.add( (T) new PrimitiveConverter(row.getByIndex( 0 )).cast(returnType) );
 				}
-			} );
+			}, raiseErrorOnKeyDuplication );
 
 		} else {
 
@@ -48,7 +52,7 @@ public class ResultsetController {
 				public void handle( NMap row ) {
 					list.add( row.toBean(returnType) );
 				}
-			} );
+			}, raiseErrorOnKeyDuplication );
 
 		}
 
@@ -67,17 +71,17 @@ public class ResultsetController {
 
     }
 
-    public void toList( ResultSet resultSet, RowHandler rowHandler ) throws SQLException {
-		toList( resultSet, rowHandler, null );
+    public void toList( ResultSet resultSet, RowHandler rowHandler, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		toList( resultSet, rowHandler, null, raiseErrorOnKeyDuplication );
 	}
 
-	public void toList( ResultSet resultSet, RowHandler rowHandler, Integer rowFetchSize ) throws SQLException {
+	public void toList( ResultSet resultSet, RowHandler rowHandler, Integer rowFetchSize, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
 		try {
 
 			if( resultSet == null ) return;
 
-			Header header= getHaeder( resultSet );
+			Header header= getHaeder( resultSet, raiseErrorOnKeyDuplication );
 
 			rowHandler.setHeader( header.keySet() );
 
@@ -94,6 +98,8 @@ public class ResultsetController {
 
     				String  key   = header.getName( i );
     				SqlType type  = header.getType( i );
+
+					if( key == null ) continue;
 
     				try {
 
@@ -126,7 +132,7 @@ public class ResultsetController {
 
 	}
 
-	public Header getHaeder( ResultSet resultSet ) throws SQLException {
+	public Header getHaeder( ResultSet resultSet, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
 		Header header = new Header();
 
@@ -149,14 +155,18 @@ public class ResultsetController {
 		}
 
 		if( duplicatedKeys.size() > 0 ) {
-			throw new SQLException( String.format( "ResultSet has duplicated key. %s", duplicatedKeys) );
+			if( raiseErrorOnKeyDuplication ) {
+				throw new SQLException( String.format( "ResultSet has duplicated key. %s", duplicatedKeys) );
+			} else {
+				NLogger.warn( "ResultSet has duplicated key. {}", duplicatedKeys );
+			}
 		}
 
 		return header;
 
 	}
 
-	private List<NMap> toList( ResultSet resultSet ) throws SQLException {
+	private List<NMap> toList( ResultSet resultSet, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
 		List<NMap> list = new ArrayList<>();
 
@@ -164,7 +174,7 @@ public class ResultsetController {
         	public void handle( NMap row ) {
         		list.add( row );
         	}
-        }, null );
+        }, null, raiseErrorOnKeyDuplication );
 
 		return list;
 
@@ -177,7 +187,7 @@ public class ResultsetController {
 			Object result = TypeMapper.get( environmentId, sqlType ).getResult( resultSet, columnIndex );
 
 			if( result instanceof ResultSet ) {
-				result = toList( (ResultSet) result );
+				result = toList( (ResultSet) result, true );
 			}
 
 			return result;

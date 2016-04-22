@@ -68,7 +68,7 @@ public class EnvironmentBuilder {
 		connectionProperties.setTimeout(      prop.getAttrVal(datasource, "timeout"    ) );
 		connectionProperties.setAutoCommit(   prop.getAttrVal(datasource, "autocommit" ) );
 
-		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
+		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
 		datasourceProperties.setPoolMin(    prop.getAttrVal( datasource, "poolMin"     ) );
 		datasourceProperties.setPoolMax(    prop.getAttrVal( datasource, "poolMax"     ) );
@@ -93,7 +93,7 @@ public class EnvironmentBuilder {
 		connectionProperties.setUserName( username );
 		connectionProperties.setUserPassword( password );
 
-		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
+		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
 		setJdbcDatasource( connectionProperties, datasourceProperties );
 
@@ -124,7 +124,7 @@ public class EnvironmentBuilder {
 	}
 
 	private void setUnpooledJdbcDatasource( JdbcConnectionProperties connectionProperties ) {
-		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties();
+		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 		datasourceProperties.setPooled( false );
 		setJdbcDatasource( connectionProperties, datasourceProperties );
 	}

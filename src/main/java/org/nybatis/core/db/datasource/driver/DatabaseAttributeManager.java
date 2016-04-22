@@ -92,16 +92,19 @@ public class DatabaseAttributeManager {
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
-        add( new DatabaseAttribute( "mysql",  "com\\.mysql\\.jdbc" ) );
-        add( new DatabaseAttribute( "maria",  "org\\.mariadb\\.jdbc" ) );
-        add( new DatabaseAttribute( "sqlite", "org\\.sqlite\\." ) );
+        add( new DatabaseAttribute( "mysql",      "com\\.mysql\\.jdbc"          ) );
+        add( new DatabaseAttribute( "maria",      "org\\.mariadb\\.jdbc"        ) );
+        add( new DatabaseAttribute( "sqlite",     "org\\.sqlite\\."             ) );
+        add( new DatabaseAttribute( "h2",         "org\\.h2\\.jdbc"             ) );
 
-        // Not Tested !
-        add( new DatabaseAttribute( "mssql",       "com\\.microsoft\\.jdbc" ) );
-        add( new DatabaseAttribute( "postgresql",  "postgresql\\.driver" ) );
-        add( new DatabaseAttribute( "sybase",      "com\\.sybase\\." ) );
-        add( new DatabaseAttribute( "db2",         "ibm\\.db2\\." ) );
-        add( new DatabaseAttribute( "odbc",        "sun\\.jdbc\\.odbc" ) );
+        //   Not Tested  !
+        add( new DatabaseAttribute( "derby",      "org\\.apache\\.derby\\.jdbc" ) );
+        add( new DatabaseAttribute( "hsqldb",     "org\\.hsqldb\\.jdbcDriver"   ) );
+        add( new DatabaseAttribute( "mssql",      "com\\.microsoft\\.jdbc"      ) );
+        add( new DatabaseAttribute( "postgresql", "postgresql\\.driver"         ) );
+        add( new DatabaseAttribute( "sybase",     "com\\.sybase\\."             ) );
+        add( new DatabaseAttribute( "db2",        "ibm\\.db2\\."                ) );
+        add( new DatabaseAttribute( "odbc",       "sun\\.jdbc\\.odbc"           ) );
 
     }
 
