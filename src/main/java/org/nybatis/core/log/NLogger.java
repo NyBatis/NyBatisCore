@@ -23,15 +23,19 @@ public class NLogger {
 	private NLogger() {}
 	
 	private static NLoggerPrinter getLogger() {
-		loadConfiguration();
+		loadDefaultConfiguration();
 		return new NLoggerPrinter( new Caller(4) );
 	}
 
-	private static void loadConfiguration() {
+	private static void loadDefaultConfiguration() {
 		if( ! isConfigurationIinitialized ) {
-			loadConfiguration( Const.path.getConfigLogger() + "/logback.xml" );
+			loadConfiguration();
 			isConfigurationIinitialized = true;
 		}
+	}
+
+	public static void loadConfiguration() {
+		loadConfiguration( Const.path.getConfigLogger() + "/logback.xml" );
 	}
 
 	/**
@@ -40,7 +44,7 @@ public class NLogger {
 	 * @return logger
 	 */
 	public static NLoggerPrinter getLogger( String loggerName ) {
-		loadConfiguration();
+		loadDefaultConfiguration();
 		return new NLoggerPrinter( loggerName );
 	}
 

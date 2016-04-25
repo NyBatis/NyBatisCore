@@ -29,7 +29,7 @@ public class SqlFileReader {
 
 		try {
 
-			NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom(file) );
+			NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom( file ) );
 
 			for( Node node : xmlReader.getChildElements("sql") ) {
 

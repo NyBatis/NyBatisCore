@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -240,8 +241,11 @@ public class ClassUtil {
 				if( addAll ) {
 					resourceNames.add( entry.getName() );
 				} else {
+
+					Path targetPath = Paths.get( entry.getName() );
+
 					for( PathMatcher matcher : matchers ) {
-						if( matcher.matches( Paths.get( entry.getName() ) )) {
+						if( matcher.matches( targetPath )) {
 							resourceNames.add( entry.getName() );
 							break;
 						}
@@ -268,7 +272,15 @@ public class ClassUtil {
 	 * @return true if it is running in jar.
 	 */
 	public static boolean isRunningInJar() {
-		return getClassLoader().getResource( "" ) == null;
+
+		URL root = getClassLoader().getResource( "" );
+
+		if( root == null ) return true;
+
+		String file = root.getFile();
+
+		return Validator.isMatched( file, "(?i).*\\.(jar|war)$" );
+
 	}
 
 	private static String[] toFilePattern( String[] pattern ) {
