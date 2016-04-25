@@ -21,18 +21,22 @@ public class ConstHelper {
 	 */
 	public String getRoot() {
 
-		URL root = ClassUtil.getClassLoader().getResource( "" );
-
 		try {
-			if( root != null ) {
-				return FileUtil.nomalizeSeparator( Paths.get( root.toURI() ) );
+			if( ClassUtil.isRunningInJar() ) {
+				return FileUtil.nomalizeSeparator( new File( "." ).getAbsolutePath() ).replaceFirst( "/\\.$", "" );
+
 			} else {
-				return FileUtil.nomalizeSeparator( new File(".").getAbsolutePath() ).replaceFirst( "/\\.$", "" );
+				URL root = ClassUtil.getClassLoader().getResource( "" );
+				return FileUtil.nomalizeSeparator( Paths.get( root.toURI() ) );
 			}
 		} catch( URISyntaxException e ) {
 			throw new BaseRuntimeException( e );
 		}
 
+	}
+
+	public boolean isRunInWar() {
+		return ClassUtil.isRunningInJar() && ClassUtil.isResourceExisted( "/WEB-INF/classes" );
 	}
 
 }
