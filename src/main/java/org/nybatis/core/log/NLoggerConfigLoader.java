@@ -1,25 +1,20 @@
 package org.nybatis.core.log;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.nybatis.core.conf.Const;
-import org.slf4j.LoggerFactory;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;
+import org.nybatis.core.conf.Const;
+import org.nybatis.core.file.FileUtil;
+import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public class NLoggerConfigLoader {
 
 	public void loadConfiguration( String filePath ) {
-
-		filePath = Const.profile.getFileName( filePath );
 
 		InputStream stream = getConfiguration( filePath );
 		
@@ -78,11 +73,11 @@ public class NLoggerConfigLoader {
 	
 	private InputStream getConfiguration( String filePath ) {
 
-		InputStream stream = null;
-		
-		File configurationFile = new File( filePath );
-		
-		if( ! configurationFile.isFile() || ! configurationFile.canRead() ) {
+		InputStream stream;
+
+		String configurationPath = Const.profile.apply( filePath );
+
+		if( ! FileUtil.isResourceExisted(configurationPath) ) {
 			
 			System.err.printf( "Logback external configuration file [%s] doesn't exist or can't be read.\n", filePath );
 			
@@ -97,13 +92,7 @@ public class NLoggerConfigLoader {
 			}
 			
 		} else {
-			
-			try {
-	            stream = new FileInputStream( configurationFile );
-            } catch( FileNotFoundException e ) {
-	            e.printStackTrace();
-            }
-			
+			stream = FileUtil.getResourceAsStream( configurationPath );
 		}
 		
 		return stream;

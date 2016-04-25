@@ -71,8 +71,8 @@ public class JdbcConnectionProperties {
 	 *
 	 * @return nano time
 	 */
-	public int getNanoTimeout() {
-		return timeoutSeconds * 1_000_000_000;
+	public long getNanoTimeout() {
+		return (long) timeoutSeconds * 1_000_000_000;
 	}
 
 	/**

@@ -144,20 +144,25 @@ public class DatabaseAttribute {
                 " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
                 " - pre :\n%s" +
-                " - post:\n%s\n"
+                " - post:\n%s\n" +
+                "Ping Query:\n" +
+                " - %s"
                 ,
                 getDatabase(),
                 patternToMatchClassName,
                 getPageSqlPre(),
-                getPageSqlPost()
+                getPageSqlPost(),
+                getPingQuery()
         );
 
     }
 
     public DatabaseAttribute clone() {
 
-        DatabaseAttribute attribute = new DatabaseAttribute( database, patternToMatchClassName );
+        DatabaseAttribute attribute = new DatabaseAttribute();
 
+        attribute.database                 = database;
+        attribute.patternToMatchClassName  = patternToMatchClassName;
         attribute.enableToGetParameterType = enableToGetParameterType;
         attribute.enableToGetBLob          = enableToGetBLob;
         attribute.enableToDoLobPrefetch    = enableToDoLobPrefetch;
@@ -165,6 +170,7 @@ public class DatabaseAttribute {
         attribute.pageSqlPost              = pageSqlPost;
         attribute.countSqlPre              = countSqlPre;
         attribute.countSqlPost             = countSqlPost;
+        attribute.pingQuery                = pingQuery;
 
         return attribute;
 

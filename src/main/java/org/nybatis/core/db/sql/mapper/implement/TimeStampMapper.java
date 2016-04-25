@@ -1,14 +1,14 @@
 package org.nybatis.core.db.sql.mapper.implement;
 
+import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.db.sql.mapper.TypeMapperIF;
+
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-
-import org.nybatis.core.db.sql.mapper.SqlType;
-import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 
 /**
  * TimeStampMapper
@@ -30,17 +30,17 @@ public class TimeStampMapper implements TypeMapperIF<Date>{
 
 	@Override
     public Date getResult( ResultSet resultSet, String columnName ) throws SQLException {
-	    return resultSet.getTimestamp( columnName );
+	    return new Date( resultSet.getTimestamp( columnName ).getTime() );
     }
 
 	@Override
     public Date getResult( ResultSet resultSet, int columnIndex ) throws SQLException {
-		return resultSet.getTimestamp( columnIndex );
+		return new Date( resultSet.getTimestamp( columnIndex ).getTime() );
     }
 
 	@Override
     public Date getResult( CallableStatement statement, int columnIndex ) throws SQLException {
-	    return statement.getTimestamp( columnIndex );
+	    return new Date( statement.getTimestamp( columnIndex ).getTime() );
     }
 
 }

@@ -2,7 +2,6 @@ package org.nybatis.core.message;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -11,10 +10,10 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.IoException;
-import org.nybatis.core.log.NLogger;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
 
@@ -140,20 +139,15 @@ public class Message {
      */
     public static void loadPool() {
 
-        try {
+        String configPath = Const.path.toResourceName( Const.path.getConfigMessage() );
 
-        	List<Path> list = FileUtil.search( Const.path.getConfigMessage(), true, false, -1, "**.prop" );
+        List<String> resourceNames = ClassUtil.getResourceNames( configPath + "/**.*.prop" );
 
-        	Collections.sort( list );
+        Collections.sort( resourceNames );
 
-        	for( Path path : list ) {
-        		loadPool( path.toString() );
-        	}
-
-        } catch( IoException e ) {
-        	NLogger.error( e );
+        for( String name : resourceNames ) {
+            loadPool( name );
         }
-
 
     }
 
@@ -163,11 +157,11 @@ public class Message {
      * @param filePath 메세지파일의 경로
      * @throws IOException
      */
-    public static void loadPool( String filePath ) throws IoException {
+    public static void loadPool( String filePath ) throws UncheckedIOException {
 
         Locale locale = getLocaleFrom( filePath );
 
-        NProperties properties = new NProperties( new File( filePath ) );
+        NProperties properties = new NProperties( filePath );
 
         for( String key : properties.keySet() ) {
             if( ! messagePool.containsKey(key) ) {

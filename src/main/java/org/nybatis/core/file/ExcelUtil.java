@@ -3,18 +3,15 @@ package org.nybatis.core.file;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.file.handler.implement.ExcelHandlerApachePoi;
 import org.nybatis.core.file.handler.implement.ExcelHandlerJxl;
-import org.nybatis.core.util.Types;
-import org.nybatis.core.validation.Validator;
 
 /**
  * Excel Utility to read or write
@@ -80,9 +77,9 @@ public class ExcelUtil {
 	 * @param excelFile excel file to write data
 	 * @param sheets    key is sheetName and value is grid data.<br>
 	 *                  value type is allowed only List or NList.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( File excelFile, Map<String, ?> sheets ) throws IoException {
+	public static void writeTo( File excelFile, Map<String, ?> sheets ) throws UncheckedIOException {
 		getHandler().writeTo( excelFile, sheets );
 	}
 
@@ -92,9 +89,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( File excelFile, String sheetName, NList sheet ) throws IoException {
+	public static void writeTo( File excelFile, String sheetName, NList sheet ) throws UncheckedIOException {
 		getHandler().writeTo( excelFile, sheetName, sheet );
 	}
 
@@ -104,9 +101,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( File excelFile, String sheetName, List<?> sheet ) throws IoException {
+	public static void writeTo( File excelFile, String sheetName, List<?> sheet ) throws UncheckedIOException {
 		getHandler().writeTo( excelFile, sheetName, sheet );
 	}
 
@@ -115,9 +112,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to write
 	 * @param sheet grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( File excelFile, NList sheet ) throws IoException {
+	public static void writeTo( File excelFile, NList sheet ) throws UncheckedIOException {
 		getHandler().writeTo( excelFile, sheet );
 	}
 
@@ -126,9 +123,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to write
 	 * @param sheet grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( File excelFile, List sheet ) throws IoException {
+	public static void writeTo( File excelFile, List sheet ) throws UncheckedIOException {
 		getHandler().writeTo( excelFile, sheet );
 	}
 
@@ -138,9 +135,9 @@ public class ExcelUtil {
 	 * @param excelFile excel file to write data
 	 * @param sheets	key is sheetName and value is grid data.<br>
 	 *                  value type is allowed only List or NList.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( String excelFile, Map<String, ?> sheets ) throws IoException {
+	public static void writeTo( String excelFile, Map<String, ?> sheets ) throws UncheckedIOException {
 	    writeTo( new File( excelFile ), sheets );
 	}
 
@@ -150,9 +147,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( String excelFile, String sheetName, NList sheet ) throws IoException {
+	public static void writeTo( String excelFile, String sheetName, NList sheet ) throws UncheckedIOException {
 		writeTo( new File( excelFile ), sheetName, sheet );
 	}
 
@@ -162,9 +159,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( String excelFile, String sheetName, List sheet ) throws IoException {
+	public static void writeTo( String excelFile, String sheetName, List sheet ) throws UncheckedIOException {
 		writeTo( new File( excelFile ), sheetName, sheet );
 	}
 
@@ -173,9 +170,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to write
 	 * @param sheet grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( String excelFile, NList sheet ) throws IoException {
+	public static void writeTo( String excelFile, NList sheet ) throws UncheckedIOException {
 		writeTo( new File( excelFile ), sheet );
 	}
 
@@ -184,9 +181,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to write
 	 * @param sheet grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( String excelFile, List sheet ) throws IoException {
+	public static void writeTo( String excelFile, List sheet ) throws UncheckedIOException {
 		writeTo( new File( excelFile ), sheet );
 	}
 
@@ -196,9 +193,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param sheetName		sheet name of excel file to read
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-    public static NList readFrom( File excelFile, String sheetName ) throws IoException {
+    public static NList readFrom( File excelFile, String sheetName ) throws UncheckedIOException {
     	return getHandler().readFrom( excelFile, sheetName );
     }
 
@@ -209,9 +206,9 @@ public class ExcelUtil {
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public static <T> List<T> readFrom( File excelFile, String sheetName, Class<T> toClass ) throws IoException {
+	public static <T> List<T> readFrom( File excelFile, String sheetName, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFrom( excelFile, sheetName, toClass );
 	}
 
@@ -220,9 +217,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to read.
 	 * @return key is sheetName and value is grid data.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-    public static Map<String, NList> readFrom( File excelFile ) throws IoException {
+    public static Map<String, NList> readFrom( File excelFile ) throws UncheckedIOException {
     	return getHandler().readFrom( excelFile );
     }
 
@@ -232,9 +229,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public static <T> Map<String, List<T>> readFrom( File excelFile, Class<T> toClass ) throws IoException {
+	public static <T> Map<String, List<T>> readFrom( File excelFile, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFrom( excelFile, toClass );
 	}
 
@@ -243,9 +240,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to read
 	 * @return grid data from first sheet
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static NList readFirstSheetFrom( File excelFile ) throws IoException {
+	public static NList readFirstSheetFrom( File excelFile ) throws UncheckedIOException {
 		return getHandler().readFirstSheetFrom( excelFile );
 	}
 
@@ -255,9 +252,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public static <T> List<T> readFirstSheetFrom( File excelFile, Class<T> toClass ) throws IoException {
+	public static <T> List<T> readFirstSheetFrom( File excelFile, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFirstSheetFrom( excelFile, toClass );
 	}
 
@@ -267,9 +264,9 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param sheetName		sheet name of excel file to read
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-    public static NList readFrom( String excelFile, String sheetName ) throws IoException {
+    public static NList readFrom( String excelFile, String sheetName ) throws UncheckedIOException {
         return readFrom( new File(excelFile), sheetName );
     }
 
@@ -280,9 +277,9 @@ public class ExcelUtil {
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public <T> List<T> readFrom( String excelFile, String sheetName, Class<T> toClass ) throws IoException {
+	public <T> List<T> readFrom( String excelFile, String sheetName, Class<T> toClass ) throws UncheckedIOException {
 		return readFrom( new File(excelFile), sheetName, toClass );
 	}
 
@@ -291,9 +288,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to read.
 	 * @return key is sheetName and value is grid data.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-    public static Map<String, NList> readFrom( String excelFile ) throws IoException {
+    public static Map<String, NList> readFrom( String excelFile ) throws UncheckedIOException {
     	return readFrom( new File(excelFile) );
     }
 
@@ -303,9 +300,9 @@ public class ExcelUtil {
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public <T> Map<String, List<T>> readFrom( String excelFile, Class<T> toClass ) throws IoException {
+	public <T> Map<String, List<T>> readFrom( String excelFile, Class<T> toClass ) throws UncheckedIOException {
 		return readFrom( new File(excelFile), toClass );
 	}
 
@@ -314,9 +311,9 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to read
 	 * @return grid data from first sheet
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static NList readFirstSheetFrom( String excelFile ) throws IoException {
+	public static NList readFirstSheetFrom( String excelFile ) throws UncheckedIOException {
 		return readFirstSheetFrom( new File( excelFile ) );
 	}
 
@@ -326,9 +323,9 @@ public class ExcelUtil {
 	 * @param excelFile 	excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public <T> List<T> readFirstSheetFrom( String excelFile, Class<T> toClass ) throws IoException {
+	public <T> List<T> readFirstSheetFrom( String excelFile, Class<T> toClass ) throws UncheckedIOException {
 		return readFirstSheetFrom( new File(excelFile), toClass );
 	}
 
@@ -341,9 +338,9 @@ public class ExcelUtil {
 	 * @param outputStream output stream to write data
 	 * @param sheets      	key is sheetName and value is grid data.<br>
 	 *                      value type is allowed only List or NList.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( OutputStream outputStream, Map<String, ?> sheets ) throws IoException {
+	public static void writeTo( OutputStream outputStream, Map<String, ?> sheets ) throws UncheckedIOException {
 		getHandler().writeTo( outputStream, sheets );
 	}
 
@@ -353,9 +350,9 @@ public class ExcelUtil {
 	 * @param outputStream 	output stream to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( OutputStream outputStream, String sheetName, NList sheet ) throws IoException {
+	public static void writeTo( OutputStream outputStream, String sheetName, NList sheet ) throws UncheckedIOException {
 		getHandler().writeTo( outputStream, sheetName, sheet );
 	}
 
@@ -365,9 +362,9 @@ public class ExcelUtil {
 	 * @param outputStream 	output stream to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param sheet			grid data
-	 * @throws IoException	File I/O Exception
+	 * @throws UncheckedIOException    File I/O Exception
 	 */
-	public static void writeTo( OutputStream outputStream, String sheetName, List<?> sheet ) throws IoException {
+	public static void writeTo( OutputStream outputStream, String sheetName, List<?> sheet ) throws UncheckedIOException {
 		getHandler().writeTo( outputStream, sheetName, sheet );
 	}
 
@@ -376,9 +373,9 @@ public class ExcelUtil {
 	 *
 	 * @param outputStream	output stream to write data
 	 * @param sheet		grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( OutputStream outputStream, NList sheet ) throws IoException {
+	public static void writeTo( OutputStream outputStream, NList sheet ) throws UncheckedIOException {
 		getHandler().writeTo( outputStream, sheet );
 	}
 
@@ -387,9 +384,9 @@ public class ExcelUtil {
 	 *
 	 * @param outputStream	output stream to write data
 	 * @param sheet			grid data
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static void writeTo( OutputStream outputStream, List<?> sheet ) throws IoException {
+	public static void writeTo( OutputStream outputStream, List<?> sheet ) throws UncheckedIOException {
 		getHandler().writeTo( outputStream, sheet );
 	}
 
@@ -399,9 +396,9 @@ public class ExcelUtil {
 	 * @param inputStream	input stream to read data
 	 * @param sheetName		sheet name of excel file to read
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public static NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+	public static NList readFrom( InputStream inputStream, String sheetName ) throws UncheckedIOException {
 		return getHandler().readFrom( inputStream, sheetName );
 	}
 
@@ -412,9 +409,9 @@ public class ExcelUtil {
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public <T> List<T> readFrom( InputStream inputStream, String sheetName, Class<T> toClass ) throws IoException {
+	public <T> List<T> readFrom( InputStream inputStream, String sheetName, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFrom( inputStream, sheetName, toClass );
 	}
 
@@ -423,9 +420,9 @@ public class ExcelUtil {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @return key is sheetName and value is grid data.
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+	public static Map<String, NList> readFrom( InputStream inputStream ) throws UncheckedIOException {
 		return getHandler().readFrom( inputStream );
 	}
 
@@ -435,9 +432,9 @@ public class ExcelUtil {
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public <T> Map<String, List<T>> readFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+	public <T> Map<String, List<T>> readFrom( InputStream inputStream, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFrom( inputStream, toClass );
 	}
 
@@ -446,9 +443,9 @@ public class ExcelUtil {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @return grid data from first sheet
-	 * @throws IoException file I/O exception
+	 * @throws UncheckedIOException file I/O exception
 	 */
-	public static NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+	public static NList readFirstSheetFrom( InputStream inputStream ) throws UncheckedIOException {
 		return getHandler().readFirstSheetFrom( inputStream );
 	}
 
@@ -458,9 +455,9 @@ public class ExcelUtil {
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
 	 * @return grid data
-	 * @throws IoException  File I/O Exception
+	 * @throws UncheckedIOException  File I/O Exception
 	 */
-	public static <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws IoException {
+	public static <T> List<T> readFirstSheetFrom( InputStream inputStream, Class<T> toClass ) throws UncheckedIOException {
 		return getHandler().readFirstSheetFrom( inputStream, toClass );
 	}
 
