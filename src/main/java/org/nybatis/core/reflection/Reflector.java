@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.rits.cloning.Cloner;
-import org.nybatis.core.exception.unchecked.ClassCastException;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.exception.unchecked.ReflectiveException;
 import org.nybatis.core.model.NList;
@@ -24,6 +24,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -255,21 +256,82 @@ public class Reflector {
 	 *
 	 * @param fromBean  jsonString, Map or bean as source
 	 * @param toBean	Map or bean as target
+	 * @return merged Map
 	 */
-    public static void merge( Object fromBean, Object toBean ) {
+	public static Map merge( Object fromBean, Object toBean ) {
+		return merge( fromBean, toBean, true );
+	}
 
-    	if( fromBean == null || toBean == null ) return;
+	/**
+	 * Merge data in instance
+	 *
+	 * @param fromBean  jsonString, Map or bean as source
+	 * @param toBean	Map or bean as target
+	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
+	 * @return merged Map
+	 */
+    public static Map merge( Object fromBean, Object toBean, boolean strict ) {
 
-		Map fromMap = toMapWithFlattenKey( fromBean );
-		Map toMap   = toMapWithFlattenKey( toBean );
+    	if( fromBean == null || toBean == null ) return new HashMap();
 
-		toMap.putAll( fromMap );
+		if ( fromBean instanceof Map && toBean instanceof Map ) {
+			return merge( (Map)fromBean, (Map)toBean, strict );
+		}
 
-		toMap = toMapWithUnflattenKey( toMap );
+		Map fromMap = toMapFrom( fromBean );
+		Map toMap   = toMapFrom( toBean );
+
+		merge( fromMap, toMap, strict );
 
 		copy( toMap, toBean );
 
+		return toMap;
+
     }
+
+	/**
+	 * Merge data between Map
+	 *
+	 * @param fromMap	Map to merge
+	 * @param toMap		Map to be merged
+	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
+	 * @return merged Map
+	 */
+	private static Map merge( Map fromMap, Map toMap, boolean strict ) {
+
+		if( fromMap == null || toMap == null ) return new HashMap();
+
+		for( Object key : fromMap.keySet() ) {
+
+			Object fromValue = fromMap.get( key );
+			Object toValue   = toMap.get( key );
+
+			if( strict ) {
+				if( Validator.isNull(fromValue) ) continue;
+			} else {
+				if( Validator.isEmpty(fromValue) ) continue;
+			}
+
+			if( ! toMap.containsKey(key) || toValue == null ) {
+				toMap.put( key, fromValue );
+
+			} else if( fromValue instanceof Map && toValue instanceof Map ) {
+				toMap.put( key, merge( (Map) fromValue, (Map) toValue, strict ) );
+
+			} else if( fromValue instanceof Collection && toValue instanceof Collection ) {
+				Collection toChild   = (Collection) toValue;
+				Collection fromChild = (Collection) fromValue;
+				fromChild.stream().filter( each -> ! toChild.contains( each ) ).forEach( toChild::add );
+
+			} else {
+				toMap.put( key, fromValue );
+			}
+
+		}
+
+		return toMap;
+
+	}
 
 	/**
 	 * Get inspection result of fields within instance
@@ -558,6 +620,29 @@ public class Reflector {
 	}
 
 	/**
+	 * Convert as bean from object
+	 * @param object		json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
+	 * @param typeReference	type to return
+	 * 	<pre>
+	 *	  Examples are below.
+	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
+	 *	    - new TypeReference<List<String>>() {}
+	 *	    - new TypeReference<List>() {}
+	 * 	</pre>
+	 * @param <T>		return type
+	 * @return	bean filled by object's value
+	 */
+	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
+
+		if( isString( object ) ) {
+			return toBeanFromJson( object.toString(), typeReference );
+		} else {
+			return objectMapper.convertValue( object, typeReference );
+		}
+
+	}
+
+	/**
 	 * Convert as bean from json text
 	 * @param jsonString	json text
 	 * @param toClass		class to return
@@ -573,6 +658,29 @@ public class Reflector {
     		throw new JsonIOException( e );
     	}
     }
+
+	/**
+	 * Convert as bean from json text
+	 * @param jsonString	json text
+	 * @param typeReference	type to return
+	 * 	<pre>
+	 *	  Examples are below.
+	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
+	 *	    - new TypeReference<List<String>>() {}
+	 *	    - new TypeReference<List>() {}
+	 * 	</pre>
+	 * @param <T>			return type
+	 * @return bean filled by json value
+	 */
+	private static <T> T toBeanFromJson( String jsonString, TypeReference<T> typeReference ) {
+		try {
+			return objectMapper.readValue( getContent( jsonString ), typeReference );
+		} catch( JsonParseException e ) {
+			throw new JsonIOException( "JsonParseException : {}\n\t- json string :\n{}", e.getMessage(), jsonString );
+		} catch( IOException e ) {
+			throw new JsonIOException( e );
+		}
+	}
 
 	/**
 	 * Convert as List from json text
@@ -689,7 +797,7 @@ public class Reflector {
 	 * Unwrap proxy invocator from bean
 	 * @param beanToUnwrapProxy	target bean to unwrap proxy method
 	 * @return	original bean
-	 * @throws ClassCastException if beanToUnwrapProxy is not proxy bean.
+	 * @throws ClassCastingException if beanToUnwrapProxy is not proxy bean.
 	 */
 	public static <T> T unwrapProxy( T beanToUnwrapProxy ) {
 
@@ -698,7 +806,7 @@ public class Reflector {
 		InvocationHandler invocationHandler = Proxy.getInvocationHandler( beanToUnwrapProxy );
 
 		if( ! (invocationHandler instanceof  NInvocationHandler) ) {
-			throw new ClassCastException( "Only proxy instance to generated by nayasis.common.reflection.Refector can be unwraped." );
+			throw new ClassCastingException( "Only proxy instance to generated by nayasis.common.reflection.Refector can be unwraped." );
 		}
 
 		return (T) ((NInvocationHandler) invocationHandler).getOriginalInstance();

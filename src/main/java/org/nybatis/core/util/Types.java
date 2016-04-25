@@ -54,19 +54,36 @@ public class Types {
 
     public static boolean isArray( Class klass ) {
         if( klass == null ) return false;
-        return isList( klass ) || klass.isArray();
-    }
-
-    public static boolean isNotArray( Class klass ) {
-        return ! isArray( klass );
+        return klass.isArray();
     }
 
     public static boolean isArray( Object object ) {
         return object != null && isArray( object.getClass() );
     }
 
+    public static boolean isNotArray( Class klass ) {
+        return ! isArray( klass );
+    }
+
     public static boolean isNotArray( Object object ) {
         return ! isArray( object );
+    }
+
+    public static boolean isArrayOrList( Class klass ) {
+        if( klass == null ) return false;
+        return isList( klass ) || klass.isArray();
+    }
+
+    public static boolean isNotArrayOrList( Class klass ) {
+        return ! isArrayOrList( klass );
+    }
+
+    public static boolean isArrayOrList( Object object ) {
+        return object != null && isArrayOrList( object.getClass() );
+    }
+
+    public static boolean isNotArrayOrList( Object object ) {
+        return ! isArrayOrList( object );
     }
 
     public static boolean isPrimitive( Class klass ) {

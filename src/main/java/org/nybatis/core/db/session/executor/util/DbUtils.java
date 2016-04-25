@@ -43,7 +43,7 @@ public class DbUtils {
 		if( klass == Calendar.class   ) return true;
 		if( klass == NDate.class      ) return true;
 		if( klass == Object.class     ) return true;
-		return Types.isArray( klass );
+		return Types.isArrayOrList( klass );
 
 	}
 

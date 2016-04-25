@@ -1,8 +1,6 @@
 package org.nybatis.core.file.handler;
 
-import org.nybatis.core.util.StringUtil;
-
-import java.nio.file.FileSystems;
+import org.nybatis.core.file.FileUtil;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,7 +8,6 @@ import java.nio.file.PathMatcher;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,11 +19,11 @@ import java.util.Set;
  */
 public class FileFinder extends SimpleFileVisitor<Path> {
 
-    private boolean                 checkPattern = true;
-    private boolean                 includeDir   = true;
-    private boolean                 includeFile  = true;
-    private final Set<PathMatcher>  matchers     = new HashSet<>();
-    private final List<Path>        result       = new ArrayList<>();
+    private boolean           checkPattern = true;
+    private boolean           includeDir   = true;
+    private boolean           includeFile  = true;
+    private Set<PathMatcher>  matchers     = new HashSet<>();
+    private List<Path>        result       = new ArrayList<>();
 
     /**
      * 기본 생성자
@@ -37,16 +34,7 @@ public class FileFinder extends SimpleFileVisitor<Path> {
      */
     public FileFinder( boolean includeFile, boolean includeDir, String... pattern ) {
 
-        for( String singlePattern : new HashSet<>(Arrays.asList(pattern)) ) {
-        	if( StringUtil.isEmpty( singlePattern ) ) continue;
-
-            if( ! singlePattern.contains("/") && ! singlePattern.contains("\\") ) {
-                singlePattern = "**/" + singlePattern;
-            }
-
-            matchers.add( FileSystems.getDefault().getPathMatcher( "glob:" + singlePattern ) );
-        }
-
+        this.matchers     = FileUtil.toPathMacher( pattern );
         this.checkPattern = ( matchers.size() != 0 );
         this.includeFile  = includeFile;
         this.includeDir   = includeDir;

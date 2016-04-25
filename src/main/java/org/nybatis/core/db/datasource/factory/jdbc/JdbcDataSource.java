@@ -10,11 +10,13 @@ import java.util.logging.Logger;
 
 import javax.sql.DataSource;
 
+import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StopWatcher;
 
 public class JdbcDataSource implements DataSource {
@@ -74,6 +76,8 @@ public class JdbcDataSource implements DataSource {
 
 				StopWatcher stopWatcher = new StopWatcher();
 
+				int tryCount = 0;
+
 				while( stopWatcher.elapsedNanoSeconds() < waitTime ) {
 
 					try {
@@ -84,9 +88,15 @@ public class JdbcDataSource implements DataSource {
 
 					if( ! connectionPoolIdle.isEmpty() ) break;
 
+					tryCount++;
+
+					NLogger.trace( "... wait for getting idle connection. ({})", tryCount );
+
 				}
 
 				if( connectionPoolIdle.isEmpty() ) {
+					NLogger.trace( "Fail to get connection" );
+					DatasourceManager.printStatus();
 					throw new DatabaseException( "Fail to get connection from JdbcConnectionPool. [{}]", connectionProperties );
 				}
 
@@ -106,21 +116,26 @@ public class JdbcDataSource implements DataSource {
 		proxyConnection = connectionPoolActive.push( proxyConnection );
 
 		NLogger.trace( "Get connection" );
-		logPoolStatus();
+		DatasourceManager.printStatus();
 
 		return proxyConnection.getConnection();
 
     }
 
-	private void logPoolStatus() {
-
-		if( ! NLogger.isTraceEnabled() ) return;
+	public NMap getPoolStatus() {
 
 		int activeCount = connectionPoolActive.size();
 		int idleCount   = connectionPoolIdle.size();
 		int total       = activeCount + idleCount;
 
-		NLogger.trace( "connection pool status ( total : {}, active : {}, idle : {})", total, activeCount, idleCount );
+		NMap result = new NMap();
+
+		result.put( "environment", datasourceProperties.getId() );
+		result.put( "total",       total                        );
+		result.put( "active",      activeCount                  );
+		result.put( "idle",        idleCount                    );
+
+		return result;
 
 	}
 
@@ -172,7 +187,7 @@ public class JdbcDataSource implements DataSource {
 		}
 
 		NLogger.trace( "Release connection" );
-		logPoolStatus();
+		DatasourceManager.printStatus();
 
     }
 

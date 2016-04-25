@@ -10,7 +10,7 @@ import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 import org.nybatis.core.db.sql.mapper.implement.ByteArrayMapper;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
-import org.nybatis.core.exception.unchecked.ClassCastException;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JdbcImplementException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
@@ -86,7 +86,7 @@ public class StatementController {
 
 	}
 
-	public void setParameter( CallableStatement statement ) throws SQLException, ClassCastException {
+	public void setParameter( CallableStatement statement ) throws SQLException, ClassCastingException {
 
 		for( int i = 0, iCnt = sqlBean.getBindParams().size(); i < iCnt; i++ ) {
 
@@ -99,8 +99,8 @@ public class StatementController {
     			} else {
     				i = setParameter( sqlBean.getEnvironmentId(), statement, i, param );
     			}
-			} catch( ClassCastException e ) {
-				throw new org.nybatis.core.exception.unchecked.ClassCastException( e, "{}, index:{}, value:{}", e.getMessage(), i, param.getValue() );
+			} catch( java.lang.ClassCastException e ) {
+				throw new ClassCastingException( e, "{}, index:{}, value:{}", e.getMessage(), i, param.getValue() );
 			}
 
 		}
@@ -115,8 +115,8 @@ public class StatementController {
 
 			try {
 				index = setParameter( sqlBean.getEnvironmentId(), statement, index, value );
-    		} catch( ClassCastException e ) {
-    			throw new ClassCastException( e, "{}, index:{}, value:{}", e.getMessage(), index, value );
+    		} catch( java.lang.ClassCastException e ) {
+    			throw new ClassCastingException( e, "{}, parameter index:{}, value:{}", e.getMessage(), index, value );
     		}
 
 		}
@@ -315,11 +315,16 @@ public class StatementController {
 
 	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) throws SQLException {
 
-		if( statement instanceof PreparedStatement ) {
-			typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );
-		} else if( statement instanceof CallableStatement ) {
-			typeMapper.setParameter( (CallableStatement) statement, paramIndex, value.getValue() );
+		try {
+			if( statement instanceof PreparedStatement ) {
+				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );
+			} else if( statement instanceof CallableStatement ) {
+				typeMapper.setParameter( (CallableStatement) statement, paramIndex, value.getValue() );
+			}
+		} catch( java.lang.ClassCastException e ) {
+			throw new ClassCastingException( e, "parameter index:[{}], value : [{}]", paramIndex, value );
 		}
+
 
 	}
 

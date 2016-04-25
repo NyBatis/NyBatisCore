@@ -206,7 +206,6 @@ public class ReflectorTest {
 
 		assertEquals( another.lastName, "Jung" );
 		assertEquals( another.prefix, "testPrefix" );
-		assertEquals( another.lastName, "Jung" );
 		assertTrue( another.fax.equals( person.fax ) );
 
 	}

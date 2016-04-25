@@ -1,10 +1,10 @@
 package org.nybatis.core.conf;
 
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nybatis.core.validation.Validator;
 
 
 /**
@@ -50,7 +50,7 @@ public class Const {
 		private static String name = null;
 
 		static {
-			name = System.getProperty( "nayasis.common.profile" );
+			name = StringUtil.nvl( System.getProperty("nayasis.common.profile") );
 		}
 
 		/**
@@ -80,8 +80,8 @@ public class Const {
 		 *
 		 *     Const.profile.set( "local" )
 		 *
-		 *     Const.profile.getFileName( "/app/webapp/config.prop" )
-		 *     --> "/app/webapp/config<font color=red>-local</font>.prop"
+		 *     Const.profile.apply( "/app/webapp/config.prop" )
+		 *     --> "/app/webapp/config<font color=red>.local</font>.prop"
 		 *
 		 * </pre>
 		 *
@@ -89,9 +89,13 @@ public class Const {
 		 * @param file filename
 		 * @return filename applied profile setting
 		 */
-		public static String getFileName( String file ) {
+		public static String apply( String file ) {
 			if( StringUtil.isEmpty(name) || StringUtil.isBlank(file) ) return file;
-			return String.format( "%s-%s.%s", FileUtil.removeExtention(file), profile.name, FileUtil.getExtention(file) );
+			return String.format( "%s%s.%s",
+					FileUtil.removeExtention(file),
+					Validator.isEmpty(profile.name) ? "" : "-" + profile.name,
+					FileUtil.getExtention(file)
+			);
 		}
 
 	}
@@ -104,8 +108,8 @@ public class Const {
 	 */
 	public abstract static class path {
 
-		private static final String root = new ConstHelper().getRoot();
-		private static       String base = root;
+		private static final String  root = new ConstHelper().getRoot();
+		private static       String  base = root;
 
 		/**
 		 * Get NayasisCore's base path. <br><br>
@@ -127,8 +131,7 @@ public class Const {
 		public static void setBase( String path ) {
 
 			if( ! FileUtil.isDirectory(path) ) {
-				NLogger.info( "base path({}) to change does not exists. current base path({}) is not changed.", path, base );
-				return;
+				NLogger.warn( "base path({}) does not exists in file system.", path );
 			}
 
 			base = path;
@@ -199,6 +202,17 @@ public class Const {
 	        return getBase() + "/localDb";
         }
 
+		/**
+		 * Convert file path to resource path. <br>
+		 *
+		 * (remove base path from file path.)
+		 *
+		 * @param filePath
+		 * @return resource path
+		 */
+		public static String toResourceName( String filePath ) {
+			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
+		}
 	}
 
 	/**

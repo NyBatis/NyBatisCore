@@ -3,30 +3,39 @@ package org.nybatis.core.db.configuration.builder;
 import java.io.File;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 import org.nybatis.core.xml.node.Node;
 
 public class PropertyResolver {
 
 	private NProperties properties = new NProperties();
 
-	public PropertyResolver() {}
+	public PropertyResolver() {
+		addDefaultProperties();
+	}
 
 	public PropertyResolver( Node properties ) {
+		addDefaultProperties();
 		setProperties(properties);
+
+	}
+
+	private void addDefaultProperties() {
+		properties.set( "profile", Const.profile.get() );
 	}
 
 	private void setProperties( Node properties ) {
 
-		String path = properties.getAttrIgnoreCase( "path" );
+		String path = getPropValue( properties.getAttrIgnoreCase( "path" ) );
 
-		if( path != null ) {
+		if( Validator.isNotEmpty(path) ) {
 			try {
 	            this.properties.readFrom( new File( Const.path.getConfigDatabase() + "/" + path) );
-            } catch( IoException e ) {
+            } catch( UncheckedIOException e ) {
             	NLogger.error( e );
             }
 		}
@@ -63,9 +72,9 @@ public class PropertyResolver {
 
 		value = StringUtil.nvl( value );
 
-		for( String key : StringUtil.capturePatterns( value, "#\\{(.+?)\\}" ) ) {
+		for( String key : StringUtil.capturePatterns( value, "[#|$]\\{(.+?)\\}" ) ) {
 			if( ! properties.hasKey( key ) ) continue;
-			value = value.replace( String.format("#{%s}", key), properties.get(key) );
+			value = value.replaceAll( String.format("[#|$]\\{%s\\}", key), properties.get(key) );
 		}
 
 		return value;

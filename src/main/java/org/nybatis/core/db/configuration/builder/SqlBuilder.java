@@ -5,9 +5,6 @@ import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 public class SqlBuilder {
@@ -15,9 +12,9 @@ public class SqlBuilder {
 	private PropertyResolver prop = new PropertyResolver();
 	private String           basePath;
 
-	public SqlBuilder( PropertyResolver propertyResolver, File basePath ) {
+	public SqlBuilder( PropertyResolver propertyResolver, String basePath ) {
 		this.prop     = propertyResolver;
-		this.basePath = basePath.getAbsolutePath();
+		this.basePath = basePath;
 	}
 
 	public void setSql( Node environment ) {
@@ -38,9 +35,22 @@ public class SqlBuilder {
 	}
 
 	private void readSql( Node path, String environmentId ) {
+
 		String inputPath = prop.getPropValue(path.getText());
-        Path   realPath  = FileUtil.isExist( inputPath ) ? Paths.get( inputPath ) : Paths.get( basePath, inputPath );
-		new SqlRepository().readFrom( realPath, environmentId );
+		String realPath;
+
+		if( FileUtil.exists( inputPath ) ) {
+			realPath = inputPath;
+		} else {
+			realPath = FileUtil.getPath( basePath, inputPath );
+		}
+
+		if( realPath.endsWith(".xml") ) {
+			new SqlRepository().readFromFile( realPath, environmentId );
+		} else {
+			new SqlRepository().readFromDirectory( realPath, environmentId );
+		}
+
 	}
 
 }

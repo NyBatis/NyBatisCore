@@ -11,8 +11,12 @@ import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 
 public class FileUtilTest {
@@ -93,6 +97,28 @@ public class FileUtilTest {
 		String source = "e:\\download\\_testaa";
 		String target = "\\\\NAS\\emul\\image\\Apple2\\_testaa";
 		FileUtil.copy( source, target, true );
+	}
+
+	@Test
+	public void isFile() {
+		Assert.assertFalse( FileUtil.isFile( "/d:/f제목 없음" ) );
+	}
+
+	@Test
+	public void readInClassPath() throws IOException {
+
+		Enumeration<URL> resources = ClassUtil.getClassLoader().getResources( "config/**" );
+
+		for( URL url : Collections.list( resources ) ) {
+
+			URLConnection urlConnection = url.openConnection();
+
+		}
+
+//		InputStream inputStream = ClassUtil.getResourceAsStream( "/config/log/logback.xml" );
+//		FileUtil.readFrom( inputStream, readLine -> {
+//            NLogger.debug( readLine );
+//        });
 	}
 
 }

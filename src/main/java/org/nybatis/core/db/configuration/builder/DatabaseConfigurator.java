@@ -1,14 +1,14 @@
 package org.nybatis.core.db.configuration.builder;
 
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.context.NThreadLocal;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.ClassUtil;
+
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
+import java.util.List;
 
 /**
  * Database Configuration Builder
@@ -29,15 +29,15 @@ public class DatabaseConfigurator {
 	 */
 	public static void build( String filePath, boolean reload ) {
 
-		filePath = Const.profile.getFileName( filePath );
+		filePath = FileUtil.nomalizeSeparator( filePath );
 
-		if( FileUtil.isNotExist(filePath) ) {
+		if( FileUtil.notExists( filePath ) ) {
 
 			try {
 
 				String modifiedPath = Paths.get( Const.path.getConfigDatabase(), filePath ).toString();
 
-				if( FileUtil.isNotExist( modifiedPath ) ) {
+				if( FileUtil.notExists( modifiedPath ) ) {
 					NLogger.error( "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath, modifiedPath );
 					filePath = null;
 				}
@@ -67,10 +67,12 @@ public class DatabaseConfigurator {
 	 */
 	public static void build( boolean reload ) {
 
-		List<Path> confLists = FileUtil.search( Const.path.getConfigDatabase(), true, false, 0, "*.xml" );
+		String dbConfDir = Const.path.toResourceName( Const.path.getConfigDatabase() );
 
-		for( Path confPath : confLists ) {
-			build( confPath.toString(), reload );
+		List<String> resourceNames = ClassUtil.getResourceNames( dbConfDir + "/*.xml" );
+
+		for( String resourceName : resourceNames ) {
+			new ConfigurationBuilder().readFrom( resourceName, reload );
 		}
 
 	}

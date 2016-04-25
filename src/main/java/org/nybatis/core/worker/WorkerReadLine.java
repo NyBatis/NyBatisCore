@@ -7,6 +7,7 @@ import java.io.IOException;
  *
  * @param <T> 작업결과를 임시저장할 오브젝트의 타입
  */
+@FunctionalInterface
 public interface WorkerReadLine {
 
 	/**

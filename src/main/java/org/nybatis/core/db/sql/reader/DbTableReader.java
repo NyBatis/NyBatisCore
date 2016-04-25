@@ -8,7 +8,7 @@ import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
@@ -88,7 +88,7 @@ public class DbTableReader {
 
             SqlRepository.put( sqlId, sqlNode );
 
-        } catch( ParseException | IoException | SqlParseException | DatabaseConfigurationException e ) {
+        } catch( ParseException | UncheckedIOException | SqlParseException | DatabaseConfigurationException e ) {
             throw new SqlConfigurationException( e, "Error on making sql ({})", subId );
         }
 

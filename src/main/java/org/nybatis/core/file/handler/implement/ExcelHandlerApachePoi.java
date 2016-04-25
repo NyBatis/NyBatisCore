@@ -15,7 +15,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.nybatis.core.exception.unchecked.ExcelNoHeadException;
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.handler.ExcelHandler;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
-	protected void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws IoException {
+	protected void writeNListTo( OutputStream outputStream, Map<String, NList> data, boolean isXlsx ) throws UncheckedIOException {
 
 		Workbook workbook = isXlsx ? new XSSFWorkbook() : new HSSFWorkbook();
 
@@ -42,7 +42,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 			}
 			workbook.write( outputStream );
 		} catch( IOException e ) {
-			throw new IoException( e  );
+			throw new UncheckedIOException( e  );
 		} finally {
 			try { workbook.close(); } catch( IOException e ) {}
 			try { if( outputStream != null ) outputStream.close(); } catch( IOException e ) {}
@@ -104,14 +104,14 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 	}
 
 	@Override
-	public NList readFrom( InputStream inputStream, String sheetName ) throws IoException {
+	public NList readFrom( InputStream inputStream, String sheetName ) throws UncheckedIOException {
 		return readFrom( inputStream, ( workbook, result ) -> {
 			result.put( sheetName, readFrom( workbook, workbook.getSheetIndex( sheetName ) ) );
 		} ).get( sheetName );
 	}
 
 	@Override
-	public NList readFirstSheetFrom( InputStream inputStream ) throws IoException {
+	public NList readFirstSheetFrom( InputStream inputStream ) throws UncheckedIOException {
 		return readFrom( inputStream, ( workbook, result ) -> {
 			Sheet sheet = workbook.getSheetAt( 0 );
 			if( sheet != null ) {
@@ -121,7 +121,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 	}
 
 	@Override
-	public Map<String, NList> readFrom( InputStream inputStream ) throws IoException {
+	public Map<String, NList> readFrom( InputStream inputStream ) throws UncheckedIOException {
 		return readFrom( inputStream, ( workbook, result ) -> {
 			for( int sheetIndex = 0, limit = workbook.getNumberOfSheets(); sheetIndex < limit; sheetIndex++ ) {
 				result.put( workbook.getSheetName( sheetIndex ), readFrom(workbook, sheetIndex) );
@@ -133,7 +133,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		void read( Workbook workbook, Map<String,NList> result );
 	}
 
-	public Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws IoException {
+	public Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws UncheckedIOException {
 
 		Map<String, NList> result = new LinkedHashMap<>();
 
@@ -148,7 +148,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 			}
 
 		} catch( IOException e ) {
-			throw new IoException( e, "Error on reading excel data from input stream." );
+			throw new UncheckedIOException( e, "Error on reading excel data from input stream." );
 		}
 
 		return result;
