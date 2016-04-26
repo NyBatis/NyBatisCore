@@ -21,11 +21,11 @@ import org.nybatis.core.util.StopWatcher;
 
 public class JdbcDataSource implements DataSource {
 
-	private JdbcDatasourceProperties datasourceProperties;
-	private JdbcConnectionProperties connectionProperties;
+	protected JdbcDatasourceProperties datasourceProperties;
+	protected JdbcConnectionProperties connectionProperties;
 
-	private final Stack<ProxyConnection> connectionPoolIdle   = new Stack<>();
-	private final Stack<ProxyConnection> connectionPoolActive = new Stack<>();
+	protected final Stack<ProxyConnection> connectionPoolIdle   = new Stack<>();
+	protected final Stack<ProxyConnection> connectionPoolActive = new Stack<>();
 
 	private static final long THREAD_WAIT_MILI_SECONDS = 200;
 
@@ -35,7 +35,7 @@ public class JdbcDataSource implements DataSource {
 		this.connectionProperties = connectionProperties;
 
 		if( datasourceProperties.isPingEnable() ) {
-			new ConnectionHealthChecker( connectionPoolIdle, this.datasourceProperties ).run();
+			new ConnectionHealthChecker( this ).run();
 		}
 
 	}
@@ -50,7 +50,15 @@ public class JdbcDataSource implements DataSource {
     }
 
 	@Override
-    public synchronized Connection getConnection( String username, String password ) throws SQLException {
+    public Connection getConnection( String username, String password ) throws SQLException {
+		return getProxyConnection( username, password ).getConnection();
+    }
+
+	public ProxyConnection getProxyConnection() throws SQLException {
+		return getProxyConnection( connectionProperties.getUserName(), connectionProperties.getUserPassword() );
+	}
+
+	public synchronized ProxyConnection getProxyConnection( String username, String password ) throws SQLException {
 
 		if( connectionPoolIdle.isEmpty() ) {
 
@@ -64,7 +72,7 @@ public class JdbcDataSource implements DataSource {
 
 			} else if( connectionPoolActive.size() < datasourceProperties.getPoolMax() ) {
 
-				int count = Math.min(  datasourceProperties.getPoolStep(), datasourceProperties.getPoolMax() - connectionPoolActive.size() );
+				int count = Math.min( datasourceProperties.getPoolStep(), datasourceProperties.getPoolMax() - connectionPoolActive.size() );
 
 				for( int i = 0; i < count; i++ ) {
 					connectionPoolIdle.push( createProxyConnection( username, password ) );
@@ -81,12 +89,12 @@ public class JdbcDataSource implements DataSource {
 				while( stopWatcher.elapsedNanoSeconds() < waitTime ) {
 
 					try {
-	                    Thread.sleep( THREAD_WAIT_MILI_SECONDS );
-                    } catch( InterruptedException e ) {
-	                    break;
-                    }
+						Thread.sleep( THREAD_WAIT_MILI_SECONDS );
+					} catch( InterruptedException e ) {
+						break;
+					}
 
-					if( ! connectionPoolIdle.isEmpty() ) break;
+					if( !connectionPoolIdle.isEmpty() ) break;
 
 					tryCount++;
 
@@ -118,25 +126,25 @@ public class JdbcDataSource implements DataSource {
 		NLogger.trace( "Get connection" );
 		DatasourceManager.printStatus();
 
-		return proxyConnection.getConnection();
+		return proxyConnection;
 
-    }
+	}
 
 	public NMap getPoolStatus() {
-
-		int activeCount = connectionPoolActive.size();
-		int idleCount   = connectionPoolIdle.size();
-		int total       = activeCount + idleCount;
 
 		NMap result = new NMap();
 
 		result.put( "environment", datasourceProperties.getId() );
-		result.put( "total",       total                        );
-		result.put( "active",      activeCount                  );
-		result.put( "idle",        idleCount                    );
+		result.put( "total",       getPoolCount()               );
+		result.put( "active",      connectionPoolActive.size()  );
+		result.put( "idle",        connectionPoolIdle.size()    );
 
 		return result;
 
+	}
+
+	public int getPoolCount() {
+		return connectionPoolActive.size() + connectionPoolIdle.size();
 	}
 
 	private ProxyConnection createProxyConnection() {
@@ -163,16 +171,14 @@ public class JdbcDataSource implements DataSource {
 
 	}
 
-	private synchronized void giveBackConnectionToPool( ProxyConnection proxyConnection ) {
+	public synchronized void giveBackConnectionToPool( ProxyConnection proxyConnection ) {
 
 		connectionPoolActive.remove( proxyConnection );
 
 		if( proxyConnection.isClosed() ) {
 
 			proxyConnection.destroy();
-
 			connectionPoolIdle.remove( proxyConnection );
-			connectionPoolIdle.push( createProxyConnection() );
 
 		} else {
 
