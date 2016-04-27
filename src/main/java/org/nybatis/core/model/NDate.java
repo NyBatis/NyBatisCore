@@ -8,6 +8,7 @@ import org.nybatis.core.reflection.mapper.NDateSerializer;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -19,7 +20,7 @@ import java.util.Date;
  */
 @JsonSerialize( using = NDateSerializer.class )
 @JsonDeserialize( using = NDateDeserializer.class )
-public class NDate {
+public class NDate implements Serializable {
 
 	public static final NDate MIN_DATE = new NDate( "0000-01-01" );
 	public static final NDate MAX_DATE = new NDate( "9999-12-31 23:59:59.999" );
