@@ -2,7 +2,6 @@ package org.nybatis.core.conf;
 
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
@@ -108,8 +107,9 @@ public class Const {
 	 */
 	public abstract static class path {
 
-		private static final String  root = new ConstHelper().getRoot();
-		private static       String  base = root;
+		private static final String  root     = new ConstHelper().getRoot();
+		private static       String  base     = root;
+		private static       boolean runInWar = new ConstHelper().isRunInWar();
 
 		/**
 		 * Get NayasisCore's base path. <br><br>
@@ -163,8 +163,12 @@ public class Const {
 		 * @return Configuration directory
 		 */
 		public static String getConfig() {
-	        return getBase() + "/config";
+	        return getBase() + getWarRoot() + "/config";
         }
+
+		private static String getWarRoot() {
+			return runInWar ? "/WEB-INF/classes" : "";
+		}
 
 		/**
 		 * Get Database configuration directory
@@ -199,7 +203,7 @@ public class Const {
 		 * @return local DB directory
 		 */
 		public static String getLocalDatabase() {
-	        return getBase() + "/localDb";
+	        return getBase() + getWarRoot() + "/localDb";
         }
 
 		/**

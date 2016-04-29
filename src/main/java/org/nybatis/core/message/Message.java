@@ -1,5 +1,13 @@
 package org.nybatis.core.message;
 
+import org.nybatis.core.conf.Const;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.util.ClassUtil;
+import org.nybatis.core.util.NProperties;
+import org.nybatis.core.util.StringUtil;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
@@ -8,14 +16,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.reflection.Reflector;
-import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.util.ClassUtil;
-import org.nybatis.core.util.NProperties;
-import org.nybatis.core.util.StringUtil;
 
 /**
  * 코드 기반의 메세지를 관리하는 유틸 클래스
@@ -111,7 +111,7 @@ public class Message {
      *
      * @return 파일에 기록할 컨텐츠
      */
-    private static String toJavaScript( String javascriptMessageObjectName ) {
+    public static String toJavaScript( String javascriptMessageObjectName ) {
 
         StringBuffer contents = new StringBuffer();
 
@@ -141,7 +141,7 @@ public class Message {
 
         String configPath = Const.path.toResourceName( Const.path.getConfigMessage() );
 
-        List<String> resourceNames = ClassUtil.getResourceNames( configPath + "/**.*.prop" );
+        List<String> resourceNames = ClassUtil.getResourceNames( configPath + "/**.prop" );
 
         Collections.sort( resourceNames );
 

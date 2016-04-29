@@ -14,7 +14,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
+import java.nio.file.PathMatcher;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -119,6 +123,27 @@ public class FileUtilTest {
 //		FileUtil.readFrom( inputStream, readLine -> {
 //            NLogger.debug( readLine );
 //        });
+	}
+
+	@Test
+	public void pathMatcher() {
+
+		List<String> entries = Arrays.asList( "WEB-INF\\classes\\config\\message\\merong\\messageMerong.prop", "WEB-INF\\classes\\config\\message\\message.prop" );
+
+		System.out.println( entries );
+
+		NLogger.debug( entries );
+
+		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher( "glob:" + "**.prop" );
+
+		for( String entry : entries ) {
+			boolean matches = pathMatcher.matches( Paths.get( entry ) );
+			if( matches ) {
+				NLogger.debug( "matched !! : {}", entry );
+			}
+		}
+
+
 	}
 
 }
