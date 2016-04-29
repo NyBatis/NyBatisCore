@@ -36,6 +36,7 @@ public class ProxyConnection {
     private Connection      proxyConnection;
     private long            lastUsedTime; // nano time
     private Runnable        runnable;
+	private int hashCode;
 
     private Set<Statement> poolStatement = new HashSet<>();
     private Set<ResultSet> poolResultset = new HashSet<>();
@@ -43,6 +44,7 @@ public class ProxyConnection {
     public ProxyConnection( Connection connection ) {
 
     	this.realConnection  = connection;
+		this.hashCode        = realConnection.hashCode();
     	this.proxyConnection = invokeConnection( connection );
 
 		resetLastUsedTime();
@@ -55,7 +57,7 @@ public class ProxyConnection {
     }
 
     public int hashCode() {
-        return realConnection.hashCode();
+        return hashCode;
     }
 
     public boolean equals( Object object ) {
