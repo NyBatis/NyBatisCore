@@ -1,8 +1,10 @@
 package org.nybatis.core.util;
 
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.file.FileUtil;
+
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
@@ -11,10 +13,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.file.FileUtil;
 
 /**
  * Properties wrapper

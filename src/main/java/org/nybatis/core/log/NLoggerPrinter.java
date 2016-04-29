@@ -5,6 +5,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
@@ -126,7 +128,13 @@ public class NLoggerPrinter {
 		} else if( param.length == 0 ) {
 
 			if( format instanceof List ) {
-				printLog( level, logger, new NList( (List)format).toString() );
+
+				try {
+					printLog( level, logger, new NList( (List) format ).toString() );
+				} catch( JsonIOException e ) {
+					printLog( level, logger, format.toString() );
+				}
+
 			} else if( Types.isArray(format) ) {
 				printLog( level, logger, Arrays.deepToString( (Object[]) format ) );
 			} else {
