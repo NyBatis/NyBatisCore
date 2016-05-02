@@ -208,7 +208,17 @@ public class SqlProperties {
 		return pageSqlEnd;
 	}
 
-	public void setPageSql( int start, int end ) {
+	public void setPageSql( Integer start, Integer end ) {
+
+		if( start == null || end == null ) {
+			start = 1;
+			end   = Integer.MAX_VALUE;
+		} else if( start == null ) {
+			start = 1;
+		} else if( end == null ) {
+			end   = Integer.MAX_VALUE;
+		}
+
 		pageSqlStart = Math.min( start, end );
 		pageSqlEnd   = Math.max( start, end );
 	}

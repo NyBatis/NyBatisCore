@@ -119,6 +119,6 @@ public interface ListExecutor {
      * @param end   end rownum
      * @return self instance
      */
-    ListExecutor setPage( int start, int end );
+    ListExecutor setPage( Integer start, Integer end );
 
 }
