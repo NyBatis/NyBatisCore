@@ -92,7 +92,7 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     }
 
     @Override
-    public OrmListExecutor<T> setPage( int start, int end ) {
+    public OrmListExecutor<T> setPage( Integer start, Integer end ) {
         sqlSession.getProperties().setPageSql( start, end );
         return this;
     }
