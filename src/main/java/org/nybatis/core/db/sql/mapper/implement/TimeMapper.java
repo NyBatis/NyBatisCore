@@ -24,17 +24,20 @@ public class TimeMapper implements TypeMapperIF<Date> {
 
 	@Override
     public Date getResult( ResultSet resultSet, String columnName ) throws SQLException {
-	    return new Date( resultSet.getTime( columnName ).getTime() );
+		Time time = resultSet.getTime( columnName );
+		return time == null ? null : new Date( time.getTime() );
     }
 
 	@Override
     public Date getResult( ResultSet resultSet, int columnIndex ) throws SQLException {
-		return new Date( resultSet.getTime( columnIndex ).getTime() );
+		Time time = resultSet.getTime( columnIndex );
+		return time == null ? null : new Date( time.getTime() );
     }
 
 	@Override
     public Date getResult( CallableStatement statement, int columnIndex ) throws SQLException {
-	    return new Date( statement.getTime( columnIndex ).getTime() );
+		Time time = statement.getTime( columnIndex );
+		return time == null ? null : new Date( time.getTime() );
     }
 
 }
