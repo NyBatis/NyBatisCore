@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
@@ -207,6 +208,16 @@ public class ReflectorTest {
 		assertEquals( another.lastName, "Jung" );
 		assertEquals( another.prefix, "testPrefix" );
 		assertTrue( another.fax.equals( person.fax ) );
+
+	}
+
+	@Test
+	public void nullTest() {
+
+		NDate date = Reflector.toBeanFrom( null, NDate.class );
+
+		NLogger.debug( date );
+
 
 	}
 
