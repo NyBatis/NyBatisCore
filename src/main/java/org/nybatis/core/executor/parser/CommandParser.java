@@ -32,9 +32,9 @@ public class CommandParser {
 				if( c == '"' ) {
 
 					quotationMode = false;
-					
+
+					command.append( c );
 					addCommandList( command );
-					
 					continue;
 					
 				}
@@ -44,15 +44,13 @@ public class CommandParser {
 				if( c == '"' ) {
 					
 					quotationMode = true;
-					
+
+					command.append( c );
 					continue;
 					
 				} else if ( c == ' ' || c == '\t' || c == '\r' || c == '\n'  ) {
-					
 					addCommandList( command );
-					
 					continue;
-					
 				}
 				
 			}
