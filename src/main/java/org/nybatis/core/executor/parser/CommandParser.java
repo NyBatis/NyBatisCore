@@ -60,7 +60,11 @@ public class CommandParser {
 		}
 		
 		addCommandList( command );
-		
+
+		if( commandList.size() > 0 ) {
+			commandList.set( 0, commandList.get( 0 ).replaceAll( "^\"(.*)\"", "$1" ) );
+		}
+
 		return commandList;
 		
 	}
