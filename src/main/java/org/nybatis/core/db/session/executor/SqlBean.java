@@ -119,7 +119,10 @@ public class SqlBean {
 	}
 
 	public String getSql() {
-		return queryResolver.getSql();
+		// remaining unbind sentence "#{param...}" cause NPE when running executeUpdate().
+		// 'statement.setEscapeProcessing( false )' can not avoid error because it cause another problem.
+		// so remove remaining unbind sentence to avoid NPE.
+		return queryResolver.getSql().replaceAll( "#\\{.+?\\}", "" );
 	}
 
 	public String getDebugSql() {

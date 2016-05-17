@@ -123,8 +123,8 @@ public class NDate implements Serializable {
      * @param date 날짜
      * @throws ParseException YYYY-MM-DD-HH-MI-SS 순서로 날짜를 해석하지 못했을 경우
      */
-    public void setDate( String date ) throws ParseException {
-        setDate( date, null );
+    public NDate setDate( String date ) throws ParseException {
+        return setDate( date, null );
     }
 
     /**
@@ -140,11 +140,11 @@ public class NDate implements Serializable {
      * @param format 날짜포맷 날짜포맷 [YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초 ]
      * @throws ParseException 정의한 format 으로 날짜를 해석하지 못했을 경우
      */
-    public void setDate( String date, String format ) {
+    public NDate setDate( String date, String format ) {
 
         if( date == null || date.length() == 0 ) {
             setDate( new Date() );
-            return;
+            return this;
         }
 
         boolean isNullFormat = Validator.isEmpty( format );
@@ -163,6 +163,7 @@ public class NDate implements Serializable {
 
         try {
 	        currentTime.setTime( sdf.parse(numString) );
+            return this;
         } catch( java.text.ParseException e ) {
         	throw new ParseException( e, e.getMessage() );
         }
@@ -183,8 +184,9 @@ public class NDate implements Serializable {
      *
      * @param date 숫자형 날짜
      */
-    public void setDate( long date ) {
+    public NDate setDate( long date ) {
     	this.currentTime.setTime( new Date(date) );
+        return this;
     }
 
     /**
@@ -192,8 +194,9 @@ public class NDate implements Serializable {
      *
      * @param date 날짜객체
      */
-    public void setDate( Calendar date ) {
+    public NDate setDate( Calendar date ) {
         this.currentTime = (Calendar) date.clone();
+        return this;
     }
 
     /**
@@ -201,8 +204,9 @@ public class NDate implements Serializable {
      *
      * @param date 날짜객체
      */
-    public void setDate( NDate date ) {
+    public NDate setDate( NDate date ) {
         this.currentTime = (Calendar) date.toCalendar().clone();
+        return this;
     }
 
     /**
@@ -348,8 +352,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addYear( int amount ) {
+    public NDate addYear( int amount ) {
         currentTime.add( Calendar.YEAR, amount );
+        return this;
     }
 
     /**
@@ -357,8 +362,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addMonth( int amount ) {
+    public NDate addMonth( int amount ) {
         currentTime.add( Calendar.MONTH, amount );
+        return this;
     }
 
     /**
@@ -366,8 +372,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addDay( int amount ) {
+    public NDate addDay( int amount ) {
         currentTime.add( Calendar.DATE, amount );
+        return this;
     }
 
     /**
@@ -375,8 +382,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addHour( int amount ) {
+    public NDate addHour( int amount ) {
         currentTime.add( Calendar.HOUR_OF_DAY, amount );
+        return this;
     }
 
     /**
@@ -384,8 +392,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addMinute( int amount ) {
+    public NDate addMinute( int amount ) {
         currentTime.add( Calendar.MINUTE, amount );
+        return this;
     }
 
     /**
@@ -393,8 +402,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addSecond( int amount ) {
+    public NDate addSecond( int amount ) {
         currentTime.add( Calendar.SECOND, amount );
+        return this;
     }
 
     /**
@@ -402,8 +412,9 @@ public class NDate implements Serializable {
      *
      * @param amount 더하거나 뺄 수량
      */
-    public void addMillisecond( int amount ) {
+    public NDate addMillisecond( int amount ) {
         currentTime.add( Calendar.MILLISECOND, amount );
+        return this;
     }
 
 
