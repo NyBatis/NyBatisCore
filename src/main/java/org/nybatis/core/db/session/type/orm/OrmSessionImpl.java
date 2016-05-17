@@ -65,10 +65,20 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
         T param = Reflector.toBeanFrom( parameter, domainClass );
 
-        if( selectMap(param).size() == 0 ) {
-            return insert( parameter );
-        } else {
-            return update( parameter );
+        boolean prev = properties.allowNonPkParameter();
+
+        properties.allowNonPkParameter( false );
+
+        try {
+
+            if( selectMap(param).size() == 0 ) {
+                return insert( parameter );
+            } else {
+                return update( parameter );
+            }
+
+        } finally {
+            properties.allowNonPkParameter( prev );
         }
 
     }
