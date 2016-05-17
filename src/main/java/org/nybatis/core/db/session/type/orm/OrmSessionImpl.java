@@ -77,6 +77,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public int update( Object entity ) {
 
         properties.setEntityParameter( entity );
+        checkPkNotNull();
 
         try {
             return getSessionExecutor( properties.sqlIdUpdatePk() ).execute();
@@ -91,12 +92,13 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public int delete( Object parameter ) {
 
         properties.setEntityParameter( parameter );
+        checkPkNotNull();
 
-        String sqlId = isPkSql( parameter ) ? properties.sqlIdDeletePk() : properties.sqlIdDelete();
+        String sqlId = isPkSql() ? properties.sqlIdDeletePk() : properties.sqlIdDelete();
 
         int cnt = getSessionExecutor( sqlId ).execute();
 
-        if( isPkSql( parameter ) ) {
+        if( isPkSql() ) {
             refreshCache();
         }
 
@@ -106,8 +108,8 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     }
 
-    private boolean isPkSql( Object parameter ) {
-        return parameter != null && parameter.getClass() == domainClass;
+    private boolean isPkSql() {
+        return ! properties.allowNonPkParameter();
     }
 
     @Override
@@ -115,7 +117,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
         properties.setEntityParameter( parameter );
 
-        String sqlId = isPkSql( parameter ) ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
+        String sqlId = isPkSql() ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
 
         try {
             return getSessionExecutor( sqlId ).select( domainClass );
@@ -130,7 +132,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
         properties.setEntityParameter( parameter );
 
-        String sqlId = isPkSql( parameter ) ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
+        String sqlId = isPkSql() ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
 
         try {
             return getSessionExecutor( sqlId ).select();
@@ -152,7 +154,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public OrmListExecutor<T> list() {
-        return new OrmListExecutorImpl<>( domainClass, sqlSession, properties.newInstance() );
+        return new OrmListExecutorImpl<>( domainClass, sqlSession, properties.newInstance().allowNonPkParameter(true) );
     }
 
     @Override
@@ -167,6 +169,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public OrmSession<T> where( String sqlExpression, Object parameter ) {
+        properties.allowNonPkParameter( true );
         properties.addWhere( sqlExpression, parameter );
         return this;
     }
@@ -236,7 +239,14 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         return sqlSession;
     }
 
+    @Override
+    public OrmSession<T> allowNonPkParameter( boolean enable ) {
+        properties.allowNonPkParameter( enable );
+        return this;
+    }
+
     private void checkPkNotNull() {
+        if( properties.allowNonPkParameter() ) return;
         Assertion.isTrue( properties.isPkNotNull(), new SqlConfigurationException( "PK has null value.({})", properties.getPkValues() ) );
     }
 
