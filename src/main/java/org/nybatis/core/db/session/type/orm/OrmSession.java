@@ -165,4 +165,16 @@ public interface OrmSession<T> {
      */
     SqlSession getSqlSession();
 
+    /**
+     * allow Non-PK parameter (default : false)
+     *
+     * <pre>
+     *   default is false to prevent unintended massive delete or update DB data.
+     * </pre>
+     *
+     * @param enable flag to allow Non-PK parameter
+     * @return
+     */
+    OrmSession<T> allowNonPkParameter( boolean enable );
+
 }
