@@ -55,7 +55,7 @@ public class SqlExecutor {
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
 
 			if( NLogger.isTraceEnabled() ) {
-				NLogger.trace( "transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
+				NLogger.trace( ">> transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
 			}
 
 			sqlHandler.run( sqlBean, conn );
@@ -63,14 +63,16 @@ public class SqlExecutor {
 		} catch( SQLException e ) {
 
 			SqlException exception = new SqlException( e, ">> {} Error (code:{}) {}\n>> Error SQL :\n{}", sqlBean, e.getErrorCode(), e.getMessage(), sqlBean.getDebugSql() );
-
 			exception.setErrorCode( e.getErrorCode() );
-
 	        throw exception;
 
 		} catch( ClassCastingException e ) {
 			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
 
+		} catch( Exception e ) {
+			NLogger.error( ">> {}.\n>> SQL to try :\n{}>> parameter :\n{}\n>> Stack trace :\n{}",
+					e.getMessage(), sqlBean.getDebugSql(), sqlBean.getParams().toDebugString( true, true ), e );
+			throw e;
         } finally {
 			TransactionManager.releaseConnection( token, conn );
         }

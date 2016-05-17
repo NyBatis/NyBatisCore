@@ -192,7 +192,7 @@ public class JdbcDataSource implements DataSource {
 
 		}
 
-		NLogger.trace( "Release connection" );
+		NLogger.trace( ">> Release connection" );
 		DatasourceManager.printStatus();
 
     }

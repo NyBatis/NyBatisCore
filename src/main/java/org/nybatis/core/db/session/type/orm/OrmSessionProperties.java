@@ -100,7 +100,7 @@ public class OrmSessionProperties {
 
         if( parameter == null ) {
 
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
+            where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
 
         } else {
 
@@ -119,10 +119,10 @@ public class OrmSessionProperties {
             }
 
             if( inputParam.containsKey(singleParamKey) ) {
-                where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s}", singleParamKey) );
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s}", singleParamKey) );
 
             } else {
-                where = where.replaceAll( "#\\{(.*?)\\}", String.format( "#{%s$1}", prefix ) );
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format( "#{%s$1}", prefix ) );
             }
 
             userParameter.putAll( inputParam );
