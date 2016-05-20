@@ -9,9 +9,12 @@ import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 import javax.sql.DataSource;
+import java.util.Collections;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class DatasourceManager {
 
@@ -93,7 +96,9 @@ public class DatasourceManager {
 
 		NList result = new NList();
 
-		for( String environmentId : getEnvironments() ) {
+		Set<String> environments = new TreeSet<>( getEnvironments() );
+
+		for( String environmentId : environments ) {
 			DataSource dataSource = get( environmentId );
 			if( dataSource instanceof JdbcDataSource ) {
 				result.addRow( ((JdbcDataSource) dataSource).getPoolStatus() );
