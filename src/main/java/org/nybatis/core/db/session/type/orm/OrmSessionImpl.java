@@ -126,6 +126,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     public T select( Object parameter ) {
 
         properties.setEntityParameter( parameter );
+        checkPkNotNull();
 
         String sqlId = isPkSql() ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
 
