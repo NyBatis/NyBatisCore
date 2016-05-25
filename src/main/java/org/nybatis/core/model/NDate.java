@@ -227,6 +227,15 @@ public class NDate implements Serializable {
         return this.currentTime;
     }
 
+    /**
+     * get time in milli-seconds
+     *
+     * @return milli-seconds time value
+     */
+    public long toTime() {
+        return this.currentTime.getTimeInMillis();
+    }
+
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
      */
