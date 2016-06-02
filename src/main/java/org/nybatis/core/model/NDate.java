@@ -3,6 +3,7 @@ package org.nybatis.core.model;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.nybatis.core.exception.unchecked.ParseException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.mapper.NDateDeserializer;
 import org.nybatis.core.reflection.mapper.NDateSerializer;
 import org.nybatis.core.util.StringUtil;
@@ -359,115 +360,197 @@ public class NDate implements Serializable {
     /**
      * 년도를 더하거나 뺀다.
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value 더하거나 뺄 수량
      */
-    public NDate addYear( int amount ) {
-        currentTime.add( Calendar.YEAR, amount );
+    public NDate addYear( int value ) {
+        currentTime.add( Calendar.YEAR, value );
         return this;
     }
 
     /**
-     * 월을 더하거나 뺀다.
+     * set year
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return  self
      */
-    public NDate addMonth( int amount ) {
-        currentTime.add( Calendar.MONTH, amount );
+    public NDate setYear( int value ) {
+        currentTime.set( Calendar.YEAR, value );
         return this;
     }
 
     /**
-     * 일을 더하거나 뺀다.
+     * adds or subtracts month
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public NDate addDay( int amount ) {
-        currentTime.add( Calendar.DATE, amount );
+    public NDate addMonth( int value ) {
+        currentTime.add( Calendar.MONTH, value );
         return this;
     }
 
     /**
-     * 시간을 더하거나 뺀다.
+     * set month
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return  self
      */
-    public NDate addHour( int amount ) {
-        currentTime.add( Calendar.HOUR_OF_DAY, amount );
+    public NDate setMonth( int value ) {
+        currentTime.set( Calendar.MONTH, value );
         return this;
     }
 
     /**
-     * 분을 더하거나 뺀다.
+     * adds or subtracts day
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public NDate addMinute( int amount ) {
-        currentTime.add( Calendar.MINUTE, amount );
+    public NDate addDay( int value ) {
+        currentTime.add( Calendar.DATE, value );
         return this;
     }
 
     /**
-     * 초를 더하거나 뺀다.
+     * set day
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public NDate addSecond( int amount ) {
-        currentTime.add( Calendar.SECOND, amount );
+    public NDate setDay( int value ) {
+        currentTime.set( Calendar.DATE, value );
         return this;
     }
 
     /**
-     * 밀리초를 더하거나 뺀다.
+     * adds or subtracts hour
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public NDate addMillisecond( int amount ) {
-        currentTime.add( Calendar.MILLISECOND, amount );
+    public NDate addHour( int value ) {
+        currentTime.add( Calendar.HOUR_OF_DAY, value );
+        return this;
+    }
+
+    /**
+     * set hour (24-hour clock)
+     *
+     * @param value
+     * @return self
+     */
+    public NDate setHour( int value ) {
+        currentTime.set( Calendar.HOUR_OF_DAY, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts minute
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addMinute( int value ) {
+        currentTime.add( Calendar.MINUTE, value );
+        return this;
+    }
+
+    /**
+     * set minute
+     *
+     * @param value
+     * @return self
+     */
+    public NDate setMinute( int value ) {
+        currentTime.set( Calendar.MINUTE, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts second
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addSecond( int value ) {
+        currentTime.add( Calendar.SECOND, value );
+        return this;
+    }
+
+    /**
+     * set second
+     *
+     * @param value
+     * @return  self
+     */
+    public NDate setSecond( int value ) {
+        currentTime.set( Calendar.SECOND, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts mili-second
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addMillisecond( int value ) {
+        currentTime.add( Calendar.MILLISECOND, value );
+        return this;
+    }
+
+    /**
+     * set mili-second
+     *
+     * @param value
+     * @return  self
+     */
+    public NDate setMillisecond( int value ) {
+        currentTime.set( Calendar.MILLISECOND, value );
         return this;
     }
 
 
     /**
-     * 현재 일을 기준으로 날짜가 월초로 세팅된 객체를 구한다.
+     * get beginning of month date from current date.
      *
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getFirstMonthDate() ); --> '2012.02.01 13:21:41' 이 출력됨
+     * System.out.println( date.getBeginningOfMonthDate() ); --> '2012.02.01 00:00:00'
      * </pre>
      *
-     * @return 월초로 변경된 날짜객체
+     * @return new NDate to be setted with beginning of month date
      */
-    public NDate getFirstMonthDate() {
+    public NDate getBeginningOfMonthDate() {
 
         Calendar newDate = Calendar.getInstance();
-
-        newDate.set( getYear(), getMonth() - 1, 1, getHour(), getMinute(), getSecond() );
-        newDate.set( Calendar.MILLISECOND, getMillisecond() );
+        newDate.set( getYear(), getMonth() - 1, 1, 0, 0, 0 );
+        newDate.set( Calendar.MILLISECOND, 0 );
 
         return new NDate( newDate );
 
     }
 
     /**
-     * 현재 일을 기준으로 날짜가 월말로 세팅된 객체를 구한다.
+     * get end of month date from current date.
      *
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getLastMonthDate() ); --> '2012.02.29 13:21:41' 이 출력됨
+     * System.out.println( date.getEndOfMonthDate() ); --> '2012.02.29 23:59:59.999'
      * </pre>
      *
-     * @return 월말로 변경된 날짜객체
+     * @return new NDate to be setted with end of month date
+     *
      */
-    public NDate getLastMonthDate() {
+    public NDate getEndOfMonthDate() {
 
         Calendar newDate = Calendar.getInstance();
 
-        newDate.set( getYear(), getMonth(), 1, getHour(), getMinute(), getSecond() );
-        newDate.set( Calendar.MILLISECOND, getMillisecond() );
-
-        newDate.add( Calendar.DATE, -1 );
+        newDate.set( getYear(), getMonth(), 1, 0, 0, 0 );
+        newDate.set( Calendar.MILLISECOND, 0 );
+        newDate.add( Calendar.MILLISECOND, -1 );
 
         return new NDate( newDate );
 
@@ -488,7 +571,7 @@ public class NDate implements Serializable {
             c1 = new NDate( toString("YYYYMMDD" ) ).toCalendar();
             c2 = new NDate( date.toString("YYYYMMDD" ) ).toCalendar();
         } catch ( ParseException e ) {
-            e.printStackTrace();
+            NLogger.error( e );
         }
 
         long diff = getDifference( c1, c2 );
@@ -512,7 +595,7 @@ public class NDate implements Serializable {
             c1 = new NDate( toString("YYYYMMDDHHMISS" ) ).toCalendar();
             c2 = new NDate( date.toString("YYYYMMDDHHMISS" ) ).toCalendar();
         } catch ( ParseException e ) {
-            e.printStackTrace();
+            NLogger.error( e );
         }
 
         long diff = getDifference( c1, c2 );
@@ -542,11 +625,7 @@ public class NDate implements Serializable {
      * @return 현재 날짜가 비교할 날짜보다 클 경우 true
      */
     public boolean greaterThan( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == 1;
-
+        return compareTo( date ) > 0 ;
     }
 
     /**
@@ -556,11 +635,7 @@ public class NDate implements Serializable {
      * @return 현재 날짜가 비교할 날짜보다 크거나 같을 경우 true
      */
     public boolean greaterThanOrEqual( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == 1 || compareVal == 0;
-
+        return compareTo( date ) >= 0;
     }
 
     /**
@@ -570,11 +645,7 @@ public class NDate implements Serializable {
      * @return 현재 날짜가 비교할 날짜보다 작을 경우 true
      */
     public boolean lessThan( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == -1;
-
+        return compareTo( date ) < 0;
     }
 
     /**
@@ -584,11 +655,7 @@ public class NDate implements Serializable {
      * @return 현재 날짜가 비교할 날짜보다 작거나 같을 경우 true
      */
     public boolean lessThanOrEqual( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == -1 || compareVal == 0;
-
+        return compareTo( date ) <= 0;
     }
 
     /**
