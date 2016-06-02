@@ -3,6 +3,7 @@ package org.nybatis.core.db.session.executor;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
@@ -12,6 +13,7 @@ import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.validation.Validator;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public class SqlBean {
 	private SqlNode        sqlNode       = null;
 	private SqlProperties  properties    = null;
 	private QueryParameter sqlParam      = null;
-	private Object         inputParam    = null;
+	private NMap           inputParam    = new NMap();
 
 	private QueryResolver queryResolver = null;
 
@@ -31,8 +33,8 @@ public class SqlBean {
 	}
 
 	public SqlBean( SqlNode sqlNode, Object parameter ) {
-		this.sqlNode    = sqlNode;
-		this.inputParam = parameter;
+		this.sqlNode = sqlNode;
+		setParameter( parameter );
 	}
 
 	/**
@@ -44,7 +46,40 @@ public class SqlBean {
 	 * @return self instance
 	 */
 	public SqlBean setParameter( Object parameter ) {
-		this.inputParam = parameter;
+
+		if( parameter != null ) {
+
+			inputParam.clear();
+
+			if( DbUtils.isPrimitive(parameter) ) {
+				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
+			} else {
+				inputParam.fromBean( parameter );
+			}
+
+		}
+
+		return this;
+
+	}
+
+	public SqlBean addParameter( Object parameter ) {
+
+		if( parameter != null ) {
+			if( DbUtils.isPrimitive(parameter) ) {
+				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
+			} else {
+				NMap newParam = new NMap().fromBean( parameter );
+				Reflector.merge( newParam, inputParam );
+			}
+		}
+
+		return this;
+
+	}
+
+	public SqlBean addParameter( String key, Object parameter ) {
+		inputParam.put( key, parameter );
 		return this;
 	}
 

@@ -91,7 +91,7 @@ public class QueryParameter extends NMap {
         if( ! hasForEachInnerParam() ) return null;
 
         Stack<String> words = new Stack<>();
-        words.addAll( StringUtil.split( key, "." ) );
+        words.addAll( StringUtil.tokenize( key, "." ) );
 
         NMap innerParam = getForEachInnerParam();
 

@@ -188,7 +188,7 @@ public class Message {
 
     	String baseName = FileUtil.removeExtention( new File( filePath ).getName() );
 
-    	List<String> sentences = StringUtil.split( baseName, "." );
+    	List<String> sentences = StringUtil.tokenize( baseName, "." );
 
     	int size = sentences.size();
 
