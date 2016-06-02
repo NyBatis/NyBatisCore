@@ -76,7 +76,7 @@ public class ResourceBundleTest {
 
     	for( Path path : list ) {
 
-    		List<String> baseName = StringUtil.split( FileUtil.removeExtention( path.getFileName().toString() ), "_" );
+    		List<String> baseName = StringUtil.tokenize( FileUtil.removeExtention( path.getFileName().toString() ), "_" );
 
 //    		int endIndex = ( baseName.size() - 2 < 0 ) ? 0 : baseName.size() - 2;
 

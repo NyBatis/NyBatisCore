@@ -643,16 +643,76 @@ public class StringUtil {
 
 	}
 
-    /**
+	/**
+	 * Split string around matches of the given <a href="../util/regex/Pattern.html#sum">regular expression</a>.
+	 *
+	 * @param value				string value
+	 * @param regexDelimeter	the delimiting regular expression
+	 * @return	string array comupted by splitting around matches of the given regular expression
+	 */
+	public static List<String> split( Object value, String regexDelimeter ) {
+		return split( value, regexDelimeter, false );
+	}
+
+	/**
+	 * Split string around matches of the given <a href="../util/regex/Pattern.html#sum">regular expression</a>.
+	 *
+	 * @param value				string value
+	 * @param regexDelimeter	the delimiting regular expression
+	 * @param returnDelimeter	include delimeter in result
+	 * @return	string array comupted by splitting around matches of the given regular expression
+	 */
+	public static List<String> split( Object value, String regexDelimeter, boolean returnDelimeter ) {
+
+		List<String> result = new ArrayList<>();
+
+		if( isEmpty(value) ) return result;
+
+		String val = value.toString();
+
+		if( isEmpty(regexDelimeter) ) {
+			result.add( val );
+			return result;
+		}
+
+		Pattern pattern = Pattern.compile( regexDelimeter );
+		Matcher matcher = pattern.matcher( val );
+
+		int caret = 0;
+
+		while( matcher.find() ) {
+
+			if( caret != matcher.start() ) {
+				result.add( val.substring( caret, matcher.start() ) );
+			}
+
+			if( returnDelimeter ) {
+				result.add( matcher.group() );
+			}
+
+			caret = matcher.end();
+
+		}
+
+		if( caret != val.length() ) {
+			result.add( val.substring( caret ) );
+		}
+
+		return result;
+
+	}
+
+
+	/**
      * 문자열을 구분자로 끊어 목록으로 변환한다.
      *
      * @param value     값
      * @param separator 구분자
      * @return 구분자로 끊어진 문자열 목록
      */
-    public static List<String> split( Object value, String separator ) {
+    public static List<String> tokenize( Object value, String separator ) {
 
-    	List<String> result = new ArrayList<String>();
+    	List<String> result = new ArrayList<>();
 
     	if( isEmpty(value) ) return result;
 
@@ -662,7 +722,7 @@ public class StringUtil {
 
     	int fromIndex = 0, toIndex = 0, separatorLength = separator.length();
 
-    	List<int[]> indexes = new ArrayList<int[]>();
+    	List<int[]> indexes = new ArrayList<>();
 
     	while( true ) {
 

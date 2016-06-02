@@ -104,6 +104,18 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     @Override
+    public SessionExecutor addParameter( Object parameter ) {
+        sqlBean.addParameter( parameter );
+        return this;
+    }
+
+    @Override
+    public SessionExecutor addParameter( String key, Object value ) {
+        sqlBean.addParameter( key, value );
+        return this;
+    }
+
+    @Override
     public SessionExecutor disableCache() {
         CacheManager.disableCache( sqlBean.getSqlId() );
         return this;

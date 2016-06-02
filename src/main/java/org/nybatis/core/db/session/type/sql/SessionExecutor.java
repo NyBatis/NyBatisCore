@@ -167,6 +167,23 @@ public interface SessionExecutor {
 	SessionExecutor setParameter( Object parameter );
 
 	/**
+	 * Add parameter
+	 *
+	 * @param parameter parameter to add. it consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return self instance
+	 */
+	SessionExecutor addParameter( Object parameter );
+
+	/**
+	 * Add parameter
+	 *
+	 * @param key	key
+	 * @param value parameter to add. it consists with Map, Bean or Primitive (int, Integer, Date... )	 * @param key
+	 * @return self instance
+	 */
+	SessionExecutor addParameter( String key, Object value );
+
+	/**
 	 * Disable statements cache functionality.
 	 *
 	 * @return self instance
