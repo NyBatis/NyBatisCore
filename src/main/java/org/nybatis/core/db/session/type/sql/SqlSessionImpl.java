@@ -1,8 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
-import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
@@ -13,7 +10,6 @@ import org.nybatis.core.exception.unchecked.BaseRuntimeException;
 import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
-import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 import java.lang.reflect.Method;
@@ -189,12 +185,6 @@ public class SqlSessionImpl implements SqlSession {
     @Override
     public SqlSession openSeperateSession() {
         return SessionManager.openSeperateSession( properties.getEnvironmentId() );
-    }
-
-    @Override
-    public String getDatabaseName() {
-        DatabaseAttribute attributes = DatasourceManager.getAttributes( properties.getEnvironmentId() );
-        return ( attributes == null ) ? "" : attributes.getDatabase();
     }
 
 }

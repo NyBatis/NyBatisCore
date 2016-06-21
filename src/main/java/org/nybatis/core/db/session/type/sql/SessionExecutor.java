@@ -214,4 +214,11 @@ public interface SessionExecutor {
 	 */
 	SessionExecutor clearCache();
 
+	/**
+	 * Get name of database connected with session.
+	 *
+	 * @return database name
+	 */
+	String getDatabaseName();
+
 }

@@ -64,10 +64,13 @@ public class SqlExecutor {
 
 			SqlException exception = new SqlException( e, ">> {} Error (code:{}) {}\n>> Error SQL :\n{}", sqlBean, e.getErrorCode(), e.getMessage(), sqlBean.getDebugSql() );
 			exception.setErrorCode( e.getErrorCode() );
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
 	        throw exception;
 
 		} catch( ClassCastingException e ) {
-			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			SqlException exception = new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+			throw exception;
 
 		} catch( Exception e ) {
 			NLogger.error( ">> {}.\n>> SQL to try :\n{}>> parameter :\n{}\n>> Stack trace :\n{}",
