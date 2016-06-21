@@ -165,4 +165,11 @@ public interface SqlSession {
 	 */
 	SqlSession openSeperateSession();
 
+	/**
+	 * Get name of database connected with session.
+	 *
+	 * @return database name
+	 */
+	String getDatabaseName();
+
 }
