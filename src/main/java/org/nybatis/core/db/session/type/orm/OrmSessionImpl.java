@@ -261,4 +261,9 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         Assertion.isTrue( properties.isPkNotNull(), new SqlConfigurationException( "PK has null value.({})", properties.getPkValues() ) );
     }
 
+    @Override
+    public String getDatabaseName() {
+        return getSessionExecutor( properties.sqlIdSelect() ).getDatabaseName();
+    }
+
 }

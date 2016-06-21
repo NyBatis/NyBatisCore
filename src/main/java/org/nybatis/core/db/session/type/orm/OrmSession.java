@@ -177,4 +177,11 @@ public interface OrmSession<T> {
      */
     OrmSession<T> allowNonPkParameter( boolean enable );
 
+    /**
+     * Get name of database connected with session.
+     *
+     * @return database name
+     */
+    String getDatabaseName();
+
 }

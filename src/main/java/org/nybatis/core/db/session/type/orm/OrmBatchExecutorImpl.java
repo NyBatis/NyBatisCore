@@ -52,4 +52,10 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     }
 
+    @Override
+    public String getDatabaseName() {
+        return new BatchExecutorImpl( sqlSession ).batchSqlId( properties.sqlIdInsertPk(), null ).getDatabaseName();
+    }
+
+
 }

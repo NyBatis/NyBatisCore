@@ -19,14 +19,33 @@ public interface OrmBatchExecutor<T> {
     OrmBatchExecutor<T> setTransactionSize( int size );
 
     /**
+     * insert data on add-batch mode.
      *
-     * @param parameters
-     * @return
+     * @param parameters    data to insert
+     * @return affected counts
      */
     int insert( List<?> parameters );
 
+    /**
+     * update data on add-batch mode
+     * @param parameters    data to update
+     * @return  affected counts
+     */
     int update( List<?> parameters );
 
+    /**
+     * delete data on add-batch mode
+     *
+     * @param parameters    data to delete
+     * @return  affected counts
+     */
     int delete( List<?> parameters );
+
+    /**
+     * Get name of database connected with session.
+     *
+     * @return database name
+     */
+    String getDatabaseName();
 
 }
