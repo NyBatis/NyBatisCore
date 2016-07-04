@@ -181,7 +181,7 @@ public class SqlBean {
 	    return DatasourceManager.getAttributes( getEnvironmentId() );
     }
 
-	public Object getInputParams() {
+	public NMap getInputParams() {
 		return inputParam;
 	}
 

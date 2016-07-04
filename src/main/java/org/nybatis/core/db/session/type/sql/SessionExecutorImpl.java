@@ -18,8 +18,8 @@ import org.nybatis.core.validation.Assertion;
  */
 public class SessionExecutorImpl implements SessionExecutor {
 
-    SqlSessionImpl sqlSession;
-    SqlBean        sqlBean;
+    private SqlSessionImpl sqlSession;
+    private SqlBean        sqlBean;
 
     public SessionExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
@@ -112,6 +112,11 @@ public class SessionExecutorImpl implements SessionExecutor {
     public SessionExecutor addParameter( String key, Object value ) {
         sqlBean.addParameter( key, value );
         return this;
+    }
+
+    @Override
+    public NMap getParameters() {
+        return sqlBean.getInputParams();
     }
 
     @Override

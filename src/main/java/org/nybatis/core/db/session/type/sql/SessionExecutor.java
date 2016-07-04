@@ -184,6 +184,15 @@ public interface SessionExecutor {
 	SessionExecutor addParameter( String key, Object value );
 
 	/**
+	 * get all parameters to be input. <br>
+	 *
+	 * it also have <b>select key</b> parameters called in sql.
+	 *
+	 * @return input parameters
+	 */
+	NMap getParameters();
+
+	/**
 	 * Disable statements cache functionality.
 	 *
 	 * @return self instance
