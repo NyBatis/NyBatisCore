@@ -96,17 +96,6 @@ public class Message {
     }
 
     /**
-     * Message Pool의 내용을 JavaScript로 만든다.
-     *
-     * @param javascriptMessageObjectName JavaScript 메세지 Object 명
-     * @param toFilePath JavaScript 파일명
-     */
-    public static void writeJavaScript( String toFilePath, String javascriptMessageObjectName ) {
-        String jsObjectName = StringUtil.nvl( javascriptMessageObjectName, Const.web.getJavascriptMessageObjectName() );
-        FileUtil.writeTo( toFilePath, toJavaScript( jsObjectName ) );
-    }
-
-    /**
      * 메세지 Pool에 담겨있는 내용을 JavaScript 컨텐츠로 만든다.
      *
      * @return 파일에 기록할 컨텐츠
