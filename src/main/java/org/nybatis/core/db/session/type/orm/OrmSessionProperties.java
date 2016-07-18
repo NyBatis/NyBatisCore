@@ -23,6 +23,7 @@ public class OrmSessionProperties {
 
     private String  environmentId;
     private String  tableName;
+    private boolean allowNonPkParameter = false;
 
     private List<String>  wheres  = new ArrayList<>();
     private String        orderBy = null;
@@ -35,8 +36,9 @@ public class OrmSessionProperties {
     public OrmSessionProperties newInstance() {
 
         OrmSessionProperties newProperties = new OrmSessionProperties();
-        newProperties.environmentId = environmentId;
-        newProperties.tableName     = tableName;
+        newProperties.environmentId        = environmentId;
+        newProperties.tableName            = tableName;
+        newProperties.allowNonPkParameter  = allowNonPkParameter;
 
         return newProperties;
 
@@ -100,7 +102,7 @@ public class OrmSessionProperties {
 
         if( parameter == null ) {
 
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
+            where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
 
         } else {
 
@@ -119,10 +121,10 @@ public class OrmSessionProperties {
             }
 
             if( inputParam.containsKey(singleParamKey) ) {
-                where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s}", singleParamKey) );
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s}", singleParamKey) );
 
             } else {
-                where = where.replaceAll( "#\\{(.*?)\\}", String.format( "#{%s$1}", prefix ) );
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format( "#{%s$1}", prefix ) );
             }
 
             userParameter.putAll( inputParam );
@@ -231,4 +233,12 @@ public class OrmSessionProperties {
 
     }
 
+    public boolean allowNonPkParameter() {
+        return allowNonPkParameter;
+    }
+
+    public OrmSessionProperties allowNonPkParameter( boolean enable ) {
+        this.allowNonPkParameter = enable;
+        return this;
+    }
 }

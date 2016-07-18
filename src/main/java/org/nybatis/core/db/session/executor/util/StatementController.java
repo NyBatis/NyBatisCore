@@ -321,7 +321,7 @@ public class StatementController {
 			} else if( statement instanceof CallableStatement ) {
 				typeMapper.setParameter( (CallableStatement) statement, paramIndex, value.getValue() );
 			}
-		} catch( java.lang.ClassCastException e ) {
+		} catch( Exception e ) {
 			throw new ClassCastingException( e, "parameter index:[{}], value : [{}]", paramIndex, value );
 		}
 

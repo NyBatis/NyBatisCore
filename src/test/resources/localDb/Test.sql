@@ -1,3 +1,3 @@
 SELECT  *
-FROM    MYBATIS_TEST
+FROM    PROD
 ;

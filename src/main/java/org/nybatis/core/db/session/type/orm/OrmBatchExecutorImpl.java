@@ -41,7 +41,7 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
 
     @Override
     public int delete( List<?> parameters ) {
-        return executeBatch( properties.sqlIdDelete(), parameters );
+        return executeBatch( properties.sqlIdDeletePk(), parameters );
     }
 
     private int executeBatch( String sqlId, List<?> params ) {
@@ -51,5 +51,11 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
         return new BatchExecutorImpl( sqlSession ).batchSqlId( sqlId, parameters ).setTransactionSize( transactionSize ).execute();
 
     }
+
+    @Override
+    public String getDatabaseName() {
+        return new BatchExecutorImpl( sqlSession ).batchSqlId( properties.sqlIdInsertPk(), null ).getDatabaseName();
+    }
+
 
 }

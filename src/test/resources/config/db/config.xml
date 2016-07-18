@@ -3,9 +3,8 @@
 
   <properties path="config.properties" />
 
-  <cache id="fifo"   class="nayasis.common.cache.fifoCache"   size="512"  flush="60000" />
-  <cache id="lru"    class="nayasis.common.cache.lruCache"    size="1024" />
-  <cache id="static" class="nayasis.common.cache.staticCache" />
+  <cache id="fifo"   class="org.nybatis.core.cache.implement.FifoCache"   size="512"  flush="60000" />
+  <cache id="lru"    class="org.nybatis.core.cache.implement.LruCache"    size="1024" />
 
   <environment id="sqlite01" default="true" >
     <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >

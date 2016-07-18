@@ -104,6 +104,6 @@ public interface OrmListExecutor<T> {
      * @param end   end rownum
      * @return self instance
      */
-    OrmListExecutor<T> setPage( int start, int end );
+    OrmListExecutor<T> setPage( Integer start, Integer end );
 
 }

@@ -41,7 +41,14 @@ public class QueryResolver {
     	for( String line : binarySql ) {
 
             if( line != null ) {
-                sql.append( line );
+
+                // remaining unbind sentence "#{param...}" cause NPE when running executeUpdate().
+                // 'statement.setEscapeProcessing( false )' can not avoid error because it cause another problem.
+                // so remove remaining unbind sentence to avoid NPE.
+                if( ! line.startsWith( "#{" ) || ! line.endsWith( "}" ) ) {
+                    sql.append( line );
+                }
+
                 continue;
             }
 

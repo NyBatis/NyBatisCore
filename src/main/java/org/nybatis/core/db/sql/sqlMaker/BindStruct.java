@@ -25,7 +25,7 @@ public class BindStruct {
 
 		this.inQuot = inQuot;
 
-        List<String> keys = StringUtil.split( keyInfo, ":" );
+        List<String> keys = StringUtil.tokenize( keyInfo, ":" );
 
         this.out = isOutParameter( keys );
 

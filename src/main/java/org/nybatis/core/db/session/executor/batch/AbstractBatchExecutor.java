@@ -101,11 +101,19 @@ public abstract class AbstractBatchExecutor {
 
 			SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n{}", sqlBean, e.getErrorCode(), e.getMessage(), sqlBean.getDebugSql() );
 			exception.setErrorCode( e.getErrorCode() );
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
 
 			throw exception;
 
+		} catch( SqlException e ) {
+
+			e.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+			throw e;
+
 		} catch( ClassCastException e ) {
-			throw new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			SqlException exception = new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+			throw exception;
 
 		}
 

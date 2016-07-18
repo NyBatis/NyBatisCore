@@ -1,11 +1,15 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.db.session.executor.batch.BatchPreparedStatementExecutor;
 import org.nybatis.core.db.session.executor.batch.BatchStatementExecutor;
 import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
@@ -85,6 +89,24 @@ public class BatchExecutorImpl implements BatchExecutor {
     public BatchExecutor setTransactionSize( Integer size ) {
         transactionSize = size;
         return this;
+    }
+
+    @Override
+    public String getDatabaseName() {
+        DatabaseAttribute attributes = DatasourceManager.getAttributes( getEnvironmentId() );
+        return ( attributes == null ) ? "" : StringUtil.nvl( attributes.getDatabase() );
+    }
+
+    private String getEnvironmentId() {
+
+        SqlProperties properties = sqlSession.getProperties();
+
+        if( sqlNode == null ) {
+            return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+        } else {
+            return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+        }
+
     }
 
 }

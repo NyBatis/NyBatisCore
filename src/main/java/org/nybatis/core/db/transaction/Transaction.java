@@ -52,6 +52,7 @@ public class Transaction {
                 conn.commit();
             } catch( SQLException e ) {}
 		}
+		NLogger.trace( ">> commit : {}", token );
 		end( token );
 	}
 
