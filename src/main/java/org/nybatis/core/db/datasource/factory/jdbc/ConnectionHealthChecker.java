@@ -1,6 +1,7 @@
 package org.nybatis.core.db.datasource.factory.jdbc;
 
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
+import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.LimitedQueue;
@@ -74,6 +75,9 @@ public class ConnectionHealthChecker {
 
 		if( closableCount <= 0 ) return;
 
+		NLogger.trace( ">> before shrinking connection pool (environment:{})", properties.getId() );
+		DatasourceManager.printStatus();
+
 		for( int i = 0; i < closableCount; i++ ) {
 			try {
 				ProxyConnection connection = dataSource.getProxyConnection();
@@ -84,7 +88,8 @@ public class ConnectionHealthChecker {
 			}
 		}
 
-		NLogger.trace( ">> shrink connecton pool (environmenti:{}, shrinked connection count:{}, current pool count:", properties.getId(), closableCount, dataSource.getPoolCount() );
+		NLogger.trace( ">> after shrinking connection pool (environment:{}, closed:[{}]cnt)", properties.getId(), closableCount );
+		DatasourceManager.printStatus();
 
 	}
 

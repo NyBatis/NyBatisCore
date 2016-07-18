@@ -424,6 +424,27 @@ public class Reflector {
 	}
 
 	/**
+	 * get json text without null value
+	 *
+	 * @param fromBean	instance to convert as json data
+	 * @param prettyPrint
+	 * @return
+	 */
+	public static String toNullIgnoredJson( Object fromBean, boolean prettyPrint ) {
+		return toJson( fromBean, prettyPrint, false, true );
+	}
+
+	/**
+	 * get json text without null value
+	 *
+	 * @param fromBean	instance to convert as json data
+	 * @return json text
+	 */
+	public static String toNullIgnoredJson( Object fromBean ) {
+		return toNullIgnoredJson( fromBean, false );
+	}
+
+	/**
 	 * Get map with flatten key
 	 *
 	 * <pre>

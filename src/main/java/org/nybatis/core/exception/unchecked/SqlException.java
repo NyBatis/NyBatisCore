@@ -11,6 +11,8 @@ public class SqlException extends BaseRuntimeException {
 
     private static final long serialVersionUID = -2193252285540217341L;
 
+    private String databaseName;
+
     /**
      * Exception Constructor
      */
@@ -48,4 +50,21 @@ public class SqlException extends BaseRuntimeException {
         super( rootCause );
     }
 
+    /**
+     * Get database name
+     *
+     * @return database name
+     */
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    /**
+     * Set database name
+     *
+     * @param databaseName database name
+     */
+    public void setDatabaseName( String databaseName ) {
+        this.databaseName = databaseName;
+    }
 }

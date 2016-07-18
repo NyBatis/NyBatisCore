@@ -94,7 +94,7 @@ public class ListExecutorImpl implements ListExecutor {
     }
 
     @Override
-    public ListExecutor setPage( int start, int end ) {
+    public ListExecutor setPage( Integer start, Integer end ) {
         sqlSession.getProperties().setPageSql( start, end );
         return this;
     }

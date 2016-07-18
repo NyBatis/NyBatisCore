@@ -30,17 +30,20 @@ public class TimeStampMapper implements TypeMapperIF<Date>{
 
 	@Override
     public Date getResult( ResultSet resultSet, String columnName ) throws SQLException {
-	    return new Date( resultSet.getTimestamp( columnName ).getTime() );
+		Timestamp timestamp = resultSet.getTimestamp( columnName );
+		return timestamp == null ? null : new Date( timestamp.getTime() );
     }
 
 	@Override
     public Date getResult( ResultSet resultSet, int columnIndex ) throws SQLException {
-		return new Date( resultSet.getTimestamp( columnIndex ).getTime() );
+		Timestamp timestamp = resultSet.getTimestamp( columnIndex );
+		return timestamp == null ? null : new Date( timestamp.getTime() );
     }
 
 	@Override
     public Date getResult( CallableStatement statement, int columnIndex ) throws SQLException {
-	    return new Date( statement.getTimestamp( columnIndex ).getTime() );
+		Timestamp timestamp = statement.getTimestamp( columnIndex );
+		return timestamp == null ? null : new Date( timestamp.getTime() );
     }
 
 }

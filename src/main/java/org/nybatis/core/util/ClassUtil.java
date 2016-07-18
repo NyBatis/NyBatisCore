@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
@@ -225,7 +227,8 @@ public class ClassUtil {
 	 */
 	public static List<String> getResourceNames( String... pattern ) {
 
-		List<String> resourceNames = new ArrayList<>();
+		Set<String> resourceNamesInJar        = new HashSet<>();
+		Set<String> resourceNamesInFileSystem = new HashSet<>();
 
 		if( isRunningInJar() ) {
 
@@ -239,30 +242,32 @@ public class ClassUtil {
 
 			for( JarEntry entry : Collections.list( jar.entries() ) ) {
 				if( addAll ) {
-					resourceNames.add( entry.getName() );
+					resourceNamesInJar.add( entry.getName() );
 				} else {
 
 					Path targetPath = Paths.get( entry.getName() );
 
 					for( PathMatcher matcher : matchers ) {
 						if( matcher.matches( targetPath )) {
-							resourceNames.add( entry.getName() );
+							resourceNamesInJar.add( entry.getName() );
 							break;
 						}
 					}
 				}
 			}
 
-		} else {
-
-			for( Path path : FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) ) ) {
-				String pathVal = FileUtil.nomalizeSeparator( path.toString() );
-				resourceNames.add( pathVal.replace( Const.path.getBase(), "" ).replaceFirst( "^/", "" ) );
-			}
-
 		}
 
-		return resourceNames;
+		List<Path> paths = FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) );
+
+		for( Path path : paths ) {
+			String pathVal = FileUtil.nomalizeSeparator( path.toString() );
+			resourceNamesInFileSystem.add( pathVal.replace( Const.path.getBase(), "" ).replaceFirst( "^/", "" ) );
+		}
+
+		resourceNamesInJar.addAll( resourceNamesInFileSystem );
+
+		return new ArrayList<>( resourceNamesInJar );
 
 	}
 

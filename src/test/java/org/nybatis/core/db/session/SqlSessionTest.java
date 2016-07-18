@@ -38,15 +38,9 @@ public class SqlSessionTest {
 
 	    DatabaseConfigurator.build();
 
-		/**
-		 * 1.
-		 */
-
-
-
 //	    new ConfigurationBuilder( Const.path.getConfigDatabase() + "/config.xml" );
 
-		// for sqlite because BLOB is not implemented by SQLite JDBC driver
+		// define specific mapper like this
 //		TypeMapper.put( "sqlite", SqlType.BLOB, new ByteArrayMapper() );
 
 //	    NLogger.debug( new SqlRepository().toString() );
@@ -207,7 +201,7 @@ public class SqlSessionTest {
 
 		NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );
 
-		GlobalSqlParameter.setEnvironmentId( "oracle" );
+		GlobalSqlParameter.setEnvironmentId( "sqlite03" );
 
 		try {
 			NLogger.debug( sqlSession.sqlId( "Sqlite.selectForList", new Param("A001") ) );

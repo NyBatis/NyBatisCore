@@ -14,32 +14,6 @@ import org.nybatis.core.validation.Validator;
  */
 public class Const {
 
-    /**
-     * Constants for developing WEB
-     */
-    public static final class web {
-
-		private static String rootFilePath = "";
-
-		private static String javascriptMessageObjectName  = "nayasis.common.msg.pool";
-
-		public static void setRootFilePath( String rootFilePath ) {
-			web.rootFilePath = rootFilePath;
-		}
-
-		public static String getRootFilePath() {
-			return web.rootFilePath;
-		}
-
-		public static String getJavascriptMessageObjectName() {
-			return javascriptMessageObjectName;
-		}
-
-		public static void setJavascriptMessageObjectName( String javascriptMessageObjectName ) {
-			web.javascriptMessageObjectName = javascriptMessageObjectName;
-		}
-	}
-
 	/**
 	 * Profile Controller to specify envorionment for example loacl, stage, product
 	 *

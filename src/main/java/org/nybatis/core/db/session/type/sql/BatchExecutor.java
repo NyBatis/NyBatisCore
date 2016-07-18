@@ -44,4 +44,11 @@ public interface BatchExecutor {
 	 */
 	BatchExecutor setTransactionSize( Integer size );
 
+	/**
+	 * Get name of database connected with session.
+	 *
+	 * @return database name
+	 */
+	String getDatabaseName();
+
 }

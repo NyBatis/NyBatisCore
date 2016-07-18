@@ -167,6 +167,32 @@ public interface SessionExecutor {
 	SessionExecutor setParameter( Object parameter );
 
 	/**
+	 * Add parameter
+	 *
+	 * @param parameter parameter to add. it consists with Map, Bean or Primitive (int, Integer, Date... )
+	 * @return self instance
+	 */
+	SessionExecutor addParameter( Object parameter );
+
+	/**
+	 * Add parameter
+	 *
+	 * @param key	key
+	 * @param value parameter to add. it consists with Map, Bean or Primitive (int, Integer, Date... )	 * @param key
+	 * @return self instance
+	 */
+	SessionExecutor addParameter( String key, Object value );
+
+	/**
+	 * get all parameters to be input. <br>
+	 *
+	 * it also have <b>select key</b> parameters called in sql.
+	 *
+	 * @return input parameters
+	 */
+	NMap getParameters();
+
+	/**
 	 * Disable statements cache functionality.
 	 *
 	 * @return self instance
@@ -196,5 +222,12 @@ public interface SessionExecutor {
 	 * @return self instance
 	 */
 	SessionExecutor clearCache();
+
+	/**
+	 * Get name of database connected with session.
+	 *
+	 * @return database name
+	 */
+	String getDatabaseName();
 
 }

@@ -137,6 +137,8 @@ public class NLoggerPrinter {
 
 			} else if( Types.isArray(format) ) {
 				printLog( level, logger, Arrays.deepToString( (Object[]) format ) );
+			} else if( format instanceof Throwable ) {
+				printLog( level, logger, getThrowableString( (Throwable) format ) );
 			} else {
 				printLog( level, logger, format.toString() );
 			}
