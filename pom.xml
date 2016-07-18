@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.nybatis</groupId>
   <artifactId>NyBatisCore</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.5.0-release</version>
   <name>NyBatisCore</name>
   <description><![CDATA[
     Nybatis Data Mapper Framework
