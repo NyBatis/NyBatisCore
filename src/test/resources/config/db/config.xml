@@ -1,66 +1,74 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<configuration>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.0" xsi:schemaLocation="urn:nybatis.configuration:1.0 http://nybatis.github.io/schema/nybatis-config.xsd">
 
   <properties path="config.properties" />
 
-  <cache id="fifo"   class="nayasis.common.cache.fifoCache"   size="512"  flush="60_000" />
-  <cache id="lru"    class="nayasis.common.cache.lruCache"    size="1024" />
-  <cache id="static" class="nayasis.common.cache.staticCache" />
+  <cache id="fifo"   class="org.nybatis.core.cache.implement.FifoCache"   size="512"  flush="60000" />
+  <cache id="lru"    class="org.nybatis.core.cache.implement.LruCache"    size="1024" />
 
-  <environment id="sqlite" default="true" >
-    <datasource type="jdbc" poolMin="1" poolMax="1" ping="true" pingCycle="600" >
+  <environment id="sqlite01" default="true" >
+    <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
-    </datasource>
-    <sqlpath>
+    </datasourceJdbc>
+    <sqlPath>
       <path>sqlite</path>
-    </sqlpath>
+    </sqlPath>
   </environment>
 
-  <environment id="sqliteUnpooled" >
-    <datasource type="jdbc" ping="true" pingCycle="60" unpooled="true"  >
+  <environment id="sqlite02" >
+    <datasourceJdbc ping="true" pingCycle="60" >
       <driver>#{driver}</driver>
-      <url>jdbc:sqlite:#{default.root}/localDb/TestDb</url>
-    </datasource>
-    <sqlpath>
+      <url>jdbc:sqlite:#{default.root}/localDb/TestDb02</url>
+    </datasourceJdbc>
+    <sqlPath>
       <path>sqlite</path>
-    </sqlpath>
+    </sqlPath>
+  </environment>
+
+  <environment id="sqlite03" >
+    <datasourceJdbc ping="true" pingCycle="60" >
+      <driver>#{driver}</driver>
+      <url>jdbc:sqlite:#{default.root}/localDb/TestDb03</url>
+    </datasourceJdbc>
+    <sqlPath>
+      <path>./sqliteSeperated/Sqlite03.xml</path>
+    </sqlPath>
   </environment>
 
   <!--<environment id="oracle" >-->
-    <!--<datasource type="jdbc" ping="true" pingCycle="60" >-->
+    <!--<datasourceJdbc ping="true" pingCycle="60" >-->
       <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->
       <!--<url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>-->
       <!--<username>SPSAC</username>-->
       <!--<password>ompskp1!</password>-->
-    <!--</datasource>-->
-    <!--<sqlpath>-->
+    <!--</datasourceJdbc>-->
+    <!--<sqlPath>-->
       <!--<path>oracle</path>-->
-    <!--</sqlpath>-->
+    <!--</sqlPath>-->
   <!--</environment>-->
 
   <!--<environment id="maria" >-->
-  <!--<datasource type="jdbc" ping="true" pingCycle="60" >-->
-  <!--<driver>org.mariadb.jdbc.Driver</driver>-->
-  <!--<url>jdbc:mariadb://127.0.0.1:3306:sakila</url>-->
-  <!--<username>root</username>-->
-  <!--</datasource>-->
-  <!--<sqlpath>-->
-  <!--<path>maria</path>-->
-  <!--</sqlpath>-->
+    <!--<datasourceJdbc ping="true" pingCycle="60" >-->
+      <!--<driver>org.mariadb.jdbc.Driver</driver>-->
+      <!--<url>jdbc:mariadb://127.0.0.1:3306:sakila</url>-->
+      <!--<username>root</username>-->
+    <!--</datasourceJdbc>-->
+    <!--<sqlPath>-->
+      <!--<path>maria</path>-->
+    <!--</sqlPath>-->
   <!--</environment>-->
 
   <!--<environment id="storeDev" >-->
-    <!--<datasource type="jdbc">-->
+    <!--<datasourceJdbc>-->
       <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->
       <!--<url>jdbc:oracle:thin:@172.21.196.27:1521:DEVSP</url>-->
       <!--<username>STORE_DEV</username>-->
       <!--<password>ompskp1!</password>-->
-    <!--</datasource>-->
-    <!--<sqlpath>-->
+    <!--</datasourceJdbc>-->
+    <!--<sqlPath>-->
       <!--<path>./mapper</path>-->
-    <!--</sqlpath>-->
+    <!--</sqlPath>-->
   <!--</environment>-->
 
 </configuration>

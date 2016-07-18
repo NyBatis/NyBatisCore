@@ -22,7 +22,7 @@ public interface OrmListExecutor<T> {
      * Retrieve list
      *
      * @param parameter parameter
-     * @return
+     * @return list
      */
     List<T> select( Object parameter );
 
@@ -97,6 +97,13 @@ public interface OrmListExecutor<T> {
      */
     OrmListExecutor<T> clearCache();
 
-    OrmListExecutor<T> setPage( int start, int end );
+    /**
+     * Set sql exeution mode to page and it's limit.
+     *
+     * @param start start rownum
+     * @param end   end rownum
+     * @return self instance
+     */
+    OrmListExecutor<T> setPage( Integer start, Integer end );
 
 }

@@ -10,7 +10,6 @@ import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
-import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 public class CacheManager {
@@ -21,15 +20,20 @@ public class CacheManager {
 	private static Map<String, Cache>        cachePool    = new HashMap<>();
 	private static Map<String, CacheModel>   cacheModels  = new LinkedHashMap<>();
 
-	public static void registerCacheModel( String id, String className, String size, String flush ) {
-
+	public static void registerCacheModel( String id, Class<Cache> klass, Integer size, Integer flushSeconds ) {
 		try {
-			CacheModel cacheModel = new CacheModel( id, className, size, flush );
-			cacheModels.put( cacheModel.getId(), cacheModel );
+			cacheModels.put( id, new CacheModel(id, klass, size, flushSeconds) );
 		} catch( IllegalArgumentException e ) {
 			NLogger.warn( e.getMessage() );
 		}
+	}
 
+	public static void registerCacheModel( String id, String className, String size, String flushSeconds ) {
+		try {
+			cacheModels.put( id, new CacheModel(id, className, size, flushSeconds) );
+		} catch( IllegalArgumentException e ) {
+			NLogger.warn( e.getMessage() );
+		}
 	}
 
 	public static boolean hasCacheModel( String cacheId ) {
@@ -127,9 +131,16 @@ public class CacheManager {
 
 		try {
 
-			Cache cache = cacheModel.makeCache();
-			cache.setFlushCycle( Validator.nvl( flushCycle, properties.getCacheFlushCycle()) );
-			cachePool.put( sqlId, cache );
+			if( ! cachePool.containsKey( sqlId ) ) {
+
+				properties.isCacheEnable( true );
+				properties.setCacheId( cacheModel.getId() );
+
+				Cache cache = cacheModel.makeCache();
+				cache.setFlushCycle( Validator.nvl( flushCycle, properties.getCacheFlushCycle()) );
+				cachePool.put( sqlId, cache );
+
+			}
 
 		} catch( ClassCastException e ) {
 			NLogger.warn( e, "cache model({})'s class({}) is fail to initialize. Sql({}) will be never cached.", properties.getCacheId(), cacheModel.getKlass(), sqlId );
@@ -148,7 +159,7 @@ public class CacheManager {
 			reportCacheModel.addRow( "cacheId", cacheModel.getId() );
 			reportCacheModel.addRow( "class",   cacheModel.getKlass().getName() );
 			reportCacheModel.addRow( "size",    cacheModel.getSize() );
-			reportCacheModel.addRow( "flush",   cacheModel.getFlush() );
+			reportCacheModel.addRow( "flush",   cacheModel.getFlushSeconds() );
 
 		}
 

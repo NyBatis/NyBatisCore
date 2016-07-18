@@ -11,7 +11,7 @@ public class NDateSerializer extends JsonSerializer<NDate> {
 
     @Override
     public void serialize( final NDate value, final JsonGenerator generator, final SerializerProvider provider) throws IOException {
-        provider.defaultSerializeValue( value.toString(), generator );
+        provider.defaultSerializeValue( value.toDate(), generator );
     }
 
 }

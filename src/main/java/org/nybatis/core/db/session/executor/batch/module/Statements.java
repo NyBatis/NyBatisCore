@@ -88,7 +88,6 @@ public abstract class Statements {
     protected Connection getConnection() {
         if( connection == null ) {
             connection = TransactionManager.getConnection( token, environmentId );
-            NLogger.debug( ">> Get Connection : {}", connection );
         }
         return connection;
     }

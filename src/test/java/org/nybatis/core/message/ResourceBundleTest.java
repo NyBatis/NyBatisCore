@@ -70,13 +70,13 @@ public class ResourceBundleTest {
 	@Test
 	public void catalogTest() throws IOException {
 
-    	List<Path> list = FileUtil.getList( Const.path.getConfigMessage(), true, false, -1, "*.properties" );
+    	List<Path> list = FileUtil.search( Const.path.getConfigMessage(), true, false, -1, "*.properties" );
 
     	Set<String> baseNames = new HashSet<>();
 
     	for( Path path : list ) {
 
-    		List<String> baseName = StringUtil.split( FileUtil.removeExtention( path.getFileName().toString() ), "_" );
+    		List<String> baseName = StringUtil.tokenize( FileUtil.removeExtention( path.getFileName().toString() ), "_" );
 
 //    		int endIndex = ( baseName.size() - 2 < 0 ) ? 0 : baseName.size() - 2;
 

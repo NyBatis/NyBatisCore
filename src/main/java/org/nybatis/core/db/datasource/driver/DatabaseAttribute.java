@@ -16,16 +16,16 @@ public class DatabaseAttribute {
     public static final String DATABASE_UNKOWN  = "unknown";
 
     private String  database                   = DATABASE_UNKOWN;
-    private String patternToMatchClassName     = "";
+    private String  patternToMatchClassName    = "";
 
     private boolean enableToGetParameterType   = true;
     private boolean enableToGetBLob            = true;
     private boolean enableToDoLobPrefetch      = true;
 
     private String  pageSqlPre                 = "";
-    private String  pageSqlPost                = String.format( " LIMIT #{%s}, #{%s}", PAGE_PARAM_START, PAGE_PARAM_END );
-    private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM ( ";
-    private String  countSqlPost               = " )";
+    private String  pageSqlPost                = String.format( "\nLIMIT #{%s}, #{%s}", PAGE_PARAM_START, PAGE_PARAM_END );
+    private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM (\n";
+    private String  countSqlPost               = "\n)";
 
     private String  pingQuery                  = "SELECT 1";
 
@@ -70,7 +70,7 @@ public class DatabaseAttribute {
      * @return if matched with pattern, return true
      */
     public boolean isMatched( String driverName ) {
-        return Validator.isFinded( driverName, patternToMatchClassName );
+        return Validator.isFound( driverName, patternToMatchClassName );
     }
 
     public boolean enableToGetParameterType() {
@@ -143,21 +143,26 @@ public class DatabaseAttribute {
                 " - name : [%s]\n" +
                 " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
-                " - pre : [%s]\n" +
-                " - post: [%s]"
+                " - pre :\n%s" +
+                " - post:\n%s\n" +
+                "Ping Query:\n" +
+                " - %s"
                 ,
                 getDatabase(),
                 patternToMatchClassName,
                 getPageSqlPre(),
-                getPageSqlPost()
+                getPageSqlPost(),
+                getPingQuery()
         );
 
     }
 
     public DatabaseAttribute clone() {
 
-        DatabaseAttribute attribute = new DatabaseAttribute( database, patternToMatchClassName );
+        DatabaseAttribute attribute = new DatabaseAttribute();
 
+        attribute.database                 = database;
+        attribute.patternToMatchClassName  = patternToMatchClassName;
         attribute.enableToGetParameterType = enableToGetParameterType;
         attribute.enableToGetBLob          = enableToGetBLob;
         attribute.enableToDoLobPrefetch    = enableToDoLobPrefetch;
@@ -165,6 +170,7 @@ public class DatabaseAttribute {
         attribute.pageSqlPost              = pageSqlPost;
         attribute.countSqlPre              = countSqlPre;
         attribute.countSqlPost             = countSqlPost;
+        attribute.pingQuery                = pingQuery;
 
         return attribute;
 

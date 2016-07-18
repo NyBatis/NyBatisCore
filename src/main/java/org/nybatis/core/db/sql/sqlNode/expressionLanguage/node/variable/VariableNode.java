@@ -61,6 +61,10 @@ public class VariableNode extends Node {
 
 	}
 
+	public String getKey() {
+		return key;
+	}
+
 	public Node getTestNode() {
 		return new StringValueNode( "0" );
 	}

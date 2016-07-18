@@ -1,82 +1,74 @@
 package org.nybatis.core.db.configuration.builder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.nybatis.core.db.sql.repository.SqlRepository;
-import org.nybatis.core.exception.unchecked.IoException;
 import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.log.NLogger;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class ConfigurationBuilder {
 
-	private static Set<String> buildChecker = new HashSet<>();
+	private static Set<String> loadedFiles = new HashSet<>();
 
-	public ConfigurationBuilder( File file ) {
-		readFrom( file );
+	public void readFrom( String file ) {
+		readFrom( file, false );
 	}
 
-	public ConfigurationBuilder( String file ) {
-		readFrom( new File(file) );
-	}
+	public void readFrom( String file, boolean reload ) {
 
-	private boolean isBuildDone( File file ) {
-		if( file == null ) return true;
-		return buildChecker.contains( file.toString() );
-	}
-
-	private void readFrom( File file ) {
-
-		if( isBuildDone(file) ) return;
+		if( reload == false && isLoaded(file) ) return;
 
 		NLogger.debug( "load database configuration from [{}]", file );
 
 		try {
 
-			synchronized( buildChecker ) {
+			synchronized( loadedFiles ) {
 
-				NXml xmlReader = new NXmlDeformed( file );
+				NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom( file ) );
 
 				Node root = xmlReader.getRoot();
 
-				PropertiesBuilder propertiesBuilder = new PropertiesBuilder( root.getChildElement("properties") );
+				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
 
-				CacheBuilder cacheBuilder = new CacheBuilder();
+				CacheBuilder cacheBuilder = new CacheBuilder( propertyResolver );
 
 				for( Node cache : root.getChildElements("cache") ) {
-					cacheBuilder.setCache( cache, propertiesBuilder );
+					cacheBuilder.setCache( cache );
 				}
 
 				cacheBuilder.setDefaultCache();
 
 				for( Node environment : root.getChildElements("environment") ) {
-					new DatasourceBuilder( environment, propertiesBuilder );
-//					new PageBuilder( environment, propertiesBuilder );
-					try {
-						new SqlBuilder( environment, propertiesBuilder, FileUtil.getDirectory(file) );
-					} catch (FileNotFoundException e) {}
+					new EnvironmentBuilder( environment, propertyResolver );
+					new SqlBuilder( propertyResolver, getDirectory(file) ).setSql( environment );
 				}
 
 				cacheBuilder.checkEachSqlCache();
 
-				// only clear file information to check build error. not clear sql information. :)
-				new SqlRepository().clearFileLoadingLog();
-
-				buildChecker.add( file.toString() );
+				loadedFiles.add( file.toString() );
 
             }
 
 
-		} catch( ParseException | IoException e ) {
+		} catch( ParseException | UncheckedIOException e ) {
 	        throw new ParseException( e, "Error on reading Database configuration file({})\n\t{}", file, e.getMessage() );
         }
 
+	}
+
+	private String getDirectory( String file ) {
+		int seperator = file.lastIndexOf( "/" );
+		return seperator < 0 ? file : file.substring( 0, seperator );
+	}
+
+	private boolean isLoaded( String file ) {
+		if( file == null ) return true;
+		return loadedFiles.contains( file );
 	}
 
 }

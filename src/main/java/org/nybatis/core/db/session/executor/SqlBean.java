@@ -4,25 +4,27 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
-import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.validation.Validator;
 
 import java.util.List;
 import java.util.Map;
 
 public class SqlBean {
 
-	private SqlNode       sqlNode       = null;
-	private SqlProperties properties    = null;
-	private NMap          sqlParam      = null;
-	private Object        inputParam    = null;
+	private SqlNode        sqlNode       = null;
+	private SqlProperties  properties    = null;
+	private QueryParameter sqlParam      = null;
+	private NMap           inputParam    = new NMap();
 
 	private QueryResolver queryResolver = null;
 
@@ -31,8 +33,8 @@ public class SqlBean {
 	}
 
 	public SqlBean( SqlNode sqlNode, Object parameter ) {
-		this.sqlNode    = sqlNode;
-		this.inputParam = parameter;
+		this.sqlNode = sqlNode;
+		setParameter( parameter );
 	}
 
 	/**
@@ -44,15 +46,47 @@ public class SqlBean {
 	 * @return self instance
 	 */
 	public SqlBean setParameter( Object parameter ) {
-		this.inputParam = parameter;
+
+		if( parameter != null ) {
+
+			inputParam.clear();
+
+			if( DbUtils.isPrimitive(parameter) ) {
+				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
+			} else {
+				inputParam.fromBean( parameter );
+			}
+
+		}
+
+		return this;
+
+	}
+
+	public SqlBean addParameter( Object parameter ) {
+
+		if( parameter != null ) {
+			if( DbUtils.isPrimitive(parameter) ) {
+				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
+			} else {
+				NMap newParam = new NMap().fromBean( parameter );
+				Reflector.merge( newParam, inputParam );
+			}
+		}
+
+		return this;
+
+	}
+
+	public SqlBean addParameter( String key, Object parameter ) {
+		inputParam.put( key, parameter );
 		return this;
 	}
 
 	public SqlBean init( SqlProperties properties ) {
 
 		this.properties = properties.merge( sqlNode.getProperties() );
-
-		this.sqlParam   = DbUtils.getParameterMergedWithGlobalParam( inputParam );
+		this.sqlParam   = new QueryParameter( inputParam ).addGlobalParameters();
 
 		if( properties.isPageSql() ) {
 			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );
@@ -92,13 +126,7 @@ public class SqlBean {
 	}
 
 	private void setEnvironmentId( String environmentId ) {
-
-		if( environmentId == null ) {
-			throw new DatabaseConfigurationException( "Database configuration does not loaded." );
-		}
-
 		properties.setEnvironmentId( environmentId );
-
 	}
 
 	public String toString() {
@@ -118,7 +146,7 @@ public class SqlBean {
 	}
 
 	public String getEnvironmentId() {
-		return properties.getEnvironmentId();
+		return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public String getSqlId() {
@@ -153,7 +181,7 @@ public class SqlBean {
 	    return DatasourceManager.getAttributes( getEnvironmentId() );
     }
 
-	public Object getInputParams() {
+	public NMap getInputParams() {
 		return inputParam;
 	}
 
@@ -209,7 +237,7 @@ public class SqlBean {
 	}
 
 	private String getDatabase() {
-		return DatasourceManager.getAttributes( properties.getEnvironmentId() ).getDatabase();
+		return DatasourceManager.getAttributes( properties.getRepresentativeEnvironmentId() ).getDatabase();
 	}
 
 }

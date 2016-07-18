@@ -2,6 +2,7 @@ package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
@@ -22,6 +23,7 @@ public class OrmSessionProperties {
 
     private String  environmentId;
     private String  tableName;
+    private boolean allowNonPkParameter = false;
 
     private List<String>  wheres  = new ArrayList<>();
     private String        orderBy = null;
@@ -34,8 +36,9 @@ public class OrmSessionProperties {
     public OrmSessionProperties newInstance() {
 
         OrmSessionProperties newProperties = new OrmSessionProperties();
-        newProperties.environmentId = environmentId;
-        newProperties.tableName     = tableName;
+        newProperties.environmentId        = environmentId;
+        newProperties.tableName            = tableName;
+        newProperties.allowNonPkParameter  = allowNonPkParameter;
 
         return newProperties;
 
@@ -69,53 +72,64 @@ public class OrmSessionProperties {
         return Const.db.getOrmSqlIdPrefix( environmentId, tableName );
     }
 
-    public String sqlIdSelectSingle() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_SINGLE;
+    public String sqlIdSelectPk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_PK;
     }
 
-    public String sqlIdSelectList() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT_MULTI;
+    public String sqlIdSelect() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_SELECT;
     }
 
-    public String sqlIdInsert() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_INSERT;
+    public String sqlIdInsertPk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_INSERT_PK;
     }
 
-    public String sqlIdUpdate() {
-        return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE;
+    public String sqlIdUpdatePk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_UPDATE_PK;
     }
 
     public String sqlIdDelete() {
         return sqlIdPrefix() + Const.db.ORM_SQL_DELETE;
     }
 
+    public String sqlIdDeletePk() {
+        return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_PK;
+    }
+
     public void addWhere( String where, Object parameter ) {
 
         if( StringUtil.isBlank(where) ) return;
 
-        int currentWhereIndex = wheres.size();
-
-        String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
-
-        NMap inputParam = setParameter( prefix, parameter );
-
-
-        where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
-
-        String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
-
         if( parameter == null ) {
-            inputParam.put( singleParamKey, null );
-        }
 
-        if( inputParam.containsKey(singleParamKey) ) {
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format("#{%s}", singleParamKey) );
+            where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
 
         } else {
-            where = where.replaceAll( "#\\{(.*?)\\}", String.format( "#{%s$1}", prefix ) );
-        }
 
-        userParameter.putAll( inputParam );
+            int currentWhereIndex = wheres.size();
+
+            String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
+
+            NMap inputParam = setParameter( prefix, parameter );
+
+            where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
+
+            String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
+
+            if( parameter == null ) {
+                inputParam.put( singleParamKey, null );
+            }
+
+            if( inputParam.containsKey(singleParamKey) ) {
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s}", singleParamKey) );
+
+            } else {
+                where = where.replaceAll( "#\\{(.+?)\\}", String.format( "#{%s$1}", prefix ) );
+            }
+
+            userParameter.putAll( inputParam );
+
+        }
 
         this.wheres.add( String.format( "AND ( %s )", where ) );
 
@@ -132,7 +146,7 @@ public class OrmSessionProperties {
     }
 
     public OrmSessionProperties clone() {
-        return new Reflector().clone( this );
+        return Reflector.clone( this );
     }
 
     public void setEntityParameter( Object parameter ) {
@@ -145,8 +159,7 @@ public class OrmSessionProperties {
 
     private NMap setParameter( String prefix, Object parameter ) {
 
-        NMap params = DbUtils.toNRowParameter( parameter );
-
+        NMap params    = new QueryParameter( parameter );
         NMap newParams = new NMap();
 
         for( Object key : params.keySet() ) {
@@ -220,4 +233,12 @@ public class OrmSessionProperties {
 
     }
 
+    public boolean allowNonPkParameter() {
+        return allowNonPkParameter;
+    }
+
+    public OrmSessionProperties allowNonPkParameter( boolean enable ) {
+        this.allowNonPkParameter = enable;
+        return this;
+    }
 }

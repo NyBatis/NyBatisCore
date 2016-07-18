@@ -8,9 +8,26 @@
     </encoder>
   </appender>
 
+  <appender name="consoleSql" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder">
+    </encoder>
+  </appender>
+
+  <appender name="fileSql" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>./log/log</File>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <FileNamePattern>./log/log_%d{yyyyMMdd_HH}</FileNamePattern>
+    </rollingPolicy>
+    <encoder class="org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder">
+      <pattern>%d{HH:mm:ss.SSS} %-5level \(%F:%L\)</pattern>
+    </encoder>
+  </appender>
+
   <logger name="org.nybatis" level="trace">
     <appender-ref ref="console" />
   </logger>
+
+  <!--<logger name="com.jayway.jsonpath.internal.path.CompiledPath" level="off" />-->
 
   <logger name="specific.test.log" level="trace">
     <appender-ref ref="console" />

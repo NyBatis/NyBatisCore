@@ -7,6 +7,7 @@ import java.util.Observer;
 
 import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.context.ThreadRoot;
+import org.nybatis.core.log.NLogger;
 
 public class TransactionToken implements Observer {
 

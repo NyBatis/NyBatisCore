@@ -6,7 +6,6 @@ import org.nybatis.core.reflection.Reflector;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.Map;
@@ -50,13 +49,13 @@ public class DatabaseAttributeManager {
 
     private static DatabaseAttribute get( Connection connection ) throws SQLException {
 
-        Connection realConnection = new Reflector().unwrapProxyBean( connection );
+        Connection realConnection = Reflector.unwrapProxy( connection );
 
         String className = realConnection.getClass().getName();
 
-        NLogger.trace( "--------------------------------------" );
+        NLogger.trace( "---------------------------------------------------------------------" );
         NLogger.trace( "Connection class name : {}", className );
-        NLogger.trace( "--------------------------------------" );
+        NLogger.trace( "---------------------------------------------------------------------" );
 
         for( DatabaseAttribute attribute : driverRepository.values() ) {
             if( attribute.isMatched( className ) ) {
@@ -88,21 +87,24 @@ public class DatabaseAttributeManager {
     static {
 
         add( new DatabaseAttribute("oracle", "oracle\\.jdbc\\.driver" )
-            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (" )
-            .setPageSqlPost( ") NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
-        add( new DatabaseAttribute( "mysql",  "com\\.mysql\\.jdbc" ) );
-        add( new DatabaseAttribute( "maria",  "org\\.mariadb\\.jdbc" ) );
-        add( new DatabaseAttribute( "sqlite", "org\\.sqlite\\." ) );
+        add( new DatabaseAttribute( "mysql",      "com\\.mysql\\.jdbc"          ) );
+        add( new DatabaseAttribute( "maria",      "org\\.mariadb\\.jdbc"        ) );
+        add( new DatabaseAttribute( "sqlite",     "org\\.sqlite\\."             ) );
+        add( new DatabaseAttribute( "h2",         "org\\.h2\\.jdbc"             ) );
 
-        // Not Tested !
-        add( new DatabaseAttribute( "mssql",       "com\\.microsoft\\.jdbc" ) );
-        add( new DatabaseAttribute( "postgresql",  "postgresql\\.driver" ) );
-        add( new DatabaseAttribute( "sybase",      "com\\.sybase\\." ) );
-        add( new DatabaseAttribute( "db2",         "ibm\\.db2\\." ) );
-        add( new DatabaseAttribute( "odbc",        "sun\\.jdbc\\.odbc" ) );
+        //   Not Tested  !
+        add( new DatabaseAttribute( "derby",      "org\\.apache\\.derby\\.jdbc" ) );
+        add( new DatabaseAttribute( "hsqldb",     "org\\.hsqldb\\.jdbcDriver"   ) );
+        add( new DatabaseAttribute( "mssql",      "com\\.microsoft\\.jdbc"      ) );
+        add( new DatabaseAttribute( "postgresql", "postgresql\\.driver"         ) );
+        add( new DatabaseAttribute( "sybase",     "com\\.sybase\\."             ) );
+        add( new DatabaseAttribute( "db2",        "ibm\\.db2\\."                ) );
+        add( new DatabaseAttribute( "odbc",       "sun\\.jdbc\\.odbc"           ) );
 
     }
 

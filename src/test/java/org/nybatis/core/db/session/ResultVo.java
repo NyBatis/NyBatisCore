@@ -10,7 +10,7 @@ public class ResultVo {
 	public byte[] image;
 
 	public String toString() {
-		return new Reflector().getFieldReport( this );
+		return Reflector.toString( this );
 	}
 
 }

@@ -26,7 +26,7 @@ public class BatchStatementExecutor extends AbstractBatchExecutor {
 
 		@Override
 		public Object generateKey( SqlBean sqlBean ) {
-			return sqlBean.getProperties().getEnvironmentId();
+			return sqlBean.getEnvironmentId();
 		}
 
 		@Override

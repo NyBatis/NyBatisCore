@@ -3,7 +3,9 @@ package org.nybatis.core.xml.node;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -19,7 +21,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SyntaxException;
 
@@ -27,6 +29,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.DocumentType;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
@@ -311,21 +314,21 @@ public class DocumentHandler {
     	return readXml( is, ignoreDtd );
     }
 
-	public Document readXml( InputStream inputStream, boolean ignoreDtd ) throws ParseException, IoException {
+	public Document readXml( InputStream inputStream, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 
 		DocumentBuilder builder = getBuilder( ignoreDtd );
 
+		InputStreamReader inputStreamReader = null;
+
 		try {
 
-			Document doc = builder.parse( inputStream );
+			inputStreamReader = new InputStreamReader( inputStream, StandardCharsets.UTF_8.toString() );
+
+			Document doc = builder.parse( new InputSource( inputStreamReader ) );
 
 			doc.setXmlStandalone( true );
 
 			return doc;
-
-//			doc.getDocumentElement().normalize();
-
-			//doc.normalizeDocument();
 
 		} catch( SAXException e ) {
 
@@ -334,7 +337,6 @@ public class DocumentHandler {
 				SAXParseException se = (SAXParseException) e;
 
 				ParseException pe = new ParseException( se, "lineNumber : {}, columnNumber : {}; {}", se.getLineNumber(), se.getColumnNumber(), se.getMessage() );
-
 				pe.setLineNumber( se.getLineNumber() );
 				pe.setColumnNumber( se.getColumnNumber() );
 
@@ -345,9 +347,10 @@ public class DocumentHandler {
 			throw new ParseException( e, e.getMessage() );
 
         } catch( IOException e ) {
-	        throw new IoException( e );
+	        throw new UncheckedIOException( e );
         } finally {
         	if( inputStream != null ) try { inputStream.close(); } catch (IOException e) {}
+			if( inputStreamReader != null ) try { inputStreamReader.close(); } catch (IOException e) {}
         }
 
 	}

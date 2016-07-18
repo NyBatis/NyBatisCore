@@ -1,7 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
@@ -9,12 +7,13 @@ import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.BaseRuntimeException;
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.validation.Assertion;
+import org.nybatis.core.exception.unchecked.DatabaseException;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.validation.Validator;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -39,17 +38,11 @@ public class SqlSessionImpl implements SqlSession {
         this.originalProperties = Validator.nvl( properties, new SqlProperties() );
         this.properties         = originalProperties.clone();
 
-        assertionEnvironmentId( this.properties.getRawEnvironmentId() );
-
     }
 
     public SqlSessionImpl initProperties() {
         properties = originalProperties.clone();
         return this;
-    }
-
-    private void assertionEnvironmentId( String environmentId ) {
-        Assertion.isTrue( DatasourceManager.isExist( environmentId ), "There is no database environment (id : {}}", environmentId );
     }
 
     public SqlProperties getProperties() {
@@ -129,21 +122,18 @@ public class SqlSessionImpl implements SqlSession {
 
         if( worker == null ) return this;
 
-        Connection conn = null;
+        Connection connection = null;
 
         try {
 
-            conn = TransactionManager.getConnection( token, properties.getEnvironmentId() );
+            connection = TransactionManager.getConnection( token, properties.getRepresentativeEnvironmentId() );
+
+            Connection protectedConnection = getProtectedConnection( connection );
 
             worker.setProperties( properties );
-            worker.setConnection( conn );
+            worker.setConnection( protectedConnection );
 
-            worker.execute( conn );
-
-            if( properties.isAutocommit() ) {
-                NLogger.debug( "commit" );
-                conn.commit();
-            }
+            worker.execute( protectedConnection );
 
             return this;
 
@@ -151,30 +141,32 @@ public class SqlSessionImpl implements SqlSession {
             throw new BaseRuntimeException( e );
 
         } finally {
-
-            if( conn != null ) {
-                try {
-                    // It it not real releaseSavepoint !
-                    // merely clear resources like Statement, PreparedStatement, CallableStatement and ResultSet occupied by connection
-                    conn.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
-                } catch( SQLException e ) {
-                    NLogger.error( e );
-                }
-
-                if( ! TransactionManager.isBegun(token) ) {
-                    try { conn.close(); } catch( SQLException e ) {}
-                }
-            }
-
+            TransactionManager.releaseConnection( token, connection );
             initProperties();
 
         }
 
     }
 
+    private Connection getProtectedConnection( Connection connection ) {
+
+        return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
+            public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
+
+                if( "close".equals(method.getName()) ) {
+                    throw new DatabaseException( "connection's close method is not supprted in useConnection feature." );
+                }
+
+                return method.invoke( connection, arguments );
+
+            }
+
+        } );
+
+    }
+
     @Override
-    public SqlSession changeEnvironmentId( String id ) {
-        assertionEnvironmentId( id );
+    public SqlSession setEnvironmentId( String id ) {
         originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         return this;
@@ -188,6 +180,11 @@ public class SqlSessionImpl implements SqlSession {
     @Override
     public <T> OrmSession<T> openOrmSession( Class<T> domainClass ) {
         return openOrmSession( null, domainClass );
+    }
+
+    @Override
+    public SqlSession openSeperateSession() {
+        return SessionManager.openSeperateSession( properties.getEnvironmentId() );
     }
 
 }

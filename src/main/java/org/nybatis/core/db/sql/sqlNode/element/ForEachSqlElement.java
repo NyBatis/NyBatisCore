@@ -1,15 +1,15 @@
 package org.nybatis.core.db.sql.sqlNode.element;
 
-import org.nybatis.core.db.session.executor.util.DbUtils;
+import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlMaker.QueryResolver;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.util.TypeUtil;
+import org.nybatis.core.util.Types;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,106 +33,75 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	private String getDelimeter( Map param ) {
-		return DbUtils.getParameterBindedValue( delimeter, param );
-	}
-
-	private String getClose( Map param ) {
-		return DbUtils.getParameterBindedValue( close, param );
-	}
-
-	private String getOpen( Map param ) {
-		return DbUtils.getParameterBindedValue( open, param );
-	}
-
-	private Map clone( Map param ) {
-		Map newMap = new HashMap();
-		newMap.putAll( param );
-		return newMap;
-	}
-
 	@Override
-    public String toString( Map param ) throws SqlParseException {
+    public String toString( QueryParameter inputParam ) throws SqlParseException {
 
-		if( ! TypeUtil.isList(param.get(paramKey))  ) return "";
-		if( ((List)param.get(paramKey)).size() == 0 ) return "";
+		boolean delimiterOn    = StringUtil.isNotEmpty( getDelimeter( inputParam ) );
+		boolean indexKeyOn     = StringUtil.isNotEmpty( indexKey );
+		boolean hasSingleParam = hasSingleParameter( inputParam );
 
-		List    loopParams  = TypeUtil.toList( param.get( paramKey ) );
-		boolean delimiterOn = ! StringUtil.isEmpty( getDelimeter( param ) );
-		boolean indexKeyOn  = ! StringUtil.isEmpty( indexKey );
+		List params = getParams( inputParam, hasSingleParam );
 
-		Map templateParam = clone( param );
+		StringBuilder sql = new StringBuilder();
 
-		StringBuilder loopSql = new StringBuilder();
+		for( int i = 0, iCnt = params.size() - 1; i <= iCnt; i++ ) {
 
-		for( int i = 0, iCnt = loopParams.size() - 1; i <= iCnt; i++ ) {
-
-			Object loopParam = loopParams.get( i );
-
-			String newSql;
-
-			if( TypeUtil.isPrimitive(loopParam) ) {
-
-				Map localParam = clone( templateParam );
-
-				localParam.put( paramKey, loopParam );
-				if( indexKeyOn ) localParam.put( indexKey, i );
-
-				newSql = getSqlTemplate( localParam );
-
-				String targetKey = String.format( "%s[%d]", paramKey, i );
-				newSql = bindLoopParam( paramKey, targetKey, loopParam, newSql, param );
-
-			} else {
-
-				NMap localParam = DbUtils.toNRowParameter( loopParam, paramKey );
-
-				if( indexKeyOn )
-					localParam.put( indexKey, i );
-
-				newSql = getSqlTemplate( localParam );
-
-				for( Object sourceKey : localParam.keySet() ) {
-
-					String targetKey = String.format( "%s[%d].%s", paramKey, i, ((String)sourceKey).replace(paramKey + ".", "") );
-					newSql = bindLoopParam( (String)sourceKey, targetKey, localParam.get( sourceKey ), newSql, param );
-
-				}
-
-			}
+			QueryParameter param = clone( inputParam ).setForEachInnerParam( paramKey, params.get(i) );
 
 			if( indexKeyOn ) {
-				String indexKeyTarget = String.format( "%s[%d].%s", paramKey, i, indexKey );
-				newSql = bindLoopParam( indexKey, indexKeyTarget, i, newSql, param );
+				param.put( indexKey, i );
 			}
 
-			loopSql.append( newSql );
+			String innerSql = getInnerSql( param );
 
-			if( delimiterOn && i != iCnt && ! StringUtil.isBlank(newSql) ) {
-				loopSql.append( ' ' ).append( getDelimeter( param ) ).append( ' ' );
+			String targetKey = String.format( "%s[%d]", paramKey, i );
+			innerSql = convertKeyToJsonPath( innerSql, paramKey, targetKey );
+			innerSql = bindSingleParamKey( innerSql, hasSingleParam );
+
+			if( indexKeyOn ) {
+				innerSql = setIndexKey( innerSql, i, inputParam );
+			}
+
+			sql.append( innerSql );
+
+			if( delimiterOn && i != iCnt && ! StringUtil.isBlank(innerSql) ) {
+				sql.append( ' ' ).append( getDelimeter( inputParam ) ).append( ' ' );
 			}
 
 		}
 
-		if( StringUtil.isBlank(loopSql) ) {
-			return loopSql.toString();
+		if( StringUtil.isBlank(sql) ) {
+			return sql.toString();
 		} else {
-			return String.format( "%s %s %s", getOpen( param ), loopSql, getClose( param ) );
+			return String.format( "%s %s %s", getOpen( inputParam ), sql, getClose( inputParam ) );
 		}
 
 	}
 
-	private String bindLoopParam( String sourceKey, String targetKey, Object value, String sql, Map inputParam ) {
+	private String setIndexKey( String sql, int index, QueryParameter inputParam ) {
 
-		String newSql = QueryResolver.makeLoopSql( sql, sourceKey, targetKey );
+		if( StringUtil.isEmpty( indexKey ) ) return sql;
 
-		if( ! sql.equals( newSql ) ) {
-			inputParam.put( targetKey, value );
+		String targetKey = String.format( "%s[%d].%s", paramKey, index, indexKey );
+
+		int beforeSize = sql.length();
+
+		sql = convertKeyToJsonPath( sql, indexKey, targetKey );
+
+		int afterSize = sql.length();
+
+		if( beforeSize != afterSize ) {
+			inputParam.put( targetKey, index );
 		}
 
-		return newSql;
+		return sql;
 
 	}
+
+	private String convertKeyToJsonPath( String sql, String sourceKey, String targetKey ) {
+		return sql.replaceAll( String.format( "#\\{%s(\\..+?)?\\}", sourceKey ), String.format( "#{%s$1}", targetKey ) );
+	}
+
 
 	private void toString( StringBuilder buffer, SqlElement node, int depth ) {
 
@@ -164,11 +133,61 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	public String getSqlTemplate( Map param ) throws SqlParseException {
+	private String getDelimeter( Map param ) {
+		return StringUtil.bindParam( delimeter, param );
+	}
+
+	private String getClose( Map param ) {
+		return StringUtil.bindParam( close, param );
+	}
+
+	private String getOpen( Map param ) {
+		return StringUtil.bindParam( open, param );
+	}
+
+	private QueryParameter clone( Map param ) {
+		QueryParameter newMap = new QueryParameter();
+		newMap.putAll( param );
+		return newMap;
+	}
+
+	private String getInnerSql( QueryParameter param ) throws SqlParseException {
 
 		String sqlTemplate = super.toString( param );
 
 		return QueryResolver.makeDynamicSql( sqlTemplate, param );
+
+	}
+
+	private boolean hasSingleParameter( NMap param ) {
+		return param.containsKey( Const.db.PARAMETER_SINGLE );
+	}
+
+	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
+		Object value = getValue( inputParam, hasSingleParam );
+		return Types.toList( value );
+	}
+
+	private Object getValue( QueryParameter param, boolean hasSingleParam ) {
+
+		Object val = param.get( paramKey );
+
+		if( val == null && hasSingleParam ) {
+			String modifiedParamKey = paramKey.replaceFirst( "^.+?(\\..+?)?$", String.format( "%s$1", Const.db.PARAMETER_SINGLE ) );
+			val = param.get( modifiedParamKey );
+		}
+
+		return val;
+
+	}
+
+	private String bindSingleParamKey( String sql, boolean hasSingleParam ) {
+
+		if( hasSingleParam ) {
+			return sql.replaceAll( "#\\{.+?(\\[.+?\\])?(\\..+?)?\\}", String.format( "#{%s$1$2}", Const.db.PARAMETER_SINGLE) );
+		} else {
+			return sql;
+		}
 
 	}
 

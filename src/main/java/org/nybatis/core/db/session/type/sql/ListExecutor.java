@@ -18,7 +18,7 @@ public interface ListExecutor {
     /**
      * Retrieve list
      *
-     * @return list NList list result
+     * @return list NList
      */
     @SupportCache
     NList selectNList();
@@ -26,7 +26,7 @@ public interface ListExecutor {
     /**
      * Retrieve list
      *
-     * @return list
+     * @return list consist with Map
      */
     @SupportCache
     List<NMap> select();
@@ -119,6 +119,6 @@ public interface ListExecutor {
      * @param end   end rownum
      * @return self instance
      */
-    ListExecutor setPage( int start, int end );
+    ListExecutor setPage( Integer start, Integer end );
 
 }

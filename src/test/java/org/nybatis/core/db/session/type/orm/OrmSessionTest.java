@@ -56,7 +56,7 @@ public class OrmSessionTest {
     }
 
     private void isOrmSqlExist() {
-        Assert.assertTrue( SqlRepository.isExist( sqlIdPrefix() + Const.db.ORM_SQL_INSERT ) );
+        Assert.assertTrue( SqlRepository.isExist( sqlIdPrefix() + Const.db.ORM_SQL_INSERT_PK ) );
     }
 
     @Test

@@ -1,36 +1,42 @@
 package org.nybatis.core.conf;
 
+import org.nybatis.core.exception.unchecked.BaseRuntimeException;
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.util.ClassUtil;
+
 import java.io.File;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Paths;
 
-import org.nybatis.core.exception.unchecked.BaseRuntimeException;
-
+/**
+ * Constant helper
+ */
 public class ConstHelper {
 
 	/**
-	 * 프로그램이 구동되는 root 디렉토리를 구한다.
-	 * 
-	 * @return root 디렉토리
+	 * get root directory where program is running
+	 *
+	 * @return root directory
 	 */
 	public String getRoot() {
 
 		try {
-			
-			String rootPath = Paths.get( Const.path.class.getResource( "/" ).toURI() ).toString();
-			
-			if( File.separatorChar == '\\' ) {
-				rootPath = rootPath.replaceAll( "\\\\", "/" );
-			}
+			if( ClassUtil.isRunningInJar() ) {
+				return FileUtil.nomalizeSeparator( new File( "." ).getAbsolutePath() ).replaceFirst( "/\\.$", "" );
 
-			return rootPath;
-			
-		} catch ( URISyntaxException e ) {
-			
+			} else {
+				URL root = ClassUtil.getClassLoader().getResource( "" );
+				return FileUtil.nomalizeSeparator( Paths.get( root.toURI() ) );
+			}
+		} catch( URISyntaxException e ) {
 			throw new BaseRuntimeException( e );
-			
 		}
-		
+
 	}
-	
+
+	public boolean isRunInWar() {
+		return ClassUtil.isRunningInJar() && ClassUtil.isResourceExisted( "/WEB-INF/classes" );
+	}
+
 }

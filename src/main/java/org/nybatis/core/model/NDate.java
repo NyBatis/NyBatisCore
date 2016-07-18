@@ -1,13 +1,18 @@
 package org.nybatis.core.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.exception.unchecked.ParseException;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.reflection.mapper.NDateDeserializer;
+import org.nybatis.core.reflection.mapper.NDateSerializer;
+import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
+
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.reflection.mapper.NDateSerializer;
-import org.nybatis.core.util.StringUtil;
 
 /**
  * represents a specific instant in time with millisecond precision
@@ -15,15 +20,18 @@ import org.nybatis.core.util.StringUtil;
  * @author nayasis@gmail.com
  */
 @JsonSerialize( using = NDateSerializer.class )
-public class NDate {
+@JsonDeserialize( using = NDateDeserializer.class )
+public class NDate implements Serializable {
 
 	public static final NDate MIN_DATE = new NDate( "0000-01-01" );
-	public static final NDate MAX_DATE = new NDate( "9999-12-31 23:59:59.999", "YYYY-MM-DD HH:MI:SS.FFF" );
+	public static final NDate MAX_DATE = new NDate( "9999-12-31 23:59:59.999" );
 
     private Calendar currentTime = Calendar.getInstance();
 
-    private static final String DEFAULT_OUTPUT_FORMAT = "YYYY-MM-DD HH:MI:SS";
-    private static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmss";
+    public static final String DEFAULT_OUTPUT_FORMAT = "YYYY-MM-DD HH:MI:SS";
+    public static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmssSSS";
+
+    public static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
     /**
      * 현재 시간을 기준으로 기본 날짜 객체를 생성한다.
@@ -116,8 +124,8 @@ public class NDate {
      * @param date 날짜
      * @throws ParseException YYYY-MM-DD-HH-MI-SS 순서로 날짜를 해석하지 못했을 경우
      */
-    public void setDate( String date ) throws ParseException {
-        setDate( date, null );
+    public NDate setDate( String date ) throws ParseException {
+        return setDate( date, null );
     }
 
     /**
@@ -127,33 +135,36 @@ public class NDate {
      * NDate date = new NDate();
      *
      * date.setDate( "2011-12-24 23:10:45", "YYYY-MM-DD HH:MI:SS" );
-     * date.setDate( "2011.12.24 23:10:45", "YYYY-MM-DD HH:MI:SS" ); -> 포맷 중간의 구분자가 달라도 처리 가능
      * </pre>
      *
      * @param date 날짜
      * @param format 날짜포맷 날짜포맷 [YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초 ]
      * @throws ParseException 정의한 format 으로 날짜를 해석하지 못했을 경우
      */
-    public void setDate( String date, String format ) {
+    public NDate setDate( String date, String format ) {
 
         if( date == null || date.length() == 0 ) {
             setDate( new Date() );
-            return;
+            return this;
         }
 
-        String pattern = getDefaultFormat( format, true );
+        boolean isNullFormat = Validator.isEmpty( format );
 
-        String numString = StringUtil.extractNumber( date );
+        String pattern = getDefaultFormat( format, isNullFormat );
 
-        int maxLength = Math.min( pattern.length(), numString.length() );
+        String numString = isNullFormat ? StringUtil.extractNumber( date ) : date;
 
-        pattern   = pattern.substring( 0, maxLength );
-        numString = numString.substring( 0, maxLength );
+        if( isNullFormat ) {
+            int maxLength = Math.min( pattern.length(), numString.length() );
+            pattern   = pattern.substring( 0, maxLength );
+            numString = numString.substring( 0, maxLength );
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat( pattern );
 
         try {
 	        currentTime.setTime( sdf.parse(numString) );
+            return this;
         } catch( java.text.ParseException e ) {
         	throw new ParseException( e, e.getMessage() );
         }
@@ -174,8 +185,9 @@ public class NDate {
      *
      * @param date 숫자형 날짜
      */
-    public void setDate( long date ) {
+    public NDate setDate( long date ) {
     	this.currentTime.setTime( new Date(date) );
+        return this;
     }
 
     /**
@@ -183,8 +195,9 @@ public class NDate {
      *
      * @param date 날짜객체
      */
-    public void setDate( Calendar date ) {
+    public NDate setDate( Calendar date ) {
         this.currentTime = (Calendar) date.clone();
+        return this;
     }
 
     /**
@@ -192,8 +205,9 @@ public class NDate {
      *
      * @param date 날짜객체
      */
-    public void setDate( NDate date ) {
+    public NDate setDate( NDate date ) {
         this.currentTime = (Calendar) date.toCalendar().clone();
+        return this;
     }
 
     /**
@@ -212,6 +226,15 @@ public class NDate {
      */
     public Calendar toCalendar() {
         return this.currentTime;
+    }
+
+    /**
+     * get time in milli-seconds
+     *
+     * @return milli-seconds time value
+     */
+    public long toTime() {
+        return this.currentTime.getTimeInMillis();
     }
 
     /* (non-Javadoc)
@@ -249,11 +272,11 @@ public class NDate {
         if( format == null || format.length() == 0 ) return DEFAULT_INPUT_FORMAT;
 
         // UI 프레임워크와 형식을 일치시키기 위해 포맷 변형
-        format = format.toUpperCase()
+        format = format
         	.replaceAll( "YYYY", "yyyy" )
-            .replaceAll( "DD",   "dd"   )
-            .replaceAll( "MI",   "mm"   )
-            .replaceAll( "SS",   "ss"   )
+            .replaceAll( "([^D])DD([^D]|$)", "$1dd$2" )
+            .replaceAll( "MI",     "mm"   )
+            .replaceAll( "([^S])SS([^S]|$)", "$1ss$2" )
             .replaceAll( "F",    "S"    );
 
         if( stripYn ) format = format.replaceAll( "[^y|M|d|H|m|s|S]", "" );
@@ -337,108 +360,197 @@ public class NDate {
     /**
      * 년도를 더하거나 뺀다.
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value 더하거나 뺄 수량
      */
-    public void addYear( int amount ) {
-        currentTime.add( Calendar.YEAR, amount );
+    public NDate addYear( int value ) {
+        currentTime.add( Calendar.YEAR, value );
+        return this;
     }
 
     /**
-     * 월을 더하거나 뺀다.
+     * set year
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return  self
      */
-    public void addMonth( int amount ) {
-        currentTime.add( Calendar.MONTH, amount );
+    public NDate setYear( int value ) {
+        currentTime.set( Calendar.YEAR, value );
+        return this;
     }
 
     /**
-     * 일을 더하거나 뺀다.
+     * adds or subtracts month
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public void addDay( int amount ) {
-        currentTime.add( Calendar.DATE, amount );
+    public NDate addMonth( int value ) {
+        currentTime.add( Calendar.MONTH, value );
+        return this;
     }
 
     /**
-     * 시간을 더하거나 뺀다.
+     * set month
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return  self
      */
-    public void addHour( int amount ) {
-        currentTime.add( Calendar.HOUR_OF_DAY, amount );
+    public NDate setMonth( int value ) {
+        currentTime.set( Calendar.MONTH, value );
+        return this;
     }
 
     /**
-     * 분을 더하거나 뺀다.
+     * adds or subtracts day
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public void addMinute( int amount ) {
-        currentTime.add( Calendar.MINUTE, amount );
+    public NDate addDay( int value ) {
+        currentTime.add( Calendar.DATE, value );
+        return this;
     }
 
     /**
-     * 초를 더하거나 뺀다.
+     * set day
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public void addSecond( int amount ) {
-        currentTime.add( Calendar.SECOND, amount );
+    public NDate setDay( int value ) {
+        currentTime.set( Calendar.DATE, value );
+        return this;
     }
 
     /**
-     * 밀리초를 더하거나 뺀다.
+     * adds or subtracts hour
      *
-     * @param amount 더하거나 뺄 수량
+     * @param value
+     * @return self
      */
-    public void addMillisecond( int amount ) {
-        currentTime.add( Calendar.MILLISECOND, amount );
+    public NDate addHour( int value ) {
+        currentTime.add( Calendar.HOUR_OF_DAY, value );
+        return this;
+    }
+
+    /**
+     * set hour (24-hour clock)
+     *
+     * @param value
+     * @return self
+     */
+    public NDate setHour( int value ) {
+        currentTime.set( Calendar.HOUR_OF_DAY, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts minute
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addMinute( int value ) {
+        currentTime.add( Calendar.MINUTE, value );
+        return this;
+    }
+
+    /**
+     * set minute
+     *
+     * @param value
+     * @return self
+     */
+    public NDate setMinute( int value ) {
+        currentTime.set( Calendar.MINUTE, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts second
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addSecond( int value ) {
+        currentTime.add( Calendar.SECOND, value );
+        return this;
+    }
+
+    /**
+     * set second
+     *
+     * @param value
+     * @return  self
+     */
+    public NDate setSecond( int value ) {
+        currentTime.set( Calendar.SECOND, value );
+        return this;
+    }
+
+    /**
+     * adds or subtracts mili-second
+     *
+     * @param value
+     * @return self
+     */
+    public NDate addMillisecond( int value ) {
+        currentTime.add( Calendar.MILLISECOND, value );
+        return this;
+    }
+
+    /**
+     * set mili-second
+     *
+     * @param value
+     * @return  self
+     */
+    public NDate setMillisecond( int value ) {
+        currentTime.set( Calendar.MILLISECOND, value );
+        return this;
     }
 
 
     /**
-     * 현재 일을 기준으로 날짜가 월초로 세팅된 객체를 구한다.
+     * get beginning of month date from current date.
      *
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getFirstMonthDate() ); --> '2012.02.01 13:21:41' 이 출력됨
+     * System.out.println( date.getBeginningOfMonthDate() ); --> '2012.02.01 00:00:00'
      * </pre>
      *
-     * @return 월초로 변경된 날짜객체
+     * @return new NDate to be setted with beginning of month date
      */
-    public NDate getFirstMonthDate() {
+    public NDate getBeginningOfMonthDate() {
 
         Calendar newDate = Calendar.getInstance();
-
-        newDate.set( getYear(), getMonth() - 1, 1, getHour(), getMinute(), getSecond() );
-        newDate.set( Calendar.MILLISECOND, getMillisecond() );
+        newDate.set( getYear(), getMonth() - 1, 1, 0, 0, 0 );
+        newDate.set( Calendar.MILLISECOND, 0 );
 
         return new NDate( newDate );
 
     }
 
     /**
-     * 현재 일을 기준으로 날짜가 월말로 세팅된 객체를 구한다.
+     * get end of month date from current date.
      *
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getLastMonthDate() ); --> '2012.02.29 13:21:41' 이 출력됨
+     * System.out.println( date.getEndOfMonthDate() ); --> '2012.02.29 23:59:59.999'
      * </pre>
      *
-     * @return 월말로 변경된 날짜객체
+     * @return new NDate to be setted with end of month date
+     *
      */
-    public NDate getLastMonthDate() {
+    public NDate getEndOfMonthDate() {
 
         Calendar newDate = Calendar.getInstance();
 
-        newDate.set( getYear(), getMonth(), 1, getHour(), getMinute(), getSecond() );
-        newDate.set( Calendar.MILLISECOND, getMillisecond() );
-
-        newDate.add( Calendar.DATE, -1 );
+        newDate.set( getYear(), getMonth(), 1, 0, 0, 0 );
+        newDate.set( Calendar.MILLISECOND, 0 );
+        newDate.add( Calendar.MILLISECOND, -1 );
 
         return new NDate( newDate );
 
@@ -459,7 +571,7 @@ public class NDate {
             c1 = new NDate( toString("YYYYMMDD" ) ).toCalendar();
             c2 = new NDate( date.toString("YYYYMMDD" ) ).toCalendar();
         } catch ( ParseException e ) {
-            e.printStackTrace();
+            NLogger.error( e );
         }
 
         long diff = getDifference( c1, c2 );
@@ -483,7 +595,7 @@ public class NDate {
             c1 = new NDate( toString("YYYYMMDDHHMISS" ) ).toCalendar();
             c2 = new NDate( date.toString("YYYYMMDDHHMISS" ) ).toCalendar();
         } catch ( ParseException e ) {
-            e.printStackTrace();
+            NLogger.error( e );
         }
 
         long diff = getDifference( c1, c2 );
@@ -513,11 +625,7 @@ public class NDate {
      * @return 현재 날짜가 비교할 날짜보다 클 경우 true
      */
     public boolean greaterThan( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == 1;
-
+        return compareTo( date ) > 0 ;
     }
 
     /**
@@ -527,11 +635,7 @@ public class NDate {
      * @return 현재 날짜가 비교할 날짜보다 크거나 같을 경우 true
      */
     public boolean greaterThanOrEqual( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == 1 || compareVal == 0;
-
+        return compareTo( date ) >= 0;
     }
 
     /**
@@ -541,11 +645,7 @@ public class NDate {
      * @return 현재 날짜가 비교할 날짜보다 작을 경우 true
      */
     public boolean lessThan( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == -1;
-
+        return compareTo( date ) < 0;
     }
 
     /**
@@ -555,11 +655,7 @@ public class NDate {
      * @return 현재 날짜가 비교할 날짜보다 작거나 같을 경우 true
      */
     public boolean lessThanOrEqual( NDate date ) {
-
-        int compareVal = compareTo( date );
-
-        return compareVal == -1 || compareVal == 0;
-
+        return compareTo( date ) <= 0;
     }
 
     /**
@@ -585,20 +681,19 @@ public class NDate {
         return new NDate( toDate() );
     }
 
-    /**
-     * 날짜가 같은지 여부를 확인한다.
-     *
-     * @param date 검사할 날짜객체
-     * @return 동일여부
-     */
-    public boolean equals( NDate date ) {
+    @Override
+    public boolean equals( Object object ) {
 
-        if ( this == date ) return true;
+        if( object == null ) return false;
+        if( this == object ) return true;
 
-        if ( date instanceof NDate ) {
-
-            if( date.toDate().equals(toDate()) ) return true;
-
+        if( object instanceof NDate ) {
+            NDate nDate = (NDate) object;
+            return currentTime.equals( nDate.currentTime );
+        } else if( object instanceof Date ) {
+            return toDate().equals( object );
+        } else if( object instanceof Calendar ) {
+            return currentTime.equals( object );
         }
 
         return false;

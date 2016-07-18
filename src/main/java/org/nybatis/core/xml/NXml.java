@@ -7,7 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
 
-import org.nybatis.core.exception.unchecked.IoException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.validation.Assertion;
@@ -56,7 +56,7 @@ public class NXml {
 	 *
 	 * @param file file that has xml contents
 	 */
-	public NXml( File file ) throws ParseException, IoException {
+	public NXml( File file ) throws ParseException, UncheckedIOException {
 		readFrom( file, true );
 	}
 
@@ -66,7 +66,7 @@ public class NXml {
 	 * @param file file that has xml contents
 	 * @param ignoreDtd ignore XML's DTD ruleset
 	 */
-	public NXml( File file, boolean ignoreDtd ) throws ParseException, IoException {
+	public NXml( File file, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 		readFrom( file, ignoreDtd );
 	}
 
@@ -75,7 +75,7 @@ public class NXml {
 	 *
 	 * @param path file path that has xml contents
 	 */
-	public NXml( Path path ) throws ParseException, IoException {
+	public NXml( Path path ) throws ParseException, UncheckedIOException {
 		readFrom( path, true );
 	}
 
@@ -85,7 +85,7 @@ public class NXml {
 	 * @param path file path that has xml contents
 	 * @param ignoreDtd ignore XML's DTD ruleset
 	 */
-	public NXml( Path path, boolean ignoreDtd ) throws ParseException, IoException {
+	public NXml( Path path, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 		readFrom( path, ignoreDtd );
 	}
 
@@ -94,7 +94,7 @@ public class NXml {
 	 *
 	 * @param xml XML string
 	 */
-	public NXml( String xml ) throws ParseException, IoException {
+	public NXml( String xml ) throws ParseException, UncheckedIOException {
 		readFrom( xml, true );
 	}
 
@@ -104,7 +104,7 @@ public class NXml {
 	 * @param xml XML string
 	 * @param ignoreDtd ignore XML's DTD ruleset
 	 */
-	public NXml( String xml, boolean ignoreDtd ) throws ParseException, IoException {
+	public NXml( String xml, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 		readFrom( xml, ignoreDtd );
 	}
 
@@ -577,9 +577,9 @@ public class NXml {
 	 * @param ignoreDtd ignore DTD
 	 * @return self instance
 	 * @throws ParseException
-	 * @throws IoException
+	 * @throws UncheckedIOException
 	 */
-    public NXml readFrom( Path path, boolean ignoreDtd ) throws ParseException, IoException {
+    public NXml readFrom( Path path, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
     	return readFrom( path.toFile(), ignoreDtd );
     }
 
@@ -603,16 +603,20 @@ public class NXml {
 	 * @param ignoreDtd ignore DTD
 	 * @return self instance
 	 * @throws ParseException
-	 * @throws IoException
+	 * @throws UncheckedIOException
 	 */
-	public NXml readFrom( File file, boolean ignoreDtd ) throws ParseException, IoException {
+	public NXml readFrom( File file, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 
 		try {
 	        readFrom( new FileInputStream( file ), ignoreDtd );
 	        return this;
         } catch( FileNotFoundException e ) {
-	        throw new IoException( e );
-        }
+	        throw new UncheckedIOException( e );
+        } catch( UncheckedIOException e ) {
+			throw e;
+		} catch( ParseException e ) {
+			throw new ParseException( String.format( "%s on file[%s].", e.getMessage(), file ), e );
+		}
 
 	}
 
@@ -623,9 +627,9 @@ public class NXml {
 	 * @param ignoreDtd		ignore DTD
 	 * @return self instance
 	 * @throws ParseException
-	 * @throws IoException
+	 * @throws UncheckedIOException
 	 */
-	public NXml readFrom( InputStream inputStream, boolean ignoreDtd ) throws ParseException, IoException {
+	public NXml readFrom( InputStream inputStream, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 		doc = new DocumentHandler().readXml( inputStream, ignoreDtd );
 		return this;
 	}
@@ -635,9 +639,9 @@ public class NXml {
 	 *
 	 * @param file 			file to write
 	 * @param prettyFormat	whether or not applying pretty format
-	 * @throws IoException
+	 * @throws UncheckedIOException
 	 */
-	public void writeTo( File file, boolean prettyFormat ) throws IoException {
+	public void writeTo( File file, boolean prettyFormat ) throws UncheckedIOException {
 		Assertion.isExists( file, "File[{}] is not exists", file );
 		FileUtil.writeTo( file, toString( prettyFormat ) );
 	}
@@ -647,9 +651,9 @@ public class NXml {
 	 *
 	 * @param filePath		file path to write
 	 * @param prettyFormat	whether or not applying pretty format
-	 * @throws IoException
+	 * @throws UncheckedIOException
 	 */
-	public void writeTo( String filePath, boolean prettyFormat ) throws IoException {
+	public void writeTo( String filePath, boolean prettyFormat ) throws UncheckedIOException {
 		writeTo( new File( filePath ), prettyFormat );
 	}
 

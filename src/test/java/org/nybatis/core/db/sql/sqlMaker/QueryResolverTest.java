@@ -7,6 +7,8 @@ import org.nybatis.core.model.NMap;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.*;
+
 public class QueryResolverTest {
     
     @Test
@@ -48,17 +50,17 @@ public class QueryResolverTest {
     public void bindParamTest() {
         
         String sql = 
-                "\n SELECT  name,"
-                        + "\n         age AS \"AGE${name}\", "
-                        + "\n         menu, -- comment ${name}"
-                        + "\n         /* menu, -- comment ${name}"
-                        + "\n         menu, -- comment ${name} "
-                        + "\n         menu, -- comment ${name} */"
-                        + "\n FROM    TABLE "
-                        + "\n WHERE   name  = ${name:babo}"
-                        + "\n AND     value LIKE '%#{age:out:int}%'"
-                        + "\n AND     rownum < #{rownum}"
-                        + "\n AND     list IN (#{list})";
+              "\n SELECT  name,"
+            + "\n         age AS \"AGE${name}\", "
+            + "\n         menu, -- comment ${name}"
+            + "\n         /* menu, -- comment ${name}"
+            + "\n         menu, -- comment ${name} "
+            + "\n         menu, -- comment ${name} */"
+            + "\n FROM    TABLE "
+            + "\n WHERE   name  = ${name:clob}"
+            + "\n AND     value LIKE '%#{age:out:int}%'"
+            + "\n AND     rownum < #{rownum}"
+            + "\n AND     list IN (#{list})";
         
         
         
@@ -68,30 +70,49 @@ public class QueryResolverTest {
         param.put( "age", "18" );
         param.put( "rownum", 5 );
         param.put( "list", Arrays.asList( "A", "B", "C", "D" ) );
-        
-        
+
         QueryResolver queryResolver = new QueryResolver( sql, param );
-        
-        Assert.assertEquals( "[{key:age, type:VARCHAR, value:18}, {key:age, type:VARCHAR, value:18}, {key:age, type:INT, value:18, out:true}, {key:rownum, type:INTEGER, value:5}, {key:list, type:ARRAY, value:[A, B, C, D]}]",
-                queryResolver.getBindParams().toString()
+
+        assertEquals(
+                "\n" +
+                "SELECT  name,\n" +
+                "        age AS \"AGE'18'\", \n" +
+                "        menu, -- comment ${name}\n" +
+                "        /* menu, -- comment ${name}\n" +
+                "        menu, -- comment ${name} \n" +
+                "        menu, -- comment ${name} */\n" +
+                "FROM    TABLE \n" +
+                "WHERE   name  = '18'\n" +
+                "AND     value LIKE '%#{age:INT}%'\n" +
+                "AND     rownum < 5\n" +
+                "AND     list IN ('A','B','C','D')"
+                , queryResolver.getDebugSql() );
+
+        assertEquals(
+                "\n" +
+                "SELECT  name,\n" +
+                "        age AS \"AGE?\", \n" +
+                "        menu, -- comment ${name}\n" +
+                "        /* menu, -- comment ${name}\n" +
+                "        menu, -- comment ${name} \n" +
+                "        menu, -- comment ${name} */\n" +
+                "FROM    TABLE \n" +
+                "WHERE   name  = ?\n" +
+                "AND     value LIKE '%?%'\n" +
+                "AND     rownum < ?\n" +
+                "AND     list IN (?,?,?,?)"
+                , queryResolver.getSql() );
+
+
+        assertEquals( queryResolver.getBindParams().toString(),
+                "[{key:age, type:VARCHAR, value:18}, {key:age, type:VARCHAR, value:18}, {key:age, type:INT, value:18, out:y}, {key:rownum, type:INTEGER, value:5}, {key:list, type:VARCHAR, value:A}, {key:list, type:VARCHAR, value:B}, {key:list, type:VARCHAR, value:C}, {key:list, type:VARCHAR, value:D}]"
         );
         
     }
 
-    @Test
-    public void loopSqlTemplateTest() {
+    public void forEach() {
 
-        String sql = "names LIKE '%' || #{names} || '%' -- #{index}";
 
-        QueryResolver queryResolver = new QueryResolver();
-
-        NLogger.debug( sql );
-
-        sql = QueryResolver.makeLoopSql( sql, "names", "names_0_NybatisLoopNode" );
-        NLogger.debug( sql );
-
-        sql = QueryResolver.makeLoopSql( sql, "index", "index_0_NybatisLoopNode" );
-        NLogger.debug( sql );
 
     }
 

@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<list>
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
 <!-- Retrieve Test -->
 
 <sql id="select" fetch="50" cache="true" flush="60" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
-  WHERE   rownum <= 10
+  WHERE   rownum &lt;= 10
 </sql>
 
 <sql id="dynamic" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   tenant_id = #{tenantId}
-  AND     rownum    <= #{rowNum}
+  AND     rownum    &lt;= #{rowNum}
   ORDER BY ${orderKey}
 </sql>
 
@@ -21,8 +21,8 @@
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   tenant_id = #{tenantId}
-  AND     rownum    <= #{rowNum}
-  ORDER BY ${orderKey} !
+  AND     rownum    &lt;= #{rowNum}
+  ORDER BY ${orderKey}
 </sql>
 
 <sql id="paged">
@@ -126,4 +126,4 @@ END;
 { #{result:out} = call TEST_FUNCTION_02() }
 </sql>
 
-</list>
+</mapper>

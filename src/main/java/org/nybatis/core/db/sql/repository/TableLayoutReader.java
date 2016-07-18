@@ -37,11 +37,11 @@ public class TableLayoutReader {
 
                 Set<String> pkList = new LinkedHashSet<>();
 
-                for( NMap pk : toList( metaData.getPrimaryKeys(null, table.scheme, table.name) ) ) {
+                for( NMap pk : toList( metaData.getPrimaryKeys(null, table.scheme, table.name), false ) ) {
                     pkList.add( StringUtil.toCamel(pk.getString("columnName")) );
                 }
 
-                for( NMap column : toList( metaData.getColumns( null, table.scheme, table.name, null ) ) ) {
+                for( NMap column : toList( metaData.getColumns(null, table.scheme, table.name, null), false ) ) {
 
                     Column c = new Column();
 
@@ -49,6 +49,7 @@ public class TableLayoutReader {
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
                     c.setNullable( column.getInt( "nullable" ) > 0 );
                     c.setPk( pkList.contains( c.getKey() ) );
+                    c.setSize( column.getInt("columnSize") );
 
                     layout.addColumn( c );
 

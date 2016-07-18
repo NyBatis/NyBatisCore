@@ -5,8 +5,15 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import com.fasterxml.jackson.core.JsonParseException;
+import org.nybatis.core.exception.unchecked.JsonIOException;
+import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.util.Types;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Common Logger Printer
@@ -17,7 +24,7 @@ import org.slf4j.LoggerFactory;
  */
 public class NLoggerPrinter {
 
-	Logger logger;
+	private Logger logger;
 
 	public NLoggerPrinter( Caller caller ) {
 		this( caller.getClassName() );
@@ -116,7 +123,25 @@ public class NLoggerPrinter {
 		if( ! logger.isEnabledFor( level ) ) return;
 
 		if( format == null ) {
-			printLog( level, logger, null );
+			printLog( level, logger, "null" );
+
+		} else if( param.length == 0 ) {
+
+			if( format instanceof List ) {
+
+				try {
+					printLog( level, logger, new NList( (List) format ).toString() );
+				} catch( JsonIOException e ) {
+					printLog( level, logger, format.toString() );
+				}
+
+			} else if( Types.isArray(format) ) {
+				printLog( level, logger, Arrays.deepToString( (Object[]) format ) );
+			} else if( format instanceof Throwable ) {
+				printLog( level, logger, getThrowableString( (Throwable) format ) );
+			} else {
+				printLog( level, logger, format.toString() );
+			}
 
 		} else {
 

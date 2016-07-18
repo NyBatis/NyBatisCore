@@ -1,11 +1,15 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.db.session.executor.batch.BatchPreparedStatementExecutor;
 import org.nybatis.core.db.session.executor.batch.BatchStatementExecutor;
 import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
@@ -13,14 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Administrator
+ * Batch Executor Implements
+ *
+ * @author nayasis@gmail.com
  * @since 2015-09-13
  */
 public class BatchExecutorImpl implements BatchExecutor {
 
-    SqlSessionImpl sqlSession;
-    SqlNode        sqlNode;
-    List<Object>   parameters;
+    private SqlSessionImpl sqlSession;
+    private SqlNode        sqlNode;
+    private List<Object>   parameters;
+    private Integer        transactionSize = null;
 
     public BatchExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
@@ -63,25 +70,41 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     @Override
-    public int execute( Integer transactionSize ) {
-        return executeBatch( transactionSize );
-    }
-
-    @Override
     public int execute() {
-        return executeBatch( null );
-    }
 
-    private int executeBatch( Integer bufferSize ) {
         try {
             if( sqlNode == null ) {
-                return new BatchStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( parameters, bufferSize );
+                return new BatchStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( parameters, transactionSize );
             } else {
-                return new BatchPreparedStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( sqlNode, parameters, bufferSize );
+                return new BatchPreparedStatementExecutor( sqlSession.getToken(), sqlSession.getProperties() ).executeSql( sqlNode, parameters, transactionSize );
             }
         } finally {
             sqlSession.initProperties();
-            parameters.clear();
+            parameters = new ArrayList<>();
+        }
+
+    }
+
+    @Override
+    public BatchExecutor setTransactionSize( Integer size ) {
+        transactionSize = size;
+        return this;
+    }
+
+    @Override
+    public String getDatabaseName() {
+        DatabaseAttribute attributes = DatasourceManager.getAttributes( getEnvironmentId() );
+        return ( attributes == null ) ? "" : StringUtil.nvl( attributes.getDatabase() );
+    }
+
+    private String getEnvironmentId() {
+
+        SqlProperties properties = sqlSession.getProperties();
+
+        if( sqlNode == null ) {
+            return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
+        } else {
+            return Validator.nvl( properties.getEnvironmentId(), GlobalSqlParameter.getEnvironmentId(), sqlNode.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
         }
 
     }

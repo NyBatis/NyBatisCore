@@ -9,7 +9,7 @@ import ch.qos.logback.classic.Level;
  * Common Static Logger
  *
  * <pre>
- * it is simple wrapper for logback and share configuration with it.
+ * it is simple logback wrapper and share configuration with other logback logger instances.
  * </pre>
  *
  * @author nayasis@gmail.com
@@ -18,14 +18,24 @@ import ch.qos.logback.classic.Level;
  */
 public class NLogger {
 
-	static {
-		loadConfiguration();
-	}
-	
+	private static boolean isConfigurationIinitialized = false;
+
 	private NLogger() {}
 	
 	private static NLoggerPrinter getLogger() {
+		loadDefaultConfiguration();
 		return new NLoggerPrinter( new Caller(4) );
+	}
+
+	private static void loadDefaultConfiguration() {
+		if( ! isConfigurationIinitialized ) {
+			loadConfiguration();
+			isConfigurationIinitialized = true;
+		}
+	}
+
+	public static void loadConfiguration() {
+		loadConfiguration( Const.path.getConfigLogger() + "/logback.xml" );
 	}
 
 	/**
@@ -34,6 +44,7 @@ public class NLogger {
 	 * @return logger
 	 */
 	public static NLoggerPrinter getLogger( String loggerName ) {
+		loadDefaultConfiguration();
 		return new NLoggerPrinter( loggerName );
 	}
 
@@ -44,18 +55,6 @@ public class NLogger {
 	 */
 	public static NLoggerPrinter getLogger( Class klass ) {
 		return new NLoggerPrinter( klass );
-	}
-
-	/**
-	 * Load default logback configuration
-	 *
-	 * <pre>
-	 * default path of configuration file suppose to "./config/log/logback.xml"
-	 * </pre>
-	 *
-	 */
-	public static void loadConfiguration() {
-		new NLoggerConfigLoader().loadConfiguration( Const.path.getConfigLogger() + "/logback.xml" );
 	}
 
 	/**

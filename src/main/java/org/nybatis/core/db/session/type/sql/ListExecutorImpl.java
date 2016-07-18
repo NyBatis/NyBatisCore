@@ -48,7 +48,7 @@ public class ListExecutorImpl implements ListExecutor {
 
     @Override
     public int count() {
-        sqlBean.getProperties().isCountSql( true );
+        sqlSession.getProperties().isCountSql( true );
         return getExecutor().select( Integer.class );
     }
 
@@ -94,7 +94,7 @@ public class ListExecutorImpl implements ListExecutor {
     }
 
     @Override
-    public ListExecutor setPage( int start, int end ) {
+    public ListExecutor setPage( Integer start, Integer end ) {
         sqlSession.getProperties().setPageSql( start, end );
         return this;
     }

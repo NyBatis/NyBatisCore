@@ -2,15 +2,22 @@ package org.nybatis.core.db.sql.sqlNode;
 
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.session.executor.GlobalSqlParameter;
+import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.RootSqlElement;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 import org.nybatis.core.xml.node.Node;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SqlNode {
 
@@ -18,6 +25,7 @@ public class SqlNode {
 	private RootSqlElement       structuredSql;
 	private SqlProperties        properties;
 	private Map<String, SqlNode> keySqls = null;
+	private Set<String>          environmentIds = new LinkedHashSet<>();
 
 	private static final Map<String, SqlNode> NULL_KEY_SQLS = new HashMap<>();
 
@@ -28,19 +36,21 @@ public class SqlNode {
 		this.properties    = new SqlProperties( environment, inputXmlSql );
 		this.keySqls       = Validator.nvl( keySqls, NULL_KEY_SQLS );
 
+		addEnvironmentId( environment );
+
 	}
 
 	/**
-	 * @return the text
+	 * @return sql string
 	 */
-	public String getText( Map<?,?> param ) {
+	public String getText( QueryParameter param ) {
 		return getText( param, false, false );
 	}
 
 	/**
-	 * @return the text
+	 * @return sql string
 	 */
-    public String getText( Map<?,?> param, boolean isPage, boolean isCount ) {
+    public String getText( QueryParameter param, boolean isPage, boolean isCount ) {
 
     	try {
 
@@ -78,11 +88,31 @@ public class SqlNode {
 		this.sqlId = sqlId;
 	}
 
+	public void addEnvironmentId( String id ) {
+		if( StringUtil.isNotEmpty(id) ) {
+			environmentIds.add( id );
+		}
+	}
+
 	/**
-	 * @return the dbResource
+	 * Get environment id.
+	 *
+	 * if global default environment id is setted by {@link GlobalSqlParameter#setDefaultEnvironmentId( id )}
+	 * and it is one of multiple environments,
+	 * global default environment is returned.
+	 *
+	 * @return environment id
 	 */
     public String getEnvironmentId() {
-	    return properties.getEnvironmentId();
+
+		String globalDefaultEnvironmentId = GlobalSqlParameter.getDefaultEnvironmentId();
+
+		if( environmentIds.isEmpty() ) return Validator.nvl( globalDefaultEnvironmentId, DatasourceManager.getDefaultEnvironmentId() );
+
+		if( environmentIds.contains( globalDefaultEnvironmentId ) ) return globalDefaultEnvironmentId;
+
+		return properties.getEnvironmentId();
+
     }
 
     public SqlProperties getProperties() {
@@ -101,8 +131,16 @@ public class SqlNode {
 		);
     }
 
+	public String getSqlSkeleton() {
+		return structuredSql.toString();
+	}
+
 	public void setMainId( String mainId ) {
 		structuredSql.setMainId( mainId );
+	}
+
+	public boolean containsEnvironmentId( String environmentId ) {
+		return environmentIds.contains( environmentId );
 	}
 
 }

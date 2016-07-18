@@ -1,12 +1,27 @@
 package org.nybatis.core.model;
 
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.exception.unchecked.BizException;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
-import org.testng.Assert;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.*;
 
 public class NMapTest {
 
@@ -61,13 +76,13 @@ public class NMapTest {
 		r2.put( 1, 1 );
 		r2.put( 2, new Integer(2) );
 
-		Assert.assertEquals( false, r1.equals( r2 ) );
+		assertEquals( false, r1.equals( r2 ) );
 
 		r2.put( 3, 3 );
-		Assert.assertEquals( false, r1.equals( r2 ) );
+		assertEquals( false, r1.equals( r2 ) );
 
 		r2.put( 3, "3" );
-		Assert.assertEquals( true, r1.equals( r2 ) );
+		assertEquals( true, r1.equals( r2 ) );
 
 	}
 
@@ -102,19 +117,19 @@ public class NMapTest {
 //		System.out.println( nrow01.hashCode() );
 		System.out.println( nrow01 );
 		System.out.println( nrow01.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow01)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow01)) );
 		System.out.println( nrow01.getValueHash() );
 		System.out.println( "-----------------------------------------");
 //		System.out.println( nrow02.hashCode() );
 		System.out.println( nrow02 );
 		System.out.println( nrow02.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow02)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow02)) );
 		System.out.println( nrow02.getValueHash() );
 		System.out.println( "-----------------------------------------");
 //		System.out.println( nrow02.hashCode() );
 		System.out.println( nrow03 );
 		System.out.println( nrow03.toJson().hashCode() );
-		System.out.println( new Reflector().toJson( new TreeMap(nrow03)) );
+		System.out.println( Reflector.toJson( new TreeMap(nrow03)) );
 		System.out.println( nrow03.getValueHash() );
 
 		Object t = "1";
@@ -142,6 +157,102 @@ public class NMapTest {
 		NMap a = new NMap( json );
 
 		NLogger.debug( a.toDebugString(false, false) );
+
+	}
+
+	@Test
+	public void convertSetToList() {
+
+		Map<String, Object> testMap = new HashMap<>();
+
+		Set<String> testSet = new HashSet<>();
+
+		testSet.add( "A" );
+		testSet.add( "B" );
+		testSet.add( "C" );
+
+		byte[] testArray01 = new byte[] { 0, 1, 2, 3, 4, 5 };
+		Byte[] testArray02 = new Byte[] { 0, 1, 2, 3, 4, 5 };
+
+		testMap.put( "set",    testSet     );
+		testMap.put( "byte01", testArray01 );
+		testMap.put( "byte02", testArray02 );
+
+		NMap map = new NMap( testMap );
+
+		assertEquals( map.get( "set" ) instanceof Set, true );
+		assertEquals( map.get( "set" ) instanceof List, false );
+		assertEquals( map.get( "byte01" ) instanceof byte[], true );
+		assertEquals( map.get( "byte02" ) instanceof Byte[], true );
+
+		map.fromBean( testMap );
+
+		assertEquals( map.get( "set" ) instanceof Set, false );
+		assertEquals( map.get( "set" ) instanceof List, true );
+		assertEquals( map.get( "byte01" ) instanceof byte[], true );
+		assertEquals( map.get( "byte02" ) instanceof byte[], true );
+
+	}
+
+	@Test
+	public void extractByJsonPath() throws JsonPathNotFoundException {
+
+		String json = "{\n" +
+				"\t\"id\": {\n" +
+				"\t\t\"name\": \"merong\",\n" +
+				"\t\t\"age\": 21,\n" +
+				"\t\t\"job\": [\"student\", \"parent\"]\n" +
+				"\t}\n" +
+				"}";
+
+		NMap map = new NMap( json );
+
+		assertEquals( map.getByJsonPath("id").toString(), "{name=merong, age=21, job=[student, parent]}" );
+
+		try {
+			NLogger.debug( map.getByJsonPath( "null" ) );
+			throw new BizException( "Expected : {}", "No results for path: $['null']" );
+		} catch( JsonPathNotFoundException e ) {}
+
+		try {
+			NLogger.debug( map.getByJsonPath( null ) );
+			throw new BizException( "Expected : {}", "path can not be null or empty" );
+		} catch( JsonPathNotFoundException e ) {}
+
+		assertEquals( map.getByJsonPath("id.name").toString(),   "merong" );
+		assertEquals( map.getByJsonPath("id.job[1]").toString(), "parent" );
+
+		try {
+			NLogger.debug( map.getByJsonPath( "id.job[3]" ) );
+			throw new BizException( "Expected : {}", "No results for path: $['null']" );
+		} catch( JsonPathNotFoundException e ) {}
+
+		NLogger.debug( map.getByJsonPath( "id[0]" ) );
+
+	}
+
+	@Test
+	public void dateConvertion() {
+
+		NMap param = new NMap();
+
+		NDate ndate = new NDate();
+		Date  date  = new Date();
+
+		param.put( "ndate", ndate );
+		param.put( "date",  date  );
+
+		NMap convertedMap = new NMap().fromBean( param );
+		NLogger.debug( convertedMap );
+
+		DateBean dateBean = convertedMap.toBean( DateBean.class );
+
+		NLogger.debug( dateBean );
+
+		assertTrue( ndate.equals( dateBean.ndate ) );
+		assertTrue( date.equals( dateBean.date ) );
+
+		System.out.println( ">>> " + Integer.MAX_VALUE );
 
 	}
 

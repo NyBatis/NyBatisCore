@@ -1,10 +1,9 @@
 package org.nybatis.core.conf;
 
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.nybatis.core.validation.Validator;
 
 
 /**
@@ -15,32 +14,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Const {
 
-    /**
-     * Constants for developing WEB
-     */
-    public static final class web {
-
-		private static String rootFilePath = "";
-
-		private static String javascriptMessageObjectName  = "nayasis.common.msg.pool";
-
-		public static void setRootFilePath( String rootFilePath ) {
-			web.rootFilePath = rootFilePath;
-		}
-
-		public static String getRootFilePath() {
-			return web.rootFilePath;
-		}
-
-		public static String getJavascriptMessageObjectName() {
-			return javascriptMessageObjectName;
-		}
-
-		public static void setJavascriptMessageObjectName( String javascriptMessageObjectName ) {
-			web.javascriptMessageObjectName = javascriptMessageObjectName;
-		}
-	}
-
 	/**
 	 * Profile Controller to specify envorionment for example loacl, stage, product
 	 *
@@ -50,7 +23,7 @@ public class Const {
 		private static String name = null;
 
 		static {
-			name = System.getProperty( "nayasis.common.profile" );
+			name = StringUtil.nvl( System.getProperty("nayasis.common.profile") );
 		}
 
 		/**
@@ -80,8 +53,8 @@ public class Const {
 		 *
 		 *     Const.profile.set( "local" )
 		 *
-		 *     Const.profile.getFileName( "/app/webapp/config.prop" )
-		 *     --> "/app/webapp/config<font color=red>-local</font>.prop"
+		 *     Const.profile.apply( "/app/webapp/config.prop" )
+		 *     --> "/app/webapp/config<font color=red>.local</font>.prop"
 		 *
 		 * </pre>
 		 *
@@ -89,9 +62,13 @@ public class Const {
 		 * @param file filename
 		 * @return filename applied profile setting
 		 */
-		public static String getFileName( String file ) {
+		public static String apply( String file ) {
 			if( StringUtil.isEmpty(name) || StringUtil.isBlank(file) ) return file;
-			return String.format( "%s-%s.%s", FileUtil.removeExtention(file), profile.name, FileUtil.getExtention(file) );
+			return String.format( "%s%s.%s",
+					FileUtil.removeExtention(file),
+					Validator.isEmpty(profile.name) ? "" : "-" + profile.name,
+					FileUtil.getExtention(file)
+			);
 		}
 
 	}
@@ -104,8 +81,9 @@ public class Const {
 	 */
 	public abstract static class path {
 
-		private static final String root = new ConstHelper().getRoot();
-		private static       String base = root;
+		private static final String  root     = new ConstHelper().getRoot();
+		private static       String  base     = root;
+		private static       boolean runInWar = new ConstHelper().isRunInWar();
 
 		/**
 		 * Get NayasisCore's base path. <br><br>
@@ -127,8 +105,7 @@ public class Const {
 		public static void setBase( String path ) {
 
 			if( ! FileUtil.isDirectory(path) ) {
-				NLogger.info( "base path({}) to change does not exists. current base path({}) is not changed.", path, base );
-				return;
+				NLogger.warn( "base path({}) does not exists in file system.", path );
 			}
 
 			base = path;
@@ -160,8 +137,12 @@ public class Const {
 		 * @return Configuration directory
 		 */
 		public static String getConfig() {
-	        return getBase() + "/config";
+	        return getBase() + getWarRoot() + "/config";
         }
+
+		private static String getWarRoot() {
+			return runInWar ? "/WEB-INF/classes" : "";
+		}
 
 		/**
 		 * Get Database configuration directory
@@ -196,9 +177,20 @@ public class Const {
 		 * @return local DB directory
 		 */
 		public static String getLocalDatabase() {
-	        return getBase() + "/localDb";
+	        return getBase() + getWarRoot() + "/localDb";
         }
 
+		/**
+		 * Convert file path to resource path. <br>
+		 *
+		 * (remove base path from file path.)
+		 *
+		 * @param filePath
+		 * @return resource path
+		 */
+		public static String toResourceName( String filePath ) {
+			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
+		}
 	}
 
 	/**
@@ -238,17 +230,20 @@ public class Const {
 		public static final String ORM_PARAMETER_USER            = ORM_SQL_PREFIX + "-User-";
 		public static final String ORM_PARAMETER_WHERE           = ORM_SQL_PREFIX + "-DynamicSqlWhere";
 		public static final String ORM_PARAMETER_ORDER_BY        = ORM_SQL_PREFIX + "-DynamicSqlOrderBy";
-		public static final String ORM_SQL_SELECT_SINGLE         = ".select.single";
-		public static final String ORM_SQL_SELECT_MULTI          = ".select.multi";
-		public static final String ORM_SQL_UPDATE                = ".update";
-		public static final String ORM_SQL_INSERT                = ".insert";
-		public static final String ORM_SQL_DELETE = ".delete";
+		public static final String ORM_SQL_SELECT_PK             = ".select.record";
+		public static final String ORM_SQL_SELECT                = ".select";
+		public static final String ORM_SQL_UPDATE_PK             = ".update.record";
+		public static final String ORM_SQL_INSERT_PK             = ".insert.record";
+		public static final String ORM_SQL_DELETE                = ".delete";
+		public static final String ORM_SQL_DELETE_PK             = ".delete.record";
 
-		public static final int    DEFAULT_CACHE_FLUSH_CYCLE     = Integer.MAX_VALUE;
+
+		public static final int DEFAULT_CACHE_FLUSH_CYCLE_SECONDS = Integer.MAX_VALUE;
 		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;
 
 		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "-DEFAULT_TABLE_NAME";
 		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "-DEFAULT_ENVIRONMENT_ID";
+		public static final String PARAMETER_INNER_FOR_EACH      = "NyBatisInnerParamForEach";
 		public static final String PARAMETER_SINGLE              = "NybatisSingleParameter";
 		public static final String PARAMETER_DATABASE            = "nybatis.database";
 
@@ -258,6 +253,8 @@ public class Const {
 
 		public static final String LOG_SQL                       = "nybatis.sql";
 		public static final String LOG_BATCH                     = "nybatis.batch";
+
+
 
 	}
 

@@ -25,10 +25,10 @@ import java.util.Map;
 public class SqlSessionSqliteTest {
 
 	public static final String TABLE_NAME     = "NYBATIS_TEST";
-	public static final String ENVIRONMENT_ID = "sqlite";
+	public static final String ENVIRONMENT_ID = "sqlite03";
 
 	private SqlSession getSession() {
-		return SessionManager.openSeperateSession( ENVIRONMENT_ID );
+		return SessionManager.openSession( ENVIRONMENT_ID );
 	}
 
 	@BeforeClass
@@ -111,7 +111,7 @@ public class SqlSessionSqliteTest {
 
 		}
 
-		sqlSession.batchSql( sqlList ).execute( 10 );
+		sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
 
 		case10_select();
 
@@ -137,10 +137,11 @@ public class SqlSessionSqliteTest {
 
 			parameters.add( param );
 
-
 		}
 
-		sqlSession.batchSql( "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", parameters ).execute( 10 );
+		String sql = "INSERT INTO ${tableName} ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )";
+
+		sqlSession.batchSql( sql, parameters ).setTransactionSize( 10 ).execute();
 
 		case10_select();
 
@@ -262,6 +263,8 @@ public class SqlSessionSqliteTest {
 
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 
+		NLogger.debug( ">>> [{}]", sqlSession.sql( SQL_SELECT, param ).select( Map.class ) );
+
 		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
 
 	}
@@ -289,6 +292,47 @@ public class SqlSessionSqliteTest {
 			NLogger.debug( "index : {}, count : {}", i, list.size() );
 
 		}
+
+	}
+
+	@Test( sequential = true, expectedExceptions = SqlException.class )
+	public void case11_batchErrorLog() {
+
+		case10_initTable();
+
+		SqlSession sqlSession = getSession();
+
+		List<String> sqlList = new ArrayList<>();
+
+		for( int i = 0; i < 100; i++ ) {
+
+			String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
+					TABLE_NAME,
+					"RNK" + StringUtil.lpad( i, '0', 5 ),
+					i,
+					"PROD-" + i
+			);
+
+			sqlList.add( sql );
+
+		}
+
+		String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
+				TABLE_NAME,
+				"RNK" + StringUtil.lpad( 10, '0', 5 ),
+				10,
+				"PROD-" + 10
+		);
+
+		sqlList.add( 13, sql );
+
+		try {
+			sqlSession.batchSql( sqlList ).setTransactionSize( 10 ).execute();
+		} catch( Exception e ) {
+			NLogger.debug( e );
+			throw e;
+		}
+
 
 	}
 

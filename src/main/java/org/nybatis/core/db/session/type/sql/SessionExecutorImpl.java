@@ -6,18 +6,20 @@ import org.nybatis.core.db.session.executor.SqlExecutor;
 import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
-import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
 
 /**
- * @author Administrator
+ * Session executor implements
+ *
+ * @author nayasis@gmail.com
  * @since 2015-09-12
  */
 public class SessionExecutorImpl implements SessionExecutor {
 
-    SqlSessionImpl sqlSession;
-    SqlBean        sqlBean;
+    private SqlSessionImpl sqlSession;
+    private SqlBean        sqlBean;
 
     public SessionExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
@@ -31,7 +33,7 @@ public class SessionExecutorImpl implements SessionExecutor {
 
         SqlNode sqlNode = SqlRepository.get( id );
 
-        Assertion.isNotNull( sqlNode, "There is no sql id({}) in repository.", id );
+        Assertion.isNotNull( sqlNode, new SqlConfigurationException( "There is no sql id({}) in repository.", id ) );
 
         sqlBean = new SqlBean( sqlNode, parameter );
 
@@ -101,9 +103,20 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     @Override
-    public SessionExecutor setAutoCommit( boolean enable ) {
-        sqlSession.getProperties().isAutocommit( enable );
+    public SessionExecutor addParameter( Object parameter ) {
+        sqlBean.addParameter( parameter );
         return this;
+    }
+
+    @Override
+    public SessionExecutor addParameter( String key, Object value ) {
+        sqlBean.addParameter( key, value );
+        return this;
+    }
+
+    @Override
+    public NMap getParameters() {
+        return sqlBean.getInputParams();
     }
 
     @Override
@@ -127,6 +140,11 @@ public class SessionExecutorImpl implements SessionExecutor {
     public SessionExecutor clearCache() {
         sqlSession.getProperties().isCacheClear( true );
         return this;
+    }
+
+    @Override
+    public String getDatabaseName() {
+        return sqlBean.getDatasourceAttribute().getDatabase();
     }
 
 }

@@ -13,8 +13,12 @@ import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
+/**
+ * Transaction
+ */
 public class Transaction {
 
 	/**
@@ -48,6 +52,7 @@ public class Transaction {
                 conn.commit();
             } catch( SQLException e ) {}
 		}
+		NLogger.trace( ">> commit : {}", token );
 		end( token );
 	}
 
@@ -89,6 +94,8 @@ public class Transaction {
 
 	public synchronized Connection getConnection( String token, String environmentId ) {
 
+		Assertion.isTrue( DatasourceManager.isExist( environmentId ), new SqlConfigurationException("There is no environment (id:{}}", environmentId) );
+
 		Connection connection = getStoredConnection( token, environmentId );
 
 		if( connection == null ) {
@@ -96,13 +103,13 @@ public class Transaction {
 			DataSource dataSource = DatasourceManager.get( environmentId );
 
 			if( dataSource == null ) {
-				throw new SqlConfigurationException( "There is not datasource in environment (id:{}).", environmentId );
+				throw new SqlConfigurationException( "There is no datasource in environment (id:{}).", environmentId );
 			}
 
 			try {
 
 				connection = dataSource.getConnection();
-				storeConnection( token, environmentId, connection );
+				grepConnection( token, environmentId, connection );
 
             } catch( Exception e ) {
 				throw new DatabaseConfigurationException( e, "Fail to get connection (environmentId : {})", environmentId );
@@ -122,9 +129,9 @@ public class Transaction {
 		transactionPool.putIfAbsent( token, new HashMap<>() );
 	}
 	
-	private void storeConnection( String token, String environmentId, Connection connection ) {
+	private void grepConnection( String token, String environmentId, Connection connection ) {
 
-		if( ! isBegun( token ) ) return;
+		if( ! isBegun(token) || isAutocommit(connection) ) return;
 
 		Map<String, Connection> connections = transactionPool.get( token );
 
@@ -134,18 +141,30 @@ public class Transaction {
 
 	}
 
-    public void releaseConnection( String token, Connection connection ) {
+	private boolean isAutocommit( Connection connection ) {
+		try {
+			return connection.getAutoCommit() == true;
+		} catch( SQLException e ) {
+			NLogger.error( e );
+			return false;
+		}
+	}
+
+	public void releaseConnection( String token, Connection connection ) {
 
         if( connection == null ) return;
 
         try {
             if( ! isBegun(token) ) {
-                getStoredConnections( token ).remove( connection );
                 connection.close();
             } else {
-                // It it not real releaseSavepoint !
-                // merely clear resources like Statement, PreparedStatement, CallableStatement and ResultSet occupied by connection
-                connection.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
+				if( isAutocommit( connection ) ) {
+					connection.close();
+				} else {
+					// It it not real releaseSavepoint !
+					// merely clear resources used by connection like Statement, PreparedStatement, CallableStatement and ResultSet.
+					connection.releaseSavepoint( ProxyConnection.RELEASE_RESOURCE );
+				}
             }
         } catch( SQLException e ) {
             NLogger.error( e );

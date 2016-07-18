@@ -144,7 +144,7 @@ public class Link {
 
 		try {
 
-			filePath = FileUtil.convertToRelativePath( Const.path.getBase(), filePath );
+			filePath = FileUtil.toRelativePath( Const.path.getBase(), filePath );
 
 		} catch( IllegalArgumentException | FileNotFoundException e ) {
 			NLogger.error( e );
@@ -155,7 +155,7 @@ public class Link {
 	}
 
 	public Link clone() {
-		return new Reflector().clone( this );
+		return Reflector.clone( this );
 	}
 
 	public Integer getId() {
@@ -243,7 +243,7 @@ public class Link {
 	}
 
 	public String toString() {
-		return new Reflector().getFieldReport( this );
+		return Reflector.toString( this );
 	}
 
 }

@@ -9,6 +9,7 @@ import java.util.Date;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NDate;
+import org.nybatis.core.reflection.Reflector;
 
 /**
  * Parameter Value to bind in SQL
@@ -70,12 +71,11 @@ public class BindParam {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append( "{" );
+		sb.append( "{" ).append( "key:" ).append( key );
 
-		if( key  != null  ) sb.append( "key:" ).append( key ).append( ", " );
-		if( type != null  ) sb.append( "type:" ).append( type ).append( ", " );
-		if( value != null ) sb.append( "value:" ).append( value ).append( ", " );
-		if( out == true   ) sb.append( "out:y" );
+		if( type  != null ) sb.append( ", " ).append( "type:" ).append( type );
+		if( value != null ) sb.append( ", " ).append( "value:" ).append( value );
+		if( out == true   ) sb.append( ", " ).append( "out:y" );
 
 		sb.append( "}" );
 
@@ -94,13 +94,17 @@ public class BindParam {
         	return;
         }
 
-        Class<?> klass = value.getClass();
+		if( Reflector.isJsonDate(value) ) {
+			this.value = value = new NDate( value.toString(), NDate.ISO_8601_24H_FULL_FORMAT ).toDate();
+		}
+
+		Class<?> klass = value.getClass();
 
         if( type == null ) {
 
         	type = SqlType.find( klass );
 
-        	if( type != SqlType.BLOB &&  type != SqlType.BLOB_BOXED ) {
+        	if( type != SqlType.BLOB && type != SqlType.BLOB_BOXED ) {
 				if( klass.isArray() ) {
         			this.value = Arrays.asList( value );
 				}
@@ -131,7 +135,7 @@ public class BindParam {
             		} else if( type == SqlType.DOUBLE ) {
             			this.value = Double.parseDouble( (String) value );
             		} else if( type == SqlType.DATE || type == SqlType.TIME || type == SqlType.TIMESTAMP  ) {
-            			this.value = new NDate( (String) value, "YYYY-MM-DD HH:MI:SS" ).toDate();
+            			this.value = new NDate( (String) value ).toDate();
             		} else if( type == SqlType.REAL || type == SqlType.DECIMAL || type == SqlType.NUMERIC  ) {
             			this.value = new BigDecimal( (String) value );
             		} else if( type == SqlType.LIST ) {

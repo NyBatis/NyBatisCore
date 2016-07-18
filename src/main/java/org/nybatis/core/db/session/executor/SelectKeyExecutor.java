@@ -31,13 +31,7 @@ public class SelectKeyExecutor {
     }
 
     private void mergeSelectKeysToInputParams( SqlBean sqlBean, NMap selectKeys ) {
-
-        Object inputParams = sqlBean.getInputParams();
-
-        if( inputParams != null && ! DbUtils.isPrimitive( inputParams.getClass() ) && selectKeys.size() != 0 ) {
-            new Reflector().merge( selectKeys, inputParams );
-        }
-
+        Reflector.merge( selectKeys, sqlBean.getInputParams() );
     }
 
     private NMap selectKeys( Map<String, SqlNode> keySqls, NMap sqlParam, SqlProperties properties ) {

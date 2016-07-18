@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.log.NLogger;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -96,14 +97,14 @@ public class StringUtilTest {
 	}
 
 	@Test
-	public void split() {
+	public void tokenize() {
 
-		assertEquals( "[I , m ,  boy || you , re ,  girl]", StringUtil.split( "I am a boy || you are a girl", "a" ).toString() );
-		assertEquals( "[I am a boy ,  you are a girl]", StringUtil.split( "I am a boy || you are a girl", "||" ).toString() );
-		assertEquals( "[I am a boy || you are a girl]", StringUtil.split( "I am a boy || you are a girl", "" ).toString() );
-		assertEquals( "[I am a boy || you are a girl]", StringUtil.split( "I am a boy || you are a girl", "ZZ" ).toString() );
+		assertEquals( "[I , m ,  boy || you , re ,  girl]", StringUtil.tokenize( "I am a boy || you are a girl", "a" ).toString() );
+		assertEquals( "[I am a boy ,  you are a girl]", StringUtil.tokenize( "I am a boy || you are a girl", "||" ).toString() );
+		assertEquals( "[I am a boy || you are a girl]", StringUtil.tokenize( "I am a boy || you are a girl", "" ).toString() );
+		assertEquals( "[I am a boy || you are a girl]", StringUtil.tokenize( "I am a boy || you are a girl", "ZZ" ).toString() );
 
-		NLogger.debug( StringUtil.split( "I am a boy || you are a girl", " " ).toString() );
+		NLogger.debug( StringUtil.tokenize( "I am a boy || you are a girl", " " ).toString() );
 
 	}
 
@@ -164,6 +165,22 @@ public class StringUtilTest {
 		assertEquals( StringUtil.isTrue( "n" ), false );
 		assertEquals( StringUtil.isTrue( "No" ), false );
 		assertEquals( StringUtil.isTrue( "another" ), false );
+
+	}
+
+	@Test
+	public void regTest() {
+
+		System.out.println( "#{name.value[1]}".replaceAll( "#\\{.+?(\\..+?)?\\}", String.format("#{%s$1}", Const.db.PARAMETER_SINGLE) ) );
+
+	}
+
+	@Test
+	public void split() {
+
+		String val = "DP01+DP02+^DP03|DP40";
+
+		assertEquals( StringUtil.split( val, "(\\+(\\^)?|\\|)", true ).toString(), "[DP01, +, DP02, +^, DP03, |, DP40]"  );
 
 	}
 

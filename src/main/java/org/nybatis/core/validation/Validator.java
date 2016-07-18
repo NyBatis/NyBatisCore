@@ -1,5 +1,10 @@
 package org.nybatis.core.validation;
 
+import org.nybatis.core.exception.unchecked.ParseException;
+import org.nybatis.core.model.NDate;
+import org.nybatis.core.util.Types;
+
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
@@ -7,147 +12,247 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.model.NDate;
-
 /**
- * 값의 정합성을 확인하는 클래스
+ * Validator to check value's validation
  *
- * @author nayasis
+ * @author nayasis@gmail.com
  */
 public class Validator {
 
     /**
-     * 날짜가 정상인지를 확인한다
+     * check whether value is valid date format.
      *
-     * @param value 날짜 (YYYY-MM-DD 형식)
-     * @return 날짜 정상여부
+     * @param value value (format is supposed to 'YYYY-MM-DD')
+     * @return true value is valid date format.
      */
     public static boolean isDate( String value ) {
-        return isDate( value, "YYYY-MM-DD" );
+        return isDate( value, null );
     }
 
     /**
-     * 날짜가 정상인지를 확인한다.
+     * check whether value is valid date format.
      *
-     * @param value 날짜
-     * @param format 날짜를 구성하는 포맷 ((예) YYYY-MM-DD HH:MI:SS)
-     * @return 날짜 정상여부
+     * @param value  date text
+     * @param format date format (ex: YYYY-MM-DD HH:MI:SS)
+     * @return true value is valid date format.
      */
     public static boolean isDate( String value, String format ) {
-
         try {
-
-            NDate date = new NDate( value, format );
-
-            return value.equalsIgnoreCase( date.toString(format) );
-
+            new NDate( value, format );
+            return true;
         } catch ( ParseException e ) {
             return false;
         }
-
     }
 
     /**
-     * 문자열이 NULL인지 여부를 확인한다.
-     *
-     * @param value 검사할 문자열
-     * @return 검사결과
+     * check whether value is null.
+     * @param value check value
+     * @return true if value is null.
      */
     public static boolean isNull( Object value ) {
         return value == null;
     }
 
     /**
-     * 문자열에 값이 없는지 여부를 확인한다.
-     *
-     * @param value 검사할 문자열
-     * @return 검사결과
+     * check whether value is not null.
+     * @param value check value
+     * @return true if value is not null.
      */
-    public static boolean isEmpty( String value ) {
-        return value == null || value.length() == 0;
+    public static boolean isNotNull( Object value ) {
+        return ! isNull( value );
     }
 
+    /**
+     * check whether value is null or empty or consists with only spaces.
+     * @param value check value
+     * @return true if value is null or empty or consists with only spaces.
+     */
     public static boolean isBlank( String value ) {
     	return value == null || value.length() == 0 || value.trim().length() == 0;
     }
 
-	public static boolean isEmpty( Collection<?> collection ) {
-		return ( collection == null || collection.isEmpty() );
-	}
-
-	public static boolean isEmpty( Map<?, ?> map ) {
-		return ( map == null || map.isEmpty() );
-	}
-
-	public static boolean isEmpty( Object[] array ) {
-		return ( array == null || array.length == 0 );
-	}
+    /**
+     * check whether value is not null nor not empty or not consists with only spaces.
+     * @param value check value
+     * @return true if value is not null nor not empty or not consists with only spaces.
+     */
+    public static boolean isNotBlank( String value ) {
+        return ! isBlank( value );
+    }
 
     /**
-     * 정규식을 이용해 문자열을 검사한다.
+     * check whether value is null or empty.<br>
      *
-     * @param value   검사할 문자열
-     * @param pattern 정규식
+     * Condition to judge empty is different from type of instance.
      * <pre>
-     * (?i) : CaseInsensitive
-     * (?x) : whitespace is ignored, and embedded comments starting with # are ignored
-     * (?m) : multiline mode
-     * (?s) : dotall mode
-     *        멀티라인 검색은 (?ms) 을 사용해야 정상적으로 작동한다.
-     * (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     *     1. String, StringBuffer, StringBuilder : empty
+     *     2. Map, Collection : empty
+     *     3. Array : size is zero.
+     *     4. Any
      * </pre>
-     * @return 정규식 일치여부
+     * @param value check value
+     * @return true if value is null or empty.
+     */
+    public static boolean isEmpty( Object value ) {
+
+        if( value == null ) return true;
+
+        if( value instanceof String ) {
+            return ( (String) value ).length() == 0;
+        } else if( value instanceof StringBuffer ) {
+            return ( (StringBuffer) value ).length() == 0;
+        } else if( value instanceof StringBuilder ) {
+            return ( (StringBuilder) value ).length() == 0;
+        } else if( value instanceof Map ) {
+            return ( (Map) value ).isEmpty();
+        } else if( value instanceof Collection ) {
+            return ( (Collection) value ).isEmpty();
+        } else if( Types.isArrayOrList( value ) ) {
+            return Array.getLength( value ) == 0;
+        }
+
+        return false;
+
+    }
+
+    /**
+     * check whether value is not null nor not empty.<br>
+     *
+     * Condition to judge empty is different from type of instance.
+     * <pre>
+     *     1. String, StringBuffer, StringBuilder : empty
+     *     2. Map, Collection : empty
+     *     3. Array : size is zero.
+     *     4. Any
+     * </pre>
+     * @param value check value
+     * @return true if value is not null nor not empty.
+     */
+    public static boolean isNotEmpty( Object value ) {
+        return ! isEmpty( value );
+    }
+
+    /**
+     * check whether value is matched with regular expression pattern.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is matched with regular expression pattern.
      * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
      */
     public static boolean isMatched( String value, String pattern ) {
-
-        if( value == null || pattern == null ) return false;
-
-        return Pattern.matches( pattern, value );
-
+        return value != null && pattern != null && Pattern.matches( pattern, value );
     }
 
     /**
-     * 정규식에 해당하는 패턴이 문자열 내에 존재하는지 여부를 확인한다.
+     * check whether value is not matched with regular expression pattern.
      *
-     * @param value   검사할 문자열
-     * @param pattern 정규식
-     * @return 패턴 존재여부
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is not matched with regular expression pattern.
+     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
      */
-    public static boolean isFinded( String value, String pattern ) {
-
-    	if( value == null || pattern == null ) return false;
-
-    	Pattern p = Pattern.compile( pattern, Pattern.MULTILINE | Pattern.DOTALL );
-
-    	Matcher matcher = p.matcher( value );
-
-    	return matcher.find();
-
+    public static boolean isNotMatched( String value, String pattern ) {
+        return ! isMatched( value, pattern );
     }
 
     /**
-     * 정규식에 해당하는 패턴이 문자열 내에 존재하는지 여부를 확인한다.
+     * check whether regular expression pattern is found in value.
      *
-     * @param  value   검사할 문자열
-     * @param  pattern 정규식
-     * @param  flags   Match flags, a bit mask that may include
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if regular expression pattern is found in value.
+     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     */
+    public static boolean isFound( String value, String pattern ) {
+    	if( value == null || pattern == null ) return false;
+    	Pattern regexp  = Pattern.compile( pattern, Pattern.MULTILINE | Pattern.DOTALL );
+    	Matcher matcher = regexp.matcher( value );
+    	return matcher.find();
+    }
+
+    /**
+     * check whether regular expression pattern is not found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if regular expression pattern is not found in value.
+     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     */
+    public static boolean isNotFound( String value, String pattern ) {
+        return ! isFound( value, pattern );
+    }
+
+    /**
+     * check whether regular expression pattern is found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @param flags   Match flags, a bit mask that may include
      *         {@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
      *         {@link Pattern#UNICODE_CASE},     {@link Pattern#CANON_EQ},  {@link Pattern#UNIX_LINES},
      *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
-     * @return 패턴 존재여부
+     * @return true if regular expression pattern is found in value.
+     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
      */
-    public static boolean isFinded( String value, String pattern, int flags ) {
-
+    public static boolean isFound( String value, String pattern, int flags ) {
     	if( value == null || pattern == null ) return false;
-
-    	Pattern p = Pattern.compile( pattern, flags );
-
-    	Matcher matcher = p.matcher( value );
-
+    	Pattern regexp  = Pattern.compile( pattern, flags );
+    	Matcher matcher = regexp.matcher( value );
     	return matcher.find();
+    }
 
+    /**
+     * check whether regular expression pattern is not found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @param flags   Match flags, a bit mask that may include
+     *         {@link Pattern#CASE_INSENSITIVE}, {@link Pattern#MULTILINE}, {@link Pattern#DOTALL},
+     *         {@link Pattern#UNICODE_CASE},     {@link Pattern#CANON_EQ},  {@link Pattern#UNIX_LINES},
+     *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
+     * @return true if regular expression pattern is not found in value.
+     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     */
+    public static boolean isNotFound( String value, String pattern, int flags ) {
+        return ! isFound( value, pattern, flags );
     }
 
     /**
@@ -161,21 +266,28 @@ public class Validator {
     }
 
     /**
+     * 문자열이 양의 정수로 구성되어있는지 여부를 확인한다.
+     * @param value 검사할 문자열
+     * @return 검사결과
+     */
+    public static boolean isPositiveFixedNumber( String value ) {
+        if( ! isFixedNumber( value ) ) return false;
+        return Long.parseLong( value ) >= 0;
+    }
+
+    /**
      * 수치자료인지 여부를 확인한다. (소수점을 포함하는 경우에도 체크 가능)
      *
      * @param value 검사할 문자열
      * @return 검사결과
      */
     public static boolean isNumeric( String value ) {
-
         try {
             Double.parseDouble( value );
+            return true;
         } catch( Exception e ) {
             return false;
         }
-
-        return true;
-
     }
 
     /**
@@ -185,10 +297,7 @@ public class Validator {
      * @return 숫자여부
      */
     public static boolean isNumericClass( Object value ) {
-
-    	if( value == null ) return false;
-    	return isNumericClass( value.getClass() );
-
+    	return value != null && isNumericClass( value.getClass() );
     }
 
     /**
@@ -198,9 +307,7 @@ public class Validator {
      * @return 숫자여부
      */
     public static boolean isNumericClass( Class<?> klass ) {
-
     	if( klass == null ) return false;
-
     	return (
 			klass == int.class        ||
 			klass == Integer.class    ||
@@ -217,9 +324,7 @@ public class Validator {
 			klass == BigDecimal.class ||
 			klass == BigInteger.class
     	);
-
     }
-
 
     /**
      * object 의 class 가 Boolean 타입인지 여부를 확인한다.
@@ -228,16 +333,10 @@ public class Validator {
      * @return Boolean 타입 여부
      */
     public static boolean isBooleanClass( Object object ) {
-
     	if( object == null ) return false;
-
-    	@SuppressWarnings( "rawtypes" )
         Class klass = object.getClass();
-
     	return ( klass == boolean.class || klass == Boolean.class );
-
     }
-
 
     /**
      * 문자열이 숫자를 가지고 있는지 여부를 확인한다.
@@ -309,19 +408,36 @@ public class Validator {
         return isMatched( value, "^[0-9a-zA-Z]+$" );
     }
 
-
     /**
-     * 이메일 여부를 확인한다.
+     * check whether value's pattern is email or not
      *
-     * @param value
-     * @return
+     * @param value check value
+     * @return true if value's pattern is email
      */
     public static boolean isEmail( String value ) {
         return isMatched( value, "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$" );
     }
 
-    public static <T> T nvl( T value, T nullValue ) {
-    	return ( value == null ) ? nullValue : value;
+    /**
+     * Let you replace null (or empty)  with another value.
+     *
+     * if value is null or empty, examine replaceValue.
+     * if replaceValue is null, examine next anotherReplaceValue.
+     * if anotherReplaceValue is not null, it is returned as result.
+     *
+     * @param value                value to examine not null or not empty.
+     * @param replaceValue         other value to examine not null.
+     * @param anotherReplaceValue  another values to examine not null.
+     * @return not null value from begin with.
+     */
+    public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {
+        if( isNotEmpty(value) )       return value;
+        if( isNotNull(replaceValue) ) return replaceValue;
+
+        for( T val : anotherReplaceValue ) {
+            if( isNotNull( val ) ) return val;
+        }
+        return null;
     }
 
 }

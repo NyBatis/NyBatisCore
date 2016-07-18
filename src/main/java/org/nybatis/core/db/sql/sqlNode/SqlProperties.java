@@ -24,13 +24,12 @@ public class SqlProperties {
 	/**
 	 * Dynamic Properties
 	 */
-	private Boolean cacheClear         = null;
-	private Boolean autocommit         = null;
-	private Boolean countSql           = null;
-	private Integer pageSqlStart       = null;
-	private Integer pageSqlEnd         = null;
-	private String  ormSqlWhere        = null;
-	private String  ormSqlOrderBy      = null;
+	private Boolean cacheClear       = null;
+	private Boolean countSql         = null;
+	private Integer pageSqlStart     = null;
+	private Integer pageSqlEnd       = null;
+	private String  ormSqlWhere      = null;
+	private String  ormSqlOrderBy    = null;
 
 	public SqlProperties() {}
 
@@ -50,7 +49,6 @@ public class SqlProperties {
 
 	public void clear() {
 		cacheClear         = null;
-		autocommit         = null;
 		countSql           = null;
 		pageSqlStart       = null;
 		pageSqlEnd         = null;
@@ -62,31 +60,43 @@ public class SqlProperties {
 
 		SqlProperties newProperties = properties.clone();
 
-		if( environmentId      != null ) newProperties.environmentId = environmentId;
-		if( fetchSize          != null ) newProperties.fetchSize = fetchSize;
-		if( lobPrefetchSize    != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
-		if( cacheEnable        != null ) newProperties.cacheEnable = cacheEnable;
-		if( cacheId            != null ) newProperties.cacheId = cacheId;
-		if( cacheFlushCycle    != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
-		if( cacheClear         != null ) newProperties.cacheClear = cacheClear;
-		if( autocommit         != null ) newProperties.autocommit = autocommit;
-		if( countSql           != null ) newProperties.countSql = countSql;
-		if( pageSqlStart       != null ) newProperties.pageSqlStart = pageSqlStart;
-		if( pageSqlEnd         != null ) newProperties.pageSqlEnd = pageSqlEnd;
+		if( environmentId   != null ) newProperties.environmentId   = environmentId;
+		if( fetchSize       != null ) newProperties.fetchSize       = fetchSize;
+		if( lobPrefetchSize != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
+		if( cacheEnable     != null ) newProperties.cacheEnable     = cacheEnable;
+		if( cacheId         != null ) newProperties.cacheId         = cacheId;
+		if( cacheFlushCycle != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
+		if( cacheClear      != null ) newProperties.cacheClear      = cacheClear;
+		if( countSql        != null ) newProperties.countSql        = countSql;
+		if( pageSqlStart    != null ) newProperties.pageSqlStart    = pageSqlStart;
+		if( pageSqlEnd      != null ) newProperties.pageSqlEnd      = pageSqlEnd;
 
 		return newProperties;
 
 	}
 
-	public String getRawEnvironmentId() {
+	public String getEnvironmentId() {
 		return environmentId;
 	}
 
-	public String getEnvironmentId() {
-		return Validator.nvl(
-				environmentId,
-				Validator.nvl( GlobalSqlParameter.getEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() )
-		);
+	/**
+	 * get representative environment id.
+	 *
+	 * <pre>
+	 *
+	 * it can be determined like below. (priority is top to bottom.)
+	 *
+	 *   - the one whici sqlId is joined
+	 *   - the one which is assigned by SqlSession or OrmSession
+	 *   - GlobalSqlParameter's environment id
+	 *   - GlobalSqlParameer's default environment id
+	 *   - default environment's id
+	 * </pre>
+	 *
+	 * @return
+	 */
+	public String getRepresentativeEnvironmentId() {
+		return Validator.nvl( environmentId, GlobalSqlParameter.getEnvironmentId(), GlobalSqlParameter.getDefaultEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );
 	}
 
 	public void setEnvironmentId( String environmentId ) {
@@ -155,7 +165,7 @@ public class SqlProperties {
 	 * @return cache flush cycle (unit:seconds)
 	 */
 	public int getCacheFlushCycle() {
-		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE );
+		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE_SECONDS );
 	}
 
 	public boolean hasSpecificCacheCycle() {
@@ -190,19 +200,6 @@ public class SqlProperties {
 		this.cacheClear = yn;
 	}
 
-	public boolean isAutocommit() {
-		return isTrue( autocommit );
-	}
-
-	public void isAutocommit( Boolean yn ) {
-		this.autocommit = yn;
-	}
-
-	public void isAutoCommit( String yn ) {
-		if( StringUtil.isEmpty(yn) ) return;
-		this.autocommit = "true".equalsIgnoreCase( yn ) || "y".equalsIgnoreCase( yn );
-	}
-
 	public Integer getPageSqlStart() {
 		return pageSqlStart;
 	}
@@ -211,7 +208,17 @@ public class SqlProperties {
 		return pageSqlEnd;
 	}
 
-	public void setPageSql( int start, int end ) {
+	public void setPageSql( Integer start, Integer end ) {
+
+		if( start == null || end == null ) {
+			start = 1;
+			end   = Integer.MAX_VALUE;
+		} else if( start == null ) {
+			start = 1;
+		} else if( end == null ) {
+			end   = Integer.MAX_VALUE;
+		}
+
 		pageSqlStart = Math.min( start, end );
 		pageSqlEnd   = Math.max( start, end );
 	}
@@ -248,16 +255,12 @@ public class SqlProperties {
 			sb.append( String.format(", cacheFlushCycle:[%d]", getCacheFlushCycle()) );
 		}
 
-		if( isAutocommit() ) {
-			sb.append( ", autocommit" );
-		}
-
 		return sb.toString();
 
 	}
 
 	public SqlProperties clone() {
-		return new Reflector().clone( this );
+		return Reflector.clone( this );
 	}
 
 	private boolean isTrue( Boolean value ) {

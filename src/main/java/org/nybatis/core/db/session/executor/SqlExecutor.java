@@ -8,7 +8,7 @@ import org.nybatis.core.db.session.executor.util.StatementController;
 import org.nybatis.core.db.session.handler.RowHandler;
 import org.nybatis.core.db.session.handler.SqlHandler;
 import org.nybatis.core.db.transaction.TransactionManager;
-import org.nybatis.core.exception.unchecked.ClassCastException;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
@@ -54,36 +54,28 @@ public class SqlExecutor {
 
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
 
-			boolean autoCommitConnection = conn.getAutoCommit();
-			boolean autoCommitTemporary  = sqlBean.getProperties().isAutocommit();
-			boolean autoCommitForce      = autoCommitConnection == false && autoCommitTemporary == true;
-
-			if( autoCommitForce ) {
-				conn.setAutoCommit( true );
+			if( NLogger.isTraceEnabled() ) {
+				NLogger.trace( ">> transaction token : [{}], isBegun : {}", token, TransactionManager.isBegun( token ) );
 			}
 
 			sqlHandler.run( sqlBean, conn );
 
-			if( ( autoCommitConnection || autoCommitTemporary ) && TransactionManager.isBegun(token) ) {
-				TransactionManager.commit( token );
-				NLogger.trace( "auto-committed" );
-			}
-
-			if( autoCommitForce ) {
-				conn.setAutoCommit( false );
-			}
-
 		} catch( SQLException e ) {
 
 			SqlException exception = new SqlException( e, ">> {} Error (code:{}) {}\n>> Error SQL :\n{}", sqlBean, e.getErrorCode(), e.getMessage(), sqlBean.getDebugSql() );
-
 			exception.setErrorCode( e.getErrorCode() );
-
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
 	        throw exception;
 
-		} catch( ClassCastException e ) {
-			throw new SqlException( "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+		} catch( ClassCastingException e ) {
+			SqlException exception = new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
+			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+			throw exception;
 
+		} catch( Exception e ) {
+			NLogger.error( ">> {}.\n>> SQL to try :\n{}>> parameter :\n{}\n>> Stack trace :\n{}",
+					e.getMessage(), sqlBean.getDebugSql(), sqlBean.getParams().toDebugString( true, true ), e );
+			throw e;
         } finally {
 			TransactionManager.releaseConnection( token, conn );
         }
@@ -91,8 +83,6 @@ public class SqlExecutor {
 	}
 
 	private void executeQuery( SqlBean sqlBean, RowHandler rowHandler, Integer rowFetchSize ) {
-
-		sqlBean.getProperties().isAutocommit( false );
 
 		execute( sqlBean, ( injectedSqlBean, connection ) -> {
 
@@ -106,7 +96,7 @@ public class SqlExecutor {
 
             ResultSet rs = stmtHandler.executeQuery( preparedStatement );
 
-            new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler );
+            new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler, true );
 
         } );
 
@@ -181,15 +171,15 @@ public class SqlExecutor {
 				try {
 					return returnType.newInstance();
 				} catch( InstantiationException | IllegalAccessException e ) {
-					throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
+					throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
 				}
 			case 1 :
-				return new Reflector().toBeanFromBean( result.getBy(0), returnType );
+				return Reflector.toBeanFrom( result.getByIndex( 0 ), returnType );
 
 		}
 
 		if( DbUtils.isPrimitive( returnType ) ) {
-			return new Reflector().toBeanFromBean( result.getBy(0), returnType );
+			return Reflector.toBeanFrom( result.getByIndex( 0 ), returnType );
 		} else {
 			return result.toBean( returnType );
 		}
@@ -200,7 +190,6 @@ public class SqlExecutor {
 
 		if( isCacheEnable && ! isCacheClear) {
 
-			@SuppressWarnings( "unchecked" )
             NList cacheValue = (NList) getCache( "selectList" );
 
 			if( cacheValue != null ) {
@@ -281,8 +270,6 @@ public class SqlExecutor {
 
 	}
 
-
-	@SuppressWarnings( "unchecked" )
     public <T> List<T> selectList( Class<T> returnType ) {
 
 		List<NMap> resultSet = selectList();
@@ -294,7 +281,7 @@ public class SqlExecutor {
 		if( isPrimitiveReturn ) {
 
 			for( NMap row : resultSet ) {
-				result.add( (T) new PrimitiveConverter(row.getBy(0)).cast(returnType) );
+				result.add( (T) new PrimitiveConverter(row.getByIndex( 0 )).cast(returnType) );
 			}
 
 		} else {
@@ -329,7 +316,6 @@ public class SqlExecutor {
 
 	}
 
-	@SuppressWarnings( "unchecked" )
     public <T> T select( Class<T> returnType ) {
 
 		NMap result = select();
@@ -341,7 +327,7 @@ public class SqlExecutor {
 			if( result == null || result.size() == 0 ) {
 				converter = new PrimitiveConverter();
 			} else {
-				converter = new PrimitiveConverter( result.getBy(0) );
+				converter = new PrimitiveConverter( result.getByIndex( 0 ) );
 			}
 
 			return (T) converter.cast( returnType );
@@ -351,7 +337,7 @@ public class SqlExecutor {
 			try {
 	            return result == null ? returnType.newInstance() : result.toBean( returnType );
             } catch( InstantiationException | IllegalAccessException e ) {
-	            throw new ClassCastException( e, "ClassCastException at converting result of {}, {}", sqlBean, e.getMessage() );
+	            throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
             }
 
 		}

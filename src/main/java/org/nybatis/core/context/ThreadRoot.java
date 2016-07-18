@@ -26,9 +26,7 @@ public class ThreadRoot implements Observer {
 
 	@Override
 	public void update( Observable watcher, Object deliveredParameter ) {
-
 		if( ! WATCHER_KEY.equals( deliveredParameter ) ) return;
-
 		threadRoot.remove();
 	}
 

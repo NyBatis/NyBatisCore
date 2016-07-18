@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<list>
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
 <sql
  id="Merong">>
@@ -10,16 +9,16 @@
   SELECT  *
   FROM    tb_dp_dataset_frame A
   WHERE   tenant_id = 'S02'
-  <if test="#{id} < 1">
-  AND     dataset_id < A.test
+  <if test="#{id} &lt; 1">
+  AND     dataset_id &lt; A.test
     <if test="#{id} > 3">
-    AND   dataset_id > 1.2
+  AND   dataset_id > 1.2
     </if>
   </if>
   <if test="#{id} = 2">
-  AND     dataset_id < 2.1
+  AND     dataset_id &lt; 2.1
     <if test="#{id} > 3">
-    AND   dataset_id > 2.2
+  AND   dataset_id > 2.2
     </if>
   </if>
   ORDER BY title
@@ -28,7 +27,7 @@
 <sql id="test" fetch="50" cache="true" flush="60" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
-  WHERE   rownum <= 10
+  WHERE   rownum &lt;= 10
   AND     list_id <![CDATA[<]]> 10
 </sql>
 
@@ -39,4 +38,4 @@
   ORDER BY ${key}
 </sql>
 
-</list>
+</mapper>

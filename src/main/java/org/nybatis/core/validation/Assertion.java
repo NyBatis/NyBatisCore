@@ -55,36 +55,12 @@ public class Assertion {
 
 	}
 
-	public static void isEmpty( Collection<?> collection, Object... errorMessage ) throws IllegalArgumentException {
-		if( ! Validator.isEmpty(collection) ) throwException( errorMessage );
+	public static void isEmpty( Object object, Object... errorMessage ) throws IllegalArgumentException {
+		if( Validator.isNotEmpty( object ) ) throwException( errorMessage );
 	}
 
-	public static void isNotEmpty( Collection<?> collection, Object... errorMessage ) throws IllegalArgumentException {
-		if( Validator.isEmpty(collection) ) throwException( errorMessage );
-	}
-
-	public static void isEmpty( Map<?, ?> map, Object... errorMessage ) throws IllegalArgumentException {
-		if( ! Validator.isEmpty(map) ) throwException( errorMessage );
-	}
-
-	public static void isNotEmpty( Map<?, ?> map, Object... errorMessage ) throws IllegalArgumentException {
-		if( Validator.isEmpty(map) ) throwException( errorMessage );
-	}
-
-	public static void isEmpty( Object[] array, Object... errorMessage ) throws IllegalArgumentException {
-		if( ! Validator.isEmpty(array) ) throwException( errorMessage );
-	}
-
-	public static void isNotEmpty( Object[] array, Object... errorMessage ) throws IllegalArgumentException {
-		if( Validator.isEmpty(array) ) throwException( errorMessage );
-	}
-
-	public static void isEmpty( String string, Object... errorMessage ) throws IllegalArgumentException {
-		if( ! Validator.isEmpty(string) ) throwException( errorMessage );
-	}
-
-	public static void isNotEmpty( String string, Object... errorMessage ) throws IllegalArgumentException {
-		if( Validator.isEmpty(string) ) throwException( errorMessage );
+	public static void isNotEmpty( Object object, Object... errorMessage ) throws IllegalArgumentException {
+		if( Validator.isEmpty(object) ) throwException( errorMessage );
 	}
 
 
