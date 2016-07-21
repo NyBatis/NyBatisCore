@@ -10,10 +10,9 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.worker.WorkerReadLine;
 
 /**
- * OS에서 명령어(Command Line)를 수행하는 유틸리티 클래스
+ * OS command line executor
  *
- * @author nayasis
- *
+ * @author nayasis@gmail.com
  */
 public class CommandExecutor {
 
@@ -27,6 +26,7 @@ public class CommandExecutor {
 	 * Command 명령어를 수행한다.
 	 *
 	 * @param commandLine 명령어
+	 * @return self instance
 	 */
 	public CommandExecutor run( String commandLine ) {
 		return run( commandLine, null, null );
@@ -37,6 +37,7 @@ public class CommandExecutor {
 	 *
 	 * @param commandLine 명령어
 	 * @param worker      출력결과를 기반으로 처리를 수행할 작업자
+	 * @return self instance
 	 */
 	public CommandExecutor run( String commandLine, WorkerReadLine worker ) {
 		return run( commandLine, null, worker );
@@ -47,6 +48,7 @@ public class CommandExecutor {
 	 *
 	 * @param commandLine	명령어
 	 * @param outputMessage	프로세스에서 출력한 메세지를 담을 객체
+	 * @return self instance
 	 */
 	public CommandExecutor run( String commandLine, StringBuffer outputMessage ) {
 	    return run( commandLine, outputMessage, null );
@@ -58,6 +60,7 @@ public class CommandExecutor {
 	 * @param commandLine	명령어
 	 * @param outputMessage	프로세스에서 출력한 메세지를 담을 객체
 	 * @param worker        출력결과를 기반으로 처리를 수행할 작업자
+	 * @return self instance
 	 */
 	public CommandExecutor run( String commandLine, StringBuffer outputMessage, WorkerReadLine worker ) {
 
@@ -75,7 +78,7 @@ public class CommandExecutor {
 	 * 명령어를 수행한다.
 	 *
 	 * @param command 커맨드
-	 * @return Executor
+	 * @return self instance
 	 */
 	public CommandExecutor run( Command command ) {
 
@@ -134,7 +137,7 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * process 종료코드를 구한다.
+	 * get process termination code
 	 *
 	 * @return the exit value of the subprocess represented by this
      *         {@code Process} object.  By convention, the value
@@ -151,10 +154,10 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * 실행이 종료될 때까지 기다린다.
+	 * wait until process is closed.
 	 *
-	 * @param timeOut 최대 대기시간 (밀리세컨)
-	 * @return 실행 결과값 (0 : succeed)
+	 * @param timeout	max wait time (mili-seconds)
+	 * @return	process termination code ( 0 : success )
 	 */
 	public int waitFor( Long timeout ) {
 
@@ -200,16 +203,16 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * 실행이 종료될 때까지 기다린다.
+	 * wait until process is closed.
 	 *
-	 * @return 실행 결과값 (0 : succeed)
+	 * @return	process termination code ( 0 : success )
 	 */
 	public int waitFor() {
 		return waitFor( null );
 	}
 
 	/**
-	 * 실행을 강제로 종료시킨다.
+	 * terminate process forcibly.
 	 */
 	public void destroy() {
 
@@ -244,6 +247,7 @@ public class CommandExecutor {
 	 * 프로세스에 명령어를 전송한다.
 	 *
 	 * @param command 전송할 명령어
+	 * @return self instance
 	 */
 	public CommandExecutor sendCommand( String command ) {
 

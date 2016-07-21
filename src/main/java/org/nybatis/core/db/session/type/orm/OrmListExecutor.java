@@ -54,9 +54,10 @@ public interface OrmListExecutor<T> {
     OrmListExecutor<T> orderBy( String sqlExpression );
 
     /**
-     * Set row fetch size temporary.<br/>
+     * Set row fetch size temporary.<br>
      *
      * @param size row fetch size.
+     * @return self instance
      */
     OrmListExecutor<T> setFetchSize( int size );
 
@@ -66,19 +67,21 @@ public interface OrmListExecutor<T> {
      * It is oracle-based funtionality.
      *
      * @param size lob prefetch size
-     * @return
+     * @return self instance
      */
     OrmListExecutor<T> setLobPrefetchSize( int size );
 
     /**
      * Cache statements should not be cached at once when has been executed.
+     *
+     * @return self instance
      */
     OrmListExecutor<T> disableCache();
 
     /**
      * Enable cache
      *
-     * @param cacheId
+     * @param cacheId   cache id
      * @return self instance
      */
     OrmListExecutor<T> enableCache( String cacheId );
@@ -86,7 +89,7 @@ public interface OrmListExecutor<T> {
     /**
      * Enable cache
      *
-     * @param cacheId cacheId
+     * @param cacheId cache id
      * @param flushSeconds cache flush cycle (unit:seconds)
      * @return self instance
      */
@@ -94,6 +97,8 @@ public interface OrmListExecutor<T> {
 
     /**
      * Clear cache
+     *
+     * @return self instance
      */
     OrmListExecutor<T> clearCache();
 

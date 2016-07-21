@@ -19,6 +19,7 @@ public @interface ExcelHeader {
      * Special value that indicates that handlers should use the default
      * name (derived from method or field name) for property.
      *
+     * @return header title value
      * @since 2.1
      */
     String value() default "";
@@ -38,6 +39,7 @@ public @interface ExcelHeader {
      * is typically used by binary formats, but may also be useful
      * for schema languages and other tools.
      *
+     * @return header sort index
      * @since 2.4
      */
     int index() default INDEX_UNKNOWN;

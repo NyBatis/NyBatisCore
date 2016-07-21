@@ -12,35 +12,37 @@ public class JsonIOException extends BaseRuntimeException {
     private static final long serialVersionUID = -2193252285540217341L;
 
     /**
-     * constructor
+     * Exception Constructor
      */
     public JsonIOException() {
         super();
     }
 
     /**
-     * constructor
+     * Exception Constructor
+     *
+     * @param rootCause root cause for this exception
      */
     public JsonIOException( Throwable rootCause ) {
         super( rootCause );
     }
-    
+
     /**
-     * constructor
+     * Exception Constructor
      *
-     * @param message   에러메세지(또는 메세지코드)
-     * @param messageParam '{}' 문자를 치환할 파라미터
+     * @param message   error message or code
+     * @param messageParam parameter to replace '{}' character
      */
     public JsonIOException( String message, Object... messageParam ) {
         super( message, messageParam );
     }
 
     /**
-     * constructor
+     * Exception Constructor
      *
-     * @param rootCause 원인이 되는 예외
-     * @param message 에러메세지(또는 메세지코드)
-     * @param messageParam '{}' 문자를 치환할 파라미터
+     * @param rootCause root cause for this exception
+     * @param message error message or code
+     * @param messageParam parameter to replace '{}' character
      */
     public JsonIOException( Throwable rootCause, String message, Object... messageParam ) {
     	super( rootCause, message, messageParam );

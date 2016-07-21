@@ -18,8 +18,9 @@ public class ProcessOutputThread extends Thread {
 	/**
 	 * 생성자
 	 *
-	 * @param inputStream Process 에서 출력될 메세지 Stream 객체
-	 * @param message 메세지를 저장할 공간
+	 * @param inputStream 	Process 에서 출력될 메세지 Stream 객체
+	 * @param message 		메세지를 저장할 공간
+	 * @param worker 		worker to read line
 	 */
 	public ProcessOutputThread( InputStream inputStream, StringBuffer message, WorkerReadLine worker ) {
 		this.inputStream = inputStream;
