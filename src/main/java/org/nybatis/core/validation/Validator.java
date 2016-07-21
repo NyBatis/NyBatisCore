@@ -148,7 +148,7 @@ public class Validator {
      *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
      * </pre>
      * @return true if value is matched with regular expression pattern.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isMatched( String value, String pattern ) {
         return value != null && pattern != null && Pattern.matches( pattern, value );
@@ -169,7 +169,7 @@ public class Validator {
      *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
      * </pre>
      * @return true if value is not matched with regular expression pattern.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotMatched( String value, String pattern ) {
         return ! isMatched( value, pattern );
@@ -190,7 +190,7 @@ public class Validator {
      *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
      * </pre>
      * @return true if regular expression pattern is found in value.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isFound( String value, String pattern ) {
     	if( value == null || pattern == null ) return false;
@@ -214,7 +214,7 @@ public class Validator {
      *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
      * </pre>
      * @return true if regular expression pattern is not found in value.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotFound( String value, String pattern ) {
         return ! isFound( value, pattern );
@@ -230,7 +230,7 @@ public class Validator {
      *         {@link Pattern#UNICODE_CASE},     {@link Pattern#CANON_EQ},  {@link Pattern#UNIX_LINES},
      *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
      * @return true if regular expression pattern is found in value.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isFound( String value, String pattern, int flags ) {
     	if( value == null || pattern == null ) return false;
@@ -249,7 +249,7 @@ public class Validator {
      *         {@link Pattern#UNICODE_CASE},     {@link Pattern#CANON_EQ},  {@link Pattern#UNIX_LINES},
      *         {@link Pattern#LITERAL},          {@link Pattern#COMMENTS},  {@link Pattern#UNICODE_CHARACTER_CLASS}
      * @return true if regular expression pattern is not found in value.
-     * @see http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotFound( String value, String pattern, int flags ) {
         return ! isFound( value, pattern, flags );
@@ -291,20 +291,22 @@ public class Validator {
     }
 
     /**
-     * value의 class 가 숫자인지 여부를 확인한다.
+     * check value's class is Numeric class <br>
+     *   - int, Integer, long, Long, short, Short, float, Float, double, Double, byte, Byte, BigDecimal, BigInteger
      *
-     * @param value 확인할 value
-     * @return 숫자여부
+     * @param value object to check.
+     * @return true if value's class is Numeric class
      */
     public static boolean isNumericClass( Object value ) {
     	return value != null && isNumericClass( value.getClass() );
     }
 
     /**
-     * object 의 class 가 숫자인지 여부를 확인한다.
+     * check class is Numeric class <br>
+     *   - int, Integer, long, Long, short, Short, float, Float, double, Double, byte, Byte, BigDecimal, BigInteger
      *
-     * @param object 확인할 Instance
-     * @return 숫자여부
+     * @param klass class to check.
+     * @return true if it is Numeric class
      */
     public static boolean isNumericClass( Class<?> klass ) {
     	if( klass == null ) return false;

@@ -58,7 +58,7 @@ public interface OrmSession<T> {
      *
      *
      * @param entity entity parameter to select.
-     * @return
+     * @return map contains entity's value
      */
     NMap selectMap( Object entity );
 
@@ -99,28 +99,36 @@ public interface OrmSession<T> {
 
     /**
      * Commit and end transaction if it was activated
+     *
+     * @return self instance
      */
     OrmSession<T> commit();
 
     /**
      * Rollback and end transaction if it was activated
+     *
+     * @return self instance
      */
     OrmSession<T> rollback();
 
     /**
-     * Begin transaction forcedly
+     * Begin transaction forcidly
+     *
+     * @return self instance
      */
     OrmSession<T> beginTransaction();
 
     /**
-     * End transaction forcedly
+     * End transaction forcidly
+     *
+     * @return self instance
      */
     OrmSession<T> endTransaction();
 
     /**
      * Check transaction is activate
      *
-     * @return is transaction activate
+     * @return true if transaction is activated.
      */
     boolean isTransactionBegun();
 
@@ -128,23 +136,28 @@ public interface OrmSession<T> {
      * Set environment id
      *
      * @param id environment id
+     * @return self instance
      */
     OrmSession<T> setEnvironmentId( String id );
 
     /**
      * Cache statements should not be cached at once when has been executed.
+     *
+     * @return self instance
      */
     OrmSession<T> disableCache();
 
     /**
      * Clear cache
+     *
+     * @return self instance
      */
     OrmSession<T> clearCache();
 
     /**
      * Enable cache
      *
-     * @param cacheId
+     * @param cacheId cache id
      * @return self instance
      */
     OrmSession<T> enableCache( String cacheId );
@@ -152,7 +165,7 @@ public interface OrmSession<T> {
     /**
      * Enable cache
      *
-     * @param cacheId cacheId
+     * @param cacheId cache id
      * @param flushSeconds cache flush cycle (unit:seconds)
      * @return self instance
      */
@@ -173,7 +186,7 @@ public interface OrmSession<T> {
      * </pre>
      *
      * @param enable flag to allow Non-PK parameter
-     * @return
+     * @return self instance
      */
     OrmSession<T> allowNonPkParameter( boolean enable );
 

@@ -76,7 +76,7 @@ public class ClassUtil {
 	 *
 	 * Type type = this.getClass().getGenericSuperclass();
 	 *
-	 * Class<?> klass = new ClassUtil().getClass( type );
+	 * Class&lt;?&gt; klass = new ClassUtil().getClass( type );
 	 * </pre>
 	 *
 	 * @param type

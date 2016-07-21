@@ -3,7 +3,7 @@ package org.nybatis.core.cache;
 
 
 /**
- * Interface that defines common cache operations.<br/><br/>
+ * Interface that defines common cache operations.<br><br>
  *
  * <b>Note:</b> Due to the generic use of caching, it is recommended that
  * implementations allow storage of <tt>null</tt> values (for example to

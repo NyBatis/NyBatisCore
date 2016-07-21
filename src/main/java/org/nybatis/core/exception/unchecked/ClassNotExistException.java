@@ -2,7 +2,7 @@ package org.nybatis.core.exception.unchecked;
 
 
 /**
- * {@link #ClassInitialException} Runtime Exception
+ * Runtime Exception for ClassNotFound
  *
  * @author nayasis@gmail.com
  *

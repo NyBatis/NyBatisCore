@@ -221,13 +221,13 @@ public class NMap extends LinkedHashMap {
 	 * Get value by json path
 	 *
 	 * @param jsonPath json path
-	 * @see https://github.com/jayway/JsonPath
+	 * @see <a href="https://github.com/jayway/JsonPath">json path example</a>
 	 * @return value(s) extracted by json path
-	 * @throws JsonPathNotFoundException
+	 * @throws JsonPathNotFoundException occurs when json path is not found.
 	 */
 	public Object getByJsonPath( String jsonPath ) throws JsonPathNotFoundException {
 
-		Object val = null;
+		Object val;
 
 		if( containsKey( jsonPath ) ) {
 			val = get( jsonPath );
@@ -305,7 +305,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	/**
-	 * get hashcode for value. <br/><br/>
+	 * get hashcode for value. <br><br>
 	 *
 	 * @return hashcode for value
 	 */

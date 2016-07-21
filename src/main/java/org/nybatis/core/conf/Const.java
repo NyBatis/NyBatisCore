@@ -54,7 +54,7 @@ public class Const {
 		 *     Const.profile.set( "local" )
 		 *
 		 *     Const.profile.apply( "/app/webapp/config.prop" )
-		 *     --> "/app/webapp/config<font color=red>.local</font>.prop"
+		 *     → "/app/webapp/config<font color=red>.local</font>.prop"
 		 *
 		 * </pre>
 		 *
@@ -185,7 +185,7 @@ public class Const {
 		 *
 		 * (remove base path from file path.)
 		 *
-		 * @param filePath
+		 * @param filePath file path
 		 * @return resource path
 		 */
 		public static String toResourceName( String filePath ) {

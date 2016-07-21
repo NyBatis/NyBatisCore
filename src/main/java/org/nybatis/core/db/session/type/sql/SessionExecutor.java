@@ -74,7 +74,7 @@ public interface SessionExecutor {
 	 * <pre>
 	 * String sqlId = '{ #{result:rs:out} = call function( #{name} ) }'
 	 *
-	 * Map<String, Object> param = new HashMap<>();
+	 * Map&lt;String, Object&gt; param = new HashMap&lt;&gt;();
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();
@@ -105,7 +105,7 @@ public interface SessionExecutor {
 	 * <pre>
 	 * String sqlId = '{ #{result:rs:out} = call function( #{name} ) }'
 	 *
-	 * Map<String, Object> param = new HashMap<>();
+	 * Map&lt;String, Object&gt; param = new HashMap&lt;&gt;();
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();
@@ -137,7 +137,7 @@ public interface SessionExecutor {
 	 * <pre>
 	 * String sqlId = '{ #{result:rs:out} = call function( #{name} ) }'
 	 *
-	 * Map<String, Object> param = new HashMap<>();
+	 * Map&lt;String, Object&gt; param = new HashMap&lt;&gt;();
 	 * param.put( "name", "nayasis" );
 	 *
 	 * SqlSession session = SessionManager.openSession();

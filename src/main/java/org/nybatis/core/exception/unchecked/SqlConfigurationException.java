@@ -43,8 +43,6 @@ public class SqlConfigurationException extends BaseRuntimeException {
      * Exception Constructor
      *
      * @param rootCause root cause for this exception
-     * @param message error message or code
-     * @param messageParam parameter to replace '{}' character
      */
     public SqlConfigurationException( Throwable rootCause ) {
     	super( rootCause );

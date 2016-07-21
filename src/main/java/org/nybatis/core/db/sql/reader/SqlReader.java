@@ -6,7 +6,7 @@ import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
 
 /**
- * Sql Reader to make SqlNode<br/>
+ * Sql Reader to make SqlNode<br>
  *
  * environmentId was must be included in SqlNode.
  *

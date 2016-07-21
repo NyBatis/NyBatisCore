@@ -6,6 +6,9 @@ import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties
 import org.nybatis.core.db.configuration.connectionPool.JdbcDatasourceProperties;
 import org.nybatis.core.db.datasource.DatasourceFactory;
 
+/**
+ * JDBC datasource factory
+ */
 public class JdbcDataSourceFactory implements DatasourceFactory {
 
 	private JdbcDatasourceProperties datasourceProperties;
@@ -14,8 +17,8 @@ public class JdbcDataSourceFactory implements DatasourceFactory {
 	/**
 	 * Create Pooled Datasource Factory
 	 *
-	 * @param datasourceProperties
-	 * @param connectionProperties
+	 * @param datasourceProperties	datasource configuration properties
+	 * @param connectionProperties	JDBC connection properties
 	 */
 	public JdbcDataSourceFactory( JdbcDatasourceProperties datasourceProperties, JdbcConnectionProperties connectionProperties ) {
 		this.datasourceProperties = datasourceProperties;
@@ -25,7 +28,7 @@ public class JdbcDataSourceFactory implements DatasourceFactory {
 	/**
 	 * Create Unpooled Datasource Factory
 	 *
-	 * @param connectionProperties
+	 * @param connectionProperties JDBC connection properties
 	 */
 	public JdbcDataSourceFactory( JdbcConnectionProperties connectionProperties ) {
 		this.datasourceProperties = new JdbcDatasourceProperties();
@@ -33,6 +36,11 @@ public class JdbcDataSourceFactory implements DatasourceFactory {
 		datasourceProperties.setPooled( false );
 	}
 
+	/**
+	 * get datasource
+	 *
+	 * @return datasource
+	 */
 	public DataSource getDataSource() {
 		return datasourceProperties.isPooled()
 			? new JdbcDataSource( datasourceProperties, connectionProperties )

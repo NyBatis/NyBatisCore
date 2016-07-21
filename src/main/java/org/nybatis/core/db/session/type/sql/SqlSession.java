@@ -91,21 +91,25 @@ public interface SqlSession {
 
 	/**
 	 * Commit and end transaction if it was activated
+	 * @return self instance
 	 */
 	SqlSession commit();
 
 	/**
 	 * Rollback and end transaction if it was activated
+	 * @return self instance
 	 */
 	SqlSession rollback();
 
 	/**
 	 * Begin transaction forcibly
+	 * @return self instance
 	 */
 	SqlSession beginTransaction();
 
 	/**
 	 * End transaction forcibly
+	 * @return self instance
 	 */
 	SqlSession endTransaction();
 
@@ -117,15 +121,16 @@ public interface SqlSession {
 	boolean isTransactionBegun();
 
 	/**
-	 * Use Connection of default environment's datasource. <br/><br/>
+	 * Use Connection of default environment's datasource. <br><br>
 	 *
-	 * It is nesessary sometimes to handle {@link Connection} directly because {@link SqlSession} dose not support for geek functionality or Vendor Dependent usage. <br/>
+	 * It is nesessary sometimes to handle {@link Connection} directly because {@link SqlSession} dose not support for geek functionality or Vendor Dependent usage. <br>
 	 * But {@link Connection#close} is not working in Connection Pool (ex. DataSource in WAS).
-	 * So, Resources like {@link Statement}, {@link PreparedStatement}, {@link CallableStatement} and {@link ResultSet} do not close and cause memory leak. <br/>
-	 * The Connection managed by SqlSession is safe for memory leak. So only you can do is just use. <br/>
-	 * When {@link Connection#close} is called, this safe Connection release all resources occupied by itself automatically. <br/>
+	 * So, Resources like {@link java.sql.Statement}, {@link PreparedStatement}, {@link CallableStatement} and {@link ResultSet} do not close and cause memory leak. <br>
+	 * The Connection managed by SqlSession is safe for memory leak. So only you can do is just use. <br>
+	 * When {@link Connection#close} is called, this safe Connection release all resources occupied by itself automatically. <br>
 	 *
 	 * @param worker  worker to use Connection
+	 * @return self instance
 	 * @throws BaseRuntimeException When error occurs.
 	 */
 	SqlSession useConnection( ConnectionHandler worker ) throws BaseRuntimeException;
@@ -134,6 +139,7 @@ public interface SqlSession {
 	 * Set environment id
 	 *
 	 * @param id environment id
+	 * @return self instance
 	 */
 	SqlSession setEnvironmentId( String id );
 
