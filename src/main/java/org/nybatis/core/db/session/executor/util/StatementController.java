@@ -71,8 +71,7 @@ public class StatementController {
 	 *
 	 * @param statement CallableStatement
 	 * @return true if the return has resultSet, false if the first result is an update count or there is no result
-
-	 * @throws SQLException
+	 * @throws SQLException occurs when sql error is raised.
 	 */
 	public boolean execute( CallableStatement statement ) throws SQLException {
 

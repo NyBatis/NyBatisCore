@@ -47,8 +47,8 @@ public class Message {
      *
      * 메세지코드 com.0001 이 '{}는 사람입니다.' 로 설정되어 있을 경우
      *
-     * Message.get( "com.0001", "정화종" ); --> "정화종은 사람입니다."
-     * Message.get( "com.0001", "ABC"    ); --> "ABC는 사람입니다."
+     * Message.get( "com.0001", "정화종" ); → "정화종은 사람입니다."
+     * Message.get( "com.0001", "ABC"    ); → "ABC는 사람입니다."
      *     </pre>
      *   </li>
      *   <li>
@@ -57,7 +57,7 @@ public class Message {
      *
      * 만약 merong 이라는 메세지코드가 정의되어 있지 않다면
      *
-     * Message.get( "merong" ); --> "merong"
+     * Message.get( "merong" ); → "merong"
      *     </pre>
      *   </li>
      * </ol>
@@ -144,7 +144,7 @@ public class Message {
      * 메세지파일(property형식)을 메모리에 적재한다.
      *
      * @param filePath 메세지파일의 경로
-     * @throws IOException
+     * @throws UncheckedIOException
      */
     public static void loadPool( String filePath ) throws UncheckedIOException {
 

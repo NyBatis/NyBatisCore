@@ -63,8 +63,8 @@ public class QueryParameter extends NMap {
 
     /**
      * Get value ( used in toString of SqlNode element )
-     * @param key
-     * @return
+     * @param key   key
+     * @return value
      */
     public Object get( String key ) {
 

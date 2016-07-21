@@ -295,10 +295,10 @@ public class ExcelUtil {
     }
 
 	/**
-	 * Read all sheet from input stream
+	 * Read all sheet from excel file
 	 *
-	 * @param inputStream	input stream to read data
-	 * @param toClass		generic type of list's class
+	 * @param excelFile excel file to read.
+	 * @param toClass	generic type of list's class
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */

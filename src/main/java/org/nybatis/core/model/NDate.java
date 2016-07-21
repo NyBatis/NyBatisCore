@@ -116,7 +116,7 @@ public class NDate implements Serializable {
      * NDate date = new NDate();
      *
      * date.setDate( "2011.12.24" );
-     * date.setDate( "2011-12-24" ); -> 포맷 중간의 구분자가 달라도 처리 가능
+     * date.setDate( "2011-12-24" ); → 포맷 중간의 구분자가 달라도 처리 가능
      * date.setDate( "2011.12.24 12:20" );
      * date.setDate( "2011.12.24 13:20:45" );
      * </pre>
@@ -517,7 +517,7 @@ public class NDate implements Serializable {
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getBeginningOfMonthDate() ); --> '2012.02.01 00:00:00'
+     * System.out.println( date.getBeginningOfMonthDate() ); → '2012.02.01 00:00:00'
      * </pre>
      *
      * @return new NDate to be setted with beginning of month date
@@ -538,7 +538,7 @@ public class NDate implements Serializable {
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getEndOfMonthDate() ); --> '2012.02.29 23:59:59.999'
+     * System.out.println( date.getEndOfMonthDate() ); → '2012.02.29 23:59:59.999'
      * </pre>
      *
      * @return new NDate to be setted with end of month date

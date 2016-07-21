@@ -49,7 +49,7 @@ public abstract class ExcelHandler {
 	/**
 	 * Write data to excelFile
 	 *
-	 * @param excelFile		excel file to write data
+	 * @param outputStream	output stream to write data
 	 * @param sheetName		sheet name of excel file to write
 	 * @param data			grid data
 	 * @throws UncheckedIOException    File I/O Exception
@@ -234,9 +234,9 @@ public abstract class ExcelHandler {
 	}
 
 	/**
-	 * Read all sheet from input stream
+	 * Read all sheet from excel file
 	 *
-	 * @param inputStream	input stream to read data
+	 * @param excelFile 	excel file to read.
 	 * @param toClass		generic type of list's class
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
