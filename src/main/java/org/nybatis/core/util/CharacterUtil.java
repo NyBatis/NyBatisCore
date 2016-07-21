@@ -48,9 +48,9 @@ public class CharacterUtil {
 	 * 
      * <pre>
      *
-     * CharacterUtil.disassembleKorean( '롱' ); -> [ 'ㄹ','ㅗ','ㅇ'] 을 반환
-     * CharacterUtil.disassembleKorean( '수' ); -> ['ㅅ','ㅜ','\0' ] 을 반환
-     * CharacterUtil.disassembleKorean( 'H'  ); -> null 을 반환
+     * CharacterUtil.disassembleKorean( '롱' ); → [ 'ㄹ','ㅗ','ㅇ'] 을 반환
+     * CharacterUtil.disassembleKorean( '수' ); → ['ㅅ','ㅜ','\0' ] 을 반환
+     * CharacterUtil.disassembleKorean( 'H'  ); → null 을 반환
      *
      * </pre>
 	 * 
@@ -83,9 +83,9 @@ public class CharacterUtil {
 	 * 
 	 * <pre>
 	 * 
-	 * CharacterUtil.hasHangulJongsung( 'H'  ) --> false
-	 * CharacterUtil.hasHangulJongsung( '수' ) --> false
-	 * CharacterUtil.hasHangulJongsung( '롱' ) --> true
+	 * CharacterUtil.hasHangulJongsung( 'H'  ) → false
+	 * CharacterUtil.hasHangulJongsung( '수' ) → false
+	 * CharacterUtil.hasHangulJongsung( '롱' ) → true
 	 * 
 	 * </pre>
 	 * 
@@ -108,8 +108,9 @@ public class CharacterUtil {
 	 * @param ch 검사할 문자
 	 * @return Half-width 분류여부
 	 * 
-	 * @see http://unicode.org/reports/tr11/
-	 * @see http://unicode.org/charts/PDF/UFF00.pdf
+	 * @see <a href="http://unicode.org/reports/tr11">http://unicode.org/reports/tr11</a>
+	 * @see <a href="http://unicode.org/charts/PDF/UFF00.pdf">http://unicode.org/charts/PDF/UFF00.pdf</a>
+	 *
 	 */
 	public static boolean isHalfWidth( char ch ) {
 

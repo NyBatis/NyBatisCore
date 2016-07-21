@@ -20,7 +20,7 @@ public class RefSqlElement extends SqlElement {
 	 * MainId가 세팅되지 않은 참조ID는
 	 * Root Sql MainId 가 세팅될 경우, 이에 맞도록 참조ID를 변경시킨다.
 	 *
-	 * @param mainId
+	 * @param mainId main id of sql id.
 	 */
 	public void includeMainId( String mainId ) {
 		if( referenceSqlId != null && ! referenceSqlId.contains( "." ) ) {

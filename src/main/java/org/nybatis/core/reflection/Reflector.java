@@ -112,7 +112,7 @@ public class Reflector {
 	 * @param field		field in target bean
 	 * @param <T>		value's generic type
 	 * @return	value
-	 * @throws ReflectiveOperationException	fail on access field
+	 * @throws ReflectiveException	fail on access field
 	 */
     public static <T> T getFieldValueFrom( Object bean, Field field ) {
 
@@ -136,7 +136,7 @@ public class Reflector {
 	 * @param fieldName	field in target bean
 	 * @param <T>		value's generic type
 	 * @return	value
-	 * @throws ReflectiveOperationException	fail on access field
+	 * @throws ReflectiveException	fail on access field
 	 */
     public static <T> T getFieldValueFrom( Object bean, String fieldName ) {
 
@@ -155,7 +155,7 @@ public class Reflector {
 	 * @param bean		target bean to set value
 	 * @param field		field in target bean
 	 * @param value		value to set on field
-	 * @throws ReflectiveOperationException	fail on access field
+	 * @throws ReflectiveException	fail on access field
 	 */
     public static void setFieldValueTo( Object bean, Field field, Object value ) {
 
@@ -175,7 +175,7 @@ public class Reflector {
 	 * @param bean		target bean to set value
 	 * @param fieldName	field name in target bean
 	 * @param value		value to set on field
-	 * @throws ReflectiveOperationException	fail on access field
+	 * @throws ReflectiveException	fail on access field
 	 */
     public static void setFieldValueTo( Object bean, String fieldName, Object value ) {
 
@@ -199,6 +199,7 @@ public class Reflector {
 	 * Get fields information paired with key and value
 	 * @param bean	target bean to inspect
 	 * @return fields information paired with key and value
+	 * @throws ReflectiveException	fail on access field
 	 */
     public static Map<String, Object> getFields( Object bean ) {
 
@@ -646,9 +647,9 @@ public class Reflector {
 	 * @param typeReference	type to return
 	 * 	<pre>
 	 *	  Examples are below.
-	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
-	 *	    - new TypeReference<List<String>>() {}
-	 *	    - new TypeReference<List>() {}
+	 *	  	- new TypeReference&lt;List&lt;HashMap&lt;String, Object&gt;&gt;&gt;() {}
+	 *	    - new TypeReference&lt;List&lt;String&gt;&gt;() {}
+	 *	    - new TypeReference&lt;List&gt;() {}
 	 * 	</pre>
 	 * @param <T>		return type
 	 * @return	bean filled by object's value
@@ -710,9 +711,9 @@ public class Reflector {
 	 * @param typeReference	type to return
 	 * 	<pre>
 	 *	  Examples are below.
-	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
-	 *	    - new TypeReference<List<String>>() {}
-	 *	    - new TypeReference<List>() {}
+	 *	  	- new TypeReference&lt;List&lt;HashMap&lt;String, Object&gt;&gt;&gt;() {}
+	 *	    - new TypeReference&lt;List&lt;String&gt;&gt;() {}
+	 *	    - new TypeReference&lt;List&gt;() {}
 	 * 	</pre>
 	 * @param <T> return type
 	 * @return List
@@ -728,7 +729,7 @@ public class Reflector {
 	}
 
 	/**
-	 * Convert as List&gt;Map>
+	 * Convert as List&lt;Map&gt;
 	 * @param jsonString	json text
 	 * @return List
 	 */
@@ -747,7 +748,7 @@ public class Reflector {
 	}
 
 	/**
-	 * Convert as List&gt;String>
+	 * Convert as List&lt;String&gt;
 	 * @param jsonString	json text
 	 * @return List
 	 */

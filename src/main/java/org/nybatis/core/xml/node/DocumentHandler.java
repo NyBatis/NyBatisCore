@@ -43,9 +43,7 @@ public class DocumentHandler {
 	/**
 	 * Get node using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -78,7 +76,7 @@ public class DocumentHandler {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>

@@ -294,7 +294,7 @@ public class NTree<T> implements Serializable {
      *       A1
      * ---------------------
      * 
-     * getLeafNodes() --> [A,1,2,A1]
+     * getLeafNodes() → [A,1,2,A1]
      * 
      * </pre>
      * 

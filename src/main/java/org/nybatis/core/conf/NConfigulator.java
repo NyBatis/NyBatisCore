@@ -29,9 +29,7 @@ public class NConfigulator {
 	/**
 	 * Get childNodes using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="expression" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -72,7 +70,7 @@ public class NConfigulator {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -133,9 +131,7 @@ public class NConfigulator {
 	/**
 	 * Get node of first childNode from root using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -176,7 +172,7 @@ public class NConfigulator {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -237,9 +233,9 @@ public class NConfigulator {
 	/**
 	 * Get value of first childNode from root using xpath expression.
 	 *
-	 * <p></p>
+	 * <p>Rule</p>
 	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="expression rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -280,7 +276,7 @@ public class NConfigulator {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -347,9 +343,7 @@ public class NConfigulator {
 	/**
 	 * Get value of childNodes using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="expression" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -390,7 +384,7 @@ public class NConfigulator {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -463,7 +457,7 @@ public class NConfigulator {
 	 * node itself can give the value but this method can bind defined default value.
 	 * </pre>
 	 *
-	 * @param node
+	 * @param node target node
 	 * @return text binded defined default value
 	 */
     public static String getValue( Node node ) {

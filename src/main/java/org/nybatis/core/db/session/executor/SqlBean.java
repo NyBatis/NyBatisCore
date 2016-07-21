@@ -38,7 +38,7 @@ public class SqlBean {
 	}
 
 	/**
-	 * Set Parameter<br/>
+	 * Set Parameter<br>
 	 *
 	 * Do not call this method after build.
 	 *
