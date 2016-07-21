@@ -22,7 +22,7 @@ public class DatabaseConfigurator {
 	 * Build Database Configration from given path<br><br>
 	 *
 	 * First it builds from given path itself.<br>
-	 * but if given path dose not exist, it will build from basepath({@link Const.path.getConfigDatabase}) + given path.
+	 * but if given path dose not exist, it will build from basepath({@link org.nybatis.core.conf.Const.path#getConfigDatabase}) + given path.
 	 *
 	 * @param filePath 	given configuration path
 	 * @param reload  	reload configuration
@@ -61,7 +61,7 @@ public class DatabaseConfigurator {
 	/**
 	 * Build All Database Configration from files in dafault path<br><br>
 	 *
-	 * default path is DatabaseConfigurationPath({@link Const.path.getConfigDatabase})
+	 * default path is DatabaseConfigurationPath({@link org.nybatis.core.conf.Const.path#getConfigDatabase})
 	 *
 	 * @param reload  	reload configuration
 	 */
@@ -81,7 +81,7 @@ public class DatabaseConfigurator {
 	 * Build Database Configration from given path<br><br>
 	 *
 	 * First it builds from given path itself.<br>
-	 * but if given path dose not exist, it will build from basepath({@link Const.path.getConfigDatabase}) + given path.
+	 * but if given path dose not exist, it will build from basepath({@link org.nybatis.core.conf.Const.path#getConfigDatabase}) + given path.
 	 *
 	 * @param filePath given configuration path
 	 */
@@ -92,7 +92,7 @@ public class DatabaseConfigurator {
 	/**
 	 * Build All Database Configration from files in dafault path<br><br>
 	 *
-	 * default path is DatabaseConfigurationPath({@link Const.path.getConfigDatabase})
+	 * default path is DatabaseConfigurationPath({@link org.nybatis.core.conf.Const.path#getConfigDatabase})
 	 *
 	 */
 	public static void build() {

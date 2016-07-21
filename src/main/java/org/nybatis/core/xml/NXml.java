@@ -109,7 +109,7 @@ public class NXml {
 	}
 
 	/**
-	 * Get document's root node. <br/>
+	 * Get document's root node. <br>
 	 *
 	 * If root node is not exist, It returns null node.
 	 *
@@ -160,9 +160,7 @@ public class NXml {
 	/**
 	 * Get first childNode from root using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="expression" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -203,7 +201,7 @@ public class NXml {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -264,9 +262,7 @@ public class NXml {
 	/**
 	 * Get childNodes from root using xpath expression.
 	 *
-	 * <p></p>
-	 *
-	 * <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 * <table summary="expressiion" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <th>Expression</th>
 	 *    <th>Description</th>
@@ -307,7 +303,7 @@ public class NXml {
 	 *
 	 *  <p>Example</p>
 	 *
-	 *  <table border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
 	 *  <tr>
 	 *    <td>Path</td>
 	 *    <td>Result</td>
@@ -378,8 +374,8 @@ public class NXml {
 	 * Get element nodes from root
 	 *
 	 * @param tagName elements' tag name
-	 *                <<font color='red'>name</font>></<font color='red'>name</font>>
-	 *                <<font color='red'>job</font>></<font color='red'>job</font>>
+	 *                &lt;<font color='red'>name</font>&gt;&lt;/<font color='red'>name</font>&gt;
+	 *                &lt;<font color='red'>job</font>&gt;&lt;/<font color='red'>job</font>&gt;
 	 * @return all element nodes having specific tag name
 	 */
 	public List<Node> getChildElements( String tagName ) {
@@ -389,8 +385,8 @@ public class NXml {
 	/**
 	 * Get one child elements from root
 	 * @param tagName elements' tag name
-	 *                <<font color='red'>name</font>></<font color='red'>name</font>>
-	 *                <<font color='red'>job</font>></<font color='red'>job</font>>
+	 *                &lt;<font color='red'>name</font>&gt;&lt;/<font color='red'>name</font>&gt;
+	 *                &lt;<font color='red'>job</font>&gt;&lt;/<font color='red'>job</font>&gt;
 	 * @return one element node having specific tag name
 	 */
 	public Node getChildElement( String tagName ) {
@@ -410,8 +406,8 @@ public class NXml {
 	 * Get child elements from root
 	 *
 	 * @param id elements' id
-	 *                <name id="<font color='red'>AAA</font>"></name>
-	 *                <job  id="<font color='red'>BBB</font>"></name>
+	 *                &lt;name id="<font color='red'>AAA</font>"&gt;&lt;/name&gt;
+	 *                &lt;job  id="<font color='red'>BBB</font>"&gt;&lt;/name&gt;
 	 * @return all elements having specific id
 	 */
 	public List<Node> getChildNodesById( String id ) {
@@ -422,8 +418,8 @@ public class NXml {
 	 * Get one child element from root
 	 *
 	 * @param id elements' id
-	 *                <name id="<font color='red'>AAA</font>"></name>
-	 *                <job  id="<font color='red'>BBB</font>"></name>
+	 *                &lt;name id="<font color='red'>AAA</font>"&gt;&lt;/name&gt;
+	 *                &lt;job  id="<font color='red'>BBB</font>"&gt;&lt;/name&gt;
 	 * @return one element having specific id
 	 */
 	public Node getChildNodeById( String id ) {

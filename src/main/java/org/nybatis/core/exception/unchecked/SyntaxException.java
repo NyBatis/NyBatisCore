@@ -22,7 +22,7 @@ public class SyntaxException extends BaseRuntimeException {
      * Exception Contsturctor
      *
      * @param message   error message or error code
-     * @param messageParam parameters to bind with '<code>{}<code>'
+     * @param messageParam parameters to bind with '<code>{}</code>'
      */
     public SyntaxException( String message, Object... messageParam ) {
         super( message, messageParam );
@@ -33,7 +33,7 @@ public class SyntaxException extends BaseRuntimeException {
      *
      * @param rootCause cause to raise exception
      * @param message   error message or error code
-     * @param messageParam parameters to bind with '<code>{}<code>'
+     * @param messageParam parameters to bind with '<code>{}</code>'
      */
     public SyntaxException( Throwable rootCause, String message, Object... messageParam ) {
     	super( rootCause, message, messageParam );

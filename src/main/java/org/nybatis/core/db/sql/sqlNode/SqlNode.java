@@ -41,14 +41,22 @@ public class SqlNode {
 	}
 
 	/**
-	 * @return sql string
+	 * get sql string
+	 *
+	 * @param param	binding parameter
+	 * @return	sql string made by parameter
 	 */
 	public String getText( QueryParameter param ) {
 		return getText( param, false, false );
 	}
 
 	/**
-	 * @return sql string
+	 * get sql string
+	 *
+	 * @param param		binding parameter
+	 * @param isPage	true if yout want to build page sql.
+	 * @param isCount	true if yout want to build count sql.
+	 * @return	sql string made by parameter
 	 */
     public String getText( QueryParameter param, boolean isPage, boolean isCount ) {
 
@@ -97,7 +105,7 @@ public class SqlNode {
 	/**
 	 * Get environment id.
 	 *
-	 * if global default environment id is setted by {@link GlobalSqlParameter#setDefaultEnvironmentId( id )}
+	 * if global default environment id is set by {@link GlobalSqlParameter#setDefaultEnvironmentId(String)}
 	 * and it is one of multiple environments,
 	 * global default environment is returned.
 	 *

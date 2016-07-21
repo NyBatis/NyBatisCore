@@ -153,9 +153,9 @@ public class StringUtil {
 	 * <pre>
 	 * NMap parameter = new NMap( "{'name':'abc', 'age':'2'}" );
 	 *
-	 * StringUtil.bindParam( "1", parameter )               --> 1
-	 * StringUtil.bindParam( "#{name}", parameter )         --> abc
-	 * StringUtil.bindParam( "PRE #{age} POST", parameter ) --> PRE 2 POST
+	 * StringUtil.bindParam( "1", parameter )               → 1
+	 * StringUtil.bindParam( "#{name}", parameter )         → abc
+	 * StringUtil.bindParam( "PRE #{age} POST", parameter ) → PRE 2 POST
 	 * </pre>
 	 *
 	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
@@ -191,10 +191,10 @@ public class StringUtil {
 	 * 포맷은 '{}' 문자를 치환가능문자로 사용한다.
 	 *
 	 * <pre>
-	 * {@link StringUtil#format}( "{}는 사람입니다.", "정화종" ); --> "정화종은 사람입니다."
-	 * {@link StringUtil#format}( "{}는 사람입니다.", "ABC"    ); --> "ABC는 사람입니다."
-	 * {@link StringUtil#format}( "{}는 사람입니다." );           --> "는 사람입니다."
-	 * {@link StringUtil#format}( "사람입니다." );               --> "사람입니다."
+	 * {@link StringUtil#format}( "{}는 사람입니다.", "정화종" ); → "정화종은 사람입니다."
+	 * {@link StringUtil#format}( "{}는 사람입니다.", "ABC"    ); → "ABC는 사람입니다."
+	 * {@link StringUtil#format}( "{}는 사람입니다." );           → "는 사람입니다."
+	 * {@link StringUtil#format}( "사람입니다." );               → "사람입니다."
 	 * </pre>
 	 *
 	 * @param format 문자열 포맷
@@ -317,7 +317,7 @@ public class StringUtil {
      *
      * [사용 예제]
      *
-     * {@link StringUtil#lpad}("AAAAAA", 'Z', 10) ) ===> ZZZZAAAAAA
+     * {@link StringUtil#lpad}("AAAAAA", 'Z', 10) ) → ZZZZAAAAAA
      *
      * </pre>
      *
@@ -356,7 +356,7 @@ public class StringUtil {
      *
      * [사용 예제]
      *
-     * {@link StringUtil#rpad}("AAAAAA", 'Z', 10) )    ===> AAAAAAZZZZ
+     * {@link StringUtil#rpad}("AAAAAA", 'Z', 10) ) → AAAAAAZZZZ
      *
      * </pre>
      *
@@ -411,7 +411,7 @@ public class StringUtil {
      * 문자열을 Camel 형으로 변환한다.
      * <pre>
      * String text = DataConverter.getCamel( "unicode_text" );
-     * System.out.println( text ); --> "unicodeText" 가 출력됨
+     * System.out.println( text ); → "unicodeText" 가 출력됨
      * </pre>
      * @param param     변환할 문자열
      * @return CAMEL 형 문자열
@@ -445,7 +445,7 @@ public class StringUtil {
      * CAMEL형 문자열을 _ 형 문자열로 변환한다.
      * <pre>
      * String text = StringUtil.toUncamel( "unicodeText" );
-     * System.out.println( text ); --> "unicode_text" 가 출력됨
+     * System.out.println( text ); → "unicode_text" 가 출력됨
      * </pre>
      * @param param     변환할 문자열
      * @return UNDERLINE 형 문자열
@@ -527,11 +527,11 @@ public class StringUtil {
      *
      * StringUtils.unescape( "\uacb0\uc7ac\uae08\uc561\uc624\ub958" );
      *
-     * -> "결제금액오류"
+     * → "결제금액오류"
      *
      * 2. \\n 형식으로 표현된 Sequence 문자열을 원래 Sequence 문자로 변경한다.
      *
-     * StringUtil.unescape( "\\n\\n" ) -> "\n\n"
+     * StringUtil.unescape( "\\n\\n" ) → "\n\n"
      * </pre>
      *
      * @param param 문자열
@@ -602,18 +602,18 @@ public class StringUtil {
      * 리스트 객체를 문자열로 만든다.
      *
      * <pre>
-     * List<String> list = Arrays.asList( "a", "b", null, "c" );
+     * List&lt;String&gt; list = Arrays.asList( "a", "b", null, "c" );
      *
      * StringUtil.join( list, "," );
      *
-     * --> a,b,c
+     * → a,b,c
      * </pre>
      *
      * @param list 리스트 객체
-     * @param delimeter 엘리먼트 사이를 연결시킬 구분 문자열
+     * @param concator 엘리먼트 사이를 연결시킬 구분 문자열
      * @return
      */
-    public static String join( List<?> list, String delimeter ) {
+    public static String join( List<?> list, String concator ) {
 
     	if( list == null || list.size() == 0 ) return "";
 
@@ -626,7 +626,7 @@ public class StringUtil {
 
     		sb.append( e.toString() );
 
-    		if( index > 0 ) sb.append( delimeter );
+    		if( index > 0 ) sb.append( concator );
 
     	}
 
@@ -804,11 +804,11 @@ public class StringUtil {
      * Compress multiple space to single space
      *
      * <pre>
-     * {@link StringUtil#compressSpace}( "A     B" ); -> "A B"
-     * {@link StringUtil#compressSpace}( "A    B" );  -> "A B"
-     * {@link StringUtil#compressSpace}( "A   B" );   -> "A B"
-     * {@link StringUtil#compressSpace}( "A  B" );    -> "A B"
-     * {@link StringUtil#compressSpace}( "A B" );     -> "A B"
+     * {@link StringUtil#compressSpace}( "A     B" ); → "A B"
+     * {@link StringUtil#compressSpace}( "A    B" );  → "A B"
+     * {@link StringUtil#compressSpace}( "A   B" );   → "A B"
+     * {@link StringUtil#compressSpace}( "A  B" );    → "A B"
+     * {@link StringUtil#compressSpace}( "A B" );     → "A B"
      * </pre>
      *
      * @param value text value
@@ -823,9 +823,9 @@ public class StringUtil {
 	 * Compress multiple space or enter to single space
 	 *
 	 * <pre>
-	 * {@link StringUtil#compressSpaceOrEnter}( "A     B" );   -> "A B"
-	 * {@link StringUtil#compressSpaceOrEnter}( "A B" );       -> "A B"
-	 * {@link StringUtil#compressSpaceOrEnter}( "A \n\n B" );  -> "A B"
+	 * {@link StringUtil#compressSpaceOrEnter}( "A     B" );   → "A B"
+	 * {@link StringUtil#compressSpaceOrEnter}( "A B" );       → "A B"
+	 * {@link StringUtil#compressSpaceOrEnter}( "A \n\n B" );  → "A B"
 	 * </pre>
 	 *
 	 * @param value text value
@@ -840,7 +840,7 @@ public class StringUtil {
 	 * Compress multiple enter to single enter
 	 *
 	 * <pre>
-	 * {@link StringUtil#compressEnter}( "A\n\n\nB" );   -> "A\nB"
+	 * {@link StringUtil#compressEnter}( "A\n\n\nB" );   → "A\nB"
 	 * </pre>
 	 *
 	 * @param value text value
@@ -856,7 +856,7 @@ public class StringUtil {
      *
      * @param value 텍스트로 만들 객체
      * @return encode된 텍스트
-     * @throws IOException
+     * @throws UncheckedIOException
      */
     public static String encode( Object value ) {
 
@@ -884,8 +884,8 @@ public class StringUtil {
      *
      * @param value 객체로 만들 text
      * @return decode된 객체
-     * @throws IOException
-     * @throws ClassNotFoundException
+     * @throws UncheckedIOException
+     * @throws ClassNotExistException
      */
     public static Object decode( Object value ) {
 
@@ -1041,9 +1041,9 @@ public class StringUtil {
 	 *
 	 * (DBMS의 Like 검색기능과 동일)
 	 *
-	 * {@link StringUtil#like}( "ABCDEFG", "%BCD%"   ) => true
-	 * {@link StringUtil#like}( "ABCDEFG", "%BCD_F%" ) => true
-	 * {@link StringUtil#like}( "AB_DEFG", "AB.DEFG" ) => false
+	 * {@link StringUtil#like}( "ABCDEFG", "%BCD%"   ) → true
+	 * {@link StringUtil#like}( "ABCDEFG", "%BCD_F%" ) → true
+	 * {@link StringUtil#like}( "AB_DEFG", "AB.DEFG" ) → false
 	 *
 	 *  </pre>
 	 *
@@ -1105,9 +1105,9 @@ public class StringUtil {
 	 *
 	 * (DBMS의 Like 검색기능과 동일)
 	 *
-	 * {@link StringUtil#notLike}( "ABCDEFG", "%BCD%"   ) => false
-	 * {@link StringUtil#notLike}( "ABCDEFG", "%BCD_F%" ) => false
-	 * {@link StringUtil#notLike}( "AB_DEFG", "AB.DEFG" ) => true
+	 * {@link StringUtil#notLike}( "ABCDEFG", "%BCD%"   ) → false
+	 * {@link StringUtil#notLike}( "ABCDEFG", "%BCD_F%" ) → false
+	 * {@link StringUtil#notLike}( "AB_DEFG", "AB.DEFG" ) → true
 	 *
 	 *  </pre>
 	 *
@@ -1152,14 +1152,14 @@ public class StringUtil {
 	 *
 	 *  String pattern = "#\\{(.+?)}";
 	 *
-	 *  List<String> finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
+	 *  List&lt;String&gt; finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
 	 *
-	 *  System.out.println( finded ); --> ['AAAA','BBBB', 'AAAA']
+	 *  System.out.println( finded ); → ['AAAA','BBBB', 'AAAA']
 	 *
 	 *  ----------------------------------------------------------------
 	 *
-	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   --> []
-	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) --> ['.', '.', '.']
+	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   → []
+	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) → ['.', '.', '.']
 	 *
 	 * </pre>
 	 *
@@ -1210,17 +1210,26 @@ public class StringUtil {
 	/**
 	 * Return value to Y or N
 	 *
-	 * @param value value to determine
-	 *              <tr><td>Y</td><td>N</td></tr>
-	 *              <tr><td>
-	 *                  <li>y</li>
-	 *                  <li>yes</li>
-	 *                  <li>t</li>
-	 *                  <li>true</li>
-	 *              </td><td>
-	 *                  <li>Null or empty</li>
-	 *                  <li>Not in 'Y' condition</li>
-	 *              </td></tr>
+	 * @param value value to convert
+	 *   <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *     <tr><td>Y</td><td>N</td></tr>
+	 *     <tr>
+	 *       <td>
+     *         <ul>
+	 *           <li>y</li>
+	 *           <li>yes</li>
+	 *           <li>t</li>
+	 *           <li>true</li>
+     *         </ul>
+	 *       </td>
+	 *       <td>
+	 *         <ul>
+	 *           <li>Null or empty</li>
+	 *           <li>Not in 'Y' condition</li>
+	 *         </ul>
+	 *       </td>
+	 *     </tr>
+	 *   </table>
 	 *
 	 * @return 'Y' or 'N'
 	 */
@@ -1247,20 +1256,44 @@ public class StringUtil {
 	}
 
 	/**
+	 * Return value to true or false.
+	 *
+	 * @param value value to convert
+	 *   <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *     <tr><td>true</td><td>false</td></tr>
+	 *     <tr><td><ul>
+	 *         <li>y</li>
+	 *         <li>yes</li>
+	 *         <li>t</li>
+	 *         <li>true</li>
+	 *     </ul></td><td><ul>
+	 *         <li>Null or empty</li>
+	 *         <li>Not in 'Y' condition</li>
+	 *     </ul></td></tr>
+	 *   </table>
+	 * @return true if value is positive
+	 */
+	public static boolean toBoolean( Object value ) {
+		return isTrue( value );
+	}
+
+	/**
 	 *
 	 * Check value is true or false
 	 *
 	 * @param value value to determine
-	 *              <tr><td>true</td><td>false</td></tr>
-	 *              <tr><td>
-	 *                  <li>y</li>
-	 *                  <li>yes</li>
-	 *                  <li>t</li>
-	 *                  <li>true</li>
-	 *              </td><td>
-	 *                  <li>Null or empty</li>
-	 *                  <li>Not in 'Y' condition</li>
-	 *              </td></tr>
+	 *   <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *     <tr><td>true</td><td>false</td></tr>
+	 *     <tr><td><ul>
+	 *         <li>y</li>
+	 *         <li>yes</li>
+	 *         <li>t</li>
+	 *         <li>true</li>
+	 *     </ul></td><td><ul>
+	 *         <li>Null or empty</li>
+	 *         <li>Not in 'Y' condition</li>
+	 *     </ul></td></tr>
+	 *   </table>
 	 * @return true if value is positive
 	 */
 	public static boolean isTrue( Object value ) {
@@ -1268,20 +1301,21 @@ public class StringUtil {
 	}
 
 	/**
-	 *
 	 * Check value is not true
 	 *
 	 * @param value value to determine
-	 *              <tr><td>true</td><td>false</td></tr>
-	 *              <tr><td>
-	 *                  <li>y</li>
-	 *                  <li>yes</li>
-	 *                  <li>t</li>
-	 *                  <li>true</li>
-	 *              </td><td>
-	 *                  <li>Null or empty</li>
-	 *                  <li>Not in 'Y' condition</li>
-	 *              </td></tr>
+	 *   <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *     <tr><td>true</td><td>false</td></tr>
+	 *     <tr><td><ul>
+	 *         <li>y</li>
+	 *         <li>yes</li>
+	 *         <li>t</li>
+	 *         <li>true</li>
+	 *     </ul></td><td><ul>
+	 *         <li>Null or empty</li>
+	 *         <li>Not in 'Y' condition</li>
+	 *     </ul></td></tr>
+	 *   </table>
 	 * @return true if value is negative
 	 */
 	public static boolean isNotTrue( Object value ) {
@@ -1289,11 +1323,13 @@ public class StringUtil {
 	}
 
 	/**
-	 * Check one string is equals to other string
+	 * Check a string is equals to other string.
+	 *
+	 * it is free from NullPointException.
 	 *
 	 * @param one    string to compare
 	 * @param other  other string to compare
-	 * @return
+	 * @return true if each are equal.
 	 */
 	public static boolean equals( String one, String other ) {
 
