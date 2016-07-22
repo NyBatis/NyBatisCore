@@ -1,4 +1,4 @@
-package org.nybatis.core.db.session;
+package org.nybatis.core.db.session.type.vo;
 
 import org.nybatis.core.reflection.Reflector;
 

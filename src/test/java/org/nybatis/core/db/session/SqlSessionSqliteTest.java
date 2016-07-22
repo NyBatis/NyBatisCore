@@ -4,6 +4,7 @@ import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.type.sql.ListExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
+import org.nybatis.core.db.session.type.vo.ResultVo;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
@@ -21,6 +22,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class SqlSessionSqliteTest {
 
@@ -214,11 +218,11 @@ public class SqlSessionSqliteTest {
 
 			NLogger.debug( "loop : {}", i );
 
-			Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
 
 			sqlSession.sql( SQL_DELETE, param ).execute();
 
-			Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
 
 			sqlSession.rollback();
 
@@ -241,11 +245,11 @@ public class SqlSessionSqliteTest {
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 		String SQL_DELETE = "DELETE   FROM ${tableName} WHERE prod_id = #{prodId}";
 
-		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
 
 		sqlSession.sql( SQL_DELETE, param ).execute();
 
-		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
 
 		sqlSession.commit();
 
@@ -265,7 +269,7 @@ public class SqlSessionSqliteTest {
 
 		NLogger.debug( ">>> [{}]", sqlSession.sql( SQL_SELECT, param ).select( Map.class ) );
 
-		Assert.assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
 
 	}
 
@@ -333,6 +337,29 @@ public class SqlSessionSqliteTest {
 			throw e;
 		}
 
+
+	}
+
+	/**
+	 * expected null parameter can be binded at sql without parameter type configuration like VARCHAR or DATE.
+	 */
+	@Test
+	public void case12_NullParamAtWhereClause() {
+
+		case10_initTable();
+
+		SqlSession session = getSession();
+
+		String sql = StringUtil.format( "SELECT * FROM {} WHERE list_id = #{listId}", TABLE_NAME );
+
+		NMap param = new NMap();
+		param.put( "listId", null );
+
+		NList list = session.sql( sql, param ).list().selectNList();
+
+		NLogger.debug( list );
+
+		assertEquals( list.size(), 0 );
 
 	}
 
