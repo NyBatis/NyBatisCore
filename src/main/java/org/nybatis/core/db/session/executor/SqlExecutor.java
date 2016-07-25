@@ -65,11 +65,18 @@ public class SqlExecutor {
 			SqlException exception = new SqlException( e, ">> {} Error (code:{}) {}\n>> Error SQL :\n{}", sqlBean, e.getErrorCode(), e.getMessage(), sqlBean.getDebugSql() );
 			exception.setErrorCode( e.getErrorCode() );
 			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+
+			NLogger.trace( exception );
+
 	        throw exception;
 
 		} catch( ClassCastingException e ) {
+
 			SqlException exception = new SqlException( e, "{} parameter binding error. ({})\n{}", sqlBean, e.getMessage(), sqlBean.getDebugSql() );
 			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
+
+			NLogger.trace( exception );
+
 			throw exception;
 
 		} catch( Exception e ) {
