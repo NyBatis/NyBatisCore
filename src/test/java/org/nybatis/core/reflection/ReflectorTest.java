@@ -218,7 +218,13 @@ public class ReflectorTest {
 
 		NLogger.debug( date );
 
+		Person person = Reflector.toBeanFrom( null, Person.class );
+
+		NLogger.debug( person );
+
 
 	}
+
+
 
 }
