@@ -6,6 +6,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.context.NThreadLocal;
 import org.nybatis.core.db.configuration.builder.ConfigurationBuilder;
 import org.nybatis.core.db.session.type.sql.SqlSession;
+import org.nybatis.core.db.session.type.vo.ResultVo;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
