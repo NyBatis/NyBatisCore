@@ -115,6 +115,9 @@ public abstract class AbstractBatchExecutor {
 			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
 			throw exception;
 
+		} finally {
+			statements.clear();
+			logs.clear();
 		}
 
 	}
