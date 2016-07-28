@@ -388,9 +388,7 @@ public class Reflector {
 
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
-		if( ignoreNull ) {
-			mapper.setSerializationInclusion( Include.NON_NULL );
-		}
+		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
 
 		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
 
