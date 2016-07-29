@@ -9,6 +9,8 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertTrue;
+
 public class ExcelFileUtilTest {
 
 	@Test
@@ -40,6 +42,25 @@ public class ExcelFileUtilTest {
 		NLogger.debug( tableXlsx );
 
 		FileUtil.delete( xlsxFileToWrite );
+
+	}
+
+
+	@Test
+	public void readVariousXlsxFormat() {
+
+		String xls  = Const.path.getBase() + "/test/excel/Test.xls";
+		String xlsx = Const.path.getBase() + "/test/excel/Test.xlsx";
+
+		NList listXls = ExcelUtil.readFirstSheetFrom( xls );
+		NLogger.debug( listXls );
+
+		assertTrue( listXls.size() > 0 );
+
+		NList listXlsx = ExcelUtil.readFirstSheetFrom( xlsx );
+		NLogger.debug( listXlsx );
+
+		assertTrue( listXlsx.size() > 0 );
 
 	}
 

@@ -24,24 +24,4 @@ public @interface ExcelHeader {
      */
     String value() default "";
 
-    /**
-     * Marker value used to indicate that no index has been specified.
-     * Used as the default value as annotations do not allow "missing"
-     * values.
-     *
-     * @since 2.4
-     */
-    int INDEX_UNKNOWN = -1;
-
-    /**
-     * Property that indicates numerical index of this property (relative
-     * to other properties specified for the Object). This index
-     * is typically used by binary formats, but may also be useful
-     * for schema languages and other tools.
-     *
-     * @return header sort index
-     * @since 2.4
-     */
-    int index() default INDEX_UNKNOWN;
-
 }
