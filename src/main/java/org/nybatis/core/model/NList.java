@@ -16,6 +16,7 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.mapper.NListSerializer;
 import org.nybatis.core.util.StringUtil;
@@ -38,8 +39,16 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     protected List<NMap>           dataBody    = new ArrayList<>();
 
 
+    /**
+     * default constructor
+     */
     public NList() {}
 
+    /**
+     * constructor
+     *
+     * @param json  json text
+     */
     public NList( String json ) {
         fromJson( json );
     }
@@ -51,6 +60,11 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         alias.putAll( initialData.alias );
     }
 
+    /**
+     * constructor
+     *
+     * @param initialData   list data
+     */
     public NList( List<?> initialData ) {
     	addRow( initialData );
     }
@@ -68,6 +82,12 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
 
+    /**
+     * append data from json text
+     *
+     * @param json  json text
+     * @return self instance
+     */
     public NList fromJson( String json ) {
 
         if( StringUtil.isEmpty(json) ) return this;
@@ -83,9 +103,9 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 별칭을 등록한다.
+     * add alias corresponding to keyset
      *
-     * @param alias 별칭
+     * @param alias alias list
      */
     public NList addAliases( Object... alias ) {
 
@@ -115,15 +135,12 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param overwrite 덮어쓰기 여부 (false 일 경우, 별칭이 이미 세팅되어 있으면 변경하지 않는다.)
      */
     public NList setAlias( Object key, Object alias, boolean overwrite ) {
-
     	if( containsKey(key) ) {
             if( overwrite || ! this.alias.containsKey( key ) ) {
                 this.alias.put( key, StringUtil.nvl( alias ) );
             }
         }
-
         return this;
-
     }
 
     /**
@@ -308,7 +325,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
                     addRow( new NMap( (Map) e ) );
 
                 } else if( e instanceof String ) { // json string이라고 간주
-                    addRow( new NMap( (String) e ) );
+                    addRow( new NMap( e ) );
 
                 } else {
                     addRow( new NMap( e ) );
@@ -352,23 +369,42 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 테이블을 특정 Bean List로 변환한다.
-     * @param <T>
+     * convert to list
      *
-     * @param klass 변환할 Bean의 Class
-     * @return Bean으로 변환된 List
+     * @param klass generic type class
+     * @return converted list
      */
     public <T> List<T> toList( Class<T> klass ) {
+        return toList( klass, false );
+    }
 
-    	List<T> result = new ArrayList<T>();
+    /**
+     * convert to list
+     *
+     * @param klass                     generic type class
+     * @param ignoreCastingException    if true, ignore casting exception
+     * @return converted list
+     */
+    public <T> List<T> toList( Class<T> klass, boolean ignoreCastingException ) {
 
-    	for( NMap row : dataBody ) {
-    		result.add( row.toBean( klass ) );
-    	}
+        List<T> result = new ArrayList<T>();
 
-    	return result;
+        for( NMap row : dataBody ) {
+            try {
+                result.add( row.toBean( klass ) );
+            } catch( Exception e ) {
+                if( ignoreCastingException ) {
+                    NLogger.trace( e );
+                } else {
+                    throw e;
+                }
+            }
+        }
+
+        return result;
 
     }
+
 
     /**
      * Get List consisted with NMap
@@ -380,22 +416,17 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 행을 삭제한다.
+     * remove row
      *
-     * @param index 행 번호
+     * @param index row index
      */
     public NList removeRow( int index ) {
-
         if( index < 0 ) return this;
-
         for( Object key :  getRow(index).keySet() ) {
             subtractKeySize( key );
         }
-
         dataBody.remove( index );
-
         return this;
-
     }
 
     private void subtractKeySize( Object key ) {
@@ -405,74 +436,58 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 열을 삭제한다.
+     * remove row
      *
      * @param key name of column
      */
     public NList removeKey( Object key ) {
-
         header.remove( key );
-
         for( NMap row : dataBody ) {
         	row.remove( key );
         }
-
         return this;
-
     }
 
     /**
-     * 열을 삭제한다.
+     * remove row
      *
-     * @param keyIndex 열 번호
+     * @param keyIndex index of keyset
      */
     public NList removeKeyBy( int keyIndex ) {
-
     	Object key = getKey( keyIndex );
-
     	if( key != null ) removeKey( key );
-
         return this;
-
     }
 
     /**
-     * 데이터를 세팅한다.
+     * set data in row
      *
-     * @param key   키
-     * @param rowIndex 인덱스
-     * @param value 값
+     * @param key       key
+     * @param rowIndex  row index
+     * @param value     value
      */
     public NList set( Object key, int rowIndex, Object value ) {
-
         NMap data = dataBody.get( rowIndex );
-
         data.put( key, value );
-
         if( ! containsKey( key ) ) {
         	header.put( key, ++rowIndex );
         }
-
         return this;
-
     }
 
     /**
-     * 데이터를 세팅한다.
+     * set data
      *
-     * @param keyIndex	키에 해당하는 인덱스
-     * @param rowIndex		인덱스
-     * @param value		값
+     * @param keyIndex  index of keyset
+     * @param rowIndex  row index
+     * @param value		value
      */
     public NList setBy( int keyIndex, int rowIndex, Object value ) {
-
     	Object key = getKey( keyIndex );
-
-    	if( key != null )
+    	if( key != null ) {
             set( key, rowIndex, value );
-
+        }
         return this;
-
     }
 
     /**
@@ -497,9 +512,9 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * Get Row Data
-     * @param rowIndex index
-     * @return row map data
+     * Get row data
+     * @param rowIndex row index
+     * @return map data
      */
     public NMap getRow( int rowIndex ) {
         return dataBody.get( rowIndex );
@@ -596,9 +611,9 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 중복을 제거한다.
+     * remove duplicated data
      *
-     * @return 중복이 제거된 NList
+     * @return deduplicated NList
      */
     public NList deduplicate() {
 
