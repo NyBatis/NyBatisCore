@@ -69,11 +69,9 @@ public class ZipFileHandler {
         try {
 
             ArchiveInputStream stream = new ZipArchiveInputStream( new FileInputStream(fileToUnzip), charset.name(), true );
-
             uncompress( stream, targetDirectory );
 
         } catch( IOException e ) {
-
             throw new UncheckedIOException( e );
         }
 
@@ -83,7 +81,7 @@ public class ZipFileHandler {
 
         List<File> fileList = new ArrayList<>();
 
-        String basePath = "";
+        String basePath;
 
         if( fileOrDirectoryToCompress.isDirectory() ) {
 
