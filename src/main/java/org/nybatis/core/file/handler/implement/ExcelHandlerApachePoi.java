@@ -145,11 +145,13 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 			reader.read( workbook, result );
 		} catch( IOException e ) {
 			throw new UncheckedIOException( e, "error on reading excel data." );
-		} catch( InvalidFormatException e ) {
+		} catch( InvalidFormatException | IllegalArgumentException e ) {
 			throw new UncheckedIOException( e, "invalid excel format." );
 		} finally {
 			if( workbook != null ) {
 				try { workbook.close(); } catch( IOException e ) {}
+			} else {
+				try { inputStream.close(); } catch( IOException e ) {}
 			}
 		}
 
