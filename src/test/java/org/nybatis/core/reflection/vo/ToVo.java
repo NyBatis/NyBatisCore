@@ -1,6 +1,7 @@
-package org.nybatis.core.reflection;
+package org.nybatis.core.reflection.vo;
 
 import org.nybatis.core.model.NDate;
+import org.nybatis.core.reflection.Reflector;
 
 public class ToVo {
 

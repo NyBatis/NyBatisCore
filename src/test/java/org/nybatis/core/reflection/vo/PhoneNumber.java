@@ -1,4 +1,6 @@
-package org.nybatis.core.reflection;
+package org.nybatis.core.reflection.vo;
+
+import org.nybatis.core.reflection.Reflector;
 
 import java.util.Objects;
 

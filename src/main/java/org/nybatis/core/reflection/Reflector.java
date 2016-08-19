@@ -631,7 +631,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
 
-		if( isString( object ) ) {
+		if( Validator.isString( object ) ) {
 			return toBeanFromJson( object.toString(), toClass );
 		} else {
 			return objectMapper.convertValue( object, toClass );
@@ -654,7 +654,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
 
-		if( isString( object ) ) {
+		if( Validator.isString( object ) ) {
 			return toBeanFromJson( object.toString(), typeReference );
 		} else {
 			return objectMapper.convertValue( object, typeReference );
@@ -763,7 +763,7 @@ public class Reflector {
 
 		if( object == null ) return new HashMap<>();
 
-		if( isString(object)  ) {
+		if( Validator.isString(object)  ) {
 			return toMapFromJson( object.toString() );
 		} else {
 			return objectMapper.convertValue( object, Map.class );
@@ -794,11 +794,6 @@ public class Reflector {
 	 */
 	public static NMap toNMapFrom( Object object ) {
 		return new NMap( toMapFrom( object ) );
-	}
-
-	private static boolean isString( Object object ) {
-		return object != null &&
-				( object instanceof String || object instanceof StringBuffer || object instanceof  StringBuilder );
 	}
 
 	/**
@@ -840,7 +835,7 @@ public class Reflector {
 	 */
 	public static boolean isJsonDate( Object value ) {
 
-		if( ! isString(value) ) return false;
+		if( Validator.isNotString(value) ) return false;
 
 		String val = value.toString();
 

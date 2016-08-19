@@ -1,4 +1,4 @@
-package org.nybatis.core.reflection;
+package org.nybatis.core.reflection.vo;
 
 import java.text.ParseException;
 
