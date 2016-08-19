@@ -134,6 +134,27 @@ public class Validator {
     }
 
     /**
+     * check if value is String or StringBuffer or StringBuilder
+     *
+     * @param value check value
+     * @return  true if value is included in [ String, StringBuffer, StringBuilder ]
+     */
+    public static boolean isString( Object value ) {
+        return value != null &&
+            ( value instanceof String || value instanceof StringBuffer || value instanceof  StringBuilder );
+    }
+
+    /**
+     * check if value is not String nor StringBuffer nor StringBuilder
+     *
+     * @param value check value
+     * @return  true if value is not included in [ String, StringBuffer, StringBuilder ]
+     */
+    public static boolean isNotString( Object value ) {
+        return ! isString( value );
+    }
+
+    /**
      * check whether value is matched with regular expression pattern.
      *
      * @param value   check value

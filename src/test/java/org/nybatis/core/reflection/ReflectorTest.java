@@ -1,22 +1,22 @@
 package org.nybatis.core.reflection;
 
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NDate;
+import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.vo.*;
+import org.nybatis.core.testModel.Link;
+import org.testng.annotations.Test;
+
 import java.io.File;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.model.NDate;
-import org.nybatis.core.model.NMap;
-import org.nybatis.core.testModel.Link;
-import org.testng.annotations.Test;
-
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-@SuppressWarnings( "rawtypes" )
 public class ReflectorTest {
 
 	@Test
@@ -223,6 +223,13 @@ public class ReflectorTest {
 		NLogger.debug( person );
 
 
+	}
+
+	@Test
+	public void variableNamedWithCharacterAndNumber() {
+		String json = "{\"S01\":\"Y\",\"S02\":\"N\"}";
+		TestVo testVo = Reflector.toBeanFrom( json, TestVo.class );
+		assertEquals( testVo.toString(), json );
 	}
 
 
