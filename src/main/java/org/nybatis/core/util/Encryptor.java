@@ -7,6 +7,7 @@ import org.nybatis.core.validation.Validator;
 
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.Key;
@@ -145,14 +146,8 @@ public class Encryptor {
     }
 
     private byte[] toByteArray( String hex ) {
-        byte[] result = null;
-        if( Validator.isNotEmpty( hex ) ) {
-            result = new byte[ hex.length() / 2 ];
-            for( int i = 0; i < result.length; i++ ) {
-                result[i] = (byte) Integer.parseInt( hex.substring(2 * i, 2 * i + 2), 16 );
-            }
-        }
-        return result;
+        if( Validator.isEmpty(hex) ) return null;
+        return DatatypeConverter.parseHexBinary( hex );
     }
 
     private String toHex( byte byteArray[] ) {
@@ -160,13 +155,9 @@ public class Encryptor {
         if( Validator.isEmpty( byteArray ) ) return "";
 
         StringBuilder sb = new StringBuilder( byteArray.length * 2 );
-
         for( byte b : byteArray ) {
-            int c = 0xFF & b;
-            if( c < 0x10 ) sb.append( '0' );
-            sb.append( Integer.toHexString(c) );
+            sb.append( String.format("%02x", b & 0XFF) );
         }
-
         return sb.toString();
 
     }
