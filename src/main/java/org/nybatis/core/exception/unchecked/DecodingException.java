@@ -2,38 +2,38 @@ package org.nybatis.core.exception.unchecked;
 
 
 /**
- * Runtime {@link #EncodingException}
+ * Runtime {@link #DecodingException}
  *
  * @author nayasis@gmail.com
  *
  */
-public class EncodingException extends BaseRuntimeException {
+public class DecodingException extends BaseRuntimeException {
 
     private static final long serialVersionUID = 6848966904417509380L;
 
     /**
      * Constructs an exception with no detail message.
      */
-    public EncodingException() {
+    public DecodingException() {
         super();
     }
 
     /**
      * Constructs an exception with detail cause.
      *
-     * @param rootCause root cause for this exception
+     * @param rootCause root cause
      */
-    public EncodingException( Throwable rootCause ) {
+    public DecodingException( Throwable rootCause ) {
         super( rootCause );
     }
-    
+
     /**
      * Exception 생성자
      *
      * @param message   error message or code
      * @param messageParam parameter to replace '{}' character
      */
-    public EncodingException( String message, Object... messageParam ) {
+    public DecodingException( String message, Object... messageParam ) {
         super( message, messageParam );
     }
 
@@ -44,7 +44,7 @@ public class EncodingException extends BaseRuntimeException {
      * @param message error message or code
      * @param messageParam parameter to replace '{}' character
      */
-    public EncodingException( Throwable rootCause, String message, Object... messageParam ) {
+    public DecodingException( Throwable rootCause, String message, Object... messageParam ) {
     	super( rootCause, message, messageParam );
     }
 
