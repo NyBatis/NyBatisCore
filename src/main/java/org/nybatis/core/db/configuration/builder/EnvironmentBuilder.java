@@ -61,20 +61,21 @@ public class EnvironmentBuilder {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
-		connectionProperties.setDriverName(   prop.getValue(  datasource, "driver"     ) );
-		connectionProperties.setUrl(          prop.getValue(  datasource, "url"        ) );
-		connectionProperties.setUserName(     prop.getValue(  datasource, "username"   ) );
-		connectionProperties.setUserPassword( prop.getValue(  datasource, "password"   ) );
-		connectionProperties.setTimeout(      prop.getAttrVal(datasource, "timeout"    ) );
-		connectionProperties.setAutoCommit(   prop.getAttrVal(datasource, "autocommit" ) );
+		connectionProperties.setDriverName(        prop.getValue(   datasource, "driver"            ) );
+		connectionProperties.setUrl(               prop.getValue(   datasource, "url"               ) );
+		connectionProperties.setUserName(          prop.getValue(   datasource, "username"          ) );
+		connectionProperties.setUserPassword(      prop.getValue(   datasource, "password"          ) );
+		connectionProperties.setTimeout(           prop.getAttrVal( datasource, "timeout"           ) );
+		connectionProperties.setAutoCommit(        prop.getAttrVal( datasource, "autocommit"        ) );
+		connectionProperties.setPasswordSecretKey( prop.getValue(   datasource, "passwordSecretKey" ) );
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
-		datasourceProperties.setPoolMin(    prop.getAttrVal( datasource, "poolMin"     ) );
-		datasourceProperties.setPoolMax(    prop.getAttrVal( datasource, "poolMax"     ) );
-		datasourceProperties.setPoolStep(   prop.getAttrVal( datasource, "poolStep"    ) );
-		datasourceProperties.setPingCycle(  prop.getAttrVal( datasource, "pingCycle"   ) );
-		datasourceProperties.setPingEnable( prop.getAttrVal( datasource, "ping"        ) );
+		datasourceProperties.setPoolMin(    prop.getAttrVal( datasource, "poolMin"   ) );
+		datasourceProperties.setPoolMax(    prop.getAttrVal( datasource, "poolMax"   ) );
+		datasourceProperties.setPoolStep(   prop.getAttrVal( datasource, "poolStep"  ) );
+		datasourceProperties.setPingCycle(  prop.getAttrVal( datasource, "pingCycle" ) );
+		datasourceProperties.setPingEnable( prop.getAttrVal( datasource, "ping"      ) );
 
 		setJdbcDatasource( connectionProperties, datasourceProperties );
 

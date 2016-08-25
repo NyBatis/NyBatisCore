@@ -10,6 +10,9 @@
     <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
+      <username>1</username>
+      <password>2</password>
+      <passwordSecretKey>adadijasdlkjasdlijaaasdlkjasdlijasdlliasd</passwordSecretKey>
     </datasourceJdbc>
     <sqlPath>
       <path>sqlite</path>
