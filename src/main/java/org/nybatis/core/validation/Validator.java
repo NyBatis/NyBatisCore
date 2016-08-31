@@ -140,8 +140,7 @@ public class Validator {
      * @return  true if value is included in [ String, StringBuffer, StringBuilder ]
      */
     public static boolean isString( Object value ) {
-        return value != null &&
-            ( value instanceof String || value instanceof StringBuffer || value instanceof  StringBuilder );
+        return Types.isString( value );
     }
 
     /**
@@ -151,7 +150,7 @@ public class Validator {
      * @return  true if value is not included in [ String, StringBuffer, StringBuilder ]
      */
     public static boolean isNotString( Object value ) {
-        return ! isString( value );
+        return ! Types.isString( value );
     }
 
     /**
@@ -456,7 +455,6 @@ public class Validator {
     public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {
         if( isNotEmpty(value) )       return value;
         if( isNotNull(replaceValue) ) return replaceValue;
-
         for( T val : anotherReplaceValue ) {
             if( isNotNull( val ) ) return val;
         }
