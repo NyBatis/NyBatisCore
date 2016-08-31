@@ -4,6 +4,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.util.Types;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -44,7 +45,7 @@ public class NMap extends LinkedHashMap {
 	 */
 	public NMap( Object value ) {
 
-		if( value instanceof String || value instanceof StringBuffer || value instanceof StringBuilder ) {
+		if( Types.isString( value ) ) {
 			fromJson( value.toString() );
 		} else {
 			fromBean( value );

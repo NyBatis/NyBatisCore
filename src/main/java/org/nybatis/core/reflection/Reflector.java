@@ -16,6 +16,7 @@ import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
 import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
@@ -631,7 +632,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
 
-		if( Validator.isString( object ) ) {
+		if( Types.isString( object ) ) {
 			return toBeanFromJson( object.toString(), toClass );
 		} else {
 			return objectMapper.convertValue( object, toClass );
@@ -654,7 +655,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
 
-		if( Validator.isString( object ) ) {
+		if( Types.isString( object ) ) {
 			return toBeanFromJson( object.toString(), typeReference );
 		} else {
 			return objectMapper.convertValue( object, typeReference );
@@ -763,7 +764,7 @@ public class Reflector {
 
 		if( object == null ) return new HashMap<>();
 
-		if( Validator.isString(object)  ) {
+		if( Types.isString(object)  ) {
 			return toMapFromJson( object.toString() );
 		} else {
 			return objectMapper.convertValue( object, Map.class );
@@ -835,7 +836,7 @@ public class Reflector {
 	 */
 	public static boolean isJsonDate( Object value ) {
 
-		if( Validator.isNotString(value) ) return false;
+		if( Types.isNotString(value) ) return false;
 
 		String val = value.toString();
 

@@ -141,4 +141,12 @@ public class Types {
 
     }
 
+    public static boolean isString( Object value ) {
+        return value != null && ( value instanceof String || value instanceof StringBuffer || value instanceof  StringBuilder );
+    }
+
+    public static boolean isNotString( Object value ) {
+        return ! isString( value );
+    }
+
 }
