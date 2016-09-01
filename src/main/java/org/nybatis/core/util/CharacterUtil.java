@@ -98,7 +98,7 @@ public class CharacterUtil {
 		
 		if( result == null ) return false;
 		
-		return result[2] == '\0';
+		return result[2] != '\0';
 		
 	}
 

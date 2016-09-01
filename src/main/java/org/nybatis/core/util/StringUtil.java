@@ -254,7 +254,7 @@ public class StringUtil {
 								result.append( hasHangulJongsung( paramToAppend ) ? '이' : '가' );
 								break;
 							case '을' : case '를' :
-								result.append( hasHangulJongsung( paramToAppend ) ? '을' : '가' );
+								result.append( hasHangulJongsung( paramToAppend ) ? '을' : '를' );
 								break;
 
 						}
