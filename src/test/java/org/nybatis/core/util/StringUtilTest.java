@@ -14,6 +14,18 @@ import static org.testng.Assert.assertEquals;
 public class StringUtilTest {
 
 	@Test
+	public void changeHangulJosa() {
+
+		assertEquals( "카드를 등록합니다."       , StringUtil.format( "{}를 등록합니다." , "카드"      ) );
+		assertEquals( "카드템플릿을 등록합니다." , StringUtil.format( "{}를 등록합니다." , "카드템플릿") );
+		assertEquals( "카드는 등록됩니다."       , StringUtil.format( "{}는 등록됩니다." , "카드"      ) );
+		assertEquals( "카드템플릿은 등록됩니다." , StringUtil.format( "{}는 등록됩니다." , "카드템플릿") );
+		assertEquals( "카드가 등록됩니다."       , StringUtil.format( "{}가 등록됩니다." , "카드"      ) );
+		assertEquals( "카드템플릿이 등록됩니다." , StringUtil.format( "{}가 등록됩니다." , "카드템플릿") );
+
+	}
+
+	@Test
 	public void unescape() {
 
 		assertEquals( "결재금액오\n\n류", StringUtil.unescape( "\uacb0\uc7ac\uae08\uc561\uc624\\n\\n\ub958" ) );
