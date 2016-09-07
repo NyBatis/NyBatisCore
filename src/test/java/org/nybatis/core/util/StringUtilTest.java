@@ -194,6 +194,8 @@ public class StringUtilTest {
 
 		assertEquals( StringUtil.split( val, "(\\+(\\^)?|\\|)", true ).toString(), "[DP01, +, DP02, +^, DP03, |, DP40]"  );
 
+		NLogger.debug( StringUtil.split( " ", "," ) );
+
 	}
 
 }
