@@ -668,7 +668,7 @@ public class StringUtil {
 
 		if( isEmpty(value) ) return result;
 
-		String val = value.toString();
+		String val = trim( value );
 
 		if( isEmpty(regexDelimeter) ) {
 			result.add( val );
