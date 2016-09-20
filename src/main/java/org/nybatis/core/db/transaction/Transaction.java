@@ -36,6 +36,7 @@ public class Transaction {
                 conn.close();
             } catch( SQLException e ) {}
 		}
+		NLogger.trace( ">> transaction is end. (tokenId : {})", token );
 		transactionPool.remove( token );
 	}
 
@@ -68,6 +69,7 @@ public class Transaction {
 				conn.rollback();
 			} catch( SQLException e ) {}
 		}
+		NLogger.trace( ">> rollback : {}", token );
 		end( token );
 
 	}
@@ -126,6 +128,7 @@ public class Transaction {
 	}
 
 	public void begin( String token ) {
+		NLogger.trace( ">> transaction is begun. (tokenId : {})", token );
 		transactionPool.putIfAbsent( token, new HashMap<>() );
 	}
 	
