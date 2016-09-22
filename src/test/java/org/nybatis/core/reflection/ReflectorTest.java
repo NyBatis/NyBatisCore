@@ -247,9 +247,6 @@ public class ReflectorTest {
 		person.birthDate = new Date();
 		person.birthNDate = new NDate();
 
-		person.profileMap.put( "key1", "val1" );
-		person.profileMap.put( "key2", "val2" );
-
 		person.profileNList.addRow( "key1", "val1" );
 		person.profileNList.addRow( "key2", "val2" );
 
