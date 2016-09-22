@@ -1242,7 +1242,7 @@ public class StringUtil {
 
 		} else {
 
-			String text = value.toString();
+			String text = trim( value );
 
 			if( "y".equalsIgnoreCase(text) )    return "Y";
 			if( "yes".equalsIgnoreCase(text) )  return "Y";

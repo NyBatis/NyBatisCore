@@ -1,4 +1,4 @@
-package org.nybatis.core.reflection.mapper;
+package org.nybatis.core.reflection.deserializer;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;

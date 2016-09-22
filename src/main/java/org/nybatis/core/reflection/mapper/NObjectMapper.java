@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+import org.nybatis.core.reflection.deserializer.DateDeserializer;
 
 import java.util.Date;
 
@@ -34,10 +35,9 @@ public class NObjectMapper extends ObjectMapper {
 
 	protected void setCustomDeserializer() {
 
-		SimpleModule module = new SimpleModule( "DateSerializer" );
-
-		module.addSerializer(   Date.class,  new DateSerializer()   );
-		module.addDeserializer( Date.class,  new DateDeserializer() );
+		SimpleModule module = new SimpleModule( "NObjectMapper" );
+		module.setSerializerModifier( new SerializerModifier() );
+		module.addDeserializer( Date.class, new DateDeserializer() );
 
 		registerModule( module );
 

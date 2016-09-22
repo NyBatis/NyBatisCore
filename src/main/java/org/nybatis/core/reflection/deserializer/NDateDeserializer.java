@@ -1,4 +1,6 @@
-package org.nybatis.core.reflection.mapper;
+package org.nybatis.core.reflection.deserializer;
+
+import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonParser;
@@ -6,25 +8,23 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import org.nybatis.core.model.NDate;
 
-import java.io.IOException;
-import java.util.Date;
-
-public class DateDeserializer extends JsonDeserializer<Date> {
+public class NDateDeserializer extends JsonDeserializer<NDate> {
 
 	@Override
-    public Date deserialize( JsonParser jp, DeserializationContext ctxt ) throws IOException {
+    public NDate deserialize( JsonParser jp, DeserializationContext ctxt ) throws IOException {
 
 		try {
 
 			long value = jp.getLongValue();
-			return new Date( value );
+			return new NDate( value );
 
 		} catch( JsonParseException e ) {
 
 			String value = jp.getValueAsString();
-			return new NDate( value, NDate.ISO_8601_24H_FULL_FORMAT ).toDate();
+			return new NDate( value, NDate.ISO_8601_24H_FULL_FORMAT );
 
 		}
+
 
     }
 
