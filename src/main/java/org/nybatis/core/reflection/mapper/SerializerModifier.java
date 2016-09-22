@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.MapType;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.serializer.customNullChecker.ArraySerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.BigDecimalSerializer;
@@ -17,7 +16,6 @@ import org.nybatis.core.reflection.serializer.customNullChecker.FloatSerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.IntegerSerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.ListSerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.LongSerializer;
-import org.nybatis.core.reflection.serializer.customNullChecker.MapSerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.SetSerializer;
 import org.nybatis.core.util.ClassUtil;
 
@@ -26,7 +24,9 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * @author nayasis
+ * Custom Serializer modifier
+ *
+ * @author nayasis@gmail.com
  * @since 2016-09-21
  */
 public class SerializerModifier extends BeanSerializerModifier {
@@ -58,7 +58,6 @@ public class SerializerModifier extends BeanSerializerModifier {
 
     }
 
-
     public JsonSerializer<?> modifyArraySerializer( SerializationConfig config, ArrayType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer ) {
         return new ArraySerializer( serializer );
     }
@@ -75,15 +74,6 @@ public class SerializerModifier extends BeanSerializerModifier {
 
     }
 
-//    public JsonSerializer<?> modifyMapSerializer( SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer ) {
-//        return new MapSerializer( serializer );
-//    }
-
-
-//    @Override
-//    public JsonSerializer<?> modifyMapSerializer( SerializationConfig config, MapType valueType, BeanDescription beanDesc, JsonSerializer<?> serializer ) {
-//        return super.modifyMapSerializer( config, valueType, beanDesc, serializer );
-//    }
 }
 
 
