@@ -3,6 +3,8 @@ package org.nybatis.core.reflection.mapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.nybatis.core.file.annotation.ExcelReadAnnotationInspector;
 import org.nybatis.core.file.annotation.ExcelWriteAnnotationInspector;
+import org.nybatis.core.reflection.deserializer.SimpleDateDeserializer;
+import org.nybatis.core.reflection.serializer.simple.SimpleDateSerializer;
 
 import java.util.Date;
 

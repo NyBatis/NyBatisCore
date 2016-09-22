@@ -1,4 +1,4 @@
-package org.nybatis.core.reflection.mapper;
+package org.nybatis.core.reflection.serializer.simple;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -8,11 +8,11 @@ import org.nybatis.core.model.NDate;
 import java.io.IOException;
 import java.util.Date;
 
-public class DateSerializer extends JsonSerializer<Date> {
+public class SimpleDateSerializer extends JsonSerializer<Date> {
 
     @Override
     public void serialize( final Date value, final JsonGenerator generator, final SerializerProvider provider) throws IOException {
-        provider.defaultSerializeValue( new NDate(value).toString(NDate.ISO_8601_24H_FULL_FORMAT ), generator );
+        provider.defaultSerializeValue( new NDate(value).toString(NDate.DEFAULT_OUTPUT_FORMAT ), generator );
     }
 
 }

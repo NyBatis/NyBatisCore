@@ -1,7 +1,10 @@
 package org.nybatis.core.db.session;
 
+import org.nybatis.core.db.annotation.Table;
 import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
+import org.nybatis.core.db.constant.NullValue;
+import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.session.type.sql.ListExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.vo.ResultVo;
@@ -11,6 +14,7 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -360,6 +364,25 @@ public class SqlSessionSqliteTest {
 		NLogger.debug( list );
 
 		assertEquals( list.size(), 0 );
+
+	}
+
+	@Test
+	public void case13_OrmSelect() {
+
+		case10_initDummyDataByStatementBatch();
+
+		OrmSession<OrmEntity> session = getSession().openOrmSession( OrmEntity.class );
+
+		List<OrmEntity> list = session.list().select();
+
+		NLogger.debug( list );
+
+		OrmEntity entity = list.get( 10 );
+
+		entity.prodName = NullValue.STRING;
+		session.update( entity );
+		NLogger.debug( session.select( entity ) );
 
 	}
 

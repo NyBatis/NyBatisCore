@@ -254,8 +254,6 @@ public class Const {
 		public static final String LOG_SQL                       = "nybatis.sql";
 		public static final String LOG_BATCH                     = "nybatis.batch";
 
-
-
 	}
 
 }

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.reflection.mapper.NDateDeserializer;
-import org.nybatis.core.reflection.mapper.NDateSerializer;
+import org.nybatis.core.reflection.deserializer.NDateDeserializer;
+import org.nybatis.core.reflection.serializer.simple.SimpleNDateSerializer;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
@@ -19,7 +19,7 @@ import java.util.Date;
  *
  * @author nayasis@gmail.com
  */
-@JsonSerialize( using = NDateSerializer.class )
+@JsonSerialize( using = SimpleNDateSerializer.class )
 @JsonDeserialize( using = NDateDeserializer.class )
 public class NDate implements Serializable {
 

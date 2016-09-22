@@ -1,5 +1,13 @@
 package org.nybatis.core.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.reflection.serializer.simple.SimpleNListSerializer;
+import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Assertion;
+import org.nybatis.core.validation.Validator;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,20 +23,12 @@ import java.util.Set;
 import java.util.Spliterator;
 import java.util.function.Consumer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.reflection.Reflector;
-import org.nybatis.core.reflection.mapper.NListSerializer;
-import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.validation.Assertion;
-import org.nybatis.core.validation.Validator;
-
 /**
  * Multiple Data aggregated by NMap
  *
  * @author nayasis
  */
-@JsonSerialize( using = NListSerializer.class )
+@JsonSerialize( using = SimpleNListSerializer.class )
 public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
 	private static final long      serialVersionUID   = -3169472792493027837L;
