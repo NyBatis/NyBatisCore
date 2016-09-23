@@ -271,31 +271,22 @@ public class DbTableReader {
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = column.getName();
 
-            if( column.isPk() ) {
+            structureDefine.append( String.format(
+                    getTestNode( "#{%s} != null || #{%s} == '%s'", " %s" ),
+                    paramName, paramName, NullValue.STRING,
+                    columnName
+            ));
 
-                structureDefine.append(String.format( " %s\n", columnName ));
-                structureValues.append(String.format( " #{%s%s}\n", paramName, column.getDataTypeForSqlMaking() ));
+            structureValues.append(String.format(
+                    getTestNode("#{%s} != null && #{%s} !='%s'", " #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    paramName, column.getDataTypeForSqlMaking()
+            ));
 
-            } else {
-
-                structureDefine.append( String.format(
-                        getTestNode( "#{%s} != null || #{%s} == '%s'", " %s" ),
-                        paramName, paramName, NullValue.STRING,
-                        columnName
-                ));
-
-                structureValues.append(String.format(
-                        getTestNode("#{%s} != null && #{%s} !='%s'", " #{%s%s}"),
-                        paramName, paramName, NullValue.STRING,
-                        paramName, column.getDataTypeForSqlMaking()
-                ));
-
-                structureValues.append( String.format(
-                        getTestNode("#{%s} == '%s'","NULL"),
-                        paramName, NullValue.STRING
-                ));
-
-            }
+            structureValues.append( String.format(
+                    getTestNode("#{%s} == '%s'","NULL"),
+                    paramName, NullValue.STRING
+            ));
 
         }
 
