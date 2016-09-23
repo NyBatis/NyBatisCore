@@ -247,7 +247,7 @@ public class NDate implements Serializable {
     /**
      * 객체를 특정 포맷에 맞는 형식으로 출력한다.
      *
-     * @param format 날짜포맷 [YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초]
+     * @param format 날짜포맷 (YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초)
      * @return 포맷에 맞는 날짜 문자열
      */
     public String toString( String format ) {
@@ -263,7 +263,7 @@ public class NDate implements Serializable {
     /**
      * 특정 형식문자열을 제외한 나머지 문자열을 제거한 format 을 구한다.
      *
-     * @param format 사용자가 입력한 날짜 지정형식
+     * @param format 사용자가 입력한 날짜 지정형식 (YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초)
      * @param stripYn yyyyMMddHHmmssSSS 이외의 문자 제외여부
      * @return yyyyMMddHHmmssSSS 이외의 문자는 제외된 날짜형식
      */
