@@ -2,7 +2,6 @@ package org.nybatis.core.db.sql.sqlNode.element.abstracts;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.ElseIfSqlElement;
@@ -10,8 +9,6 @@ import org.nybatis.core.db.sql.sqlNode.element.ElseSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.IfSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.WhenSqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
-import org.nybatis.core.model.NMap;
-
 
 public abstract class SqlElement {
 
@@ -53,13 +50,15 @@ public abstract class SqlElement {
 				list.add( new ElementText( element.getClass(), element.toString( param ) ) );
 			}
 
-			if( isIfSeries(element) ) {
+			if( isIf(element) ) {
+				previousCondition = getIfSeriesResult( element, param );
+
+			} else if( isElseIf( element ) ) {
 				if( previousCondition == null || previousCondition == false ) {
 					previousCondition = getIfSeriesResult( element, param );
 				}
-			}
 
-			if( isIfCloseSeries(element) ) {
+			} else if( isElse( element ) ) {
 				previousCondition = null;
 			}
 
@@ -69,16 +68,21 @@ public abstract class SqlElement {
 
 	}
 
-	private boolean isIfSeries( SqlElement element ) {
-		return element instanceof IfSqlElement;
+	private boolean isIf( SqlElement element ) {
+		return element.getClass() == IfSqlElement.class;
+	}
+
+	private boolean isElseIf( SqlElement element ) {
+		return element.getClass() == ElseIfSqlElement.class;
+	}
+
+	private boolean isElse( SqlElement element ) {
+		return element.getClass() == ElseSqlElement.class;
 	}
 
 	private boolean getIfSeriesResult( SqlElement element, QueryParameter param ) {
-
-		if( ! isIfSeries(element) ) return false;
-
+		if( ! isIf( element ) ) return false;
 		return ((IfSqlElement) element).isTrue( param );
-
 	}
 
 	private boolean isElseSeries( SqlElement element ) {
@@ -89,10 +93,6 @@ public abstract class SqlElement {
 		if( klass == WhenSqlElement.class   ) return true;
 		return klass == ElseSqlElement.class;
 
-	}
-
-	private boolean isIfCloseSeries( SqlElement element ) {
-		return element instanceof ElseSqlElement;
 	}
 
 }
