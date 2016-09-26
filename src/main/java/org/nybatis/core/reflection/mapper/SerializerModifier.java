@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.type.ArrayType;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.serializer.customNullChecker.ArraySerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.BigDecimalSerializer;
 import org.nybatis.core.reflection.serializer.customNullChecker.BooleanSerializer;
@@ -35,8 +34,6 @@ public class SerializerModifier extends BeanSerializerModifier {
     public JsonSerializer<?> modifySerializer( SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer ) {
 
         Class<?> klass = beanDesc.getBeanClass();
-
-        NLogger.debug( klass );
 
         if( klass == Boolean.class ) {
             return new BooleanSerializer( serializer );
