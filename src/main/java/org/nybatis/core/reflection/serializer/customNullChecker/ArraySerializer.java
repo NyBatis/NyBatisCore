@@ -5,14 +5,14 @@ import org.nybatis.core.db.constant.NullValue;
 
 import java.io.IOException;
 
-public class ArraySerializer extends AbstractJsonSerializer<Object[]> {
+public class ArraySerializer extends AbstractJsonSerializer<Object> {
 
     public ArraySerializer( JsonSerializer defaultSerializer ) {
         super( defaultSerializer );
     }
 
     @Override
-    public boolean isNull( Object[] value ) throws IOException {
+    public boolean isNull( Object value ) throws IOException {
         return
                 value == NullValue.ARRAY_STRING ||
                 value == NullValue.ARRAY_BOOLEAN ||
