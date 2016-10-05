@@ -143,7 +143,7 @@ public class NDate implements Serializable {
      */
     public NDate setDate( String date, String format ) {
 
-        if( date == null || date.length() == 0 ) {
+        if( StringUtil.isEmpty(date) ) {
             setDate( new Date() );
             return this;
         }
