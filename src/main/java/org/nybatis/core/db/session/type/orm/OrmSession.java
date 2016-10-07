@@ -3,15 +3,13 @@ package org.nybatis.core.db.session.type.orm;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.model.NMap;
 
-import java.util.Map;
-
 /**
  * ORM session
  *
  * @author nayasis@gmail.com
  * @since 2015-09-21
  */
-public interface OrmSession<T> {
+public interface OrmSession<T> extends Cloneable {
 
     /**
      * Insert entity
@@ -196,5 +194,12 @@ public interface OrmSession<T> {
      * @return database name
      */
     String getDatabaseName();
+
+    /**
+     * clone current instance.
+     *
+     * @return cloned sql session
+     */
+    OrmSession<T> clone();
 
 }

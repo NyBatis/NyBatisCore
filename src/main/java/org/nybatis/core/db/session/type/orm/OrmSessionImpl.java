@@ -39,6 +39,12 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     }
 
+    public OrmSession<T> clone() {
+        OrmSessionImpl<T> ormSession = new OrmSessionImpl<>( domainClass, sqlSession, properties.getTableName() );
+        ormSession.properties = properties.clone();
+        return ormSession;
+    }
+
     private void createOrmSql() {
         new DbTableReader().read( properties.getEnvironmentId(), properties.getTableName() );
     }

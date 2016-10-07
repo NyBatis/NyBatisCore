@@ -45,6 +45,10 @@ public class SqlSessionImpl implements SqlSession {
         return this;
     }
 
+    public SqlSession clone() {
+        return new SqlSessionImpl( token, properties );
+    }
+
     public SqlProperties getProperties() {
         return properties;
     }
