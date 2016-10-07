@@ -1,7 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.TableLayout;
@@ -19,7 +18,7 @@ import java.util.List;
  * @author nayasis@gmail.com
  * @since 2015-09-16
  */
-public class OrmSessionProperties {
+public class OrmSessionProperties implements Cloneable {
 
     private String  environmentId;
     private String  tableName;
