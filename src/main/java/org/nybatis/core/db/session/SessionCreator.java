@@ -10,9 +10,12 @@ import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionToken;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
+
+import java.lang.annotation.Annotation;
 
 /**
  * Session Creator
@@ -47,12 +50,14 @@ public class SessionCreator {
 
 		String domainTableName, domainEnvironmentId = null;
 
-		if( domainClass.isAnnotationPresent( Table.class ) ) {
-			Table table = domainClass.getAnnotation( Table.class );
-			domainEnvironmentId = table.environmentId();
-			domainTableName     = ( table.value() == null || table.value().isEmpty() ) ? table.name() : table.value();
+		Table tableAnnotation = getTableAnnotaion( domainClass );
+
+		if( tableAnnotation != null ) {
+			domainEnvironmentId = tableAnnotation.environmentId();
+			domainTableName     = Validator.nvl( tableAnnotation.value(), tableAnnotation.name() );
 			if( Const.db.DEFAULT_ENVIRONMENT_ID.equals( domainEnvironmentId ) ) domainEnvironmentId = null;
-			if( Const.db.DEFAULT_TABLE_NAME.equals( domainTableName ) ) domainTableName = StringUtil.toUncamel( domainClass.getSimpleName() ).toUpperCase();
+			if( Const.db.DEFAULT_TABLE_NAME.equals( domainTableName ) )
+				domainTableName = StringUtil.toUncamel( domainClass.getSimpleName() ).toUpperCase();
 
 		} else {
 			domainTableName = StringUtil.toUncamel( domainClass.getSimpleName() ).toUpperCase();
@@ -64,6 +69,24 @@ public class SessionCreator {
 		SqlSession sqlSession = createSqlSession( token, environmentId );
 
 		return new OrmSessionImpl<>( domainClass, (SqlSessionImpl) sqlSession, tableName );
+
+	}
+
+	private Table getTableAnnotaion( Class domainClass ) {
+
+		if( domainClass == null ) return null;
+
+		Class klass = domainClass;
+
+		while( true ) {
+
+			if( klass.isAnnotationPresent( Table.class ) )
+				return (Table) klass.getAnnotation( Table.class );
+
+			klass = klass.getSuperclass();
+			if( klass == Object.class ) return null;
+
+		}
 
 	}
 

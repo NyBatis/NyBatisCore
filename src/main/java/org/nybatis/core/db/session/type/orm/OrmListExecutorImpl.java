@@ -3,7 +3,6 @@ package org.nybatis.core.db.session.type.orm;
 import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.exception.unchecked.InvalidArgumentException;
-import org.nybatis.core.validation.Assertion;
 
 import java.util.List;
 
@@ -46,7 +45,7 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> where( String sqlExpression ) {
-        return where( sqlExpression, null );
+        return where( sqlExpression );
     }
 
     @Override
