@@ -95,40 +95,42 @@ public class OrmSessionProperties implements Cloneable {
         return sqlIdPrefix() + Const.db.ORM_SQL_DELETE_PK;
     }
 
+    public void addWhere( String where ) {
+
+        if( StringUtil.isBlank(where) ) return;
+
+        where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
+
+        this.wheres.add( String.format( "AND ( %s )", where ) );
+
+    }
+
     public void addWhere( String where, Object parameter ) {
 
         if( StringUtil.isBlank(where) ) return;
 
-        if( parameter == null ) {
+        int currentWhereIndex = wheres.size();
 
-            where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s$1}", Const.db.ORM_PARAMETER_ENTITY) );
+        String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
+
+        NMap inputParam = setParameter( prefix, parameter );
+
+        where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
+
+        String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
+
+        if( parameter == null ) {
+            inputParam.put( singleParamKey, null );
+        }
+
+        if( inputParam.containsKey(singleParamKey) ) {
+            where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s}", singleParamKey) );
 
         } else {
-
-            int currentWhereIndex = wheres.size();
-
-            String prefix = String.format( "%s%d-", Const.db.ORM_PARAMETER_USER, currentWhereIndex );
-
-            NMap inputParam = setParameter( prefix, parameter );
-
-            where = where.trim().replaceFirst( "(?ims)^WHERE ", "" ).replaceFirst( "(?ims)^AND ", "" );
-
-            String singleParamKey = String.format( "%s%s", prefix, Const.db.PARAMETER_SINGLE );
-
-            if( parameter == null ) {
-                inputParam.put( singleParamKey, null );
-            }
-
-            if( inputParam.containsKey(singleParamKey) ) {
-                where = where.replaceAll( "#\\{(.+?)\\}", String.format("#{%s}", singleParamKey) );
-
-            } else {
-                where = where.replaceAll( "#\\{(.+?)\\}", String.format( "#{%s$1}", prefix ) );
-            }
-
-            userParameter.putAll( inputParam );
-
+            where = where.replaceAll( "#\\{(.+?)\\}", String.format( "#{%s$1}", prefix ) );
         }
+
+        userParameter.putAll( inputParam );
 
         this.wheres.add( String.format( "AND ( %s )", where ) );
 
