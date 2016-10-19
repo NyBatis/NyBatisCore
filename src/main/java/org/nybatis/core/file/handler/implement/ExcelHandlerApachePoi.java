@@ -176,45 +176,15 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		for( int idxRow = 1, maxRowCnt = sheet.getPhysicalNumberOfRows(); idxRow < maxRowCnt; idxRow++ ) {
 
 			Row  row  = sheet.getRow( idxRow );
-
 			NMap data = new NMap();
 
 			for( int idxColumn = 0, maxColumnCnt = header.size(); idxColumn < maxColumnCnt; idxColumn++ ) {
 
 				Cell cell = row.getCell( idxColumn );
-
 				if( cell == null ) continue;
 
 				String key = header.getString( idxColumn );
-
-				switch( cell.getCellType() ) {
-					case Cell.CELL_TYPE_FORMULA :
-						if( StringUtil.isNotEmpty( cell ) ) {
-							switch( evaluator.evaluateFormulaCell(cell) ) {
-								case Cell.CELL_TYPE_NUMERIC :
-									data.put( key, getNumericCellValue(cell) );
-									break;
-								case Cell.CELL_TYPE_BOOLEAN :
-									data.put( key, cell.getBooleanCellValue() );
-									break;
-								case Cell.CELL_TYPE_STRING  :
-									data.put( key, cell.getStringCellValue() );
-									break;
-							}
-						} else {
-							data.put( key, cell.getStringCellValue() );
-						}
-						break;
-					case Cell.CELL_TYPE_NUMERIC :
-						data.put( key, getNumericCellValue(cell) );
-						break;
-					case Cell.CELL_TYPE_BOOLEAN :
-						data.put( key, cell.getBooleanCellValue() );
-						break;
-					default :
-						data.put( key, cell.getStringCellValue() );
-
-				}
+				data.put( key, getValue(cell, evaluator) );
 
 			}
 
@@ -223,6 +193,32 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		}
 
 		return result;
+
+	}
+
+	private Object getValue( Cell cell, FormulaEvaluator evaluator ) {
+
+		switch( cell.getCellType() ) {
+			case Cell.CELL_TYPE_FORMULA :
+				if( StringUtil.isNotEmpty( cell ) ) {
+					switch( evaluator.evaluateFormulaCell(cell) ) {
+						case Cell.CELL_TYPE_NUMERIC :
+							return getNumericCellValue( cell );
+						case Cell.CELL_TYPE_BOOLEAN :
+							return cell.getBooleanCellValue();
+						case Cell.CELL_TYPE_STRING  :
+							return cell.getStringCellValue();
+					}
+				}
+				return cell.getStringCellValue();
+			case Cell.CELL_TYPE_NUMERIC :
+				return getNumericCellValue( cell );
+			case Cell.CELL_TYPE_BOOLEAN :
+				return cell.getBooleanCellValue();
+			default :
+				return cell.getStringCellValue();
+
+		}
 
 	}
 
