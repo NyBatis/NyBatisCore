@@ -199,7 +199,7 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Get resource names
+	 * find resources
 	 *
 	 * @param pattern   path matching pattern (glob expression. if not exists, add all result)
 	 * <pre>
@@ -223,9 +223,9 @@ public class ClassUtil {
 	 * 3. *.{java,txt} If file is either java or txt, path will be matched.
 	 * 4. abc.? matches a file which start with abc and it has extension with only single character.
 	 * </pre>
-	 * @return
+	 * @return found resource names
 	 */
-	public static List<String> getResourceNames( String... pattern ) {
+	public static List<String> findResources( String... pattern ) {
 
 		Set<String> resourceNamesInJar        = new HashSet<>();
 		Set<String> resourceNamesInFileSystem = new HashSet<>();

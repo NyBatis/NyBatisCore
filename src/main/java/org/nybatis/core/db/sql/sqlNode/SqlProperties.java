@@ -93,7 +93,7 @@ public class SqlProperties {
 	 *   - default environment's id
 	 * </pre>
 	 *
-	 * @return
+	 * @return representative environment id
 	 */
 	public String getRepresentativeEnvironmentId() {
 		return Validator.nvl( environmentId, GlobalSqlParameter.getEnvironmentId(), GlobalSqlParameter.getDefaultEnvironmentId(), DatasourceManager.getDefaultEnvironmentId() );

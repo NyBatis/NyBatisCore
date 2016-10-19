@@ -69,7 +69,7 @@ public class DatabaseConfigurator {
 
 		String dbConfDir = Const.path.toResourceName( Const.path.getConfigDatabase() );
 
-		List<String> resourceNames = ClassUtil.getResourceNames( dbConfDir + "/*.xml" );
+		List<String> resourceNames = ClassUtil.findResources( dbConfDir + "/*.xml" );
 
 		for( String resourceName : resourceNames ) {
 			new ConfigurationBuilder().readFrom( resourceName, reload );

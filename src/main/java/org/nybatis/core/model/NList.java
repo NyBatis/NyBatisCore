@@ -709,7 +709,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      *
      * @param printHeader if true, print header.
      * @param printAllRow if true, print all row.
-     * @return
+     * @return debug string
      */
     public String toDebugString( boolean printHeader, boolean printAllRow ) {
         return new NListPrinter(this).toString(printHeader, printAllRow);

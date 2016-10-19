@@ -9,7 +9,6 @@ import org.nybatis.core.util.NProperties;
 import org.nybatis.core.util.StringUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -130,7 +129,7 @@ public class Message {
 
         String configPath = Const.path.toResourceName( Const.path.getConfigMessage() );
 
-        List<String> resourceNames = ClassUtil.getResourceNames( configPath + "/**.prop" );
+        List<String> resourceNames = ClassUtil.findResources( configPath + "/**.prop" );
 
         Collections.sort( resourceNames );
 
