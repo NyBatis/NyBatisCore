@@ -179,7 +179,7 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 			NMap data = new NMap();
 
-			for( int idxColumn = 0, maxColumnCnt = row.getPhysicalNumberOfCells(); idxColumn < maxColumnCnt; idxColumn++ ) {
+			for( int idxColumn = 0, maxColumnCnt = header.size(); idxColumn < maxColumnCnt; idxColumn++ ) {
 
 				Cell cell = row.getCell( idxColumn );
 
