@@ -426,9 +426,9 @@ public class Reflector {
 	/**
 	 * get json text without null value
 	 *
-	 * @param fromBean	instance to convert as json data
-	 * @param prettyPrint
-	 * @return
+	 * @param fromBean		instance to convert as json
+	 * @param prettyPrint	true if you want to see json text with indentation
+	 * @return json text
 	 */
 	public static String toNullIgnoredJson( Object fromBean, boolean prettyPrint ) {
 		return toJson( fromBean, prettyPrint, false, true );

@@ -161,7 +161,7 @@ public class StringUtil {
 	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
 	 *                 key of value is inner text of '#{..}' pattern.
 	 * @param parameter parameter contains key and value
-	 * @return
+	 * @return parameter binded string
 	 */
 	public static String bindParam( Object value, Map parameter ) {
 
@@ -415,7 +415,6 @@ public class StringUtil {
      * </pre>
      * @param param     변환할 문자열
      * @return CAMEL 형 문자열
-     * @author 정화수
      */
     public static String toCamel( String param ) {
 
@@ -449,8 +448,6 @@ public class StringUtil {
      * </pre>
      * @param param     변환할 문자열
      * @return UNDERLINE 형 문자열
-     * @author 정화수
-     * @since 2011-05-02
      */
     public static String toUncamel( String param ) {
 
@@ -484,8 +481,6 @@ public class StringUtil {
      *
      * @param param
      * @return 특수문자가 제거된 텍스트
-     * @author 정화수
-     * @since 2011-04-07
      */
     public static String escape( Object param ) {
 
@@ -611,7 +606,7 @@ public class StringUtil {
      *
      * @param list 리스트 객체
      * @param concator 엘리먼트 사이를 연결시킬 구분 문자열
-     * @return
+     * @return joined text
      */
     public static String join( List<?> list, String concator ) {
 
