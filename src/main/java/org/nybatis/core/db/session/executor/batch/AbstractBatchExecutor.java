@@ -5,6 +5,7 @@ import org.nybatis.core.db.session.executor.SelectKeyExecutor;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.batch.module.Logs;
 import org.nybatis.core.db.session.executor.batch.module.Statements;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
@@ -172,6 +173,7 @@ public abstract class AbstractBatchExecutor {
 		}
 
 		if( logger.isDebugEnabled() ) {
+			DbUtils.logCaller();
 			for( Object key : statements.keySet() ) {
 				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms\n{}", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key), logs.getLog(key) );
 			}
