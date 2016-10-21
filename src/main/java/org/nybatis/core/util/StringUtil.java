@@ -744,15 +744,10 @@ public class StringUtil {
     }
 
     /**
-     * <pre>
-     *
      * 전화번호에 지역번호, 국번, 번호를 구분해 -를 붙여서 return 해주는 메소드
      *
-     * </pre>
-     * @param phoneNumber 전화번호
-     * @return - 기호로 구분된 전화번호
-     * @author nayasis
-     * @since  2011-08-09
+     * @param phoneNumber phone number
+	 * @return phone number delimeted with '-'
      */
     public static String getPhoneNumber( Object phoneNumber ) {
     	if( isEmpty(phoneNumber) ) return "";
@@ -807,7 +802,7 @@ public class StringUtil {
      * </pre>
      *
      * @param value text value
-     * @return
+     * @return text with space compressed
      */
     public static String compressSpace( Object value ) {
     	if( isEmpty(value) ) return "";
@@ -824,7 +819,7 @@ public class StringUtil {
 	 * </pre>
 	 *
 	 * @param value text value
-	 * @return
+	 * @return text with space or enter compressed
 	 */
 	public static String compressSpaceOrEnter( Object value ) {
 		if( isEmpty(value) ) return "";
@@ -839,7 +834,7 @@ public class StringUtil {
 	 * </pre>
 	 *
 	 * @param value text value
-	 * @return
+	 * @return text with enter compressed
 	 */
 	public static String compressEnter( Object value ) {
 		if( isEmpty(value) ) return "";
