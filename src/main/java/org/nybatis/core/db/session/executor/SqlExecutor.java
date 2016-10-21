@@ -52,6 +52,8 @@ public class SqlExecutor {
 
 		try {
 
+			DbUtils.logCaller();
+
 			conn = TransactionManager.getConnection( token, sqlBean.getEnvironmentId() );
 
 			if( NLogger.isTraceEnabled() ) {

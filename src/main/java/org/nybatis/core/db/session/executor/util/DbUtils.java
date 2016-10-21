@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.executor.util;
 
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.Types;
 
@@ -9,6 +10,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DbUtils {
+
+	private static SqlCallerFinder sqlCallerFinder = new SqlCallerFinder();
 
 	public static boolean isPrimitive( Object object ) {
 		return object == null || isPrimitive( object.getClass() );
@@ -45,6 +48,11 @@ public class DbUtils {
 		if( klass == Object.class     ) return true;
 		return Types.isArrayOrList( klass );
 
+	}
+
+	public static void logCaller() {
+		if( ! NLogger.isDebugEnabled() ) return;
+		NLogger.debug( ">> called from : {}", sqlCallerFinder.get() );
 	}
 
 }
