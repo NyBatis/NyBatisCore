@@ -161,8 +161,18 @@ public abstract class AbstractBatchExecutor {
 
 				NLogger.debug( ">> successCount : {}, notAavailable : {}, failCount : {}", successCount, notAavailable, failCount );
 
-				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
-						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
+				SqlException exception;
+
+				try {
+					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
+							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
+
+				} catch( OutOfMemoryError error ) {
+
+					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error",
+							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
+
+				}
 
 				exception.setErrorCode( e.getErrorCode() );
 
