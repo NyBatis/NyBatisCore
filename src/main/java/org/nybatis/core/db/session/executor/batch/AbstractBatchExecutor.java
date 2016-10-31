@@ -169,6 +169,8 @@ public abstract class AbstractBatchExecutor {
 
 				} catch( OutOfMemoryError error ) {
 
+					NLogger.warn( "fail on logging error detail due to OutOfMemoryError\n\n{} Error (code:{}) {}", statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
+
 					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error",
 							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
 
