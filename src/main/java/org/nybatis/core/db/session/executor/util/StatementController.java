@@ -8,11 +8,14 @@ import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 import org.nybatis.core.db.sql.mapper.implement.ByteArrayMapper;
+import org.nybatis.core.db.sql.mapper.implement.TimeMapper;
+import org.nybatis.core.db.sql.mapper.implement.TimeStampMapper;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JdbcImplementException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StopWatcher;
 import org.slf4j.Logger;
@@ -313,18 +316,40 @@ public class StatementController {
 	}
 
 	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) throws SQLException {
-
 		try {
+			Object val = castNDateToDate( typeMapper, value );
 			if( statement instanceof PreparedStatement ) {
-				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );
+				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, val );
 			} else if( statement instanceof CallableStatement ) {
-				typeMapper.setParameter( (CallableStatement) statement, paramIndex, value.getValue() );
+				typeMapper.setParameter( (CallableStatement) statement, paramIndex, val );
 			}
 		} catch( Exception e ) {
 			throw new ClassCastingException( e, "parameter index:[{}], value : [{}]", paramIndex, value );
 		}
+	}
 
-
+	/**
+	 * correct NDate to Date
+	 *
+	 * At first, Jackson's JsonSerializer was delegated to this convertion.
+	 * but as version of Jackson up to 2.8.x, map convertion bypass value ignoring JsonSerializer.
+	 *
+	 * so, value casting is implemented in here.
+	 *
+	 * @param typeMapper	parameter type mapper
+	 * @param parameter		parameter
+	 * @return proper casted value
+	 */
+	private Object castNDateToDate( TypeMapperIF<Object> typeMapper, BindParam parameter ) {
+		Object val = parameter.getValue();
+		if( val == null ) return val;
+		if( val instanceof NDate ) {
+            Class typeMapperClass = typeMapper.getClass();
+            if( typeMapperClass == TimeMapper.class || typeMapperClass == TimeStampMapper.class ) {
+                val = ((NDate) val).toDate();
+            }
+        }
+		return val;
 	}
 
 
