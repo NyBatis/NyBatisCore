@@ -16,7 +16,7 @@ import java.util.Date;
  * java.sql.Date handle data as Date only and miss time information(HH:MI:SS).<br>
  * So It is necessary to handle data as TimeStamp
  */
-public class TimeStampMapper implements TypeMapperIF<Date>{
+public class TimeStampMapper implements TypeMapperIF<Date> {
 
 	@Override
     public void setParameter( PreparedStatement statement, int index, Date param ) throws SQLException {

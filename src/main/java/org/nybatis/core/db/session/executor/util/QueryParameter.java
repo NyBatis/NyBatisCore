@@ -55,7 +55,7 @@ public class QueryParameter extends NMap {
             fromBean( singleParam );
 
         } else {
-            fromBean( Reflector.toJson(value) );
+            fromBean( value );
         }
 
         return this;
