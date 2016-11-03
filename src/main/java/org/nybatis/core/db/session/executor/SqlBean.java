@@ -113,10 +113,7 @@ public class SqlBean {
 
 		setDatabaseParameter();
 
-		if( logger.isTraceEnabled() ) {
-			String json = sqlParam == null ? "{ }" : sqlParam.toJson( true );
-			logger.trace( ">> {} parameter\n{}", toString(), json );
-		}
+		printParameterLog();
 
 		String query = sqlNode.getText( sqlParam, properties.isPageSql(), properties.isCountSql() );
 
@@ -132,6 +129,12 @@ public class SqlBean {
 			throw new SqlConfigurationException( e, "{} {}", toString(), e.getMessage() );
 		}
 
+	}
+
+	private void printParameterLog() {
+		if( ! logger.isTraceEnabled() ) return;
+		String json = sqlParam == null ? "{ }" : sqlParam.toJson( true );
+		logger.trace( ">> {} parameter\n{}", toString(), json );
 	}
 
 	private void setEnvironmentId( String environmentId ) {

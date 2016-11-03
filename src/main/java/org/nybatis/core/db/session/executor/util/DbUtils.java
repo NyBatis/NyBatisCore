@@ -1,8 +1,11 @@
 package org.nybatis.core.db.session.executor.util;
 
+import org.nybatis.core.conf.Const;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.Types;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -10,6 +13,8 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class DbUtils {
+
+	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_SQL );
 
 	private static SqlCallerFinder sqlCallerFinder = new SqlCallerFinder();
 
@@ -51,8 +56,8 @@ public class DbUtils {
 	}
 
 	public static void logCaller() {
-		if( ! NLogger.isDebugEnabled() ) return;
-		NLogger.debug( ">> called from : {}", sqlCallerFinder.get() );
+		if( ! logger.isDebugEnabled() ) return;
+		logger.debug( ">> called from : {}", sqlCallerFinder.get() );
 	}
 
 }
