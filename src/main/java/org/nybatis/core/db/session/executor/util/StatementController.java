@@ -317,40 +317,14 @@ public class StatementController {
 
 	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) throws SQLException {
 		try {
-			Object val = castNDateToDate( typeMapper, value );
 			if( statement instanceof PreparedStatement ) {
-				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, val );
+				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );
 			} else if( statement instanceof CallableStatement ) {
-				typeMapper.setParameter( (CallableStatement) statement, paramIndex, val );
+				typeMapper.setParameter( (CallableStatement) statement, paramIndex, value.getValue() );
 			}
 		} catch( Exception e ) {
 			throw new ClassCastingException( e, "parameter index:[{}], value : [{}]", paramIndex, value );
 		}
 	}
-
-	/**
-	 * correct NDate to Date
-	 *
-	 * At first, Jackson's JsonSerializer was delegated to this convertion.
-	 * but as version of Jackson up to 2.8.x, map convertion bypass value ignoring JsonSerializer.
-	 *
-	 * so, value casting is implemented in here.
-	 *
-	 * @param typeMapper	parameter type mapper
-	 * @param parameter		parameter
-	 * @return proper casted value
-	 */
-	private Object castNDateToDate( TypeMapperIF<Object> typeMapper, BindParam parameter ) {
-		Object val = parameter.getValue();
-		if( val == null ) return val;
-		if( val instanceof NDate ) {
-            Class typeMapperClass = typeMapper.getClass();
-            if( typeMapperClass == TimeMapper.class || typeMapperClass == TimeStampMapper.class ) {
-                val = ((NDate) val).toDate();
-            }
-        }
-		return val;
-	}
-
 
 }

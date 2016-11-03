@@ -100,75 +100,71 @@ public class BindParam {
 
 		Class<?> klass = value.getClass();
 
-        if( type == null ) {
-
+		if( type == null ) {
         	type = SqlType.find( klass );
+		}
 
-        	if( type != SqlType.BLOB && type != SqlType.BLOB_BOXED ) {
-				if( klass.isArray() ) {
-        			this.value = Arrays.asList( value );
+		if( type != SqlType.BLOB && type != SqlType.BLOB_BOXED ) {
+			if( klass.isArray() ) {
+				this.value = Arrays.asList( value );
+			}
+		}
+
+		if( klass == byte[].class ) {
+			type = SqlType.BLOB;
+		} else if( klass == Byte[].class ) {
+			type = SqlType.BLOB_BOXED;
+		} else if( klass == String.class ) {
+
+			try {
+
+				if( type == SqlType.INT || type == SqlType.INTEGER ) {
+					this.value = Integer.parseInt( (String) value );
+				} else if( type == SqlType.BOOLEAN ) {
+					this.value = "true".equalsIgnoreCase( (String) value );
+				} else if( type == SqlType.BIT ) {
+					this.value = "true".equalsIgnoreCase( (String) value );
+				} else if( type == SqlType.TINYINT ) {
+					this.value = Byte.parseByte( (String) value );
+				} else if( type == SqlType.SMALLINT ) {
+					this.value = Short.parseShort( (String) value );
+				} else if( type == SqlType.FLOAT ) {
+					this.value = Float.parseFloat( (String) value );
+				} else if( type == SqlType.DOUBLE ) {
+					this.value = Double.parseDouble( (String) value );
+				} else if( type == SqlType.DATE || type == SqlType.TIME || type == SqlType.TIMESTAMP  ) {
+					this.value = new NDate( (String) value ).toDate();
+				} else if( type == SqlType.REAL || type == SqlType.DECIMAL || type == SqlType.NUMERIC  ) {
+					this.value = new BigDecimal( (String) value );
+				} else if( type == SqlType.LIST ) {
+					this.value = new ArrayList<String>().add( (String) value );
 				}
-        	}
 
-        } else {
+			} catch( NumberFormatException e ) {
+				throw new SqlConfigurationException( "parameter casting exception. (key:{}, value:{}, {}:{})", this.key, value, e.getClass().getSimpleName(), e.getMessage() );
+			}
 
-            if( klass == byte[].class ) {
-            	type = SqlType.BLOB;
-            } else if( klass == Byte[].class ) {
-            	type = SqlType.BLOB_BOXED;
-            } else if( klass == String.class ) {
+		} else if( klass == Date.class ) {
+			if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
+			type = SqlType.DATE;
 
-            	try {
+		} else if( klass == Calendar.class ) {
+			this.value = ((Calendar) this.value).getTime();
+			if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
+			type = SqlType.DATE;
 
-            		if( type == SqlType.INT || type == SqlType.INTEGER ) {
-            			this.value = Integer.parseInt( (String) value );
-            		} else if( type == SqlType.BOOLEAN ) {
-            			this.value = "true".equalsIgnoreCase( (String) value );
-            		} else if( type == SqlType.BIT ) {
-            			this.value = "true".equalsIgnoreCase( (String) value );
-            		} else if( type == SqlType.TINYINT ) {
-            			this.value = Byte.parseByte( (String) value );
-            		} else if( type == SqlType.SMALLINT ) {
-            			this.value = Short.parseShort( (String) value );
-            		} else if( type == SqlType.FLOAT ) {
-            			this.value = Float.parseFloat( (String) value );
-            		} else if( type == SqlType.DOUBLE ) {
-            			this.value = Double.parseDouble( (String) value );
-            		} else if( type == SqlType.DATE || type == SqlType.TIME || type == SqlType.TIMESTAMP  ) {
-            			this.value = new NDate( (String) value ).toDate();
-            		} else if( type == SqlType.REAL || type == SqlType.DECIMAL || type == SqlType.NUMERIC  ) {
-            			this.value = new BigDecimal( (String) value );
-            		} else if( type == SqlType.LIST ) {
-            			this.value = new ArrayList<String>().add( (String) value );
-            		}
+		} else if( klass == NDate.class ) {
+			this.value = ((NDate) this.value).toDate();
+			if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
+			type = SqlType.DATE;
 
-            	} catch( NumberFormatException e ) {
-            		throw new SqlConfigurationException( "parameter casting exception. (key:{}, value:{}, {}:{})", this.key, value, e.getClass().getSimpleName(), e.getMessage() );
-            	}
+		// Databse Native Array Object (Must be defined it's type in database)
+		} else if( type == SqlType.ARRAY ) {
+			this.value = value;
 
-            } else if( klass == Date.class ) {
-            	if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
-            	type = SqlType.DATE;
-
-            } else if( klass == Calendar.class ) {
-            	this.value = ((Calendar) this.value).getTime();
-            	if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
-            	type = SqlType.DATE;
-
-            } else if( klass == NDate.class ) {
-            	this.value = ((NDate) this.value).toDate();
-            	if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
-            	type = SqlType.DATE;
-
-			// Databse Native Array Object (Must be defined it's type in database)
-			} else if( type == SqlType.ARRAY ) {
-				this.value = value;
-
-            } else if( type == SqlType.VARCHAR || type == SqlType.CHAR ) {
-            	this.value = value.toString();
-            }
-
-        }
+		} else if( type == SqlType.VARCHAR || type == SqlType.CHAR ) {
+			this.value = value.toString();
+		}
 
     }
 
