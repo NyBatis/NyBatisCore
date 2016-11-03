@@ -247,8 +247,8 @@ public class ReflectorTest {
 		person.birthDate = new Date();
 		person.birthNDate = new NDate();
 
-		person.profileNList.addRow( "key1", "val1" );
-		person.profileNList.addRow( "key2", "val2" );
+		person.profileNList.add( "key1", "val1" );
+		person.profileNList.add( "key2", "val2" );
 
 		NLogger.debug( Reflector.toJson( person ) );
 

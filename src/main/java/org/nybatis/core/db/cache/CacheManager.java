@@ -156,10 +156,10 @@ public class CacheManager {
 
 		for( CacheModel cacheModel : cacheModels.values() ) {
 
-			reportCacheModel.addRow( "cacheId", cacheModel.getId() );
-			reportCacheModel.addRow( "class",   cacheModel.getKlass().getName() );
-			reportCacheModel.addRow( "size",    cacheModel.getSize() );
-			reportCacheModel.addRow( "flush",   cacheModel.getFlushSeconds() );
+			reportCacheModel.add( "cacheId", cacheModel.getId() );
+			reportCacheModel.add( "class", cacheModel.getKlass().getName() );
+			reportCacheModel.add( "size", cacheModel.getSize() );
+			reportCacheModel.add( "flush", cacheModel.getFlushSeconds() );
 
 		}
 

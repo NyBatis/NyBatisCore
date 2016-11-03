@@ -51,10 +51,10 @@ public class QueryParameter extends NMap {
             NMap singleParam = new NMap();
             singleParam.put( Const.db.PARAMETER_SINGLE, value );
 
-            fromBean( singleParam );
+            bind( singleParam );
 
         } else {
-            fromBean( value );
+            bind( value );
         }
 
         return this;
