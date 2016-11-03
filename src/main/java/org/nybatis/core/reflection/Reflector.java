@@ -349,25 +349,25 @@ public class Reflector {
 
         	if( ! field.isAccessible() ) field.setAccessible( true );
 
-        	result.addRow( "field", field.getName() );
+        	result.add( "field", field.getName() );
 
         	try {
 
         		String typeName = field.getType().getName();
 
-        		result.addRow( "type", typeName );
+        		result.add( "type", typeName );
 
         		switch( typeName ) {
         			case "[C" :
-        				result.addRow( "value", "[" + new String( (char[]) field.get( bean ) ) + "]" );
+        				result.add( "value", "[" + new String( (char[]) field.get( bean ) ) + "]" );
         				break;
         			default :
-        				result.addRow( "value", field.get( bean ) );
+        				result.add( "value", field.get( bean ) );
 
         		}
 
         	} catch( IllegalArgumentException | IllegalAccessException e ) {
-        		result.addRow( "value", e.getMessage() );
+        		result.add( "value", e.getMessage() );
             }
 
         }
@@ -624,6 +624,21 @@ public class Reflector {
 	}
 
 	/**
+	 * check text is valid json type
+	 *
+	 * @param json	json text
+	 * @return valid or not
+	 */
+	public static boolean isValidJson( String json ) {
+		try {
+			objectMapper.readTree( json );
+			return true;
+		} catch( IOException e ) {
+			return false;
+		}
+	}
+
+	/**
 	 * Convert as bean from object
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @param toClass	class to return
@@ -729,30 +744,30 @@ public class Reflector {
 
 	/**
 	 * Convert as List&lt;Map&gt;
-	 * @param jsonString	json text
+	 * @param json	json text
 	 * @return List
 	 */
-    public static List<Map<String,Object>> toListFromJsonAsMap( String jsonString ) {
-    	return toListFromJsonAs( jsonString, new TypeReference<List<HashMap<String, Object>>>() {} );
+    public static List<Map<String,Object>> toListFromJsonAsMap( String json ) {
+    	return toListFromJsonAs( json, new TypeReference<List<HashMap<String, Object>>>() {} );
     }
 
 	/**
 	 * Convert as List
 	 *
-	 * @param jsonString json text
+	 * @param json json text
 	 * @return List
 	 */
-	public static List toListFromJson( String jsonString ) {
-		return toListFromJsonAs( jsonString, new TypeReference<List>() {} );
+	public static List toListFromJson( String json ) {
+		return toListFromJsonAs( json, new TypeReference<List>() {} );
 	}
 
 	/**
 	 * Convert as List&lt;String&gt;
-	 * @param jsonString	json text
+	 * @param json	json text
 	 * @return List
 	 */
-	public static List<String> toListFromJsonAsString( String jsonString ) {
-		return toListFromJsonAs( jsonString, new TypeReference<List<String>>() {} );
+	public static List<String> toListFromJsonAsString( String json ) {
+		return toListFromJsonAs( json, new TypeReference<List<String>>() {} );
 	}
 
 	/**

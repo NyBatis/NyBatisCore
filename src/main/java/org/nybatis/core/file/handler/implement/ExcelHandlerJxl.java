@@ -86,7 +86,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
         for( int row = 0; row < rowCnt; row++ ) {
 
             for( int col = 0; col < colCnt; col++ ) {
-                sheet.addCell( new Label( col, row + 1, toExcelText( data.getBy( col, row ) ), bodyCellFormat ) );
+                sheet.addCell( new Label( col, row + 1, toExcelText( data.get( data.getKey( col ), row ) ), bodyCellFormat ) );
             }
 
         }
@@ -169,7 +169,7 @@ public class ExcelHandlerJxl extends ExcelHandler {
                     columnName = cell.getContents();
 
                 } else {
-                    result.addRow( columnName, cell.getContents() );
+                    result.add( columnName, cell.getContents() );
                 }
 
             }

@@ -12,7 +12,6 @@ import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.validation.Validator;
@@ -59,7 +58,7 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				inputParam.fromBean( parameter );
+				inputParam.bind( parameter );
 			}
 
 		}
@@ -74,7 +73,7 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				NMap newParam = new NMap().fromBean( parameter );
+				NMap newParam = new NMap().bind( parameter );
 				Reflector.merge( newParam, inputParam );
 			}
 		}

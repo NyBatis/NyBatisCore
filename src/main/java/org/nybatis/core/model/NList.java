@@ -1,10 +1,12 @@
 package org.nybatis.core.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.serializer.simple.SimpleNListSerializer;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
@@ -15,7 +17,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,20 +25,18 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
- * Multiple Data aggregated by NMap
+ * Multiple Data aggregated with NMap
  *
- * @author nayasis
+ * @author nayasis@gmail.com
  */
 @JsonSerialize( using = SimpleNListSerializer.class )
 public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
-	private static final long      serialVersionUID   = -3169472792493027837L;
-    private static final String    NO_KEY             = NList.class.getName() + ".NO_KEY";
+	private static final long serialVersionUID = -3169472792493027837L;
 
     protected Map<Object, Integer> header      = new LinkedHashMap<>();
     protected Map<Object, String>  alias       = new LinkedHashMap<>();
     protected List<NMap>           dataBody    = new ArrayList<>();
-
 
     /**
      * default constructor
@@ -47,58 +46,50 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     /**
      * constructor
      *
-     * @param json  json text
+     * @param json json text
      */
     public NList( String json ) {
-        fromJson( json );
-    }
-
-    public NList( NList initialData ) {
-        if( initialData == null || initialData.size() == 0 ) return;
-    	dataBody.addAll( initialData.dataBody );
-        header.putAll( initialData.header );
-        alias.putAll( initialData.alias );
+        _addRow( json, false );
+        refreshKey();
     }
 
     /**
      * constructor
      *
-     * @param initialData   list data
+     * @param nlist  NList data
      */
-    public NList( List<?> initialData ) {
-    	addRow( initialData );
+    public NList( NList nlist ) {
+        if( nlist == null || nlist.size() == 0 ) return;
+    	dataBody.addAll( nlist.dataBody );
+        header.putAll( nlist.header );
+        alias.putAll( nlist.alias );
     }
-
-    public NList( List<NMap> data, Set<?> header ) {
-
-        if( data == null || header == null ) return;
-
-        for( NMap nmap : data )
-            dataBody.add( nmap );
-
-        for( Object key : header )
-            this.header.put( key, data.size() );
-
-    }
-
 
     /**
-     * append data from json text
+     * constructor
      *
-     * @param json  json text
-     * @return self instance
+     * @param list   list
      */
-    public NList fromJson( String json ) {
+    public NList( List list ) {
+    	this( list, null );
+    }
 
-        if( StringUtil.isEmpty(json) ) return this;
+    /**
+     * constructor
+     *
+     * @param list      list
+     * @param header    specific header
+     */
+    public NList( List list, Set<?> header ) {
 
-        List<Map<String, Object>> maps = Reflector.toListFromJson( json );
+        boolean headerExist = Validator.isNotEmpty( header );
 
-        for( Map map : maps ) {
-            addRow( map );
+        _addRows( list, !headerExist );
+
+        if( headerExist ) {
+            for( Object key : header )
+                this.header.put( key, list.size() );
         }
-
-        return refreshKey();
 
     }
 
@@ -128,11 +119,11 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * key 에 해당하는 별칭을 세팅한다.
-     *
-     * @param key   key
-     * @param alias 별칭
-     * @param overwrite 덮어쓰기 여부 (false 일 경우, 별칭이 이미 세팅되어 있으면 변경하지 않는다.)
+     * set alias of key
+     * @param key       key to named alias
+     * @param alias     alias corresponding key
+     * @param overwrite if false, do not assign alias to key already assigned.
+     * @return
      */
     public NList setAlias( Object key, Object alias, boolean overwrite ) {
     	if( containsKey(key) ) {
@@ -144,10 +135,11 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * key 에 해당하는 별칭을 세팅한다.
+     * set alias
      *
      * @param key   key
-     * @param alias 별칭
+     * @param alias alias
+     * @return self instance
      */
     public NList setAlias( Object key, String alias ) {
     	setAlias( key, alias, true );
@@ -155,83 +147,73 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * key에 해당하는 별칭을 구한다.
-     *
-     * @param key key
-     * @return 별칭
+     * get alias corresponding key
+     * @param key
+     * @return alias
      */
     public String getAlias( Object key ) {
-    	return containsKey( key ) ? alias.get( key ) : null;
+    	return containsKey(key) ? alias.get(key) : null;
     }
 
     /**
-     * 별칭 목록을 구한다.
+     * get alias list
      *
-     * @return 별칭 목록
+     * @return list's aliases
      */
     public List<String> getAliases() {
-
     	refreshKey();
-
     	List<String> aliases = new ArrayList<>();
-
     	for( Object key : header.keySet() ) {
     		aliases.add( StringUtil.nvl( getAlias(key), StringUtil.nvl(key)) );
     	}
-
     	return aliases;
-
     }
 
     /**
-     * key 정보를 추가한다.
-     *
-     * @param key 추가할 key
-     * @return self-instance
+     * add key in header
+     * @param key key to add
+     * @return self instance
      */
     public NList addKey( Object... key ) {
-
         for( Object val : key ) {
         	if( ! containsKey( val ) ) {
         		header.put( val, 0 );
         	}
         }
-
         return this;
 
     }
-
 
     /**
      * Refresh Header and Key information
      */
     public NList refreshKey() {
 
-        Map<Object, Integer> newHeader = new HashMap<>();
+        Map<Object, Integer> currentHeader = new HashMap<>();
 
+        // read last index from bottom
         for( int i = dataBody.size() - 1; i >=0; i-- ) {
-            for( Object key : dataBody.get( i ).keySet() ) {
-                if( newHeader.containsKey(key) ) continue;
-                newHeader.put( key, i + 1 );
+            for( Object key : dataBody.get(i).keySet() ) {
+                if( currentHeader.containsKey(key) ) continue;
+                currentHeader.put( key, i + 1 );
             }
         }
 
+        // fill in previous order (and remove it from current header)
         Map<Object, Integer> buffer = new LinkedHashMap<>();
-
-        Set<Object> bufferKeyset = new LinkedHashSet<>();
-        bufferKeyset.addAll( header.keySet() );
-
         for( Object key : header.keySet() ) {
-            if( newHeader.containsKey(key) ) {
-                buffer.put( key, newHeader.get( key ) );
-                bufferKeyset.remove( key );
+            if( currentHeader.containsKey(key) ) {
+                buffer.put( key, currentHeader.get(key) );
+                currentHeader.remove(key);
             }
         }
 
-        for( Object key : bufferKeyset ) {
-            buffer.put( key, newHeader.get( key ) );
+        // fill the rest in current header
+        for( Object key : currentHeader.keySet() ) {
+            buffer.put( key, currentHeader.get(key) );
         }
 
+        // swap
         header.clear();
         header.putAll( buffer );
 
@@ -240,12 +222,13 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * 값을 추가한다.
+     * add row
      *
-     * @param key   키
-     * @param value 값
+     * @param key   key
+     * @param value value
+     * @return self instance
      */
-    public NList addRow( Object key, Object value ) {
+    public NList add( Object key, Object value ) {
 
     	int dataSize  = size( key );
     	int totalSize = size();
@@ -266,94 +249,148 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * add row with json text
+     * add row
      *
      * <pre>
      * {@link NList} data = new {@link NList};
      *
      * data.add( "{key:'1', val:'AAA'}" );
-     *
      * </pre>
      *
-     * @param jsonString json 문자열
+     * @param value row data (Bean, Map, JSON text)
+     * @return self instance
      */
-    public NList addRow( String jsonString ) {
-        addRow( new NMap( jsonString ) );
+    public NList addRow( Object value ) {
+        _addRow( value, true );
         return this;
     }
 
-    public NList addRow( Map data ) {
-        addRow( new NMap( data ) ) ;
-        return this;
-    }
+    private void _addRow( Object value, boolean syncronizeHeaderData ) {
 
-    public NList addRow( NMap data ) {
+        if( value == null ) return;
 
-    	if( data == null ) data = new NMap();
-        dataBody.add( data );
-        int size = dataBody.size();
-        for( Object key : data.keySet() ) {
-            header.put( key, size );
-        }
+        if( value instanceof NMap ) {
+            _addRowFromNMap( (NMap) value, syncronizeHeaderData );
 
-        return this;
-    }
+        } else if( value instanceof Map ) {
+            _addRowFromNMap( new NMap( value ), syncronizeHeaderData );
 
-    public NList addRow( NList data ) {
-    	if( data != null ) {
-            dataBody.addAll( data.dataBody );
-            refreshKey();
-        }
-        return this;
-    }
+        } else if( value instanceof List ) {
+            _addRows( (List) value, syncronizeHeaderData );
 
-	/**
-	 * 데이터를 추가한다.
-	 *
-	 * @param data 만약 generic이 String이면 데이터를 Json 으로 간주하고 추가하며, generic이 아니라면 NMap 형식으로 데이터를 추가한다.
-	 */
-	@SuppressWarnings( "rawtypes" )
-    public NList addRow( List<?> data ) {
+        } else if( value instanceof NList ) {
+            addRows( (NList) value );
 
-		if( data != null ) {
-            for( Object e : data ) {
+        } else if( Types.isArray(value) ) {
+            _addRows( Types.toList( value ), syncronizeHeaderData );
 
-                if( e instanceof NMap ) {
-                    addRow( (NMap) e );
+        } else if( Types.isString( value ) ) {
 
-                } else if( e instanceof Map ) {
-                    addRow( new NMap( (Map) e ) );
+            String json = value.toString();
 
-                } else if( e instanceof String ) { // json string이라고 간주
-                    addRow( new NMap( e ) );
-
-                } else {
-                    addRow( new NMap( e ) );
+            try {
+                List list = Reflector.toListFromJson( json );
+                _addRows( list, false );
+                if( syncronizeHeaderData ) {
+                    refreshKey();
                 }
-
+            } catch( JsonIOException e ) {
+                Map<String, Object> map = Reflector.toMapFrom( json );
+                _addRow( map, syncronizeHeaderData );
             }
 
+        } else {
+            _addRow( new NMap( value ), syncronizeHeaderData );
         }
 
-        return this;
+    }
 
+    private void _addRowFromNMap( NMap data, boolean syncronizeHeaderData ) {
+
+        dataBody.add( Validator.nvl(data, new NMap()) );
+
+        if( syncronizeHeaderData ) {
+            int size = dataBody.size();
+            for( Object key : data.keySet() ) {
+                header.put( key, size );
+            }
+        }
+
+    }
+
+    /**
+     * add rows from another NList data
+     *
+     * @param nlist NList data
+     * @return self instance
+     */
+    public NList addRows( NList nlist ) {
+        _addRows( nlist, true );
+        return this;
+    }
+
+    public void _addRows( NList nlist, boolean syncronizeHeaderData ) {
+
+        if( nlist == null ) return;
+
+        dataBody.addAll( nlist.dataBody );
+
+        if( ! syncronizeHeaderData ) return;
+
+        for( Object key : nlist.header.keySet() ) {
+            if( header.containsKey(key) ) {
+                header.put( key, header.get(key) + nlist.header.get(key) );
+            } else {
+                header.put( key, nlist.header.get(key) );
+            }
+        }
+
+    }
+
+    /**
+     * add rows from another List contains Map or Bean or JSON text.
+     *
+     * @param list List data
+     * @return self instance
+     */
+    public NList addRows( List list ) {
+        _addRows( list, true );
+        return this;
 	}
 
+    private void _addRows( List list, boolean syncronizeHeaderData ) {
+        if( list != null ) {
+            for( Object e : list ) {
+                _addRow( e, syncronizeHeaderData );
+            }
+        }
+    }
+
+    /**
+     * get data size of header key
+     *
+     * @param key header key
+     * @return data size
+     */
     public int size( Object key ) {
     	return Validator.nvl( header.get( key ), 0 );
     }
 
+    /**
+     * get total row size
+     *
+     * @return data size
+     */
     public int size() {
     	return dataBody.size();
     }
 
     /**
-     * 특정 key에 해당하는 컬럼 데이터들을 List 형태로 가져온다.
+     * get values corresponding key
      *
-     * @param key 추출할 컬럼 key
-     * @return key에 해당하는 List
+     * @param key   key column
+     * @return values corresponding key
      */
-    @SuppressWarnings( { "unchecked", "rawtypes" } )
     public <T> List<T> toList( String key ) {
 
     	List result = new ArrayList<>();
@@ -449,17 +486,6 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * remove row
-     *
-     * @param keyIndex index of keyset
-     */
-    public NList removeKeyBy( int keyIndex ) {
-    	Object key = getKey( keyIndex );
-    	if( key != null ) removeKey( key );
-        return this;
-    }
-
-    /**
      * set data in row
      *
      * @param key       key
@@ -476,40 +502,45 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     }
 
     /**
-     * set data
-     *
-     * @param keyIndex  index of keyset
-     * @param rowIndex  row index
-     * @param value		value
+     * set row data
+     * @param rowIndex          row index
+     * @param beanOrMapOrJson   data (Bean, map, json)
+     * @return self instance
      */
-    public NList setBy( int keyIndex, int rowIndex, Object value ) {
-    	Object key = getKey( keyIndex );
-    	if( key != null ) {
-            set( key, rowIndex, value );
-        }
+    public NList setRow( int rowIndex, Object beanOrMapOrJson ) {
+        _setRow( rowIndex, beanOrMapOrJson, true );
         return this;
+
     }
 
-    /**
-     * Set row data
-     *
-     * @param rowIndex index
-     * @param map  map data
-     */
-    public NList setRow( int rowIndex, NMap map ) {
+    private NList _setRow( int rowIndex, Object value, boolean syncronizeHeaderData ) {
+
+        if( value == null || Types.isArrayOrList(value) ) return this;
+
+        if( value instanceof NMap ) {
+            setRowFromNMap( rowIndex, (NMap) value, syncronizeHeaderData );
+        } else {
+            setRowFromNMap( rowIndex, new NMap(value), syncronizeHeaderData );
+        }
+
+        return this;
+
+    }
+
+    public void setRowFromNMap( int rowIndex, NMap map, boolean syncronizeHeaderData ) {
 
         dataBody.set( rowIndex, map );
 
-        int size = rowIndex + 1;
-
-        for( Object key : map.keySet() ) {
-        	if( containsKey( key ) ) continue;
-            header.put( key, size );
+        if( syncronizeHeaderData ) {
+            int size = rowIndex + 1;
+            for( Object key : map.keySet() ) {
+                if( containsKey( key ) ) continue;
+                header.put( key, size );
+            }
         }
 
-        return this;
-
     }
+
 
     /**
      * Get row data
@@ -520,59 +551,36 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         return dataBody.get( rowIndex );
     }
 
-    public NList setBy( int index, Map<Object, Object> data ) {
-    	setRow( index, new NMap( data ) );
-        return this;
-    }
-
+    /**
+     * get value in row
+     *
+     * @param key   key
+     * @param index row index
+     * @return value
+     */
     public Object get( Object key, int index ) {
         NMap data = dataBody.get( index );
         return data == null ? null : data.get( key );
     }
 
-    public Object getBy( int keyIndex, int index ) {
-        return get( getKey(keyIndex), index );
-    }
-
-
     public String getString( Object key, int index ) {
-    	return dataBody.get( index ).getString(key);
-    }
-
-    public String getStringBy( int keyIndex, int index ) {
-    	return dataBody.get( index ).getString( getKey( keyIndex) );
+    	return getRow( index ).getString(key);
     }
 
     public int getInt( Object key, int index ) {
-    	return dataBody.get( index).getInt( key );
-    }
-
-    public int getIntBy( int keyIndex, int index ) {
-    	return dataBody.get( index ).getInt( getKey( keyIndex) );
+    	return getRow( index ).getInt( key );
     }
 
     public long getLong( Object key, int index ) {
-    	return dataBody.get( index ).getLong( key );
-    }
-
-    public long getLongBy( int keyIndex, int index ) {
-    	return dataBody.get( index ).getLong( getKey(keyIndex) );
+    	return getRow( index ).getLong( key );
     }
 
     public float getFloat( Object key, int index ) {
-    	return dataBody.get( index ).getFloat( key );
-    }
-
-    public float getFloatBy( int keyIndex, int index ) {
-    	return dataBody.get( index ).getFloat( getKey( keyIndex) );
+    	return getRow( index ).getFloat( key );
     }
 
     public double getDouble( Object key, int index ) {
-    	return dataBody.get( index ).getDouble( key );
-    }
-
-    public double getDoubleBy( int keyIndex, int index ) {
-    	return dataBody.get( index ).getDouble( getKey( keyIndex) );
+    	return getRow( index ).getDouble( key );
     }
 
     public boolean containsKey( Object key ) {
@@ -583,21 +591,30 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         return dataBody.contains( row );
     }
 
+    /**
+     * get key header size
+     *
+     * @return size of key header
+     */
     public int keySize() {
         return header.size();
     }
 
+    /**
+     * get key header
+     * @return key header
+     */
     public Set<Object> keySet() {
         return header.keySet();
     }
 
-    public Set<Object> keySetCloned() {
-        Set<Object> result = new LinkedHashSet<>();
-        result.addAll( keySet() );
-        return result;
-    }
-
-    private Object getKey( int keyIndex ) {
+    /**
+     * get key by sequence
+     *
+     * @param keyIndex key index (sequence)
+     * @return key
+     */
+    public Object getKey( int keyIndex ) {
 
         Assertion.isTrue( 0 <= keyIndex &&  keyIndex <= keySize(), new IndexOutOfBoundsException( String.format( "Index[%d] is out of bounds from 0 to %d", keyIndex, keySize() ) ) );
 

@@ -15,12 +15,12 @@ public class CharacterUtilTest {
 		
 		for( char c : testCharArray ) {
 			
-			result.addRow( "code", Integer.toHexString( c ) );
-			result.addRow( "Half-width", CharacterUtil.isHalfWidth( c ) );
-			result.addRow( "testCharacter", c );
-			result.addRow( "isCJK", CharacterUtil.isCJK( c ) );
-			result.addRow( "isCJK2", CharacterUtil.isCJK2( c ) );
-			result.addRow( "unicodeBlock", Character.UnicodeBlock.of( c ) );
+			result.add( "code", Integer.toHexString( c ) );
+			result.add( "Half-width", CharacterUtil.isHalfWidth( c ) );
+			result.add( "testCharacter", c );
+			result.add( "isCJK", CharacterUtil.isCJK( c ) );
+			result.add( "isCJK2", CharacterUtil.isCJK2( c ) );
+			result.add( "unicodeBlock", Character.UnicodeBlock.of( c ) );
 			
 		}
 

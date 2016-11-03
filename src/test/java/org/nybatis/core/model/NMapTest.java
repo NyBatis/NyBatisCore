@@ -188,7 +188,7 @@ public class NMapTest {
 		assertEquals( map.get( "byte01" ) instanceof byte[], true );
 		assertEquals( map.get( "byte02" ) instanceof Byte[], true );
 
-		map.fromBean( testMap );
+		map.bind( testMap );
 
 		assertEquals( map.get( "set" ) instanceof Set, false );
 		assertEquals( map.get( "set" ) instanceof List, true );
@@ -245,7 +245,7 @@ public class NMapTest {
 		param.put( "ndate", ndate );
 		param.put( "date",  date  );
 
-		NMap convertedMap = new NMap().fromBean( param );
+		NMap convertedMap = new NMap().bind( param );
 		NLogger.debug( convertedMap );
 
 		DateBean dateBean = convertedMap.toBean( DateBean.class );
