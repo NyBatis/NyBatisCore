@@ -1,27 +1,22 @@
 package org.nybatis.core.model;
 
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.TreeMap;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.nybatis.core.exception.unchecked.BizException;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class NMapTest {
 
@@ -40,9 +35,16 @@ public class NMapTest {
 		public void setAge( int age ) {
 			this.age = age;
 		}
+		public NDate getBirth() {
+			return birth;
+		}
+		public void setBirth( NDate birth ) {
+			this.birth = birth;
+		}
 
 		private String name;
 		private int    age;
+		private NDate  birth = new NDate();
 		public  double salary;
 
 	}
@@ -60,6 +62,7 @@ public class NMapTest {
 
 		System.out.println( NMap );
 
+		// {name=정화수, age=37, birth=2016-11-03T03:09:52.016+0900, salary=102.3}
 
 	}
 
