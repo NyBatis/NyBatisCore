@@ -4,7 +4,6 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
 
 import java.util.Stack;
