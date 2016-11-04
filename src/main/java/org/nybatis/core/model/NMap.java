@@ -269,6 +269,24 @@ public class NMap extends LinkedHashMap {
 	}
 
 	/**
+	 * rebuild key for JsonPath. <br><br>
+	 *
+	 * Map can contains POJO and then JsonPath could not working on it.
+	 * it change all POJO value to Map.
+	 *
+	 * @return self instance
+	 */
+	public NMap rebuildKeyForJsonPath() {
+
+		Map jsonPathMap = new JsonPathMapper().toJsonPath( this );
+		this.clear();
+		this.putAll( jsonPathMap );
+
+		return this;
+
+	}
+
+	/**
 	 * get value by key's index
 	 *
 	 * @param keyIndex key index

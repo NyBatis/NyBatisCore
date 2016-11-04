@@ -62,16 +62,10 @@ public class QueryParameter extends NMap {
         // map can contains POJO and then JsonPath is not working.
         // so convert all POJO value to map.
         // it doesn't change Primitive Value or Byte[] (byte[]).
-        setKeyStructureToJsonPath();
+        rebuildKeyForJsonPath();
 
         return this;
 
-    }
-
-    private void setKeyStructureToJsonPath() {
-        Map map = new JsonPathMapper().toJsonPath( this );
-        this.clear();
-        this.putAll( map );
     }
 
     /**
