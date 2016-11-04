@@ -324,8 +324,6 @@ public class PrimitiveConverter {
 
 		if( val == null ) return null;
 
-		ClassUtil classUtil = new ClassUtil();
-
 		try {
 			if( ClassUtil.isExtendedBy( val, Map.class ) ) return toMap();
 			return toBean( klass );
@@ -343,24 +341,15 @@ public class PrimitiveConverter {
 		return TO_WRAPPER.containsKey( klass );
 	}
 
-	@SuppressWarnings( "unchecked" )
     private <T> Class<T> wrap( T value ) {
-
 		if( value == null ) return null;
-
 		return (Class<T>) wrap( value.getClass() );
-
 	}
 
 	private <T> Class<T> wrap( Class<T> klass ) {
-
 		if( klass == null ) return klass;
-
-		@SuppressWarnings( "unchecked" )
 		Class<T> wrapped = (Class<T>) TO_WRAPPER.get( klass );
-
 		return ( wrapped == null ) ? klass : wrapped;
-
 	}
 
 }
