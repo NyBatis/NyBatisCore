@@ -340,7 +340,7 @@ public class SqlSessionTest {
 
 		param.put( "tenantId", "S01"          );
 		param.put( "listId",   "TAR000000759" );
-		param.put( "listNm" );
+		param.put( "listNm",   null );
 
 		try {
 

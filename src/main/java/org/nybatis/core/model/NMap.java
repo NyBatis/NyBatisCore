@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Single Data
  *
- * @author nayasis
+ * @author nayasis@gmail.com
  *
  */
 public class NMap extends LinkedHashMap {
@@ -97,6 +97,12 @@ public class NMap extends LinkedHashMap {
 		return toJson( false );
 	}
 
+	/**
+	 * convert data to specific Bean
+	 *
+	 * @param klass	Class type to convert
+	 * @return converted bean
+	 */
 	public <T> T toBean( Class<T> klass ) {
 		return Reflector.toBeanFrom( this, klass );
 	}
@@ -105,71 +111,130 @@ public class NMap extends LinkedHashMap {
 		return new PrimitiveConverter( get(key) );
 	}
 
+	/**
+	 * get value as string
+	 * @param key key
+	 * @return String value
+	 */
 	public String getString( Object key ) {
 		return getConverter(key).toString();
 	}
 
+	/**
+	 * get value as int
+	 * @param key key
+	 * @return int value
+	 */
 	public int getInt( Object key ) {
 		return getConverter(key).toInt();
 	}
 
+	/**
+	 * get value as short
+	 * @param key key
+	 * @return short value
+	 */
 	public short getShort( Object key ) {
 		return getConverter(key).toShort();
 	}
 
+	/**
+	 * get value as char
+	 * @param key key
+	 * @return char value
+	 */
 	public char getChar( Object key ) {
 		return getConverter(key).toChar();
 	}
 
+	/**
+	 * get value as long
+	 * @param key key
+	 * @return long value
+	 */
 	public long getLong( Object key ) {
 		return getConverter(key).toLong();
 	}
 
+	/**
+	 * get value as float
+	 * @param key key
+	 * @return float value
+	 */
 	public float getFloat( Object key ) {
 		return getConverter(key).toFloat();
 	}
 
+	/**
+	 * get value as boolean
+	 * @param key key
+	 * @return boolean value
+	 */
 	public boolean getBoolean( Object key ) {
 		return getConverter(key).toBoolean();
 	}
 
+	/**
+	 * get value as byte
+	 * @param key key
+	 * @return byte value
+	 */
 	public Byte getByte( Object key ) {
 		return getConverter(key).toByte();
 	}
 
+	/**
+	 * get value as NDate
+	 * @param key key
+	 * @return NDate value
+	 */
 	public NDate getNDate( Object key ) {
 		return getConverter(key).toNDate();
 	}
 
+	/**
+	 * get value as Date
+	 * @param key key
+	 * @return Date value
+	 */
 	public Date getDate( Object key ) {
 		return getConverter(key).toDate();
 	}
 
-	public Calendar getCalender( Object key ) {
-		return getConverter( key ).toCalendar();
-	}
-
+	/**
+	 * get value as double
+	 * @param key key
+	 * @return double value
+	 */
 	public double getDouble( Object key ) {
 		return getConverter( key ).toDouble();
 	}
 
+	/**
+	 * get value as BigDecimal
+	 * @param key key
+	 * @return BigDecimal value
+	 */
 	public BigDecimal getBigDecimal( Object key ) {
 		return getConverter( key ).toBigDecimal();
 	}
 
+	/**
+	 * get value as BigInt
+	 * @param key key
+	 * @return BigInt value
+	 */
 	public BigInteger getBigInt( Object key ) {
 		return getConverter( key ).toBigInt();
 	}
 
-	public void put( Object key ) {
-		put( key, null );
-	}
-
+	/**
+	 * get value (auto type casting)
+	 * @param key key
+	 * @return value
+	 */
 	public <T> T getAs( Object key ) {
-		return castType( get( key ) );
-	}
-
-	private <T> T castType( Object val ) {
+		Object val = get( key );
 		return val == null ? null : (T) val;
 	}
 
@@ -203,22 +268,31 @@ public class NMap extends LinkedHashMap {
 
 	}
 
+	/**
+	 * get value by key's index
+	 *
+	 * @param keyIndex key index
+	 * @return value of key by index
+	 */
 	public Object getByIndex( int keyIndex ) {
         return super.get( getKey(keyIndex) );
 	}
 
+	/**
+	 * get key by index
+	 *
+	 * @param index	sequence index
+	 * @return key
+	 */
 	public Object getKey( int index ) {
 
         int maxIndex = super.size() - 1;
-
         if( 0 > index || index > maxIndex ) throw new ArrayIndexOutOfBoundsException( String.format("maxIndex : %d, inputedIndex : %d", maxIndex, index) );
 
         Iterator<Object> iterator = super.keySet().iterator();
-
-        for( int i = 0, iCnt = index; i < iCnt; i++ ) {
+        for( int i = 0; i < index; i++ ) {
             iterator.next();
         }
-
         return iterator.next();
 
 	}
@@ -228,10 +302,22 @@ public class NMap extends LinkedHashMap {
 		return Reflector.clone( this );
 	}
 
+	/**
+	 * get debug string
+	 *
+	 * @return	debug string contains key and value
+	 */
 	public String toDebugString() {
 		return toDebugString( true, false );
 	}
 
+	/**
+	 * get debug string contains key's class type and value
+	 *
+	 * @param showHeader	if true, show header
+	 * @param showType		if true, show key's class type
+	 * @return debug string
+	 */
 	public String toDebugString( boolean showHeader, boolean showType ) {
 
 		NList result = new NList();
@@ -250,7 +336,7 @@ public class NMap extends LinkedHashMap {
 	}
 
 	/**
-	 * get hashcode for value. <br><br>
+	 * get hashcode for value.
 	 *
 	 * @return hashcode for value
 	 */

@@ -52,7 +52,7 @@ public class SqlSessionOracleTest {
 
 		param.put( "tenantId", "S01"          );
 		param.put( "listId",   "TAR000000759" );
-		param.put( "listNm" );
+		param.put( "listNm",   null );
 
 		NMap result = sqlSession.sqlId( "OracleTest.procedure01", param ).call();
 
