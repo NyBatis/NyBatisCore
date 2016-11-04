@@ -87,7 +87,8 @@ public class Types {
     }
 
     public static boolean isPrimitive( Class klass ) {
-        return new PrimitiveConverter().isPrimitive( klass );
+        PrimitiveConverter converter = new PrimitiveConverter();
+        return converter.isPrimitive( klass ) || converter.isWrapper( klass );
     }
 
     public static boolean isNotPrimitive( Class klass ) {

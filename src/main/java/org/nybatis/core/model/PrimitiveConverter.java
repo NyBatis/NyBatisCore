@@ -172,8 +172,6 @@ public class PrimitiveConverter {
 		}
 	}
 
-
-
 	public NDate toNDate() {
 
 		if( isEmpty() ) return ignoreCastingError ? NDate.MIN_DATE : null;
@@ -339,6 +337,10 @@ public class PrimitiveConverter {
 
 	public boolean isPrimitive( Class<?> klass ) {
 		return TO_PRIMITIVE.containsKey( klass );
+	}
+
+	public boolean isWrapper( Class<?> klass ) {
+		return TO_WRAPPER.containsKey( klass );
 	}
 
 	@SuppressWarnings( "unchecked" )
