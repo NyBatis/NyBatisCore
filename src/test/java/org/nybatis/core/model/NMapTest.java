@@ -4,6 +4,7 @@ package org.nybatis.core.model;
 import org.nybatis.core.exception.unchecked.BizException;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.vo.Card;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.annotations.Test;
 
@@ -256,6 +257,51 @@ public class NMapTest {
 		assertTrue( date.equals( dateBean.date ) );
 
 		System.out.println( ">>> " + Integer.MAX_VALUE );
+
+	}
+
+	@Test
+	public void jsonPath() throws JsonPathNotFoundException {
+
+		NList nList = new NList( "[ {\n" +
+				"     \"cardId\" : \"CRD0002323\",\n" +
+				"     \"expoOrd\" : 1\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003010\",\n" +
+				"     \"expoOrd\" : 2\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003011\",\n" +
+				"     \"expoOrd\" : 3\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003330\",\n" +
+				"     \"expoOrd\" : 4\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003343\",\n" +
+				"     \"expoOrd\" : 5\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0002420\",\n" +
+				"     \"expoOrd\" : 6\n" +
+				"   } ]" );
+
+		NLogger.debug( nList );
+
+		assertEquals( nList.size(), 6 );
+		assertEquals( nList.get( "cardId", 3 ), "CRD0003330" );
+
+		NMap map = new NMap();
+		map.put( "card", nList.toList() );
+
+		assertEquals( map.getByJsonPath( "card[0].cardId" ), "CRD0002323" );
+
+		// POJO value is not Map so JsonPath is not working !
+		map.put( "card", nList.toList(Card.class) );
+
+		// convert key structure to JsonPath
+		Map jsonPathMap = new JsonPathMapper().toJsonPath( map );
+		map.clear();
+		map.putAll( jsonPathMap );
+
+		assertEquals( map.getByJsonPath( "card[0].cardId" ), "CRD0002323" );
 
 	}
 
