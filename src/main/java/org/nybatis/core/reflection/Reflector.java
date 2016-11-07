@@ -280,8 +280,8 @@ public class Reflector {
 			return merge( (Map)fromBean, (Map)toBean, strict );
 		}
 
-		Map fromMap = toMapFrom( fromBean );
-		Map toMap   = toMapFrom( toBean );
+		Map fromMap = new NMap( toMapFrom( fromBean ) ).rebuildKeyForJsonPath();
+		Map toMap   = new NMap( toMapFrom( toBean ) ).rebuildKeyForJsonPath();
 
 		merge( fromMap, toMap, strict );
 
