@@ -3,6 +3,7 @@ package org.nybatis.core.util;
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.validation.Validator;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -628,6 +630,18 @@ public class StringUtil {
     	return sb.toString();
 
     }
+
+	/**
+	 * concat set values
+	 *
+	 * @param set		values to concat
+	 * @param concator  concator
+	 * @return joined text
+	 */
+	public static String join( Set<?> set, String concator ) {
+		if( set == null || set.size() == 0 ) return "";
+		return join( new ArrayList(set), concator );
+	}
 
 	public static String join( Stack<?> stack, String delimeter ) {
 

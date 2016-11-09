@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -189,7 +188,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      */
     public NList refreshKey() {
 
-        Map<Object, Integer> currentHeader = new HashMap<>();
+        Map<Object, Integer> currentHeader = new LinkedHashMap<>();
 
         // read last index from bottom
         for( int i = dataBody.size() - 1; i >=0; i-- ) {

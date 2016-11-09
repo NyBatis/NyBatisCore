@@ -2,6 +2,7 @@ package org.nybatis.core.model;
 
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.util.StringUtil;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -261,6 +262,16 @@ public class NListTest {
         assertEquals( d.size(), 3 );
         assertEquals( d.getInt( "b", 2 ), 2 );
 
+    }
+
+    @Test
+    public void preserveKeySequence() {
+
+        NList list = new NList();
+        list.addRow( "{\"리스트ID\":\"TAR000001715\",\"리스트명\":\"테스트\",\"노출여부\":\"N\",\"그룹ID\":\"TAR00\",\"상품수\":0,\"카드링크\":\"N\",\"등록ID\":\"kinesis\",\"등록일자\":\"2016-11-02 17:55:47\",\"수정ID\":\"kinesis\",\"수정일자\":\"2016-11-02 17:55:47\",\"스마트오퍼링\":\"\"}" );
+        String keys = StringUtil.join( list.keySet(), "," );
+
+        assertEquals( keys, "리스트ID,리스트명,노출여부,그룹ID,상품수,카드링크,등록ID,등록일자,수정ID,수정일자,스마트오퍼링" );
 
     }
 
