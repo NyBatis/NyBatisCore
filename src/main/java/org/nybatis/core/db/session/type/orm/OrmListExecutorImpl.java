@@ -30,17 +30,27 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public List<T> select( Object parameter ) {
-        if( parameter != null && parameter instanceof Class ) {
-            throw new InvalidArgumentException( "The parameter [{}] must be query parameter. OrmSession's select parameter doesn't represent reflection of return result;", parameter );
-        }
+        checkParameterValidation( parameter );
         properties.setEntityParameter( parameter );
         return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
     }
 
+    private void checkParameterValidation( Object parameter ) {
+        if( parameter != null && parameter instanceof Class ) {
+            throw new InvalidArgumentException( "The parameter [{}] must be query parameter. OrmSession's select parameter doesn't represent reflection of return result;", parameter );
+        }
+    }
+
     @Override
-    public int count( T parameter ) {
+    public int count( Object parameter ) {
+        checkParameterValidation( parameter );
         properties.setEntityParameter( parameter );
         return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().count();
+    }
+
+    @Override
+    public int count() {
+        return count( null );
     }
 
     @Override
