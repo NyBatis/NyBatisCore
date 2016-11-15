@@ -4,7 +4,6 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
@@ -305,11 +304,16 @@ public class ClassUtil {
 	}
 
 	private static JarFile getJarFile( URL url ) {
+
+		String filePath = FileUtil.nomalizeSeparator( url.getFile() );
+		filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
+
 		try {
-            return new JarFile( url.getFile() );
+            return new JarFile( filePath );
         } catch( IOException e ) {
             throw new UncheckedIOException( e );
         }
+
 	}
 
 }
