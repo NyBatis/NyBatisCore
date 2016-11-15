@@ -423,7 +423,7 @@ public class StringUtil {
     	if( isEmpty(param) ) return "";
 
     	param = param.toLowerCase();
-        Pattern pattern = Pattern.compile( "(_[a-zA-Z])" );
+        Pattern pattern = Pattern.compile( "(_[a-zA-Z0-9])" );
         Matcher matcher = pattern.matcher( param );
         StringBuffer sb = new StringBuffer();
 
