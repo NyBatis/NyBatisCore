@@ -26,7 +26,20 @@ public interface OrmListExecutor<T> {
      */
     List<T> select( Object parameter );
 
-    int count( T parameter );
+    /**
+     * get list's row count
+     *
+     * @param parameter parameter
+     * @return row count
+     */
+    int count( Object parameter );
+
+    /**
+     * get list's row count
+     *
+     * @return row count
+     */
+    int count();
 
     /**
      * Add 'where' condition
