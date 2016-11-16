@@ -113,7 +113,7 @@ public class Types {
         } else {
 
             if( object instanceof List ) {
-                result = (List) object;
+                result = new ArrayList<>( (List) object );
             } else if( object instanceof Set ) {
                 result = new ArrayList<>( (Set) object );
             } else if( object instanceof NList ) {
