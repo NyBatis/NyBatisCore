@@ -198,4 +198,12 @@ public class StringUtilTest {
 
 	}
 
+	@Test
+	public void camel() {
+
+		assertEquals( "lndPlus19Yn", StringUtil.toCamel( "lnd_plus_19_yn" ) );
+		assertEquals( "lnd_plus_19_yn", StringUtil.toUncamel( "lndPlus19Yn" ) );
+
+	}
+
 }
