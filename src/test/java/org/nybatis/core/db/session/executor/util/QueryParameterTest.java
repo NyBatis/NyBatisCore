@@ -2,9 +2,13 @@ package org.nybatis.core.db.session.executor.util;
 
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.log.NLoggerPrinter;
+import org.nybatis.core.model.NMap;
+import org.nybatis.core.model.vo.Card;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.*;
@@ -44,4 +48,29 @@ public class QueryParameterTest {
         System.out.printf( "val : %s\n", parameter.get( "id.job[3]" ) );
 
     }
+
+    @Test
+    public void preserveOriginalParameter() {
+
+        List<Card> list = new ArrayList<>();
+
+        Card card = new Card();
+        card.cardId  = "A";
+        card.expoOrd = 1;
+
+        list.add( card );
+
+        NMap map = new NMap();
+
+        map.put( "list", list );
+
+        QueryParameter queryParameter = new QueryParameter( map );
+
+        // 원본 파라미터 (map) 상태는 계속 유지되어야 함
+
+        NMap convertedCard = ((List<NMap>) queryParameter.get( "list" )).get( 0 );
+        Card originalCard  = ((List<Card>)map.get( "list" )).get( 0 );
+
+    }
+
 }
