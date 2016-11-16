@@ -59,9 +59,11 @@ public class NMapTest {
 		p.age  = 37;
 		p.salary = 102.3;
 
-		NMap NMap = new NMap( p );
+		NMap map = new NMap( p );
 
-		System.out.println( NMap );
+		System.out.println( map );
+
+		NLogger.debug( map );
 
 		// {name=정화수, age=37, birth=2016-11-03T03:09:52.016+0900, salary=102.3}
 

@@ -12,8 +12,16 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * NLogger configuration loader
+ */
 public class NLoggerConfigLoader {
 
+	/**
+	 * load configuration
+	 *
+	 * @param filePath file or resource path of logback configuration
+	 */
 	public void loadConfiguration( String filePath ) {
 
 		InputStream stream = getConfiguration( filePath );
@@ -21,11 +29,8 @@ public class NLoggerConfigLoader {
 		if( stream == null ) return;
 		
 		LoggerContext context = getLoggerContext();
-		
 		JoranConfigurator configurator = new JoranConfigurator();
-		
 		configurator.setContext(context);
-		
 		context.reset();
 		
 		try {
@@ -35,23 +40,19 @@ public class NLoggerConfigLoader {
 			e.printStackTrace();
 			
         } finally {
-        	
         	try {
         		stream.close();
-        	} catch( IOException e ) {
-	            e.printStackTrace();
-            }
-        	
+        	} catch( IOException e ) {}
         }
-		
+
 	}
 
 	private LoggerContext getLoggerContext() {
 	    return (LoggerContext) LoggerFactory.getILoggerFactory();
     }
 	
-	private boolean isConfigurationNotLoaded() {
-		return getLoggerContext().getObject( CoreConstants.SAFE_JORAN_CONFIGURATION ) == null;
+	private boolean isConfigurationLoaded() {
+		return getLoggerContext().getObject( CoreConstants.SAFE_JORAN_CONFIGURATION ) != null;
 	}
 
 	private String getDefaultConfiguration() {
@@ -73,30 +74,37 @@ public class NLoggerConfigLoader {
 	
 	private InputStream getConfiguration( String filePath ) {
 
-		InputStream stream;
-
 		String configurationPath = Const.profile.apply( filePath );
 
 		if( ! FileUtil.isResourceExisted(configurationPath) ) {
-			
 			System.err.printf( "Logback external configuration file [%s] doesn't exist or can't be read.\n", filePath );
-			
-			if( ! isConfigurationNotLoaded() ) {
-				System.err.printf( "NLogger maybe read default logback configuration.\n\n" );
-				return null;
-				
-			} else {
-				System.err.printf( "NLogger uses default simple configuration.\n\n" );
-				stream = new ByteArrayInputStream( getDefaultConfiguration().getBytes() );
-				
-			}
-			
+			return loadDefaultConfiguration();
+
 		} else {
-			stream = FileUtil.getResourceAsStream( configurationPath );
+			InputStream stream = FileUtil.getResourceAsStream( configurationPath );
+			if( isNotInputstreamAvailable( stream ) ) {
+				stream = loadDefaultConfiguration();
+			}
+			return stream;
 		}
 		
-		return stream;
-		
 	}
-	
+
+	private InputStream loadDefaultConfiguration() {
+		if( isConfigurationLoaded() ) {
+			System.err.printf( "NLogger maybe read default logback configuration.\n\n" );
+			return null;
+		}
+		System.err.printf( "NLogger uses default simple configuration.\n\n" );
+		return new ByteArrayInputStream( getDefaultConfiguration().getBytes() );
+	}
+
+	private boolean isNotInputstreamAvailable( InputStream inputStream ) {
+		try {
+			return inputStream == null || inputStream.available() == 0;
+		} catch( IOException e ) {
+			return false;
+		}
+	}
+
 }
