@@ -453,7 +453,7 @@ public class StringUtil {
      */
     public static String toUncamel( String param ) {
 
-        Pattern pattern = Pattern.compile( "([A-Z]|[0-9]+)" );
+        Pattern pattern = Pattern.compile( "([A-Z])" );
         Matcher matcher = pattern.matcher( param );
         StringBuffer sb = new StringBuffer();
 
