@@ -4,7 +4,6 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
@@ -199,7 +198,7 @@ public class ClassUtil {
 	}
 
 	/**
-	 * Get resource names
+	 * find resources
 	 *
 	 * @param pattern   path matching pattern (glob expression. if not exists, add all result)
 	 * <pre>
@@ -223,9 +222,9 @@ public class ClassUtil {
 	 * 3. *.{java,txt} If file is either java or txt, path will be matched.
 	 * 4. abc.? matches a file which start with abc and it has extension with only single character.
 	 * </pre>
-	 * @return
+	 * @return found resource names
 	 */
-	public static List<String> getResourceNames( String... pattern ) {
+	public static List<String> findResources( String... pattern ) {
 
 		Set<String> resourceNamesInJar        = new HashSet<>();
 		Set<String> resourceNamesInFileSystem = new HashSet<>();
@@ -305,11 +304,16 @@ public class ClassUtil {
 	}
 
 	private static JarFile getJarFile( URL url ) {
+
+		String filePath = FileUtil.nomalizeSeparator( url.getFile() );
+		filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
+
 		try {
-            return new JarFile( url.getFile() );
+            return new JarFile( filePath );
         } catch( IOException e ) {
             throw new UncheckedIOException( e );
         }
+
 	}
 
 }

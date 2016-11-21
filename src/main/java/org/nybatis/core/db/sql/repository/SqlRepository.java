@@ -98,7 +98,7 @@ public class SqlRepository {
 				readFromFile( path.toString(), environmentId );
 			}
 		} else {
-			List<String> resourceNames = ClassUtil.getResourceNames( directory + "/**.xml" );
+			List<String> resourceNames = ClassUtil.findResources( directory + "/**.xml" );
 			for( String resourceName : resourceNames ) {
 				readFromFile( resourceName, environmentId );
 			}

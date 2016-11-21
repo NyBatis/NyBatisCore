@@ -235,7 +235,7 @@ public class SqlGrammerTest {
 
 		QueryParameter param = new QueryParameter();
 
-		param.fromJson( json );
+		param.bind( json );
 
 //		param = new NMap();
 

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.reflection.mapper.NDateDeserializer;
-import org.nybatis.core.reflection.mapper.NDateSerializer;
+import org.nybatis.core.reflection.deserializer.NDateDeserializer;
+import org.nybatis.core.reflection.serializer.simple.SimpleNDateSerializer;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
@@ -19,7 +19,7 @@ import java.util.Date;
  *
  * @author nayasis@gmail.com
  */
-@JsonSerialize( using = NDateSerializer.class )
+@JsonSerialize( using = SimpleNDateSerializer.class )
 @JsonDeserialize( using = NDateDeserializer.class )
 public class NDate implements Serializable {
 
@@ -143,7 +143,7 @@ public class NDate implements Serializable {
      */
     public NDate setDate( String date, String format ) {
 
-        if( date == null || date.length() == 0 ) {
+        if( StringUtil.isEmpty(date) ) {
             setDate( new Date() );
             return this;
         }
@@ -247,7 +247,7 @@ public class NDate implements Serializable {
     /**
      * 객체를 특정 포맷에 맞는 형식으로 출력한다.
      *
-     * @param format 날짜포맷 [YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초]
+     * @param format 날짜포맷 (YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초)
      * @return 포맷에 맞는 날짜 문자열
      */
     public String toString( String format ) {
@@ -263,7 +263,7 @@ public class NDate implements Serializable {
     /**
      * 특정 형식문자열을 제외한 나머지 문자열을 제거한 format 을 구한다.
      *
-     * @param format 사용자가 입력한 날짜 지정형식
+     * @param format 사용자가 입력한 날짜 지정형식 (YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초, FFF: 밀리초)
      * @param stripYn yyyyMMddHHmmssSSS 이외의 문자 제외여부
      * @return yyyyMMddHHmmssSSS 이외의 문자는 제외된 날짜형식
      */
@@ -271,7 +271,6 @@ public class NDate implements Serializable {
 
         if( format == null || format.length() == 0 ) return DEFAULT_INPUT_FORMAT;
 
-        // UI 프레임워크와 형식을 일치시키기 위해 포맷 변형
         format = format
         	.replaceAll( "YYYY", "yyyy" )
             .replaceAll( "([^D])DD([^D]|$)", "$1dd$2" )
@@ -286,81 +285,82 @@ public class NDate implements Serializable {
     }
 
     /**
-     * 년도를 구한다.
+     * get year
      *
-     * @return 4자리 년도
+     * @return year
      */
     public int getYear() {
         return currentTime.get( Calendar.YEAR );
     }
 
     /**
-     * 월을 구한다.
+     * get month
      *
-     * @return 월 ( 1 - 12 )
+     * @return month ( 1 - 12 )
      */
     public int getMonth() {
         return currentTime.get( Calendar.MONTH ) + 1;
     }
 
     /**
-     * 일을 구한다.
+     * get day
      *
-     * @return 일
+     * @return day
      */
     public int getDay() {
         return currentTime.get( Calendar.DATE );
     }
 
     /**
-     * 요일을 구한다.
+     * get week day
      *
-     * @return 요일 ( 1:일요일, 2:월요일, 3:화요일, 4:수요일, 5:목요일, 6:금요일, 7:토요일 )
+     * @return week day ( 1:sunday, 2:monday, 3:thuesday, 4:wednesday, 5:thursday, 6:friday, 7:saturdays )
      */
     public int getWeekDay() {
         return currentTime.get( Calendar.DAY_OF_WEEK );
     }
 
     /**
-     * 시간을 구한다.
+     * get hours
      *
-     * @return 시간 ( 0 - 24 )
+     * @return hours ( 0 - 24 )
      */
     public int getHour() {
         return currentTime.get( Calendar.HOUR_OF_DAY );
     }
 
     /**
-     * 분을 구한다.
+     * get miniutes
      *
-     * @return 분 (0-59)
+     * @return minutes (0-59)
      */
     public int getMinute() {
         return currentTime.get( Calendar.MINUTE );
     }
 
     /**
-     * 초를 구한다.
+     * get seconds
      *
-     * @return 초 (0-59)
+     * @return seconds (0-59)
      */
     public int getSecond() {
         return currentTime.get( Calendar.SECOND );
     }
 
     /**
-     * 밀리초를 구한다.
+     * get milli-seconds
      *
-     * @return 밀리초
+     * @return milli-seconds
      */
     public int getMillisecond() {
         return currentTime.get( Calendar.MILLISECOND );
     }
 
     /**
-     * 년도를 더하거나 뺀다.
+     * add or subtract year
      *
-     * @param value 더하거나 뺄 수량
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addYear( int value ) {
         currentTime.add( Calendar.YEAR, value );
@@ -370,8 +370,8 @@ public class NDate implements Serializable {
     /**
      * set year
      *
-     * @param value
-     * @return  self
+     * @param value value to set
+     * @return  self instance
      */
     public NDate setYear( int value ) {
         currentTime.set( Calendar.YEAR, value );
@@ -381,8 +381,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts month
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addMonth( int value ) {
         currentTime.add( Calendar.MONTH, value );
@@ -392,8 +392,8 @@ public class NDate implements Serializable {
     /**
      * set month
      *
-     * @param value
-     * @return  self
+     * @param value value to set
+     * @return  self instance
      */
     public NDate setMonth( int value ) {
         currentTime.set( Calendar.MONTH, value );
@@ -403,8 +403,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts day
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addDay( int value ) {
         currentTime.add( Calendar.DATE, value );
@@ -414,8 +414,8 @@ public class NDate implements Serializable {
     /**
      * set day
      *
-     * @param value
-     * @return self
+     * @param value value to set
+     * @return self instance
      */
     public NDate setDay( int value ) {
         currentTime.set( Calendar.DATE, value );
@@ -425,8 +425,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts hour
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addHour( int value ) {
         currentTime.add( Calendar.HOUR_OF_DAY, value );
@@ -436,8 +436,8 @@ public class NDate implements Serializable {
     /**
      * set hour (24-hour clock)
      *
-     * @param value
-     * @return self
+     * @param value value to set
+     * @return self instance
      */
     public NDate setHour( int value ) {
         currentTime.set( Calendar.HOUR_OF_DAY, value );
@@ -447,8 +447,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts minute
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addMinute( int value ) {
         currentTime.add( Calendar.MINUTE, value );
@@ -458,8 +458,8 @@ public class NDate implements Serializable {
     /**
      * set minute
      *
-     * @param value
-     * @return self
+     * @param value value to set
+     * @return self instance
      */
     public NDate setMinute( int value ) {
         currentTime.set( Calendar.MINUTE, value );
@@ -469,8 +469,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts second
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addSecond( int value ) {
         currentTime.add( Calendar.SECOND, value );
@@ -480,8 +480,8 @@ public class NDate implements Serializable {
     /**
      * set second
      *
-     * @param value
-     * @return  self
+     * @param value value to set
+     * @return  self instance
      */
     public NDate setSecond( int value ) {
         currentTime.set( Calendar.SECOND, value );
@@ -491,8 +491,8 @@ public class NDate implements Serializable {
     /**
      * adds or subtracts mili-second
      *
-     * @param value
-     * @return self
+     * @param value value to add or subtract
+     * @return self instance
      */
     public NDate addMillisecond( int value ) {
         currentTime.add( Calendar.MILLISECOND, value );
@@ -502,8 +502,8 @@ public class NDate implements Serializable {
     /**
      * set mili-second
      *
-     * @param value
-     * @return  self
+     * @param value value to add or subtract
+     * @return  self instance
      */
     public NDate setMillisecond( int value ) {
         currentTime.set( Calendar.MILLISECOND, value );

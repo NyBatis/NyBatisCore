@@ -17,6 +17,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -91,9 +92,14 @@ public class BatchPreparedStatementExecutor extends AbstractBatchExecutor {
 			NList paramLog = new NList();
 
 			for( List<BindParam> params : paramListPool.get(key) ) {
+
+				NMap rowParam = new NMap();
+
 				for( BindParam param : params ) {
-					paramLog.addRow( param.getKey(), param.getValue() );
+					rowParam.put( param.getKey(), param.getValue() );
 				}
+
+				paramLog.addRow( rowParam );
 
 			}
 

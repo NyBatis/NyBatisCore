@@ -171,4 +171,11 @@ public interface SqlSession {
 	 */
 	SqlSession openSeperateSession();
 
+	/**
+	 * clone current instance.
+	 *
+	 * @return cloned sql session
+	 */
+	SqlSession clone();
+
 }

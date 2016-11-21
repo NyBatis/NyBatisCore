@@ -5,6 +5,7 @@ import org.nybatis.core.db.session.executor.SelectKeyExecutor;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.batch.module.Logs;
 import org.nybatis.core.db.session.executor.batch.module.Statements;
+import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
@@ -115,6 +116,9 @@ public abstract class AbstractBatchExecutor {
 			exception.setDatabaseName( sqlBean.getDatasourceAttribute().getDatabase() );
 			throw exception;
 
+		} finally {
+			statements.clear();
+			logs.clear();
 		}
 
 	}
@@ -157,8 +161,20 @@ public abstract class AbstractBatchExecutor {
 
 				NLogger.debug( ">> successCount : {}, notAavailable : {}, failCount : {}", successCount, notAavailable, failCount );
 
-				SqlException exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
-						statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
+				SqlException exception;
+
+				try {
+					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
+							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
+
+				} catch( OutOfMemoryError error ) {
+
+					NLogger.warn( "fail on logging error detail due to OutOfMemoryError\n\n{} Error (code:{}) {}", statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
+
+					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error",
+							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
+
+				}
 
 				exception.setErrorCode( e.getErrorCode() );
 
@@ -169,6 +185,7 @@ public abstract class AbstractBatchExecutor {
 		}
 
 		if( logger.isDebugEnabled() ) {
+			DbUtils.logCaller();
 			for( Object key : statements.keySet() ) {
 				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms\n{}", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key), logs.getLog(key) );
 			}

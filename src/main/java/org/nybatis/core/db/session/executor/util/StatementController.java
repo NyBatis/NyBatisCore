@@ -8,11 +8,14 @@ import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 import org.nybatis.core.db.sql.mapper.implement.ByteArrayMapper;
+import org.nybatis.core.db.sql.mapper.implement.TimeMapper;
+import org.nybatis.core.db.sql.mapper.implement.TimeStampMapper;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
 import org.nybatis.core.db.sql.sqlMaker.BindStruct;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JdbcImplementException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StopWatcher;
 import org.slf4j.Logger;
@@ -313,7 +316,6 @@ public class StatementController {
 	}
 
 	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) throws SQLException {
-
 		try {
 			if( statement instanceof PreparedStatement ) {
 				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );
@@ -323,9 +325,6 @@ public class StatementController {
 		} catch( Exception e ) {
 			throw new ClassCastingException( e, "parameter index:[{}], value : [{}]", paramIndex, value );
 		}
-
-
 	}
-
 
 }

@@ -1,6 +1,7 @@
 package org.nybatis.core.db.sql.reader;
 
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.db.sql.repository.Column;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.repository.TableLayout;
@@ -101,10 +102,16 @@ public class DbTableReader {
         sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
+
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
+
             sb.append( String.format(
-                    getTestNode("#{%s} != null","AND %s = #{%s%s}"),
-                    getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
+                    getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
             ));
+
         }
 
         sb.append( getOverrideWhereNode() );
@@ -121,10 +128,22 @@ public class DbTableReader {
         sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
+
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
+
             sb.append( String.format(
-                    getTestNode("#{%s} != null","AND %s = #{%s%s}"),
-                    getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
+                    getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
             ));
+
+            sb.append( String.format(
+                    getTestNode("#{%s} == '%s'","AND %s IS NULL"),
+                    paramName, NullValue.STRING,
+                    columnName
+            ));
+
         }
 
         sb.append( getOverrideWhereNode() );
@@ -145,9 +164,19 @@ public class DbTableReader {
 
             if( column.isPk() ) continue;
 
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
+
             sb.append(String.format(
-                getTestNode("#{%s} != null", "  %s = #{%s%s}" ),
-                getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
+                getTestNode("#{%s} != null && #{%s} != '%s'", "  %s = #{%s%s}" ),
+                paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
+            ));
+
+            sb.append( String.format(
+                    getTestNode("#{%s} == '%s'"," %s = NULL"),
+                    paramName, NullValue.STRING,
+                    columnName
             ));
 
         }
@@ -156,9 +185,12 @@ public class DbTableReader {
         sb.append( "WHERE 1 = 1\n" );
 
         for( Column column : layout.getPkColumns() ) {
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
             sb.append( String.format(
-                    getTestNode( "#{%s} != null","AND %s = #{%s%s}"),
-                    getOverrideKey(column.getKey()), column.getName(), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
+                    getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
             ));
         }
 
@@ -175,10 +207,22 @@ public class DbTableReader {
         sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getColumns() ) {
+
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
+
             sb.append( String.format(
-                    getTestNode( "#{%s} != null", "AND %s = #{%s}" ),
-                    getOverrideKey( column.getKey() ), column.getName(), getOverrideKey( column.getKey() )
+                    getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
             ));
+
+            sb.append( String.format(
+                    getTestNode("#{%s} == '%s'","AND %s IS NULL"),
+                    paramName, NullValue.STRING,
+                    columnName
+            ));
+
         }
 
         sb.append( getOverrideWhereNode() );
@@ -194,10 +238,16 @@ public class DbTableReader {
         sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
 
         for( Column column : layout.getPkColumns() ) {
+
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
+
             sb.append( String.format(
-                    getTestNode( "#{%s} != null", "AND %s = #{%s}" ),
-                    getOverrideKey( column.getKey() ), column.getName(), getOverrideKey( column.getKey() )
+                    getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    columnName, paramName, column.getDataTypeForSqlMaking()
             ));
+
         }
 
         sb.append( getOverrideWhereNode() );
@@ -213,31 +263,35 @@ public class DbTableReader {
         StringBuilder structureDefine = new StringBuilder();
         StringBuilder structureValues = new StringBuilder();
 
-        boolean isFirst = true;
+        structureDefine.append( "<group delimeter=\",\">\n" );
+        structureValues.append( "<group delimeter=\",\">\n" );
 
         for( Column column : layout.getColumns() ) {
 
-            if( column.isPk() ) {
+            String paramName  = getOverrideKey( column.getKey() );
+            String columnName = column.getName();
 
-                structureDefine.append(String.format( (isFirst ? " " : ",") + " %s\n", column.getName() ));
-                structureValues.append(String.format( (isFirst ? " " : ",") + " #{%s%s}\n", getOverrideKey( column.getKey() ), column.getDataTypeForSqlMaking() ));
+            structureDefine.append( String.format(
+                    getTestNode( "#{%s} != null || #{%s} == '%s'", " %s" ),
+                    paramName, paramName, NullValue.STRING,
+                    columnName
+            ));
 
-            } else {
+            structureValues.append(String.format(
+                    getTestNode("#{%s} != null && #{%s} !='%s'", " #{%s%s}"),
+                    paramName, paramName, NullValue.STRING,
+                    paramName, column.getDataTypeForSqlMaking()
+            ));
 
-                structureDefine.append( String.format(
-                        getTestNode( "#{%s} != null", (isFirst ? " " : ",") + " %s" ),
-                        getOverrideKey(column.getKey()), column.getName()
-                ));
+            structureValues.append( String.format(
+                    getTestNode("#{%s} == '%s'","NULL"),
+                    paramName, NullValue.STRING
+            ));
 
-                structureValues.append(String.format(
-                        getTestNode("#{%s} != null", (isFirst ? " " : ",") + " #{%s%s}"),
-                        getOverrideKey(column.getKey()), getOverrideKey(column.getKey()), column.getDataTypeForSqlMaking()
-                ));
-
-            }
-
-            isFirst = false;
         }
+
+        structureDefine.append( "</group>\n" );
+        structureValues.append( "</group>\n" );
 
         sb.append( String.format( "INSERT /*+ %s.%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
                 Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),

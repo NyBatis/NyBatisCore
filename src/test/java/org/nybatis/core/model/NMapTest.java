@@ -1,27 +1,23 @@
 package org.nybatis.core.model;
 
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import org.nybatis.core.exception.unchecked.BizException;
+import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.vo.Card;
+import org.nybatis.core.reflection.Reflector;
+import org.testng.annotations.Test;
+
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.nybatis.core.exception.unchecked.BizException;
-import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.reflection.Reflector;
-import org.testng.annotations.Test;
-
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class NMapTest {
 
@@ -40,9 +36,16 @@ public class NMapTest {
 		public void setAge( int age ) {
 			this.age = age;
 		}
+		public NDate getBirth() {
+			return birth;
+		}
+		public void setBirth( NDate birth ) {
+			this.birth = birth;
+		}
 
 		private String name;
 		private int    age;
+		private NDate  birth = new NDate();
 		public  double salary;
 
 	}
@@ -56,10 +59,13 @@ public class NMapTest {
 		p.age  = 37;
 		p.salary = 102.3;
 
-		NMap NMap = new NMap( p );
+		NMap map = new NMap( p );
 
-		System.out.println( NMap );
+		System.out.println( map );
 
+		NLogger.debug( map );
+
+		// {name=정화수, age=37, birth=2016-11-03T03:09:52.016+0900, salary=102.3}
 
 	}
 
@@ -185,7 +191,7 @@ public class NMapTest {
 		assertEquals( map.get( "byte01" ) instanceof byte[], true );
 		assertEquals( map.get( "byte02" ) instanceof Byte[], true );
 
-		map.fromBean( testMap );
+		map.bind( testMap );
 
 		assertEquals( map.get( "set" ) instanceof Set, false );
 		assertEquals( map.get( "set" ) instanceof List, true );
@@ -242,7 +248,7 @@ public class NMapTest {
 		param.put( "ndate", ndate );
 		param.put( "date",  date  );
 
-		NMap convertedMap = new NMap().fromBean( param );
+		NMap convertedMap = new NMap().bind( param );
 		NLogger.debug( convertedMap );
 
 		DateBean dateBean = convertedMap.toBean( DateBean.class );
@@ -253,6 +259,51 @@ public class NMapTest {
 		assertTrue( date.equals( dateBean.date ) );
 
 		System.out.println( ">>> " + Integer.MAX_VALUE );
+
+	}
+
+	@Test
+	public void jsonPath() throws JsonPathNotFoundException {
+
+		NList nList = new NList( "[ {\n" +
+				"     \"cardId\" : \"CRD0002323\",\n" +
+				"     \"expoOrd\" : 1\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003010\",\n" +
+				"     \"expoOrd\" : 2\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003011\",\n" +
+				"     \"expoOrd\" : 3\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003330\",\n" +
+				"     \"expoOrd\" : 4\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0003343\",\n" +
+				"     \"expoOrd\" : 5\n" +
+				"   }, {\n" +
+				"     \"cardId\" : \"CRD0002420\",\n" +
+				"     \"expoOrd\" : 6\n" +
+				"   } ]" );
+
+		NLogger.debug( nList );
+
+		assertEquals( nList.size(), 6 );
+		assertEquals( nList.get( "cardId", 3 ), "CRD0003330" );
+
+		NMap map = new NMap();
+		map.put( "card", nList.toList() );
+
+		assertEquals( map.getByJsonPath( "card[0].cardId" ), "CRD0002323" );
+
+		// POJO value is not Map so JsonPath is not working !
+		map.put( "card", nList.toList(Card.class) );
+
+		// convert key structure to JsonPath
+		Map jsonPathMap = new JsonPathMapper().toJsonPath( map );
+		map.clear();
+		map.putAll( jsonPathMap );
+
+		assertEquals( map.getByJsonPath( "card[0].cardId" ), "CRD0002323" );
 
 	}
 

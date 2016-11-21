@@ -10,6 +10,12 @@
     <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>#{driver}</driver>
       <url>#{url}</url>
+      <username>1</username>
+      <!-- it is possible to set password as plain text -->
+      <!-- or to set password as encrypted value (Using org.nybatis.core.util.Encryptor) -->
+      <!-- passwordSecretKey can be set as text value itself or URL. -->
+      <password>c66586dd415a4fddbaad8a4b1edcdce2</password>
+      <passwordSecretKey>secret</passwordSecretKey>
     </datasourceJdbc>
     <sqlPath>
       <path>sqlite</path>

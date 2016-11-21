@@ -135,8 +135,8 @@ public enum SqlType {
 		if( klass == Date.class          ) return SqlType.DATE;
 		if( klass == Calendar.class      ) return SqlType.DATE;
 		if( klass == NDate.class         ) return SqlType.DATE;
-		if( Types.isMap( klass )         ) return SqlType.JAVA_OBJECT;
-		if( Types.isArrayOrList( klass )       ) return SqlType.LIST;
+		if( Types.isMap(klass)           ) return SqlType.JAVA_OBJECT;
+		if( Types.isArrayOrList(klass)   ) return SqlType.LIST;
 
 		return SqlType.VARCHAR;
 

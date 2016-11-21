@@ -2,6 +2,7 @@ package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
+import org.nybatis.core.exception.unchecked.InvalidArgumentException;
 
 import java.util.List;
 
@@ -29,19 +30,32 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public List<T> select( Object parameter ) {
+        checkParameterValidation( parameter );
         properties.setEntityParameter( parameter );
         return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
     }
 
+    private void checkParameterValidation( Object parameter ) {
+        if( parameter != null && parameter instanceof Class ) {
+            throw new InvalidArgumentException( "The parameter [{}] must be query parameter. OrmSession's select parameter doesn't represent reflection of return result;", parameter );
+        }
+    }
+
     @Override
-    public int count( T parameter ) {
+    public int count( Object parameter ) {
+        checkParameterValidation( parameter );
         properties.setEntityParameter( parameter );
         return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().count();
     }
 
     @Override
+    public int count() {
+        return count( null );
+    }
+
+    @Override
     public OrmListExecutor<T> where( String sqlExpression ) {
-        return where( sqlExpression, null );
+        return where( sqlExpression );
     }
 
     @Override

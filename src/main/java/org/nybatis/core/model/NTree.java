@@ -377,8 +377,8 @@ public class NTree<T> implements Serializable {
     }
 
     /**
-     * check if parent branch is existing.
-     * @return
+     * check if parent branch exists.
+     * @return true if parent branch exists.
      */
     public boolean hasParent() {
         return parent != null;

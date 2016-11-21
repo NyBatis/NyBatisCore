@@ -3,9 +3,11 @@ package org.nybatis.core.db.session.executor.util;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
+import org.nybatis.core.model.JsonPathMapper;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
+import java.util.Map;
 import java.util.Stack;
 
 import static org.nybatis.core.conf.Const.db.PARAMETER_INNER_FOR_EACH;
@@ -51,11 +53,16 @@ public class QueryParameter extends NMap {
             NMap singleParam = new NMap();
             singleParam.put( Const.db.PARAMETER_SINGLE, value );
 
-            fromBean( singleParam );
+            bind( singleParam );
 
         } else {
-            fromBean( value );
+            bind( value );
         }
+
+        // map can contains POJO and then JsonPath is not working.
+        // so convert all POJO value to map.
+        // it doesn't change Primitive Value or Byte[] (byte[]).
+        rebuildKeyForJsonPath();
 
         return this;
 

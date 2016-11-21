@@ -1,7 +1,13 @@
 package org.nybatis.core.db.datasource.factory.parameter;
 
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.Encryptor;
 import org.nybatis.core.util.StringUtil;
 
+/**
+ * JDBC connection properties
+ */
 public class JdbcConnectionProperties {
 
 	private String  driverName;
@@ -92,6 +98,31 @@ public class JdbcConnectionProperties {
 		try {
 			this.timeoutSeconds = Integer.parseInt( seconds );
 		} catch( NumberFormatException e ) {}
+	}
+
+	/**
+	 * set secret key for password decryption
+	 *
+	 * @param secretKey	secret key
+	 */
+	public void setPasswordSecretKey( String secretKey ) {
+
+		if( StringUtil.isBlank(secretKey) ) return;
+
+		if( FileUtil.isResourceExisted(secretKey) ) {
+			secretKey = FileUtil.readResourceFrom(secretKey);
+		}
+
+		secretKey = StringUtil.trim( secretKey );
+
+		if( StringUtil.isEmpty(secretKey) ) {
+			NLogger.warn( "There is no secret key for password decryption" );
+			return;
+		}
+
+		Encryptor encryptor = new Encryptor();
+		userPassword = encryptor.decrypt( userPassword, secretKey );
+
 	}
 
 	public String toString() {

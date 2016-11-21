@@ -87,7 +87,8 @@ public class Types {
     }
 
     public static boolean isPrimitive( Class klass ) {
-        return new PrimitiveConverter().isPrimitive( klass );
+        PrimitiveConverter converter = new PrimitiveConverter();
+        return converter.isPrimitive( klass ) || converter.isWrapper( klass );
     }
 
     public static boolean isNotPrimitive( Class klass ) {
@@ -112,7 +113,7 @@ public class Types {
         } else {
 
             if( object instanceof List ) {
-                result = (List) object;
+                result = new ArrayList<>( (List) object );
             } else if( object instanceof Set ) {
                 result = new ArrayList<>( (Set) object );
             } else if( object instanceof NList ) {
@@ -139,6 +140,14 @@ public class Types {
 
         return false;
 
+    }
+
+    public static boolean isString( Object value ) {
+        return value != null && ( value instanceof String || value instanceof StringBuffer || value instanceof  StringBuilder );
+    }
+
+    public static boolean isNotString( Object value ) {
+        return ! isString( value );
     }
 
 }

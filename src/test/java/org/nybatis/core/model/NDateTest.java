@@ -2,6 +2,7 @@ package org.nybatis.core.model;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -97,6 +98,14 @@ public class NDateTest {
         public String toString() {
             return Reflector.toJson( this );
         }
+
+    }
+
+    @Test
+    public void test() {
+
+        NLogger.debug( new NDate() );
+        NLogger.debug( new NDate().toString("YYYY-MM-DD'T'HH:MI:SS") );
 
     }
 

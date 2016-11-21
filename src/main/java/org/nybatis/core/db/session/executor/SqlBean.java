@@ -15,11 +15,15 @@ import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
 
 public class SqlBean {
+
+	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_SQL );
 
 	private SqlNode        sqlNode       = null;
 	private SqlProperties  properties    = null;
@@ -54,7 +58,7 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				inputParam.fromBean( parameter );
+				inputParam.bind( parameter );
 			}
 
 		}
@@ -69,7 +73,7 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				NMap newParam = new NMap().fromBean( parameter );
+				NMap newParam = new NMap().bind( parameter );
 				Reflector.merge( newParam, inputParam );
 			}
 		}
@@ -108,12 +112,13 @@ public class SqlBean {
 
 		setDatabaseParameter();
 
+		printParameterLog();
+
 		String query = sqlNode.getText( sqlParam, properties.isPageSql(), properties.isCountSql() );
 
 		try {
 
 			queryResolver = new QueryResolver( query, sqlParam );
-
 			return this;
 
 		} catch( StringIndexOutOfBoundsException e ) {
@@ -123,6 +128,12 @@ public class SqlBean {
 			throw new SqlConfigurationException( e, "{} {}", toString(), e.getMessage() );
 		}
 
+	}
+
+	private void printParameterLog() {
+		if( ! logger.isTraceEnabled() ) return;
+		String json = sqlParam == null ? "{ }" : sqlParam.toJson( true );
+		logger.trace( ">> {} parameter\n{}", toString(), json );
 	}
 
 	private void setEnvironmentId( String environmentId ) {

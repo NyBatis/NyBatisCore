@@ -153,7 +153,7 @@ public interface SessionExecutor {
 	 *
 	 * @param returnType        Map or Bean (if you want to return row), Primitive (if you want to single value)
 	 * @param listReturnTypes   (optional) return type of ResultSet(s). basic return type is NMap.
-	 * @return
+	 * @return result of function or precedure
 	 */
 	@SupportCacheOnlyResult
 	<T> T call( Class<T> returnType, Class<?>... listReturnTypes );

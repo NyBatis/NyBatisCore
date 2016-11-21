@@ -134,6 +134,26 @@ public class Validator {
     }
 
     /**
+     * check if value is String or StringBuffer or StringBuilder
+     *
+     * @param value check value
+     * @return  true if value is included in [ String, StringBuffer, StringBuilder ]
+     */
+    public static boolean isString( Object value ) {
+        return Types.isString( value );
+    }
+
+    /**
+     * check if value is not String nor StringBuffer nor StringBuilder
+     *
+     * @param value check value
+     * @return  true if value is not included in [ String, StringBuffer, StringBuilder ]
+     */
+    public static boolean isNotString( Object value ) {
+        return ! Types.isString( value );
+    }
+
+    /**
      * check whether value is matched with regular expression pattern.
      *
      * @param value   check value
@@ -435,7 +455,6 @@ public class Validator {
     public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {
         if( isNotEmpty(value) )       return value;
         if( isNotNull(replaceValue) ) return replaceValue;
-
         for( T val : anotherReplaceValue ) {
             if( isNotNull( val ) ) return val;
         }

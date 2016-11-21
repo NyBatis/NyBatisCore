@@ -4,6 +4,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.format.CellDateFormatter;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -13,11 +14,11 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.nybatis.core.exception.unchecked.ExcelNoHeadException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.handler.ExcelHandler;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -112,12 +113,13 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	@Override
 	public NList readFirstSheetFrom( InputStream inputStream ) throws UncheckedIOException {
-		return readFrom( inputStream, ( workbook, result ) -> {
+		Map<String, NList> sheets = readFrom( inputStream, ( workbook, result ) -> {
 			Sheet sheet = workbook.getSheetAt( 0 );
 			if( sheet != null ) {
 				result.put( "FirstSheet", readFrom( workbook, 0 ) );
 			}
-		} ).get( 0 );
+		} );
+		return sheets.get( "FirstSheet" );
 	}
 
 	@Override
@@ -135,20 +137,22 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 
 	public Map<String, NList> readFrom( InputStream inputStream, Reader reader ) throws UncheckedIOException {
 
-		Map<String, NList> result = new LinkedHashMap<>();
+		Map<String, NList> result   = new LinkedHashMap<>();
+		Workbook           workbook = null;
 
-		try (
-				Workbook workbook = new HSSFWorkbook( inputStream )
-		) {
-
-			try {
-				reader.read( workbook, result );
-			} catch( ExcelNoHeadException e ) {
-				NLogger.trace( "Excel Sheet (sheet:{}) has no header", e.getMessage() );
-			}
-
+		try {
+			workbook = WorkbookFactory.create( inputStream );
+			reader.read( workbook, result );
 		} catch( IOException e ) {
-			throw new UncheckedIOException( e, "Error on reading excel data from input stream." );
+			throw new UncheckedIOException( e, "error on reading excel data." );
+		} catch( InvalidFormatException | IllegalArgumentException e ) {
+			throw new UncheckedIOException( e, "invalid excel format." );
+		} finally {
+			if( workbook != null ) {
+				try { workbook.close(); } catch( IOException e ) {}
+			} else {
+				try { inputStream.close(); } catch( IOException e ) {}
+			}
 		}
 
 		return result;
@@ -172,45 +176,15 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		for( int idxRow = 1, maxRowCnt = sheet.getPhysicalNumberOfRows(); idxRow < maxRowCnt; idxRow++ ) {
 
 			Row  row  = sheet.getRow( idxRow );
-
 			NMap data = new NMap();
 
-			for( int idxColumn = 0, maxColumnCnt = row.getPhysicalNumberOfCells(); idxColumn < maxColumnCnt; idxColumn++ ) {
+			for( int idxColumn = 0, maxColumnCnt = header.size(); idxColumn < maxColumnCnt; idxColumn++ ) {
 
 				Cell cell = row.getCell( idxColumn );
-
 				if( cell == null ) continue;
 
 				String key = header.getString( idxColumn );
-
-				switch( cell.getCellType() ) {
-					case Cell.CELL_TYPE_FORMULA :
-						if( StringUtil.isNotEmpty( cell ) ) {
-							switch( evaluator.evaluateFormulaCell(cell) ) {
-								case Cell.CELL_TYPE_NUMERIC :
-									data.put( key, getNumericCellValue(cell) );
-									break;
-								case Cell.CELL_TYPE_BOOLEAN :
-									data.put( key, cell.getBooleanCellValue() );
-									break;
-								case Cell.CELL_TYPE_STRING  :
-									data.put( key, cell.getStringCellValue() );
-									break;
-							}
-						} else {
-							data.put( key, cell.getStringCellValue() );
-						}
-						break;
-					case Cell.CELL_TYPE_NUMERIC :
-						data.put( key, getNumericCellValue(cell) );
-						break;
-					case Cell.CELL_TYPE_BOOLEAN :
-						data.put( key, cell.getBooleanCellValue() );
-						break;
-					default :
-						data.put( key, cell.getStringCellValue() );
-
-				}
+				data.put( key, getValue(cell, evaluator) );
 
 			}
 
@@ -219,6 +193,32 @@ public class ExcelHandlerApachePoi extends ExcelHandler {
 		}
 
 		return result;
+
+	}
+
+	private Object getValue( Cell cell, FormulaEvaluator evaluator ) {
+
+		switch( cell.getCellType() ) {
+			case Cell.CELL_TYPE_FORMULA :
+				if( StringUtil.isNotEmpty( cell ) ) {
+					switch( evaluator.evaluateFormulaCell(cell) ) {
+						case Cell.CELL_TYPE_NUMERIC :
+							return getNumericCellValue( cell );
+						case Cell.CELL_TYPE_BOOLEAN :
+							return cell.getBooleanCellValue();
+						case Cell.CELL_TYPE_STRING  :
+							return cell.getStringCellValue();
+					}
+				}
+				return cell.getStringCellValue();
+			case Cell.CELL_TYPE_NUMERIC :
+				return getNumericCellValue( cell );
+			case Cell.CELL_TYPE_BOOLEAN :
+				return cell.getBooleanCellValue();
+			default :
+				return cell.getStringCellValue();
+
+		}
 
 	}
 

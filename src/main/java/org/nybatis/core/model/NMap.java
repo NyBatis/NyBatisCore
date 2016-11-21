@@ -11,14 +11,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Single Data
  *
- * @author nayasis
+ * @author nayasis@gmail.com
  *
  */
 public class NMap extends LinkedHashMap {
@@ -27,11 +25,18 @@ public class NMap extends LinkedHashMap {
 
 	private boolean ignoreCastingError = true;
 
+	/**
+	 * default constructor
+	 */
 	public NMap() {
 	    super();
 	}
 
-	@SuppressWarnings( { "rawtypes", "unchecked" } )
+	/**
+	 * constructor
+	 *
+	 * @param value	initial value
+	 */
     public NMap( Map value ) {
 		super( value );
 	}
@@ -43,31 +48,34 @@ public class NMap extends LinkedHashMap {
 	 *              if value is Entity, init map with Bean Parser.
 	 */
 	public NMap( Object value ) {
-
-		if( value instanceof String || value instanceof StringBuffer || value instanceof StringBuilder ) {
-			fromJson( value.toString() );
-		} else {
-			fromBean( value );
-		}
-
+		bind( value );
 	}
 
+	/**
+	 * ignore type cast error on calling get(..) method
+	 * @param ignore whether or not ignoring type cast error
+	 * @return self instance
+	 */
 	public NMap ignoreCastingError( boolean ignore ) {
 		ignoreCastingError = ignore;
 		return this;
 	}
 
+	/**
+	 * get ignoring option of type casting error.
+	 * @return if true, ignore type casting error.
+	 */
 	public boolean isIgnoreCastingError() {
 		return ignoreCastingError;
 	}
 
-    public NMap fromJson( String json ) {
-		super.putAll( Reflector.toMapFromJson(json) );
-	    return this;
-	}
-
-    public NMap fromBean( Object bean ) {
-		super.putAll( Reflector.toMapFrom( bean ) );
+	/**
+	 * bind value from Bean or Map or JSON text
+	 * @param beanOrMapOrJson	bind value (Bean or Map or JSON text)
+	 * @return self instance
+	 */
+    public NMap bind( Object beanOrMapOrJson ) {
+		super.putAll( Reflector.toMapFrom( beanOrMapOrJson ) );
 	    return this;
 	}
 
@@ -89,6 +97,12 @@ public class NMap extends LinkedHashMap {
 		return toJson( false );
 	}
 
+	/**
+	 * convert data to specific Bean
+	 *
+	 * @param klass	Class type to convert
+	 * @return converted bean
+	 */
 	public <T> T toBean( Class<T> klass ) {
 		return Reflector.toBeanFrom( this, klass );
 	}
@@ -97,123 +111,130 @@ public class NMap extends LinkedHashMap {
 		return new PrimitiveConverter( get(key) );
 	}
 
+	/**
+	 * get value as string
+	 * @param key key
+	 * @return String value
+	 */
 	public String getString( Object key ) {
-		return getConverter( key ).toString();
+		return getConverter(key).toString();
 	}
 
-	public String getStringBy( int keyIndex ) {
-		return getString( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as int
+	 * @param key key
+	 * @return int value
+	 */
 	public int getInt( Object key ) {
 		return getConverter(key).toInt();
 	}
 
-	public int getIntByIndex( int keyIndex ) {
-		return getInt( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as short
+	 * @param key key
+	 * @return short value
+	 */
 	public short getShort( Object key ) {
 		return getConverter(key).toShort();
 	}
 
-	public short getShortByIndex( int keyIndex ) {
-		return getShort( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as char
+	 * @param key key
+	 * @return char value
+	 */
 	public char getChar( Object key ) {
-		return getConverter( key).toChar();
+		return getConverter(key).toChar();
 	}
 
-	public char getCharByIndex( int keyIndex ) {
-		return getChar( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as long
+	 * @param key key
+	 * @return long value
+	 */
 	public long getLong( Object key ) {
-		return getConverter( key).toLong();
+		return getConverter(key).toLong();
 	}
 
-	public long getLongByIndex( int keyIndex ) {
-		return getLong( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as float
+	 * @param key key
+	 * @return float value
+	 */
 	public float getFloat( Object key ) {
-		return getConverter( key).toFloat();
+		return getConverter(key).toFloat();
 	}
 
-	public float getFloatByIndex( int keyIndex ) {
-		return getFloat( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as boolean
+	 * @param key key
+	 * @return boolean value
+	 */
 	public boolean getBoolean( Object key ) {
-		return getConverter( key ).toBoolean();
+		return getConverter(key).toBoolean();
 	}
 
-	public Boolean getBooleanByIndex( int keyIndex ) {
-		return getBoolean( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as byte
+	 * @param key key
+	 * @return byte value
+	 */
 	public Byte getByte( Object key ) {
-		return getConverter( key).toByte();
+		return getConverter(key).toByte();
 	}
 
-	public Byte getByteByIndex( int keyIndex ) {
-		return getByte( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as NDate
+	 * @param key key
+	 * @return NDate value
+	 */
 	public NDate getNDate( Object key ) {
 		return getConverter(key).toNDate();
 	}
 
-	public NDate getNDateByIndex( int keyIndex ) {
-		return  getNDate( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as Date
+	 * @param key key
+	 * @return Date value
+	 */
 	public Date getDate( Object key ) {
-		return getConverter( key).toDate();
+		return getConverter(key).toDate();
 	}
 
-	public Calendar getCalender( Object key ) {
-		return getConverter( key ).toCalendar();
-	}
-
-	public Calendar getCalenderByIndex( int keyIndex ) {
-		return getCalender( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as double
+	 * @param key key
+	 * @return double value
+	 */
 	public double getDouble( Object key ) {
 		return getConverter( key ).toDouble();
 	}
 
-	public double getDoubleByIndex( int keyIndex ) {
-		return getDouble( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as BigDecimal
+	 * @param key key
+	 * @return BigDecimal value
+	 */
 	public BigDecimal getBigDecimal( Object key ) {
 		return getConverter( key ).toBigDecimal();
 	}
 
-	public BigDecimal getBigDecimalByIndex( int keyIndex ) {
-		return getBigDecimal( getKey( keyIndex ) );
-	}
-
+	/**
+	 * get value as BigInt
+	 * @param key key
+	 * @return BigInt value
+	 */
 	public BigInteger getBigInt( Object key ) {
 		return getConverter( key ).toBigInt();
 	}
 
-	public BigInteger getBigIntByIndex( int keyIndex ) {
-		return getBigInt( getKey( keyIndex ) );
-	}
-
-	public void put( Object key ) {
-		put( key, null );
-	}
-
+	/**
+	 * get value (auto type casting)
+	 * @param key key
+	 * @return value
+	 */
 	public <T> T getAs( Object key ) {
-		return castType( get( key ) );
-	}
-
-	private <T> T castType( Object val ) {
+		Object val = get( key );
 		return val == null ? null : (T) val;
 	}
 
@@ -247,69 +268,96 @@ public class NMap extends LinkedHashMap {
 
 	}
 
-	public Object getByIndex( int keyIndex ) {
-        return super.get( getKey( keyIndex ) );
+	/**
+	 * rebuild key for JsonPath. <br><br>
+	 *
+	 * Map can contains POJO and then JsonPath could not working on it.
+	 * it change all POJO value to Map.
+	 *
+	 * @return self instance
+	 */
+	public NMap rebuildKeyForJsonPath() {
+
+		Map jsonPathMap = new JsonPathMapper().toJsonPath( this );
+		this.clear();
+		this.putAll( jsonPathMap );
+
+		return this;
+
 	}
 
+	/**
+	 * get value by key's index
+	 *
+	 * @param keyIndex key index
+	 * @return value of key by index
+	 */
+	public Object getByIndex( int keyIndex ) {
+        return super.get( getKey(keyIndex) );
+	}
+
+	/**
+	 * get key by index
+	 *
+	 * @param index	sequence index
+	 * @return key
+	 */
 	public Object getKey( int index ) {
 
         int maxIndex = super.size() - 1;
-
         if( 0 > index || index > maxIndex ) throw new ArrayIndexOutOfBoundsException( String.format("maxIndex : %d, inputedIndex : %d", maxIndex, index) );
 
         Iterator<Object> iterator = super.keySet().iterator();
-
-        for( int i = 0, iCnt = index; i < iCnt; i++ ) {
+        for( int i = 0; i < index; i++ ) {
             iterator.next();
         }
-
         return iterator.next();
 
 	}
 
-	public Set<Object> keySetCloned() {
-		Set<Object> result = new LinkedHashSet<>();
-		result.addAll( super.keySet() );
-		return result;
-	}
-
+	@Override
 	public NMap clone() {
 		return Reflector.clone( this );
 	}
 
+	/**
+	 * get debug string
+	 *
+	 * @return	debug string contains key and value
+	 */
 	public String toDebugString() {
 		return toDebugString( true, false );
 	}
 
+	/**
+	 * get debug string contains key's class type and value
+	 *
+	 * @param showHeader	if true, show header
+	 * @param showType		if true, show key's class type
+	 * @return debug string
+	 */
 	public String toDebugString( boolean showHeader, boolean showType ) {
 
 		NList result = new NList();
 
 		for( Object key : keySet() ) {
-
-			result.addRow( "key", key );
-
+			result.add( "key", key );
 			Object val = get( key );
-
 			if( showType ) {
-				result.addRow( "type", val == null ? null : val.getClass().getTypeName() );
+				result.add( "type", val == null ? null : val.getClass().getTypeName() );
 			}
-
-			result.addRow( "val", val );
-
+			result.add( "val", val );
 		}
 
 		return result.toDebugString( showHeader, true );
 
-
 	}
 
 	/**
-	 * get hashcode for value. <br><br>
+	 * get hashcode for value.
 	 *
 	 * @return hashcode for value
 	 */
-	@SuppressWarnings( { "rawtypes", "unchecked" } )
     public int getValueHash() {
 		return Reflector.toJson(this, false, true, false).hashCode();
 	}

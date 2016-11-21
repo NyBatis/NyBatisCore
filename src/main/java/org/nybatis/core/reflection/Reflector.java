@@ -16,6 +16,7 @@ import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
 import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Validator;
 
 import java.io.IOException;
@@ -279,8 +280,8 @@ public class Reflector {
 			return merge( (Map)fromBean, (Map)toBean, strict );
 		}
 
-		Map fromMap = toMapFrom( fromBean );
-		Map toMap   = toMapFrom( toBean );
+		Map fromMap = new NMap( toMapFrom( fromBean ) ).rebuildKeyForJsonPath();
+		Map toMap   = new NMap( toMapFrom( toBean ) ).rebuildKeyForJsonPath();
 
 		merge( fromMap, toMap, strict );
 
@@ -348,25 +349,25 @@ public class Reflector {
 
         	if( ! field.isAccessible() ) field.setAccessible( true );
 
-        	result.addRow( "field", field.getName() );
+        	result.add( "field", field.getName() );
 
         	try {
 
         		String typeName = field.getType().getName();
 
-        		result.addRow( "type", typeName );
+        		result.add( "type", typeName );
 
         		switch( typeName ) {
         			case "[C" :
-        				result.addRow( "value", "[" + new String( (char[]) field.get( bean ) ) + "]" );
+        				result.add( "value", "[" + new String( (char[]) field.get( bean ) ) + "]" );
         				break;
         			default :
-        				result.addRow( "value", field.get( bean ) );
+        				result.add( "value", field.get( bean ) );
 
         		}
 
         	} catch( IllegalArgumentException | IllegalAccessException e ) {
-        		result.addRow( "value", e.getMessage() );
+        		result.add( "value", e.getMessage() );
             }
 
         }
@@ -388,9 +389,7 @@ public class Reflector {
 
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
-		if( ignoreNull ) {
-			mapper.setSerializationInclusion( Include.NON_NULL );
-		}
+		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
 
 		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
 
@@ -427,9 +426,9 @@ public class Reflector {
 	/**
 	 * get json text without null value
 	 *
-	 * @param fromBean	instance to convert as json data
-	 * @param prettyPrint
-	 * @return
+	 * @param fromBean		instance to convert as json
+	 * @param prettyPrint	true if you want to see json text with indentation
+	 * @return json text
 	 */
 	public static String toNullIgnoredJson( Object fromBean, boolean prettyPrint ) {
 		return toJson( fromBean, prettyPrint, false, true );
@@ -625,6 +624,21 @@ public class Reflector {
 	}
 
 	/**
+	 * check text is valid json type
+	 *
+	 * @param json	json text
+	 * @return valid or not
+	 */
+	public static boolean isValidJson( String json ) {
+		try {
+			objectMapper.readTree( json );
+			return true;
+		} catch( IOException e ) {
+			return false;
+		}
+	}
+
+	/**
 	 * Convert as bean from object
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @param toClass	class to return
@@ -633,7 +647,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
 
-		if( isString( object ) ) {
+		if( Types.isString( object ) ) {
 			return toBeanFromJson( object.toString(), toClass );
 		} else {
 			return objectMapper.convertValue( object, toClass );
@@ -656,7 +670,7 @@ public class Reflector {
 	 */
 	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
 
-		if( isString( object ) ) {
+		if( Types.isString( object ) ) {
 			return toBeanFromJson( object.toString(), typeReference );
 		} else {
 			return objectMapper.convertValue( object, typeReference );
@@ -730,30 +744,30 @@ public class Reflector {
 
 	/**
 	 * Convert as List&lt;Map&gt;
-	 * @param jsonString	json text
+	 * @param json	json text
 	 * @return List
 	 */
-    public static List<Map<String,Object>> toListFromJsonAsMap( String jsonString ) {
-    	return toListFromJsonAs( jsonString, new TypeReference<List<HashMap<String, Object>>>() {} );
+    public static List<Map<String,Object>> toListFromJsonAsMap( String json ) {
+    	return toListFromJsonAs( json, new TypeReference<List<HashMap<String, Object>>>() {} );
     }
 
 	/**
 	 * Convert as List
 	 *
-	 * @param jsonString json text
+	 * @param json json text
 	 * @return List
 	 */
-	public static List toListFromJson( String jsonString ) {
-		return toListFromJsonAs( jsonString, new TypeReference<List>() {} );
+	public static List toListFromJson( String json ) {
+		return toListFromJsonAs( json, new TypeReference<List>() {} );
 	}
 
 	/**
 	 * Convert as List&lt;String&gt;
-	 * @param jsonString	json text
+	 * @param json	json text
 	 * @return List
 	 */
-	public static List<String> toListFromJsonAsString( String jsonString ) {
-		return toListFromJsonAs( jsonString, new TypeReference<List<String>>() {} );
+	public static List<String> toListFromJsonAsString( String json ) {
+		return toListFromJsonAs( json, new TypeReference<List<String>>() {} );
 	}
 
 	/**
@@ -765,7 +779,7 @@ public class Reflector {
 
 		if( object == null ) return new HashMap<>();
 
-		if( isString(object)  ) {
+		if( Types.isString(object)  ) {
 			return toMapFromJson( object.toString() );
 		} else {
 			return objectMapper.convertValue( object, Map.class );
@@ -796,11 +810,6 @@ public class Reflector {
 	 */
 	public static NMap toNMapFrom( Object object ) {
 		return new NMap( toMapFrom( object ) );
-	}
-
-	private static boolean isString( Object object ) {
-		return object != null &&
-				( object instanceof String || object instanceof StringBuffer || object instanceof  StringBuilder );
 	}
 
 	/**
@@ -842,7 +851,7 @@ public class Reflector {
 	 */
 	public static boolean isJsonDate( Object value ) {
 
-		if( ! isString(value) ) return false;
+		if( Types.isNotString(value) ) return false;
 
 		String val = value.toString();
 

@@ -3,6 +3,7 @@ package org.nybatis.core.util;
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.validation.Validator;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -161,7 +163,7 @@ public class StringUtil {
 	 * @param value value text. if value has '#{..}', it is replaced by value of parameter.
 	 *                 key of value is inner text of '#{..}' pattern.
 	 * @param parameter parameter contains key and value
-	 * @return
+	 * @return parameter binded string
 	 */
 	public static String bindParam( Object value, Map parameter ) {
 
@@ -254,7 +256,7 @@ public class StringUtil {
 								result.append( hasHangulJongsung( paramToAppend ) ? '이' : '가' );
 								break;
 							case '을' : case '를' :
-								result.append( hasHangulJongsung( paramToAppend ) ? '을' : '가' );
+								result.append( hasHangulJongsung( paramToAppend ) ? '을' : '를' );
 								break;
 
 						}
@@ -415,14 +417,13 @@ public class StringUtil {
      * </pre>
      * @param param     변환할 문자열
      * @return CAMEL 형 문자열
-     * @author 정화수
      */
     public static String toCamel( String param ) {
 
     	if( isEmpty(param) ) return "";
 
     	param = param.toLowerCase();
-        Pattern pattern = Pattern.compile( "(_[a-zA-Z])" );
+        Pattern pattern = Pattern.compile( "(_[a-zA-Z0-9])" );
         Matcher matcher = pattern.matcher( param );
         StringBuffer sb = new StringBuffer();
 
@@ -449,8 +450,6 @@ public class StringUtil {
      * </pre>
      * @param param     변환할 문자열
      * @return UNDERLINE 형 문자열
-     * @author 정화수
-     * @since 2011-05-02
      */
     public static String toUncamel( String param ) {
 
@@ -484,8 +483,6 @@ public class StringUtil {
      *
      * @param param
      * @return 특수문자가 제거된 텍스트
-     * @author 정화수
-     * @since 2011-04-07
      */
     public static String escape( Object param ) {
 
@@ -611,7 +608,7 @@ public class StringUtil {
      *
      * @param list 리스트 객체
      * @param concator 엘리먼트 사이를 연결시킬 구분 문자열
-     * @return
+     * @return joined text
      */
     public static String join( List<?> list, String concator ) {
 
@@ -633,6 +630,18 @@ public class StringUtil {
     	return sb.toString();
 
     }
+
+	/**
+	 * concat set values
+	 *
+	 * @param set		values to concat
+	 * @param concator  concator
+	 * @return joined text
+	 */
+	public static String join( Set<?> set, String concator ) {
+		if( set == null || set.size() == 0 ) return "";
+		return join( new ArrayList(set), concator );
+	}
 
 	public static String join( Stack<?> stack, String delimeter ) {
 
@@ -668,7 +677,7 @@ public class StringUtil {
 
 		if( isEmpty(value) ) return result;
 
-		String val = value.toString();
+		String val = trim( value );
 
 		if( isEmpty(regexDelimeter) ) {
 			result.add( val );
@@ -749,15 +758,10 @@ public class StringUtil {
     }
 
     /**
-     * <pre>
-     *
      * 전화번호에 지역번호, 국번, 번호를 구분해 -를 붙여서 return 해주는 메소드
      *
-     * </pre>
-     * @param phoneNumber 전화번호
-     * @return - 기호로 구분된 전화번호
-     * @author nayasis
-     * @since  2011-08-09
+     * @param phoneNumber phone number
+	 * @return phone number delimeted with '-'
      */
     public static String getPhoneNumber( Object phoneNumber ) {
     	if( isEmpty(phoneNumber) ) return "";
@@ -812,7 +816,7 @@ public class StringUtil {
      * </pre>
      *
      * @param value text value
-     * @return
+     * @return text with space compressed
      */
     public static String compressSpace( Object value ) {
     	if( isEmpty(value) ) return "";
@@ -829,7 +833,7 @@ public class StringUtil {
 	 * </pre>
 	 *
 	 * @param value text value
-	 * @return
+	 * @return text with space or enter compressed
 	 */
 	public static String compressSpaceOrEnter( Object value ) {
 		if( isEmpty(value) ) return "";
@@ -844,7 +848,7 @@ public class StringUtil {
 	 * </pre>
 	 *
 	 * @param value text value
-	 * @return
+	 * @return text with enter compressed
 	 */
 	public static String compressEnter( Object value ) {
 		if( isEmpty(value) ) return "";
@@ -1242,7 +1246,7 @@ public class StringUtil {
 
 		} else {
 
-			String text = value.toString();
+			String text = trim( value );
 
 			if( "y".equalsIgnoreCase(text) )    return "Y";
 			if( "yes".equalsIgnoreCase(text) )  return "Y";

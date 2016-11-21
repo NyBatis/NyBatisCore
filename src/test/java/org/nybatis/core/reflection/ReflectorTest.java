@@ -1,22 +1,24 @@
 package org.nybatis.core.reflection;
 
-import java.io.File;
-import java.text.ParseException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
+import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
+import org.nybatis.core.reflection.vo.*;
 import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.text.ParseException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
-@SuppressWarnings( "rawtypes" )
 public class ReflectorTest {
 
 	@Test
@@ -218,6 +220,70 @@ public class ReflectorTest {
 
 		NLogger.debug( date );
 
+		Person person = Reflector.toBeanFrom( null, Person.class );
+
+		NLogger.debug( person );
+
+
+	}
+
+	@Test
+	public void variableNamedWithCharacterAndNumber() {
+		String json = "{\"S01\":\"Y\",\"S02\":\"N\"}";
+		TestVo testVo = Reflector.toBeanFrom( json, TestVo.class );
+		assertEquals( testVo.toString(), json );
+	}
+
+
+	@Test
+	public void setNybatisDbNullValueTest() {
+
+		Person person = new Person();
+
+		person.firstName = "HWASU";
+		person.lastName  = "JUNG";
+		person.age       = 12;
+		person.weight    = 25L;
+		person.birthDate = new Date();
+		person.birthNDate = new NDate();
+
+		person.profileNList.add( "key1", "val1" );
+		person.profileNList.add( "key2", "val2" );
+
+		NLogger.debug( Reflector.toJson( person ) );
+
+		person.firstName         = NullValue.STRING;
+		person.lastName          = NullValue.STRING;
+		person.age               = NullValue.INTEGER;
+		person.weight            = NullValue.LONG;
+		person.phoneList         = NullValue.LIST;
+		person.previousAddresses = NullValue.ARRAY_STRING;
+		person.profileNList      = NullValue.NLIST;
+		person.profileSet        = NullValue.SET;
+		person.birthDate         = NullValue.DATE;
+		person.birthNDate        = NullValue.NDATE;
+
+		for( int i = 0; i < 10; i++ ) {
+			NLogger.debug( "---------------------" );
+			NLogger.debug( Reflector.toJson( person ) );
+		}
+
+		NLogger.debug( "---------------------" );
+
+		Map<String, Object> map = Reflector.toMapFrom( person );
+
+		assertEquals( map.get( "firstName" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "lastName" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "age" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "weight" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "phoneList" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "previousAddresses" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "profileNMap" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "profileMap" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "profileNList" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "profileSet" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "birthDate" ).toString(), NullValue.STRING );
+		assertEquals( map.get( "birthNDate" ).toString(), NullValue.STRING );
 
 	}
 

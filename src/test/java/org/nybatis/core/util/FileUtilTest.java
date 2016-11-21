@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 
+import static org.testng.Assert.assertEquals;
+
 public class FileUtilTest {
 
 	@Test
@@ -143,6 +145,18 @@ public class FileUtilTest {
 			}
 		}
 
+	}
+
+	@Test
+	public void nomalize() {
+
+		String path = "c:\\document\\test";
+
+		assertEquals( "c:/document/test", FileUtil.nomalizeSeparator( "c:\\document\\test" ) );
+		assertEquals( "c:/document/test", FileUtil.nomalizeSeparator( "c:\\document\\test\\" ) );
+		assertEquals( "c:/document/test", FileUtil.nomalizeSeparator( "c:\\document\\test/" ) );
+		assertEquals( "c:/document/test/merong", FileUtil.nomalizeSeparator( "c:\\document\\test//merong" ) );
+		assertEquals( "c:/document/test/merong", FileUtil.nomalizeSeparator( "c:\\document\\test\\//merong///" ) );
 
 	}
 
