@@ -35,6 +35,7 @@ public interface ListExecutor {
      * Retrieve list
      *
      * @param returnType  Map or Bean (if you want to return row), Primitive (if you want to return value)
+     * @param <T> expected class of return
      * @return list consist with row or value
      */
     @SupportCache

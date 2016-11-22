@@ -447,9 +447,10 @@ public class Validator {
      * if replaceValue is null, examine next anotherReplaceValue.
      * if anotherReplaceValue is not null, it is returned as result.
      *
-     * @param value                value to examine not null or not empty.
-     * @param replaceValue         other value to examine not null.
-     * @param anotherReplaceValue  another values to examine not null.
+     * @param value                 value to examine not null or not empty.
+     * @param replaceValue          other value to examine not null.
+     * @param anotherReplaceValue   another values to examine not null.
+     * @param <T> 			        expected class of return
      * @return not null value from begin with.
      */
     public static <T> T nvl( T value, T replaceValue, T... anotherReplaceValue ) {

@@ -14,7 +14,7 @@ import java.util.Stack;
 /**
  * Tree model
  *
- * @param <T>
+ * @param <T> type parameter
  */
 public class NTree<T> implements Serializable {
 
@@ -242,20 +242,20 @@ public class NTree<T> implements Serializable {
     }
 
     /**
-     * Check whether data was used in previous Ntree branch
+     * Check whether value was used in previous Ntree branch
      *
-     * @param data
-     * @return true if data was never used in Ntree branch
+     * @param value value to recursive check
+     * @return true if value was never used in Ntree branch
      */
-    public boolean isRecursive( T data ) {
+    public boolean isRecursive( T value ) {
 
-        if( this.data == null && data == null ) return true;
-        if( this.data.equals(data) ) return true;
+        if( this.data == null && value == null ) return true;
+        if( this.data.equals(value) ) return true;
 
         NTree<T> parent = getParent();
 
         while( parent != null ) {
-            if( parent.getValue().equals(data) ) return true;
+            if( parent.getValue().equals(value) ) return true;
             parent = parent.getParent();
         }
 

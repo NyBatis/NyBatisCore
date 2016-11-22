@@ -33,7 +33,8 @@ public class NListPrinter {
     /**
      * Print NList data
      *
-     * @param printAllRow allow to print All Row
+     * @param printHeader if true, print header
+     * @param printAllRow if true, print all row
      * @return grid data contents
      */
     public String toString( boolean printHeader, boolean printAllRow ) {

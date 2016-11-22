@@ -374,8 +374,8 @@ public class NXml {
 	 * Get element nodes from root
 	 *
 	 * @param tagName elements' tag name
-	 *                &lt;<font color='red'>name</font>&gt;&lt;/<font color='red'>name</font>&gt;
-	 *                &lt;<font color='red'>job</font>&gt;&lt;/<font color='red'>job</font>&gt;
+	 *                &lt;<font style="color:red">name</font>&gt;&lt;/<font style="color:red">name</font>&gt;
+	 *                &lt;<font style="color:red">job</font>&gt;&lt;/<font style="color:red">job</font>&gt;
 	 * @return all element nodes having specific tag name
 	 */
 	public List<Node> getChildElements( String tagName ) {
@@ -385,8 +385,8 @@ public class NXml {
 	/**
 	 * Get one child elements from root
 	 * @param tagName elements' tag name
-	 *                &lt;<font color='red'>name</font>&gt;&lt;/<font color='red'>name</font>&gt;
-	 *                &lt;<font color='red'>job</font>&gt;&lt;/<font color='red'>job</font>&gt;
+	 *                &lt;<font style="color:red">name</font>&gt;&lt;/<font style="color:red">name</font>&gt;
+	 *                &lt;<font style="color:red">job</font>&gt;&lt;/<font style="color:red">job</font>&gt;
 	 * @return one element node having specific tag name
 	 */
 	public Node getChildElement( String tagName ) {
@@ -406,8 +406,8 @@ public class NXml {
 	 * Get child elements from root
 	 *
 	 * @param id elements' id
-	 *                &lt;name id="<font color='red'>AAA</font>"&gt;&lt;/name&gt;
-	 *                &lt;job  id="<font color='red'>BBB</font>"&gt;&lt;/name&gt;
+	 *                &lt;name id="<font style="color:red">AAA</font>"&gt;&lt;/name&gt;
+	 *                &lt;job  id="<font style="color:red">BBB</font>"&gt;&lt;/name&gt;
 	 * @return all elements having specific id
 	 */
 	public List<Node> getChildNodesById( String id ) {
@@ -418,8 +418,8 @@ public class NXml {
 	 * Get one child element from root
 	 *
 	 * @param id elements' id
-	 *                &lt;name id="<font color='red'>AAA</font>"&gt;&lt;/name&gt;
-	 *                &lt;job  id="<font color='red'>BBB</font>"&gt;&lt;/name&gt;
+	 *                &lt;name id="<font style="color:red">AAA</font>"&gt;&lt;/name&gt;
+	 *                &lt;job  id="<font style="color:red">BBB</font>"&gt;&lt;/name&gt;
 	 * @return one element having specific id
 	 */
 	public Node getChildNodeById( String id ) {
@@ -514,7 +514,7 @@ public class NXml {
 	 * @param publicId The external subset public identifier.
 	 * @param systemId The external subset system identifier.
 	 * @return self instance
-	 * @throws ParseException
+	 * @throws ParseException xml parsing exception
 	 */
 	public NXml setDocType( String publicId, String systemId ) throws ParseException {
 
@@ -572,8 +572,8 @@ public class NXml {
 	 * @param path 		file path to read
 	 * @param ignoreDtd ignore DTD
 	 * @return self instance
-	 * @throws ParseException
-	 * @throws UncheckedIOException
+	 * @throws ParseException 		XML parsing exception
+	 * @throws UncheckedIOException IO exception occurs
 	 */
     public NXml readFrom( Path path, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
     	return readFrom( path.toFile(), ignoreDtd );
@@ -585,7 +585,7 @@ public class NXml {
 	 * @param xml 		XML string to read
 	 * @param ignoreDtd ignore DTD
 	 * @return self instance
-	 * @throws ParseException
+	 * @throws ParseException	XML parsing exception
 	 */
     public NXml readFrom( String xml, boolean ignoreDtd ) throws ParseException {
     	doc = new DocumentHandler().readXml( xml, ignoreDtd );
@@ -598,8 +598,8 @@ public class NXml {
 	 * @param file 		file to read
 	 * @param ignoreDtd ignore DTD
 	 * @return self instance
-	 * @throws ParseException
-	 * @throws UncheckedIOException
+	 * @throws ParseException 		XML parsing exception
+	 * @throws UncheckedIOException	I/O exception
 	 */
 	public NXml readFrom( File file, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 
@@ -622,8 +622,8 @@ public class NXml {
 	 * @param inputStream	input stream to read
 	 * @param ignoreDtd		ignore DTD
 	 * @return self instance
-	 * @throws ParseException
-	 * @throws UncheckedIOException
+	 * @throws ParseException		XML parsing exception
+	 * @throws UncheckedIOException	I/O exception
 	 */
 	public NXml readFrom( InputStream inputStream, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
 		doc = new DocumentHandler().readXml( inputStream, ignoreDtd );
@@ -635,7 +635,7 @@ public class NXml {
 	 *
 	 * @param file 			file to write
 	 * @param prettyFormat	whether or not applying pretty format
-	 * @throws UncheckedIOException
+	 * @throws UncheckedIOException I/O exception
 	 */
 	public void writeTo( File file, boolean prettyFormat ) throws UncheckedIOException {
 		Assertion.isExists( file, "File[{}] is not exists", file );
@@ -647,7 +647,7 @@ public class NXml {
 	 *
 	 * @param filePath		file path to write
 	 * @param prettyFormat	whether or not applying pretty format
-	 * @throws UncheckedIOException
+	 * @throws UncheckedIOException	I/O exception
 	 */
 	public void writeTo( String filePath, boolean prettyFormat ) throws UncheckedIOException {
 		writeTo( new File( filePath ), prettyFormat );

@@ -13,14 +13,14 @@ import org.nybatis.core.model.NMap;
  * SqlSession session = SessionManager.openSession();
  *
  * Map param = new HashMap();
- * param.put( <font color=red>"id"</font>, <font color=blue>"merong"</font> );
+ * param.put( <font style="color:red">"id"</font>, <font style="color:blue">"merong"</font> );
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, param );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, param );
  *
  * session.rollback();
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"A001"</font> );
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"B002"</font> );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"A001"</font> );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"B002"</font> );
  *
  * session.commit();
  *
@@ -42,7 +42,8 @@ public interface SessionExecutor {
 	/**
 	 * Retrieve a single row or single value
 	 *
-	 * @param returnType  Map or Bean (if you want to return row), Primitive (if you want to single value)
+	 * @param returnType	Map or Bean (if you want to return row), Primitive (if you want to single value)
+	 * @param <T> 			expected class of return
 	 * @return single row or single value
 	 */
 	@SupportCache
@@ -153,6 +154,7 @@ public interface SessionExecutor {
 	 *
 	 * @param returnType        Map or Bean (if you want to return row), Primitive (if you want to single value)
 	 * @param listReturnTypes   (optional) return type of ResultSet(s). basic return type is NMap.
+	 * @param <T>				expected class of return
 	 * @return result of function or precedure
 	 */
 	@SupportCacheOnlyResult
