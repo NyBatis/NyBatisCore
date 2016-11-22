@@ -481,16 +481,16 @@ public class StringUtil {
      * json 구조 등이 깨지지 않게 하는데 사용된다.
      * </pre>
      *
-     * @param param
+     * @param value text
      * @return 특수문자가 제거된 텍스트
      */
-    public static String escape( Object param ) {
+    public static String escape( Object value ) {
 
-    	if( isEmpty(param) ) return "";
+    	if( isEmpty(value) ) return "";
 
     	StringBuilder sb = new StringBuilder();
 
-        for( char ch : param.toString().toCharArray() ) {
+        for( char ch : value.toString().toCharArray() ) {
 
             switch( ch ) {
 
@@ -860,7 +860,7 @@ public class StringUtil {
      *
      * @param value 텍스트로 만들 객체
      * @return encode된 텍스트
-     * @throws UncheckedIOException
+     * @throws UncheckedIOException if I/O exception occurs.
      */
     public static String encode( Object value ) {
 
@@ -888,8 +888,8 @@ public class StringUtil {
      *
      * @param value 객체로 만들 text
      * @return decode된 객체
-     * @throws UncheckedIOException
-     * @throws ClassNotExistException
+     * @throws UncheckedIOException if I/O exception occurs.
+     * @throws ClassNotExistException if class is not found in class loader.
      */
     public static Object decode( Object value ) {
 
@@ -918,7 +918,7 @@ public class StringUtil {
 	 * encode URL
 	 * @param url url to encode
 	 * @return encoded URL
-	 * @throws EncodingException
+	 * @throws EncodingException	if an encoding error occurs.
 	 */
     public static String encodeUrl( Object url ) throws EncodingException {
 
@@ -934,7 +934,7 @@ public class StringUtil {
 	 * decode URL
 	 * @param url url to decode
 	 * @return decoded URL
-	 * @throws EncodingException
+	 * @throws EncodingException	if an decoding error occurs.
 	 */
     public static String decodeUrl( Object url ) throws EncodingException {
 
@@ -1124,7 +1124,7 @@ public class StringUtil {
 	}
 
 	/**
-	 * 정규식 예약문자 <font color="blue">([](){}.*+?$^|#\)</font> 앞에 <font color="red">\</font> 문자를 붙여준다.
+	 * 정규식 예약문자 <font style="color:blue">([](){}.*+?$^|#\)</font> 앞에 <font style="color:red">\</font> 문자를 붙여준다.
 	 *
 	 * @param pattern 변환할 정규식 패턴문자열
 	 * @return  변환된 문자열

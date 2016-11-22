@@ -54,7 +54,7 @@ public class Const {
 		 *     Const.profile.set( "local" )
 		 *
 		 *     Const.profile.apply( "/app/webapp/config.prop" )
-		 *     → "/app/webapp/config<font color=red>.local</font>.prop"
+		 *     -&gt; "/app/webapp/config<font style="color:red">.local</font>.prop"
 		 *
 		 * </pre>
 		 *

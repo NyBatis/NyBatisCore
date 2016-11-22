@@ -33,6 +33,9 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+/**
+ * XML document handler
+ */
 public class DocumentHandler {
 
 	public    static final int    DEFAULT_TAB_SIZE = 4;
@@ -115,8 +118,9 @@ public class DocumentHandler {
 	 *  </tr>
 	 *  </table>
 	 *
-	 * @param xPath xPath Expression
-	 * @return Node
+	 * @param fromNode	start node to find by xPath expression
+	 * @param xPath		xPath Expression
+	 * @return matched node
 	 */
 	public Node getNode( Node fromNode, String xPath ) {
 		try {
@@ -126,6 +130,86 @@ public class DocumentHandler {
         }
 	}
 
+
+	/**
+	 * Get nodes using xpath expression.
+	 *
+	 * <table summary="rule" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <tr>
+	 *    <th>Expression</th>
+	 *    <th>Description</th>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>nodename</td>
+	 *    <td>Selects all nodes have [nodename]</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>/</td>
+	 *    <td>Selects from the root node</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>//</td>
+	 *    <td>Selects nodes in the document from the current node that match the selection no matter where they are</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>.</td>
+	 *    <td>Selects the current node</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>..</td>
+	 *    <td>Selects the parent of the current node</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>@</td>
+	 *    <td>Selects attributes</td>
+	 *  </tr>
+	 *  </table>
+	 *
+	 *  <p>Example</p>
+	 *
+	 *  <table summary="example" border="1" style="border-collapse:collapse; border:1px gray solid;">
+	 *  <tr>
+	 *    <td>Path</td>
+	 *    <td>Result</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>employee</td>
+	 *    <td>Selects all nodes with the name “employee”</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>employees/employee</td>
+	 *    <td>Selects all employee elements that are children of employees</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>//employee</td>
+	 *    <td>Selects all book elements no matter where they are in the document</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>/employees/employee[1]</td>
+	 *    <td>Selects the first employee element that is the child of the employees element.</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>/employees/employee[last()]</td>
+	 *    <td>Selects the last employee element that is the child of the employees element</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>/employees/employee[last()-1]</td>
+	 *    <td>Selects the last but one employee element that is the child of the employees element</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>//employee[@type='admin']</td>
+	 *    <td>Selects all the employee elements that have an attribute named type with a value of 'admin'</td>
+	 *  </tr>
+	 *  <tr>
+	 *    <td>//*[@id='c2']</td>
+	 *    <td>Selects all elements that have an attribute named id with a value of 'c2'</td>
+	 *  </tr>
+	 *  </table>
+	 *
+	 * @param fromNode	start node to find by xPath expression
+	 * @param xPath		xPath Expression
+	 * @return matched nodes
+	 */
 	public NodeList getNodes( Node fromNode, String xPath ) {
 		try {
 			return (NodeList) xpath.evaluate( xPath, fromNode, XPathConstants.NODESET );

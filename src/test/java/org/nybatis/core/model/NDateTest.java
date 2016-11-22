@@ -35,8 +35,8 @@ public class NDateTest {
 
         NDate date = new NDate( "2016-06-02 13:59:21" );
 
-        NDate beginningOfMonthDate = date.getBeginningOfMonthDate();
-        NDate endOfMonthDate       = date.getEndOfMonthDate();
+        NDate beginningOfMonthDate = date.getBeginningOfMonth();
+        NDate endOfMonthDate       = date.getEndOfMonth();
 
         assertEquals( beginningOfMonthDate.toString(), "2016-06-01 00:00:00" );
         assertEquals( endOfMonthDate.toString(), "2016-06-30 23:59:59" );

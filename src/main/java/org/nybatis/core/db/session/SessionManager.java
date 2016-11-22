@@ -55,6 +55,7 @@ public class SessionManager {
 	 * @param environmentId database environment id
 	 * @param tableName     database table name
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openOrmSession( String environmentId, String tableName, Class<T> domainClass ) {
@@ -67,6 +68,7 @@ public class SessionManager {
 	 *
 	 * @param tableName     database table name
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openOrmSession( String tableName, Class<T> domainClass ) {
@@ -79,6 +81,7 @@ public class SessionManager {
 	 * and environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
 	 *
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openOrmSession( Class<T> domainClass ) {
@@ -91,6 +94,7 @@ public class SessionManager {
 	 * @param environmentId database environment id
 	 * @param tableName     database table name
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openSeperateOrmSession( String environmentId, String tableName, Class<T> domainClass ) {
@@ -103,6 +107,7 @@ public class SessionManager {
 	 *
 	 * @param tableName     database table name
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openSeperateOrmSession( String tableName, Class<T> domainClass ) {
@@ -115,6 +120,7 @@ public class SessionManager {
 	 * and environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
 	 *
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	public static <T> OrmSession<T> openSeperateOrmSession( Class<T> domainClass ) {

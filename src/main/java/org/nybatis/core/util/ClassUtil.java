@@ -33,9 +33,9 @@ public class ClassUtil {
 	/**
 	 * Get class for name
 	 *
-	 * @param className
-	 * @throws ClassNotFoundException
-	 * @return Class for name
+	 * @param className	class name
+	 * @throws ClassNotFoundException if class is not founded in class loader.
+	 * @return class for name
 	 */
 	public static Class<?> getClass( String className ) throws ClassNotFoundException {
 
@@ -78,9 +78,9 @@ public class ClassUtil {
 	 * Class&lt;?&gt; klass = new ClassUtil().getClass( type );
 	 * </pre>
 	 *
-	 * @param type
-	 * @return Class by generic type
-	 * @throws ClassNotFoundException
+	 * @param type class type
+	 * @return class by generic type
+	 * @throws ClassNotFoundException if class is not founded in class loader.
 	 */
 	public static Class<?> getClass( Type type ) throws ClassNotFoundException {
 

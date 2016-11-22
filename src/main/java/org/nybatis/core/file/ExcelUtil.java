@@ -205,6 +205,7 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -228,6 +229,7 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile		excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -251,6 +253,7 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile		excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -276,6 +279,7 @@ public class ExcelUtil {
 	 * @param excelFile		excel file to read
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -299,6 +303,7 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile excel file to read.
 	 * @param toClass	generic type of list's class
+	 * @param <T>		expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -322,15 +327,13 @@ public class ExcelUtil {
 	 *
 	 * @param excelFile 	excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
 	public <T> List<T> readFirstSheetFrom( String excelFile, Class<T> toClass ) throws UncheckedIOException {
 		return readFirstSheetFrom( new File(excelFile), toClass );
 	}
-
-
-	// -----
 
 	/**
 	 * Write data to excel file
@@ -408,6 +411,7 @@ public class ExcelUtil {
 	 * @param inputStream	input stream to read data
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T>			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -431,6 +435,7 @@ public class ExcelUtil {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
+	 * @param <T>			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -454,6 +459,7 @@ public class ExcelUtil {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -474,8 +480,9 @@ public class ExcelUtil {
 	/**
 	 * Convert data to bean list
 	 *
-	 * @param data data for excel
-	 * @param toClass generic type of list
+	 * @param data		data for excel
+	 * @param toClass	generic type of list
+	 * @param <T>		expected class of return
 	 * @return data as toClass generic type
 	 */
 	public static <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {

@@ -75,7 +75,7 @@ public interface OrmSession<T> extends Cloneable {
     OrmBatchExecutor<T> batch();
 
     /**
-     * Set <font color=blue><b>WHERE</b></font> clause used in SQL.
+     * Set <font style="color:blue;bold;">WHERE</font> clause used in SQL.
      *
      * It only affects to {@link OrmSession#update(Object)} or {@link OrmSession#delete(Object)}
      *
@@ -85,7 +85,7 @@ public interface OrmSession<T> extends Cloneable {
     OrmSession<T> where( String sqlExpression );
 
     /**
-     * Set <font color=blue><b>WHERE</b></font> clause used in SQL.
+     * Set <font style="color:blue;bold;">WHERE</font> clause used in SQL.
      *
      * It only affects to {@link OrmSession#update(Object)} or {@link OrmSession#delete(Object)}
      *
@@ -133,7 +133,7 @@ public interface OrmSession<T> extends Cloneable {
     /**
      * Set environment id
      *
-     * @param id environment id
+     * @param id    environment id
      * @return self instance
      */
     OrmSession<T> setEnvironmentId( String id );
@@ -155,7 +155,7 @@ public interface OrmSession<T> extends Cloneable {
     /**
      * Enable cache
      *
-     * @param cacheId cache id
+     * @param cacheId   cache id
      * @return self instance
      */
     OrmSession<T> enableCache( String cacheId );
@@ -163,8 +163,8 @@ public interface OrmSession<T> extends Cloneable {
     /**
      * Enable cache
      *
-     * @param cacheId cache id
-     * @param flushSeconds cache flush cycle (unit:seconds)
+     * @param cacheId       cache id
+     * @param flushSeconds  cache flush cycle (unit:seconds)
      * @return self instance
      */
     OrmSession<T> enableCache( String cacheId, Integer flushSeconds );
@@ -183,7 +183,7 @@ public interface OrmSession<T> extends Cloneable {
      *   default is false to prevent unintended massive delete or update DB data.
      * </pre>
      *
-     * @param enable flag to allow Non-PK parameter
+     * @param enable    flag to allow Non-PK parameter
      * @return self instance
      */
     OrmSession<T> allowNonPkParameter( boolean enable );

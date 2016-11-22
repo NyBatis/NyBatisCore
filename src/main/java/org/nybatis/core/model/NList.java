@@ -96,6 +96,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * add alias corresponding to keyset
      *
      * @param alias alias list
+     * @return self instance
      */
     public NList addAliases( Object... alias ) {
 
@@ -122,7 +123,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param key       key to named alias
      * @param alias     alias corresponding key
      * @param overwrite if false, do not assign alias to key already assigned.
-     * @return
+     * @return self instance
      */
     public NList setAlias( Object key, Object alias, boolean overwrite ) {
     	if( containsKey(key) ) {
@@ -147,7 +148,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     /**
      * get alias corresponding key
-     * @param key
+     * @param key   column key
      * @return alias
      */
     public String getAlias( Object key ) {
@@ -185,6 +186,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     /**
      * Refresh Header and Key information
+     *
+     * @return self instance
      */
     public NList refreshKey() {
 
@@ -387,7 +390,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     /**
      * get values corresponding key
      *
-     * @param key   key column
+     * @param key   column key
+     * @param <T> 	expected class of return
      * @return values corresponding key
      */
     public <T> List<T> toList( String key ) {
@@ -408,6 +412,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * convert to list
      *
      * @param klass generic type class
+     * @param <T> 	expected class of return
      * @return converted list
      */
     public <T> List<T> toList( Class<T> klass ) {
@@ -419,6 +424,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      *
      * @param klass                     generic type class
      * @param ignoreCastingException    if true, ignore casting exception
+     * @param <T> 	                    expected class of return
      * @return converted list
      */
     public <T> List<T> toList( Class<T> klass, boolean ignoreCastingException ) {
@@ -455,6 +461,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * remove row
      *
      * @param index row index
+     * @return self instance
      */
     public NList removeRow( int index ) {
         if( index < 0 ) return this;
@@ -474,7 +481,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
     /**
      * remove row
      *
-     * @param key name of column
+     * @param key column key
+     * @return self instance
      */
     public NList removeKey( Object key ) {
         header.remove( key );
@@ -490,6 +498,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param key       key
      * @param rowIndex  row index
      * @param value     value
+     * @return self instance
      */
     public NList set( Object key, int rowIndex, Object value ) {
         NMap data = dataBody.get( rowIndex );
@@ -526,7 +535,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     }
 
-    public void setRowFromNMap( int rowIndex, NMap map, boolean syncronizeHeaderData ) {
+    private void setRowFromNMap( int rowIndex, NMap map, boolean syncronizeHeaderData ) {
 
         dataBody.set( rowIndex, map );
 
@@ -646,6 +655,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     /**
      * Remove data include header information
+     *
+     * @return self instance
      */
     public NList clear() {
     	header.clear();
@@ -656,6 +667,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
     /**
      * Remove data only
+     *
+     * @return self instance
      */
     public NList clearData() {
         dataBody.clear();
@@ -743,6 +756,8 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      *
      * @param comparator comparator to determine the order of the list.
      *                   A {@code null} value indicates that the elements' <i>natural ordering</i> should be used.
+     *
+     * @return self instance
      */
     public NList sort( Comparator<NMap> comparator ) {
         Collections.sort( dataBody, comparator );

@@ -190,6 +190,7 @@ public abstract class ExcelHandler {
 	 * @param excelFile		excel file to read
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -214,6 +215,7 @@ public abstract class ExcelHandler {
 	 *
 	 * @param excelFile 	excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -238,6 +240,7 @@ public abstract class ExcelHandler {
 	 *
 	 * @param excelFile 	excel file to read.
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -262,6 +265,7 @@ public abstract class ExcelHandler {
 	 * @param inputStream	input stream to read data
 	 * @param sheetName		sheet name of excel file to read
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -284,6 +288,7 @@ public abstract class ExcelHandler {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -306,6 +311,7 @@ public abstract class ExcelHandler {
 	 *
 	 * @param inputStream	input stream to read data
 	 * @param toClass		generic type of list's class
+	 * @param <T> 			expected class of return
 	 * @return grid data
 	 * @throws UncheckedIOException  File I/O Exception
 	 */
@@ -429,8 +435,9 @@ public abstract class ExcelHandler {
 	/**
 	 * Convert data to bean list
 	 *
-	 * @param data data for excel
-	 * @param toClass generic type of list
+	 * @param data		data for excel
+	 * @param toClass	generic type of list
+	 * @param <T> 		expected class of return
 	 * @return data as toClass generic type
 	 */
 	public <T> Map<String, List<T>> toBeanList( Map<String, NList> data, Class<T> toClass ) {
