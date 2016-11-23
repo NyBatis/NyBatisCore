@@ -4,6 +4,8 @@ import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.Types;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -110,6 +112,10 @@ public class Validator {
             return ( (Collection) value ).isEmpty();
         } else if( Types.isArrayOrList( value ) ) {
             return Array.getLength( value ) == 0;
+        } else if( value instanceof InputStream ) {
+            try {
+                return ((InputStream) value ).available() == 0;
+            } catch( IOException e ) {}
         }
 
         return false;
