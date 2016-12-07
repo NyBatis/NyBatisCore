@@ -8,6 +8,7 @@ import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
+import org.nybatis.core.validation.Validator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,8 @@ public class ForEachSqlElement extends SqlElement {
 		boolean hasSingleParam = hasSingleParameter( inputParam );
 
 		List params = getParams( inputParam, hasSingleParam );
+
+		if( Validator.isEmpty(params) ) return "";
 
 		StringBuilder sql = new StringBuilder();
 
