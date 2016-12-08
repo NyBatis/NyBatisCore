@@ -2,6 +2,7 @@ package org.nybatis.core.db.sql.repository;
 
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Assertion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,7 +22,7 @@ public class TableLayoutRepository {
     }
 
     private static String getKey( String environmentId, String tableName ) {
-        return environmentId + "::" + tableName;
+        return String.format( ".%s::%s", environmentId, tableName );
     }
 
     public static TableLayout getLayout( String environmentId, String tableName ) {
@@ -31,14 +32,16 @@ public class TableLayoutRepository {
         synchronized( lock ) {
             if( ! tableLayoutRepository.containsKey( key ) ) {
                 TableLayout tableLayout = new TableLayoutReader().getTableLayout( environmentId, tableName );
-                tableLayoutRepository.put( key, tableLayout );
-                NLogger.debug( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                if( ! tableLayout.isEmpty() ) {
+                    tableLayoutRepository.put( key, tableLayout );
+                    NLogger.debug( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                }
             }
         }
 
         TableLayout layout = tableLayoutRepository.get( key );
 
-        if( layout.isEmpty() ) {
+        if( layout == null ) {
             throw new SqlConfigurationException( "Fail to find table layout. (environmentId:{}, tableName:{})", environmentId, tableName );
         }
 
