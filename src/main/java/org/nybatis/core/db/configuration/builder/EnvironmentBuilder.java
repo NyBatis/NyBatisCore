@@ -82,10 +82,18 @@ public class EnvironmentBuilder {
 	}
 
 	public void setJdbcDatasource( Class driver, String url, String username, String password ) {
-		setJdbcDatasource( driver.getName(), url, username, password );
+		setJdbcDatasource( driver, url, username, password, null );
+	}
+
+	public void setJdbcDatasource( Class driver, String url, String username, String password, String passwordSecretKey ) {
+		setJdbcDatasource( driver.getName(), url, username, password, passwordSecretKey );
 	}
 
 	public void setJdbcDatasource( String driverName, String url, String username, String password ) {
+		setJdbcDatasource( driverName, url, username, password, null );
+	}
+
+	public void setJdbcDatasource( String driverName, String url, String username, String password, String passwordSecretKey ) {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
@@ -93,12 +101,14 @@ public class EnvironmentBuilder {
 		connectionProperties.setUrl( url );
 		connectionProperties.setUserName( username );
 		connectionProperties.setUserPassword( password );
+		connectionProperties.setPasswordSecretKey( passwordSecretKey );
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
 		setJdbcDatasource( connectionProperties, datasourceProperties );
 
 	}
+
 
 	public void setJdbcDatasource( JdbcConnectionProperties connectionProperties, JdbcDatasourceProperties datasourceProperties ) {
 		DatasourceFactory factory = new JdbcDataSourceFactory( datasourceProperties, connectionProperties );
