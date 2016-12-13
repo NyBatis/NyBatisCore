@@ -8,6 +8,7 @@ import org.nybatis.core.model.vo.Card;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -304,6 +305,21 @@ public class NMapTest {
 		map.putAll( jsonPathMap );
 
 		assertEquals( map.getByJsonPath( "card[0].cardId" ), "CRD0002323" );
+
+	}
+
+	@Test
+	public void convertSubEntty() {
+
+		Card card = new Card();
+
+//		card.getCopyTargetTenant().setS02( "Y" );
+
+		Map<String, Object> objectMap = Reflector.toMapFrom( card );
+
+//		String s = Reflector.toJson( "" );
+
+		NLogger.debug( objectMap );
 
 	}
 

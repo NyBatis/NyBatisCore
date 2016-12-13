@@ -248,7 +248,7 @@ public class Const {
 		public static final String PARAMETER_DATABASE            = "nybatis.database";
 
 		public static String getOrmSqlIdPrefix( String environmentId, String tableName ) {
-			return String.format( "%s%s.%s", ORM_SQL_PREFIX, environmentId, tableName );
+			return String.format( "%s.%s.%s", ORM_SQL_PREFIX, environmentId, tableName );
 		}
 
 		public static final String LOG_SQL                       = "nybatis.sql";

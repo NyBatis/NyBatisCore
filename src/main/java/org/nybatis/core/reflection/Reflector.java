@@ -387,6 +387,8 @@ public class Reflector {
 	 */
 	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
 
+		if( fromBean == null ) return null;
+
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
 		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
