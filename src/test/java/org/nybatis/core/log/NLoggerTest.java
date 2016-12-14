@@ -4,6 +4,8 @@ import java.nio.BufferOverflowException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 import org.testng.annotations.Test;
 
 public class NLoggerTest {
@@ -51,5 +53,11 @@ public class NLoggerTest {
 		NLogger.getLogger( "specific.test.log" ).debug( "사랑하는\n나의\n어머니" );
 	}
 
+	@Test
+	public void specificCaller() {
+		NLogger.debug( "merong" );
+		NLogger.setCallderDepth( 0 ).debug( "merong" );
+		NLogger.setCallderDepth( 1 ).debug( "merong" );
+	}
 
 }
