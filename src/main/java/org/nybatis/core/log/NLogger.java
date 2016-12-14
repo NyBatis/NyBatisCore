@@ -4,6 +4,7 @@ package org.nybatis.core.log;
 import org.nybatis.core.conf.Const;
 
 import ch.qos.logback.classic.Level;
+import org.slf4j.Marker;
 
 /**
  * Common Static Logger
@@ -22,11 +23,6 @@ public class NLogger {
 
 	private NLogger() {}
 	
-	private static NLoggerPrinter getLogger() {
-		loadDefaultConfiguration();
-		return new NLoggerPrinter( new Caller(4) );
-	}
-
 	private static void loadDefaultConfiguration() {
 		if( ! isConfigurationIinitialized ) {
 			loadConfiguration();
@@ -46,6 +42,21 @@ public class NLogger {
 	public static NLoggerPrinter getLogger( String loggerName ) {
 		loadDefaultConfiguration();
 		return new NLoggerPrinter( loggerName );
+	}
+
+	/**
+	 * get logger for specific call depth
+	 *
+	 * @param callDepth	caller depth (default : 4)
+	 * @return logger
+	 */
+	public static NLoggerPrinter getLogger( int callDepth ) {
+		loadDefaultConfiguration();
+		return new NLoggerPrinter( new Caller( 4 + callDepth) );
+	}
+
+	private static NLoggerPrinter getLogger() {
+		return getLogger( 0 );
 	}
 
 	/**
@@ -144,6 +155,96 @@ public class NLogger {
 
 	public static void error( Object message, Throwable throwable ) {
 		getLogger().error( message, throwable );
+	}
+
+	public static void trace( Marker marker, Object message ) {
+		getLogger().trace( marker, message );
+	}
+
+	public static void trace( Marker marker, Object format, Object... param ) {
+		getLogger().trace( marker, format, param );
+	}
+
+	public static void trace( Marker marker, Throwable throwable ) {
+		getLogger().trace( marker, throwable );
+	}
+
+	public static void trace( Marker marker, Object message, Throwable throwable ) {
+		getLogger().trace( marker, message, throwable );
+	}
+
+	public static void debug( Marker marker, Object message ) {
+		getLogger().debug( marker, message );
+	}
+
+	public static void debug( Marker marker, Object format, Object... param ) {
+		getLogger().debug( marker, format, param );
+	}
+
+	public static void debug( Marker marker, Throwable throwable ) {
+		getLogger().debug( marker, throwable );
+	}
+
+	public static void debug( Marker marker, Object message, Throwable throwable ) {
+		getLogger().debug( marker, message, throwable );
+	}
+
+	public static void info( Marker marker, Object message ) {
+		getLogger().info( marker, message );
+	}
+
+	public static void info( Marker marker, Object format, Object... param ) {
+		getLogger().info( marker, format, param );
+	}
+
+	public static void info( Marker marker, Throwable throwable ) {
+		getLogger().info( marker, throwable );
+	}
+
+	public static void info( Marker marker, Object message, Throwable throwable ) {
+		getLogger().info( marker, message, throwable );
+	}
+
+	public static void warn( Marker marker, Object message ) {
+		getLogger().warn( marker, message );
+	}
+
+	public static void warn( Marker marker, Object format, Object... param ) {
+		getLogger().warn( marker, format, param );
+	}
+
+	public static void warn( Marker marker, Throwable throwable ) {
+		getLogger().warn( marker, throwable );
+	}
+
+	public static void warn( Marker marker, Object message, Throwable throwable ) {
+		getLogger().warn( marker, message, throwable );
+	}
+
+	public static void error( Marker marker, Object message ) {
+		getLogger().error( marker, message );
+	}
+
+	public static void error( Marker marker, Object format, Object... param ) {
+		getLogger().error( marker, format, param );
+	}
+
+	public static void error( Marker marker, Throwable throwable ) {
+		getLogger().error( marker, throwable );
+	}
+
+	public static void error( Marker marker, Object message, Throwable throwable ) {
+		getLogger().error( marker, message, throwable );
+	}
+
+	/**
+	 * specify caller depth to print class name and line in logback appender.
+	 *
+	 * @param depth	callder depth
+	 * @return self instance
+	 */
+	public static NLoggerPrinter setCallderDepth( int depth ) {
+		return getLogger().setCallerDepth( depth );
 	}
 
 	public static boolean isTraceEnabled() {
