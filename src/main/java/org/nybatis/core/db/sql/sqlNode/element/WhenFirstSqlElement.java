@@ -14,7 +14,7 @@ public class WhenFirstSqlElement extends IfSqlElement {
 
 	private void toString( StringBuilder buffer, SqlElement node, int depth ) {
 
-		String tab = StringUtil.lpad( "", ' ', depth * 2 );
+		String tab = StringUtil.lpad( "", depth * 2, ' ' );
 
 		buffer.append( String.format( "%s%s", tab, node.toString() ) );
 

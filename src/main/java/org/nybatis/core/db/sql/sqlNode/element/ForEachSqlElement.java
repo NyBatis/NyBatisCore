@@ -108,7 +108,7 @@ public class ForEachSqlElement extends SqlElement {
 
 	private void toString( StringBuilder buffer, SqlElement node, int depth ) {
 
-		String tab = StringUtil.lpad( "", ' ', depth * 2 );
+		String tab = StringUtil.lpad( "", depth * 2, ' ' );
 
 		if( node instanceof IfSqlElement ) {
 

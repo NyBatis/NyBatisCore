@@ -110,7 +110,7 @@ public class SqlSessionSqliteTest {
 
 			String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
 					TABLE_NAME,
-					"RNK" + StringUtil.lpad( i % 10, '0', 5 ),
+					"RNK" + StringUtil.lpad( i % 10, 5, '0' ),
 					i,
 					"PROD-" + i
 			);
@@ -139,7 +139,7 @@ public class SqlSessionSqliteTest {
 			NMap param = new NMap();
 
 			param.put( "tableName", TABLE_NAME );
-			param.put( "listId", "RNK" + StringUtil.lpad( i % 10, '0', 5 ) );
+			param.put( "listId", "RNK" + StringUtil.lpad( i % 10, 5, '0' ) );
 			param.put( "prodId", i );
 			param.put( "prodName", "PROD-" + i );
 
@@ -167,7 +167,7 @@ public class SqlSessionSqliteTest {
 			NMap param = new NMap();
 
 			param.put( "tableName", TABLE_NAME );
-			param.put( "listId", "RNK" + StringUtil.lpad( i % 10, '0', 5 ) );
+			param.put( "listId", "RNK" + StringUtil.lpad( i % 10, 5, '0' ) );
 			param.put( "prodId", i );
 			param.put( "prodName", "PROD-" + i );
 
@@ -316,7 +316,7 @@ public class SqlSessionSqliteTest {
 
 			String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
 					TABLE_NAME,
-					"RNK" + StringUtil.lpad( i, '0', 5 ),
+					"RNK" + StringUtil.lpad( i, 5, '0' ),
 					i,
 					"PROD-" + i
 			);
@@ -327,7 +327,7 @@ public class SqlSessionSqliteTest {
 
 		String sql = String.format( "INSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( '%s', '%s', '%s' )",
 				TABLE_NAME,
-				"RNK" + StringUtil.lpad( 10, '0', 5 ),
+				"RNK" + StringUtil.lpad( 10, 5, '0' ),
 				10,
 				"PROD-" + 10
 		);

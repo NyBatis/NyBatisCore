@@ -371,7 +371,7 @@ public class SqlSessionTest {
 		try {
 
 			for( int i = 0; i < 10; i++ ) {
-				param.prodId = StringUtil.lpad( i, '0', 5 );
+				param.prodId = StringUtil.lpad( i, 5, '0' );
 				param.price  = i * 1000;
 
 				NLogger.debug( "affected count : {}", sqlSession.sqlId( "Sqlite.insert", param ).execute() );
