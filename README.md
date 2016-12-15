@@ -74,7 +74,7 @@ DatabaseConfigurator.build( Const.path.getRoot() + "/yourConfiguration.xml" );
 
 ### SQL ###
 
-SQL is written as XML in file like MyBatis. but SQL id decided only with **<font color="blue">FileName</font><font color="red">.</font><font color="green">id</font>**
+SQL is written as XML in file like MyBatis. but SQL id defined as **FileName.id** only.
 
 
 ```xml
@@ -96,7 +96,7 @@ User.xml
 </mapper>
 ```
 
-Java code is like below.
+Java code is like below. (sql id is **User** + **select** ) 
 
 ```java
 SqlSession session = SessionManager.openSession();
@@ -105,10 +105,10 @@ Map param = new HashMap();
 param.put( "name", "nayasis" );
 param.put( "age",  18 );
 
-List<Map> list = session.sqlId( "User.mapper", param ).list().select();
+List<Map> list = session.sqlId( "User.select", param ).list().select();
 ```
 
-Or 
+Also you can define specific return type in result set.   
 
 ```java
 public class User {
