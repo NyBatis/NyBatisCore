@@ -103,7 +103,7 @@ public class Encryptor {
 
         } else {
 
-            String key = StringUtil.rpad( secretKey, '0', 16 );
+            String key = StringUtil.rpad( secretKey, 16, '0' );
             try {
                 byte[] bytes = key.getBytes( "UTF-8" );
                 keyBytes = new byte[ 16 ];

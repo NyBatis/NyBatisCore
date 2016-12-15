@@ -75,16 +75,16 @@ public class StringUtil {
 	 * CJK 문자크기 특성을 반영하여 lpad 처리된 문자열을 구한다.
 	 *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
 	 */
-	public static String lpadCJK( Object value, char padChar, int length ) {
+	public static String lpadCJK( Object value, int length, char padChar ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
-		return lpad( value, padChar, adjustLength );
+		return lpad( value, adjustLength, padChar );
 
 	}
 
@@ -92,16 +92,16 @@ public class StringUtil {
 	 * CJK 문자크기 특성을 반영하여 rpad 처리된 문자열을 구한다.
 	 *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
 	 */
-	public static String rpadCJK( Object value, char padChar, int length ) {
+	public static String rpadCJK( Object value, int length, char padChar ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
-		return rpad( value, padChar, adjustLength );
+		return rpad( value, adjustLength, padChar );
 
 	}
 
@@ -324,11 +324,11 @@ public class StringUtil {
      * </pre>
      *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
      */
-    public static String lpad( Object value, char padChar, int length ) {
+    public static String lpad( Object value, int length, char padChar ) {
 
         String text        = nvl( value );
         int    textCharCnt = text.length();
@@ -363,11 +363,11 @@ public class StringUtil {
      * </pre>
      *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
      */
-    public static String rpad( Object value, char padChar, int length ) {
+    public static String rpad( Object value, int length, char padChar ) {
 
         String text  = nvl( value );
         int    index = Math.min( length, text.length() );
@@ -506,7 +506,7 @@ public class StringUtil {
                 default:
 
                     if( ch >= '\u0000' && ch <= '\u001F' ) {
-                    	sb.append("\\u").append( lpad(Integer.toHexString(ch), '0', 4).toUpperCase() );
+                    	sb.append("\\u").append( lpad(Integer.toHexString(ch), 4, '0').toUpperCase() );
                     } else {
                     	sb.append(ch);
                     }
