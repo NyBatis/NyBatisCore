@@ -3,7 +3,6 @@ package org.nybatis.core.util;
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.validation.Validator;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -1342,6 +1341,23 @@ public class StringUtil {
 		if( one != null && other == null ) return false;
 
 		return one.equals( other );
+
+	}
+
+	/**
+	 * check String value has CJK (Chinese, Japanese, Korean) character
+	 * @param value valut to check
+	 * @return true if value has CJK character.
+	 */
+	public static boolean hasCJKCharacter( Object value ) {
+
+		if( isEmpty(value) ) return false;
+
+		for( char ch : value.toString().toCharArray() ) {
+			if( CharacterUtil.isCJK(ch) ) return true;
+		}
+
+		return false;
 
 	}
 

@@ -1,9 +1,5 @@
 package org.nybatis.core.util;
 
-import java.lang.Character.UnicodeBlock;
-
-
-
 /**
  * 문자 처리 유틸
  * 
@@ -244,27 +240,27 @@ public class CharacterUtil {
 
 	}
 
-	public static boolean isCJK2( char ch ) {
-
-		UnicodeBlock unicodeBlock = Character.UnicodeBlock.of( ch );
-		
-		return	unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
-             || unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
-	         || unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
-	         || unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS
-	         || unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
-	         || unicodeBlock == Character.UnicodeBlock.CJK_RADICALS_SUPPLEMENT
-	         || unicodeBlock == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
-	         || unicodeBlock == Character.UnicodeBlock.HIRAGANA
-	         || unicodeBlock == Character.UnicodeBlock.KATAKANA
-	         || unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO
-	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO
-	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO_EXTENDED_A
-	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO_EXTENDED_B
-	         || unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES
-	         || unicodeBlock == Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS
-	    ;
-		
-	}
+//	public static boolean isCJK2( char ch ) {
+//
+//		UnicodeBlock unicodeBlock = Character.UnicodeBlock.of( ch );
+//
+//		return	unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+//           || unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+//	         || unicodeBlock == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+//	         || unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_FORMS
+//	         || unicodeBlock == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+//	         || unicodeBlock == Character.UnicodeBlock.CJK_RADICALS_SUPPLEMENT
+//	         || unicodeBlock == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+//	         || unicodeBlock == Character.UnicodeBlock.HIRAGANA
+//	         || unicodeBlock == Character.UnicodeBlock.KATAKANA
+//	         || unicodeBlock == Character.UnicodeBlock.HANGUL_COMPATIBILITY_JAMO
+//	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO
+//	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO_EXTENDED_A
+//	         || unicodeBlock == Character.UnicodeBlock.HANGUL_JAMO_EXTENDED_B
+//	         || unicodeBlock == Character.UnicodeBlock.HANGUL_SYLLABLES
+//	         || unicodeBlock == Character.UnicodeBlock.ENCLOSED_CJK_LETTERS_AND_MONTHS
+//	    ;
+//
+//	}
 	
 }
