@@ -19,7 +19,6 @@ public class CharacterUtilTest {
 			result.add( "Half-width", CharacterUtil.isHalfWidth( c ) );
 			result.add( "testCharacter", c );
 			result.add( "isCJK", CharacterUtil.isCJK( c ) );
-			result.add( "isCJK2", CharacterUtil.isCJK2( c ) );
 			result.add( "unicodeBlock", Character.UnicodeBlock.of( c ) );
 			
 		}
