@@ -11,8 +11,11 @@ import org.nybatis.core.validation.Validator;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * represents a specific instant in time with millisecond precision
@@ -32,6 +35,10 @@ public class NDate implements Serializable {
     public static final String DEFAULT_INPUT_FORMAT  = "yyyyMMddHHmmssSSS";
 
     public static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+    private static final Set<String> ISO_8601_COMPATIBLE_FORMATS = new LinkedHashSet<>(
+            Arrays.asList( "yyyyMMdd'T'HHmmssZ", "yyyyMMdd'T'HHmmssSSSZ", "yyyyMMdd'T'HHmmssSSZ", "yyyyMMdd'T'HHmmssSZ" )
+    );
 
     /**
      * constructor with current date
@@ -153,22 +160,54 @@ public class NDate implements Serializable {
         boolean isNullFormat = Validator.isEmpty( format );
 
         String pattern = getDefaultFormat( format, isNullFormat );
-
-        String numString = isNullFormat ? StringUtil.extractNumber( date ) : date;
+        String value   = isNullFormat ? StringUtil.extractNumber( date ) : date;
 
         if( isNullFormat ) {
-            int maxLength = Math.min( pattern.length(), numString.length() );
+            int maxLength = Math.min( pattern.length(), value.length() );
             pattern   = pattern.substring( 0, maxLength );
-            numString = numString.substring( 0, maxLength );
+            value = value.substring( 0, maxLength );
         }
+
+        try {
+
+            parse( value, pattern );
+            return this;
+
+        } catch( ParseException parseException ) {
+
+            if( ISO_8601_24H_FULL_FORMAT.equals(pattern) ) {
+
+                String isoValue = extractIsoValue( date );
+
+                for( String isoFormat : ISO_8601_COMPATIBLE_FORMATS ) {
+                    try {
+                        parse( isoValue, isoFormat );
+                        return this;
+                    } catch( ParseException isoError ) {}
+                }
+
+                throw parseException;
+
+            } else {
+                throw parseException;
+            }
+
+        }
+
+    }
+
+    private String extractIsoValue( String value ) {
+        return value.replaceAll( "[^0-9T\\+]", "" );
+    }
+
+    private void parse( String val, String pattern ) {
 
         SimpleDateFormat sdf = new SimpleDateFormat( pattern );
 
         try {
-	        currentTime.setTime( sdf.parse(numString) );
-            return this;
+            currentTime.setTime( sdf.parse(val) );
         } catch( java.text.ParseException e ) {
-        	throw new ParseException( e, e.getMessage() );
+            throw new ParseException( e, e.getMessage() );
         }
 
     }

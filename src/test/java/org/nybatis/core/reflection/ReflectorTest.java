@@ -1,14 +1,22 @@
 package org.nybatis.core.reflection;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.vo.*;
+import org.nybatis.core.reflection.vo.FromVo;
+import org.nybatis.core.reflection.vo.Person;
+import org.nybatis.core.reflection.vo.PersonAnother;
+import org.nybatis.core.reflection.vo.PhoneNumber;
+import org.nybatis.core.reflection.vo.TestRes;
+import org.nybatis.core.reflection.vo.TestVo;
+import org.nybatis.core.reflection.vo.ToVo;
 import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
@@ -16,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -285,6 +294,58 @@ public class ReflectorTest {
 		assertEquals( map.get( "birthDate" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "birthNDate" ).toString(), NullValue.STRING );
 
+	}
+
+	@Test
+	public void parseJson() throws IOException {
+
+		TestRes res = Reflector.toBeanFrom( getValidTestJson(), TestRes.class );
+		NLogger.debug( Reflector.toJson( res, true ) );
+
+		try {
+
+			Reflector.toBeanFrom( getInvalidTestJson(), TestRes.class );
+			assertFalse( true );
+
+		} catch( Exception e ) {
+			NLogger.debug( e );
+		}
+
+	}
+
+	private String getInvalidTestJson() {
+		return "{\n" +
+				"\t\"name\": \"test\",\n" +
+				"\t\"count\": 5,\n" +
+				"\t\"date\": {\n" +
+				"\t\t\"type\": \"date/reg\",\n" +
+				"\t\t\"text\": \"20140101T000000+0900\"\n" +
+				"\t},\n" +
+				"\t\"etcProp\": {},\n" +
+				"\t\"subList\": [{\n" +
+				"\t\t\"name\": \"sub-1\",\n" +
+				"\t\t\"value\": \"sub-value-1\"\n" +
+				"\t}, {\n" +
+				"\t\t\"name\": \"sub-2\",\n" +
+				"\t\t\"value\": \"sub-value-2\"\n" +
+				"\t}]\n" +
+				"}";
+	}
+
+	private String getValidTestJson() {
+		return "{\n" +
+				"\t\"name\": \"test\",\n" +
+				"\t\"count\": 5,\n" +
+				"\t\"date\": \"20140101T000000+0900\",\n" +
+				"\t\"etcProp\": {},\n" +
+				"\t\"subList\": [{\n" +
+				"\t\t\"name\": \"sub-1\",\n" +
+				"\t\t\"value\": \"sub-value-1\"\n" +
+				"\t}, {\n" +
+				"\t\t\"name\": \"sub-2\",\n" +
+				"\t\t\"value\": \"sub-value-2\"\n" +
+				"\t}]\n" +
+				"}";
 	}
 
 }
