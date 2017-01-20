@@ -11,6 +11,7 @@ import org.nybatis.core.util.Types;
 import org.nybatis.core.validation.Validator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -168,6 +169,10 @@ public class ForEachSqlElement extends SqlElement {
 
 	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
 		Object value = getValue( inputParam, hasSingleParam );
+		if( value == null ) return new ArrayList();
+		if( Types.isPrimitive(value) ) {
+			return Arrays.asList( value );
+		}
 		return Types.toList( value );
 	}
 
