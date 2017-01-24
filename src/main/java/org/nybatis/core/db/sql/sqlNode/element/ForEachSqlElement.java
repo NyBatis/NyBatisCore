@@ -168,12 +168,16 @@ public class ForEachSqlElement extends SqlElement {
 	}
 
 	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
+
 		Object value = getValue( inputParam, hasSingleParam );
 		if( value == null ) return new ArrayList();
-		if( Types.isPrimitive(value) ) {
+
+		if( Types.isArrayOrList(value) ) {
+			return Types.toList( value );
+		} else {
 			return Arrays.asList( value );
 		}
-		return Types.toList( value );
+
 	}
 
 	private Object getValue( QueryParameter param, boolean hasSingleParam ) {
