@@ -6,6 +6,7 @@ import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.validation.Validator;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
@@ -77,17 +78,24 @@ public class NLoggerConfigLoader {
 		String configurationPath = Const.profile.apply( filePath );
 
 		if( ! FileUtil.isResourceExisted(configurationPath) ) {
-			System.err.printf( "Logback external configuration file [%s] doesn't exist or can't be read.\n", filePath );
-			return loadDefaultConfiguration();
 
-		} else {
-			InputStream stream = FileUtil.getResourceAsStream( configurationPath );
-			if( isNotInputstreamAvailable( stream ) ) {
-				stream = loadDefaultConfiguration();
+			if( ! FileUtil.isResourceExisted(filePath) ) {
+				System.err.printf( "Logback external configuration file [%s] doesn't exist or can't be read.\n", filePath );
+				return loadDefaultConfiguration();
 			}
-			return stream;
+
+			configurationPath = filePath;
+
 		}
-		
+
+		InputStream stream = FileUtil.getResourceAsStream( configurationPath );
+
+		if( Validator.isEmpty(stream) ) {
+			stream = loadDefaultConfiguration();
+		}
+
+		return stream;
+
 	}
 
 	private InputStream loadDefaultConfiguration() {
@@ -97,14 +105,6 @@ public class NLoggerConfigLoader {
 		}
 		System.err.printf( "NLogger uses default simple configuration.\n\n" );
 		return new ByteArrayInputStream( getDefaultConfiguration().getBytes() );
-	}
-
-	private boolean isNotInputstreamAvailable( InputStream inputStream ) {
-		try {
-			return inputStream == null || inputStream.available() == 0;
-		} catch( IOException e ) {
-			return false;
-		}
 	}
 
 }

@@ -11,8 +11,11 @@ import org.nybatis.core.validation.Validator;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * represents a specific instant in time with millisecond precision
@@ -33,8 +36,12 @@ public class NDate implements Serializable {
 
     public static final String ISO_8601_24H_FULL_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
 
+    private static final Set<String> ISO_8601_COMPATIBLE_FORMATS = new LinkedHashSet<>(
+            Arrays.asList( "yyyyMMdd'T'HHmmssZ", "yyyyMMdd'T'HHmmssSSSZ", "yyyyMMdd'T'HHmmssSSZ", "yyyyMMdd'T'HHmmssSZ" )
+    );
+
     /**
-     * 현재 시간을 기준으로 기본 날짜 객체를 생성한다.
+     * constructor with current date
      */
     public NDate() {}
 
@@ -121,7 +128,8 @@ public class NDate implements Serializable {
      * date.setDate( "2011.12.24 13:20:45" );
      * </pre>
      *
-     * @param date 날짜
+     * @param date date string
+     * @return self instance
      * @throws ParseException YYYY-MM-DD-HH-MI-SS 순서로 날짜를 해석하지 못했을 경우
      */
     public NDate setDate( String date ) throws ParseException {
@@ -139,6 +147,7 @@ public class NDate implements Serializable {
      *
      * @param date 날짜
      * @param format 날짜포맷 날짜포맷 [YYYY:년, MM:월, DD:일, HH:시, MI:분, SS:초 ]
+     * @return self instance
      * @throws ParseException 정의한 format 으로 날짜를 해석하지 못했을 경우
      */
     public NDate setDate( String date, String format ) {
@@ -151,22 +160,54 @@ public class NDate implements Serializable {
         boolean isNullFormat = Validator.isEmpty( format );
 
         String pattern = getDefaultFormat( format, isNullFormat );
-
-        String numString = isNullFormat ? StringUtil.extractNumber( date ) : date;
+        String value   = isNullFormat ? StringUtil.extractNumber( date ) : date;
 
         if( isNullFormat ) {
-            int maxLength = Math.min( pattern.length(), numString.length() );
+            int maxLength = Math.min( pattern.length(), value.length() );
             pattern   = pattern.substring( 0, maxLength );
-            numString = numString.substring( 0, maxLength );
+            value = value.substring( 0, maxLength );
         }
+
+        try {
+
+            parse( value, pattern );
+            return this;
+
+        } catch( ParseException parseException ) {
+
+            if( ISO_8601_24H_FULL_FORMAT.equals(pattern) ) {
+
+                String isoValue = extractIsoValue( date );
+
+                for( String isoFormat : ISO_8601_COMPATIBLE_FORMATS ) {
+                    try {
+                        parse( isoValue, isoFormat );
+                        return this;
+                    } catch( ParseException isoError ) {}
+                }
+
+                throw parseException;
+
+            } else {
+                throw parseException;
+            }
+
+        }
+
+    }
+
+    private String extractIsoValue( String value ) {
+        return value.replaceAll( "[^0-9T\\+]", "" );
+    }
+
+    private void parse( String val, String pattern ) {
 
         SimpleDateFormat sdf = new SimpleDateFormat( pattern );
 
         try {
-	        currentTime.setTime( sdf.parse(numString) );
-            return this;
+            currentTime.setTime( sdf.parse(val) );
         } catch( java.text.ParseException e ) {
-        	throw new ParseException( e, e.getMessage() );
+            throw new ParseException( e, e.getMessage() );
         }
 
     }
@@ -175,15 +216,17 @@ public class NDate implements Serializable {
      * Date 객체로 날짜를 세팅한다.
      *
      * @param date 날짜
+     * @return self instance
      */
-    public void setDate( Date date ) {
-        this.currentTime.setTime( date );
+    public NDate setDate( Date date ) {
+        this.currentTime.setTime( date ); return this;
     }
 
     /**
      * Date 객체로 날짜를 세팅한다.
      *
      * @param date 숫자형 날짜
+     * @return self instance
      */
     public NDate setDate( long date ) {
     	this.currentTime.setTime( new Date(date) );
@@ -194,6 +237,7 @@ public class NDate implements Serializable {
      * Calendar 객체로 날짜를 세팅한다.
      *
      * @param date 날짜객체
+     * @return self instance
      */
     public NDate setDate( Calendar date ) {
         this.currentTime = (Calendar) date.clone();
@@ -204,6 +248,7 @@ public class NDate implements Serializable {
      * NDate 객체로 날짜를 세팅한다.
      *
      * @param date 날짜객체
+     * @return self instance
      */
     public NDate setDate( NDate date ) {
         this.currentTime = (Calendar) date.toCalendar().clone();
@@ -517,12 +562,12 @@ public class NDate implements Serializable {
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getBeginningOfMonthDate() ); → '2012.02.01 00:00:00'
+     * System.out.println( date.getBeginningOfMonth() ); → '2012.02.01 00:00:00'
      * </pre>
      *
      * @return new NDate to be setted with beginning of month date
      */
-    public NDate getBeginningOfMonthDate() {
+    public NDate getBeginningOfMonth() {
 
         Calendar newDate = Calendar.getInstance();
         newDate.set( getYear(), getMonth() - 1, 1, 0, 0, 0 );
@@ -538,13 +583,13 @@ public class NDate implements Serializable {
      * <pre>
      * NDate date = new NDate( "2012.02.29 13:21:41" );
      *
-     * System.out.println( date.getEndOfMonthDate() ); → '2012.02.29 23:59:59.999'
+     * System.out.println( date.getEndOfMonth() ); → '2012.02.29 23:59:59.999'
      * </pre>
      *
      * @return new NDate to be setted with end of month date
      *
      */
-    public NDate getEndOfMonthDate() {
+    public NDate getEndOfMonth() {
 
         Calendar newDate = Calendar.getInstance();
 

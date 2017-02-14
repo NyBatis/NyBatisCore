@@ -18,14 +18,14 @@ import java.util.List;
  * SqlSession session = SessionManager.openSession();
  *
  * Map param = new HashMap();
- * param.put( <font color=red>"id"</font>, <font color=blue>"merong"</font> );
+ * param.put( <font style="color:red">"id"</font>, <font style="color:blue">"merong"</font> );
  *
- * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, param ).update();
+ * session.sql( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, param ).update();
  *
  * session.rollback();
  *
- * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"A001"</font> ).update();
- * session.sql( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"B002"</font> ).update();
+ * session.sql( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"A001"</font> ).update();
+ * session.sql( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"B002"</font> ).update();
  *
  * session.commit();
  *
@@ -38,14 +38,14 @@ public interface SqlSession {
 
 	/**
 	 * Set SQL ID in mapper
-	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @param  id SQL ID consisted with <font style="color:blue">MAPPER_FILE_NAME</font><font style="color:red;bold;">.</font><font style="color:green">sqlId</font>.
 	 * @return executor to run sql
 	 */
 	SessionExecutor sqlId( String id );
 
 	/**
 	 * Set SQL ID in mapper
-	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @param  id SQL ID consisted with <font style="color:blue">MAPPER_FILE_NAME</font><font style="color:red;bold;">.</font><font style="color:green">sqlId</font>.
 	 * @param  parameter Parameter to bind with sql. it consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return executor to run sql
 	 */
@@ -68,7 +68,7 @@ public interface SqlSession {
 
 	/**
 	 * Set SQL ID in mapper for batch execution.
-	 * @param  id SQL ID consisted with <font color="blue">MAPPER_FILE_NAME</font><font color="red"><b>.</b></font><font color="green">sqlId</font>.
+	 * @param  id SQL ID consisted with <font style="color:blue">MAPPER_FILE_NAME</font><font style="color:red;bold;">.</font><font style="color:green">sqlId</font>.
 	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return batch mode executor to run sql
 	 */
@@ -149,6 +149,7 @@ public interface SqlSession {
 	 *
 	 * @param tableName     database table name
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	<T> OrmSession<T> openOrmSession( String tableName, Class<T> domainClass );
@@ -159,6 +160,7 @@ public interface SqlSession {
 	 * and environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
 	 *
 	 * @param domainClass   domain class represent to database table
+	 * @param <T> 			expected class of return
 	 * @return OrmSession
 	 */
 	<T> OrmSession<T> openOrmSession( Class<T> domainClass );

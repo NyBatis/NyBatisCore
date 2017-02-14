@@ -3,7 +3,6 @@ package org.nybatis.core.util;
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.validation.Validator;
 
 import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
@@ -75,16 +74,16 @@ public class StringUtil {
 	 * CJK 문자크기 특성을 반영하여 lpad 처리된 문자열을 구한다.
 	 *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
 	 */
-	public static String lpadCJK( Object value, char padChar, int length ) {
+	public static String lpadCJK( Object value, int length, char padChar ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
-		return lpad( value, padChar, adjustLength );
+		return lpad( value, adjustLength, padChar );
 
 	}
 
@@ -92,16 +91,16 @@ public class StringUtil {
 	 * CJK 문자크기 특성을 반영하여 rpad 처리된 문자열을 구한다.
 	 *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
 	 */
-	public static String rpadCJK( Object value, char padChar, int length ) {
+	public static String rpadCJK( Object value, int length, char padChar ) {
 
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
-		return rpad( value, padChar, adjustLength );
+		return rpad( value, adjustLength, padChar );
 
 	}
 
@@ -324,11 +323,11 @@ public class StringUtil {
      * </pre>
      *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
      */
-    public static String lpad( Object value, char padChar, int length ) {
+    public static String lpad( Object value, int length, char padChar ) {
 
         String text        = nvl( value );
         int    textCharCnt = text.length();
@@ -363,11 +362,11 @@ public class StringUtil {
      * </pre>
      *
      * @param value    	조작할 문자열
-     * @param padChar	PADDING 문자
      * @param length	결과 문자열 길이
+     * @param padChar	PADDING 문자
      * @return String Padding 된 문자열
      */
-    public static String rpad( Object value, char padChar, int length ) {
+    public static String rpad( Object value, int length, char padChar ) {
 
         String text  = nvl( value );
         int    index = Math.min( length, text.length() );
@@ -481,16 +480,16 @@ public class StringUtil {
      * json 구조 등이 깨지지 않게 하는데 사용된다.
      * </pre>
      *
-     * @param param
+     * @param value text
      * @return 특수문자가 제거된 텍스트
      */
-    public static String escape( Object param ) {
+    public static String escape( Object value ) {
 
-    	if( isEmpty(param) ) return "";
+    	if( isEmpty(value) ) return "";
 
     	StringBuilder sb = new StringBuilder();
 
-        for( char ch : param.toString().toCharArray() ) {
+        for( char ch : value.toString().toCharArray() ) {
 
             switch( ch ) {
 
@@ -506,7 +505,7 @@ public class StringUtil {
                 default:
 
                     if( ch >= '\u0000' && ch <= '\u001F' ) {
-                    	sb.append("\\u").append( lpad(Integer.toHexString(ch), '0', 4).toUpperCase() );
+                    	sb.append("\\u").append( lpad(Integer.toHexString(ch), 4, '0').toUpperCase() );
                     } else {
                     	sb.append(ch);
                     }
@@ -860,7 +859,7 @@ public class StringUtil {
      *
      * @param value 텍스트로 만들 객체
      * @return encode된 텍스트
-     * @throws UncheckedIOException
+     * @throws UncheckedIOException if I/O exception occurs.
      */
     public static String encode( Object value ) {
 
@@ -888,8 +887,8 @@ public class StringUtil {
      *
      * @param value 객체로 만들 text
      * @return decode된 객체
-     * @throws UncheckedIOException
-     * @throws ClassNotExistException
+     * @throws UncheckedIOException if I/O exception occurs.
+     * @throws ClassNotExistException if class is not found in class loader.
      */
     public static Object decode( Object value ) {
 
@@ -918,7 +917,7 @@ public class StringUtil {
 	 * encode URL
 	 * @param url url to encode
 	 * @return encoded URL
-	 * @throws EncodingException
+	 * @throws EncodingException	if an encoding error occurs.
 	 */
     public static String encodeUrl( Object url ) throws EncodingException {
 
@@ -934,7 +933,7 @@ public class StringUtil {
 	 * decode URL
 	 * @param url url to decode
 	 * @return decoded URL
-	 * @throws EncodingException
+	 * @throws EncodingException	if an decoding error occurs.
 	 */
     public static String decodeUrl( Object url ) throws EncodingException {
 
@@ -1124,7 +1123,7 @@ public class StringUtil {
 	}
 
 	/**
-	 * 정규식 예약문자 <font color="blue">([](){}.*+?$^|#\)</font> 앞에 <font color="red">\</font> 문자를 붙여준다.
+	 * 정규식 예약문자 <font style="color:blue">([](){}.*+?$^|#\)</font> 앞에 <font style="color:red">\</font> 문자를 붙여준다.
 	 *
 	 * @param pattern 변환할 정규식 패턴문자열
 	 * @return  변환된 문자열
@@ -1342,6 +1341,23 @@ public class StringUtil {
 		if( one != null && other == null ) return false;
 
 		return one.equals( other );
+
+	}
+
+	/**
+	 * check String value has CJK (Chinese, Japanese, Korean) character
+	 * @param value valut to check
+	 * @return true if value has CJK character.
+	 */
+	public static boolean hasCJKCharacter( Object value ) {
+
+		if( isEmpty(value) ) return false;
+
+		for( char ch : value.toString().toCharArray() ) {
+			if( CharacterUtil.isCJK(ch) ) return true;
+		}
+
+		return false;
 
 	}
 

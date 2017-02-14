@@ -5,12 +5,13 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
-import com.fasterxml.jackson.core.JsonParseException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
+import org.nybatis.core.log.converter.StackTracer;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
 import org.slf4j.LoggerFactory;
+import org.slf4j.Marker;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,8 @@ public class NLoggerPrinter {
 
 	private Logger logger;
 
+	private Integer callerDepth;
+
 	public NLoggerPrinter( Caller caller ) {
 		this( caller.getClassName() );
 	}
@@ -39,120 +42,208 @@ public class NLoggerPrinter {
 	}
 
 	public void trace( Object message ) {
-		log( Level.TRACE, message );
+		log( null, Level.TRACE, message );
 	}
 
 	public void trace( Object format, Object... param ) {
-		log( Level.TRACE, format, param );
+		log( null, Level.TRACE, format, param );
 	}
-	
+
 	public void trace( Throwable throwable ) {
-		log( Level.TRACE, "{}", throwable );
+		log( null, Level.TRACE, "{}", throwable );
 	}
 
 	public void trace( Object message, Throwable throwable ) {
-		log( Level.TRACE, "{}\n{}", message, throwable );
+		log( null, Level.TRACE, "{}\n{}", message, throwable );
 	}
 
 	public void debug( Object message ) {
-		log( Level.DEBUG, message );
+		log( null, Level.DEBUG, message );
 	}
 
 	public void debug( Object format, Object... param ) {
-		log( Level.DEBUG, format, param );
+		log( null, Level.DEBUG, format, param );
 	}
-	
+
 	public void debug( Throwable throwable ) {
-		log( Level.DEBUG, "{}", throwable );
+		log( null, Level.DEBUG, "{}", throwable );
 	}
 
 	public void debug( Object message, Throwable throwable ) {
-		log( Level.DEBUG, "{}\n{}", message, throwable );
+		log( null, Level.DEBUG, "{}\n{}", message, throwable );
 	}
 
 	public void info( Object message ) {
-		log( Level.INFO, message );
+		log( null, Level.INFO, message );
 	}
 
 	public void info( Object format, Object... param ) {
-		log( Level.INFO, format, param );
+		log( null, Level.INFO, format, param );
 	}
-	
+
 	public void info( Throwable throwable ) {
-		log( Level.INFO, "{}", throwable );
+		log( null, Level.INFO, "{}", throwable );
 	}
 
 	public void info( Object message, Throwable throwable ) {
-		log( Level.INFO, "{}\n{}", message, throwable );
+		log( null, Level.INFO, "{}\n{}", message, throwable );
 	}
 
 	public void warn( Object message ) {
-		log( Level.WARN, message );
+		log( null, Level.WARN, message );
 	}
 
 	public void warn( Object format, Object... param ) {
-		log( Level.WARN, format, param );
+		log( null, Level.WARN, format, param );
 	}
 
 	public void warn( Throwable throwable ) {
-		log( Level.WARN, "{}", throwable );
+		log( null, Level.WARN, "{}", throwable );
 	}
 
 	public void warn( Object message, Throwable throwable ) {
-		log( Level.WARN, "{}\n{}", message, throwable );
+		log( null, Level.WARN, "{}\n{}", message, throwable );
 	}
 
 	public void error( Object message ) {
-		log( Level.ERROR, message );
+		log( null, Level.ERROR, message );
 	}
 
 	public void error( Object format, Object... param ) {
-		log( Level.ERROR, format, param );
+		log( null, Level.ERROR, format, param );
 	}
 
 	public void error( Throwable throwable ) {
-		log( Level.ERROR, "{}", throwable );
+		log( null, Level.ERROR, "{}", throwable );
 	}
 
 	public void error( Object message, Throwable throwable ) {
-		log( Level.ERROR, "{}\n{}", message, throwable );
+		log( null, Level.ERROR, "{}\n{}", message, throwable );
 	}
 
-	private void log( Level level, Object format, Object... param ) {
+	public void trace( Marker marker, Object message ) {
+		log( marker, Level.TRACE, message );
+	}
 
-		if( ! logger.isEnabledFor( level ) ) return;
+	public void trace( Marker marker, Object format, Object... param ) {
+		log( marker, Level.TRACE, format, param );
+	}
 
-		if( format == null ) {
-			printLog( level, logger, "null" );
+	public void trace( Marker marker, Throwable throwable ) {
+		log( marker, Level.TRACE, "{}", throwable );
+	}
 
-		} else if( param.length == 0 ) {
+	public void trace( Marker marker, Object message, Throwable throwable ) {
+		log( marker, Level.TRACE, "{}\n{}", message, throwable );
+	}
 
-			if( format instanceof List ) {
+	public void debug( Marker marker, Object message ) {
+		log( marker, Level.DEBUG, message );
+	}
 
-				try {
-					printLog( level, logger, new NList( (List) format ).toString() );
-				} catch( JsonIOException e ) {
-					printLog( level, logger, format.toString() );
+	public void debug( Marker marker, Object format, Object... param ) {
+		log( marker, Level.DEBUG, format, param );
+	}
+
+	public void debug( Marker marker, Throwable throwable ) {
+		log( marker, Level.DEBUG, "{}", throwable );
+	}
+
+	public void debug( Marker marker, Object message, Throwable throwable ) {
+		log( marker, Level.DEBUG, "{}\n{}", message, throwable );
+	}
+
+	public void info( Marker marker, Object message ) {
+		log( marker, Level.INFO, message );
+	}
+
+	public void info( Marker marker, Object format, Object... param ) {
+		log( marker, Level.INFO, format, param );
+	}
+
+	public void info( Marker marker, Throwable throwable ) {
+		log( marker, Level.INFO, "{}", throwable );
+	}
+
+	public void info( Marker marker, Object message, Throwable throwable ) {
+		log( marker, Level.INFO, "{}\n{}", message, throwable );
+	}
+
+	public void warn( Marker marker, Object message ) {
+		log( marker, Level.WARN, message );
+	}
+
+	public void warn( Marker marker, Object format, Object... param ) {
+		log( marker, Level.WARN, format, param );
+	}
+
+	public void warn( Marker marker, Throwable throwable ) {
+		log( marker, Level.WARN, "{}", throwable );
+	}
+
+	public void warn( Marker marker, Object message, Throwable throwable ) {
+		log( marker, Level.WARN, "{}\n{}", message, throwable );
+	}
+
+	public void error( Marker marker, Object message ) {
+		log( marker, Level.ERROR, message );
+	}
+
+	public void error( Marker marker, Object format, Object... param ) {
+		log( marker, Level.ERROR, format, param );
+	}
+
+	public void error( Marker marker, Throwable throwable ) {
+		log( marker, Level.ERROR, "{}", throwable );
+	}
+
+	public void error( Marker marker, Object message, Throwable throwable ) {
+		log( marker, Level.ERROR, "{}\n{}", message, throwable );
+	}
+
+	private void log( Marker marker, Level level, Object format, Object... param ) {
+
+		try {
+
+			if( ! logger.isEnabledFor( level ) ) return;
+
+			if( format == null ) {
+				printLog( marker, level, logger, "null" );
+
+			} else if( param.length == 0 ) {
+
+				if( format instanceof List ) {
+
+					try {
+						printLog( marker, level, logger, new NList( (List) format ).toString() );
+					} catch( JsonIOException e ) {
+						printLog( marker, level, logger, format.toString() );
+					}
+
+				} else if( Types.isArray(format) ) {
+					printLog( marker, level, logger, Arrays.deepToString( (Object[]) format ) );
+				} else if( format instanceof Throwable ) {
+					printLog( marker, level, logger, getThrowableString( (Throwable) format ) );
+				} else {
+					printLog( marker, level, logger, format.toString() );
 				}
 
-			} else if( Types.isArray(format) ) {
-				printLog( level, logger, Arrays.deepToString( (Object[]) format ) );
-			} else if( format instanceof Throwable ) {
-				printLog( level, logger, getThrowableString( (Throwable) format ) );
 			} else {
-				printLog( level, logger, format.toString() );
-			}
 
-		} else {
-
-			for( int i = 0, iCnt = param.length; i < iCnt; i++ ) {
-				if( param[i] instanceof Throwable ) {
-					param[i] = getThrowableString( (Throwable) param[i] );
+				for( int i = 0, iCnt = param.length; i < iCnt; i++ ) {
+					if( param[i] instanceof Throwable ) {
+						param[i] = getThrowableString( (Throwable) param[i] );
+					} else if( Types.isArray(param[i]) ) {
+						param[i] = Arrays.deepToString( (Object[]) param[i] );
+					}
 				}
+
+				printLog( marker, level, logger, StringUtil.format( format, param ) );
+
 			}
 
-			printLog( level, logger, StringUtil.format( format, param ) );
-
+		} finally {
+			callerDepth = null;
 		}
 
 	}
@@ -180,25 +271,42 @@ public class NLoggerPrinter {
 	public boolean isErrorEnabled() {
 		return isEnabledFor( Level.ERROR );
 	}
-	
-	private void printLog( Level level, Logger logger, String value ) {
+
+	/**
+	 * specify caller depth to print class name and line in logback appender.
+	 *
+	 * @param depth	callder depth
+	 * @return self instance
+	 */
+	public NLoggerPrinter setCallerDepth( int depth ) {
+		callerDepth = depth;
+		return this;
+	}
+
+	private void printLog( Marker marker, Level level, Logger logger, String value ) {
+
+		String callerDepth = null;
+
+		if( this.callerDepth != null ) {
+			callerDepth = String.format( "%s::%d", StackTracer.CALLER_DEPTH, this.callerDepth );
+		}
 
 		switch( level.levelInt ) {
-			
+
 			case Level.TRACE_INT:
-				logger.trace( value );
+				logger.trace( marker, value, callerDepth );
 				break;
 			case Level.DEBUG_INT:
-				logger.debug( value );
+				logger.debug( marker, value, callerDepth );
 				break;
 			case Level.INFO_INT:
-				logger.info( value );
+				logger.info( marker, value, callerDepth );
 				break;
 			case Level.WARN_INT:
-				logger.warn( value );
+				logger.warn( marker, value, callerDepth );
 				break;
 			case Level.ERROR_INT:
-				logger.error( value );
+				logger.error( marker, value, callerDepth );
 				break;
 				
 		}

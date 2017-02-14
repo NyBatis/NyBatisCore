@@ -2,10 +2,12 @@ package org.nybatis.core.util;
 
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.validation.Validator;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -51,7 +53,10 @@ public class NProperties {
     public NProperties readFrom( String file, String charset ) throws UncheckedIOException {
 
 		try {
-			properties.load( new BufferedReader( new InputStreamReader( FileUtil.getResourceAsStream( file ), charset ) ));
+			InputStream stream = FileUtil.getResourceAsStream( file );
+			if( Validator.isNotEmpty(stream) ) {
+				properties.load( new BufferedReader( new InputStreamReader( stream, charset ) ));
+			}
 		} catch( IOException e ) {
 			throw new UncheckedIOException( e );
 		}

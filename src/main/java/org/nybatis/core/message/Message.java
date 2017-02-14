@@ -17,17 +17,14 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 코드 기반의 메세지를 관리하는 유틸 클래스
+ * Message utility class based on message code
  *
- * @author 정화수
+ * @author nayasis@gmail.com
  *
  */
 public class Message {
 
-    /**
-     * 메세지를 관리하는 Pool
-     */
-
+    // message pool ( code / local / message text )
     private static Map<String, Map<Locale, String>> messagePool = new Hashtable<>();
 
     private static Locale NULL_LOCALE = new Locale( "", "" );
@@ -37,14 +34,14 @@ public class Message {
     }
 
     /**
-     * 코드값에 해당하는 메세지를 가져온다.
+     * get message correspoding to code
      *
      * <ol>
      *   <li>
      *     <pre>
-     * 메세지의 '{}' 문자는 치환가능문자로 사용하며
+     *  '{}' in message are replaced with binding parameters.
      *
-     * 메세지코드 com.0001 이 '{}는 사람입니다.' 로 설정되어 있을 경우
+     * if message code "com.0001" is "{}는 사람입니다.", then
      *
      * Message.get( "com.0001", "정화종" ); → "정화종은 사람입니다."
      * Message.get( "com.0001", "ABC"    ); → "ABC는 사람입니다."
@@ -52,9 +49,9 @@ public class Message {
      *   </li>
      *   <li>
      *     <pre>
-     * 미정의된 메세지코드를 가져올 경우, 메세지코드가 그대로 출력된다.
+     * if message code is not defined, return code itself.
      *
-     * 만약 merong 이라는 메세지코드가 정의되어 있지 않다면
+     * if "merong" is just code and not defined, then
      *
      * Message.get( "merong" ); → "merong"
      *     </pre>
@@ -62,23 +59,55 @@ public class Message {
      * </ol>
      *
      *
-     * @param code 메세지 코드
-     * @param param '{}' 문자를 치환할 파라미터
-     * @return 코드값에 해당하는 메세지
+     * @param locale    locale
+     * @param code      message code
+     * @param param     binding parameter replaced with '{}'
+     * @return message correspoding to code
      */
     public static String get( Locale locale, Object code, Object... param ) {
         return StringUtil.format( getMessage( code, locale ), param );
     }
 
+    /**
+     * get default locale's message correspoding to code.
+     *
+     * <ol>
+     *   <li>
+     *     <pre>
+     *  '{}' in message are replaced with binding parameters.
+     *
+     * if message code "com.0001" is "{}는 사람입니다.", then
+     *
+     * Message.get( "com.0001", "정화종" ); → "정화종은 사람입니다."
+     * Message.get( "com.0001", "ABC"    ); → "ABC는 사람입니다."
+     *     </pre>
+     *   </li>
+     *   <li>
+     *     <pre>
+     * if message code is not defined, return code itself.
+     *
+     * if "merong" is just code and not defined, then
+     *
+     * Message.get( "merong" ); → "merong"
+     *     </pre>
+     *   </li>
+     * </ol>
+     *
+     *
+     * @param code      message code
+     * @param param     binding parameter replaced with '{}'
+     * @return message correspoding to code
+     */
     public static String get( Object code, Object... param ) {
     	return get( Locale.getDefault(), code, param );
     }
 
     /**
-     * Repository에서 코드값에 해당하는 메세지를 가져온다.
+     * get message from repository
      *
-     * @param code 메세지 코드
-     * @return 코드값에 해당하는 메세지
+     * @param code      message code
+     * @param locale    locale
+     * @return message corresponding to code
      */
     private static String getMessage( Object code, Locale locale ) {
 
@@ -95,9 +124,10 @@ public class Message {
     }
 
     /**
-     * 메세지 Pool에 담겨있는 내용을 JavaScript 컨텐츠로 만든다.
+     * convert message pool to javascript object
      *
-     * @return 파일에 기록할 컨텐츠
+     * @param javascriptMessageObjectName   object name of javascript
+     * @return javascript contents
      */
     public static String toJavaScript( String javascriptMessageObjectName ) {
 
@@ -119,13 +149,15 @@ public class Message {
     }
 
     /**
-     * 메세지파일(property형식)을 메모리에 적재한다.
+     * load message file (*.prop) to memory
      *
      * <pre>
-     * /config/message 디렉토리에 들어있는 *.prop 형식의 파일들을 읽어들인다. (파일명 오름차순 순으로 정렬한다.)
+     * base path is '/config/message/*.prop'
      * </pre>
+     *
+     * @throws UncheckedIOException if I/O exception occurs.
      */
-    public static void loadPool() {
+    public static void loadPool() throws UncheckedIOException {
 
         String configPath = Const.path.toResourceName( Const.path.getConfigMessage() );
 
@@ -140,10 +172,11 @@ public class Message {
     }
 
     /**
-     * 메세지파일(property형식)을 메모리에 적재한다.
      *
-     * @param filePath 메세지파일의 경로
-     * @throws UncheckedIOException
+     * load message file to memory
+     *
+     * @param filePath message file path
+     * @throws UncheckedIOException  if I/O exception occurs.
      */
     public static void loadPool( String filePath ) throws UncheckedIOException {
 
@@ -163,10 +196,16 @@ public class Message {
 
     }
 
+    /**
+     * clear message pool
+     */
     public static void clearPool() {
     	messagePool.clear();
     }
 
+    /**
+     * refresh message pool
+     */
     public static void refreshPool() {
     	clearPool();
     	loadPool();

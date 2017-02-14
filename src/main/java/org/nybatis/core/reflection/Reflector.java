@@ -387,6 +387,8 @@ public class Reflector {
 	 */
 	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
 
+		if( fromBean == null ) return null;
+
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
 
 		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
@@ -818,6 +820,7 @@ public class Reflector {
 	 * @param beanToWrapProxy	target bean to wrap method
 	 * @param interfaces		target interfaces to wrap method
 	 * @param methodInvocator	method invocator
+	 * @param <T> 				expected class of return
 	 * @return	proxy bean to wrap
 	 */
     public static <T> T wrapProxy( T beanToWrapProxy, Class<?>[] interfaces, MethodInvocator methodInvocator ) {
@@ -827,6 +830,7 @@ public class Reflector {
 	/**
 	 * Unwrap proxy invocator from bean
 	 * @param beanToUnwrapProxy	target bean to unwrap proxy method
+	 * @param <T> 				expected class of return
 	 * @return	original bean
 	 * @throws ClassCastingException if beanToUnwrapProxy is not proxy bean.
 	 */

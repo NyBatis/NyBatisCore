@@ -21,12 +21,24 @@ public class NDateTest {
 
     @Test
     public void testSetSecond() throws Exception {
-
         NDate date = new NDate( "2016-06-02 13:59:21" );
-
         date.setSecond( 0 );
-
         assertEquals( "2016-06-02 13:59:00", date.toString() );
+    }
+
+    @Test
+    public void testIsoConverting() {
+
+        String format = NDate.ISO_8601_24H_FULL_FORMAT;
+
+        NLogger.debug( new NDate( "2014-01-01T00:00:00.123+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-01-01T00:00:00.12+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-01-01T00:00:00.1+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-01-01T00:00:00+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-01-01T00:0000+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-01-01T000000+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "2014-0101T000000+0900", format ).toString( format ) );
+        NLogger.debug( new NDate( "20140101T000000+0900", format ).toString( format ) );
 
     }
 
@@ -35,8 +47,8 @@ public class NDateTest {
 
         NDate date = new NDate( "2016-06-02 13:59:21" );
 
-        NDate beginningOfMonthDate = date.getBeginningOfMonthDate();
-        NDate endOfMonthDate       = date.getEndOfMonthDate();
+        NDate beginningOfMonthDate = date.getBeginningOfMonth();
+        NDate endOfMonthDate       = date.getEndOfMonth();
 
         assertEquals( beginningOfMonthDate.toString(), "2016-06-01 00:00:00" );
         assertEquals( endOfMonthDate.toString(), "2016-06-30 23:59:59" );

@@ -22,7 +22,7 @@ public class JsonPathMapper {
      * it change only POJO to Map sturcture.
      *
      * @param map map value
-     * @return
+     * @return map has serialized key
      */
     public Map toJsonPath( Map map ) {
 

@@ -148,9 +148,9 @@ public class StringUtilTest {
 
 		int length = 50;
 
-		NLogger.debug( pattern, StringUtil.rpad("1671287205674218853", ' ', length) ) ;
-		NLogger.debug( pattern, StringUtil.rpad("[199.0, 392.0, 120.0, 70.0]", ' ', length) ) ;
-		NLogger.debug( pattern, StringUtil.rpad("", ' ', length) ) ;
+		NLogger.debug( pattern, StringUtil.rpad("1671287205674218853", length, ' ') ) ;
+		NLogger.debug( pattern, StringUtil.rpad("[199.0, 392.0, 120.0, 70.0]", length, ' ') ) ;
+		NLogger.debug( pattern, StringUtil.rpad("", length, ' ') ) ;
 
 	}
 

@@ -8,8 +8,10 @@ import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
+import org.nybatis.core.validation.Validator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +43,8 @@ public class ForEachSqlElement extends SqlElement {
 		boolean hasSingleParam = hasSingleParameter( inputParam );
 
 		List params = getParams( inputParam, hasSingleParam );
+
+		if( Validator.isEmpty(params) ) return "";
 
 		StringBuilder sql = new StringBuilder();
 
@@ -105,7 +109,7 @@ public class ForEachSqlElement extends SqlElement {
 
 	private void toString( StringBuilder buffer, SqlElement node, int depth ) {
 
-		String tab = StringUtil.lpad( "", ' ', depth * 2 );
+		String tab = StringUtil.lpad( "", depth * 2, ' ' );
 
 		if( node instanceof IfSqlElement ) {
 
@@ -164,8 +168,16 @@ public class ForEachSqlElement extends SqlElement {
 	}
 
 	private List getParams( QueryParameter inputParam, boolean hasSingleParam ) {
+
 		Object value = getValue( inputParam, hasSingleParam );
-		return Types.toList( value );
+		if( value == null ) return new ArrayList();
+
+		if( Types.isArrayOrList(value) ) {
+			return Types.toList( value );
+		} else {
+			return Arrays.asList( value );
+		}
+
 	}
 
 	private Object getValue( QueryParameter param, boolean hasSingleParam ) {

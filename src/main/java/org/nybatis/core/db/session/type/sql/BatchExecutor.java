@@ -10,14 +10,14 @@ import org.nybatis.core.db.annotation.NotSupportCache;
  * SqlSession session = SessionManager.openSession();
  *
  * Map param = new HashMap();
- * param.put( <font color=red>"id"</font>, <font color=blue>"merong"</font> );
+ * param.put( <font style="color:red">"id"</font>, <font style="color:blue">"merong"</font> );
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, param );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, param );
  *
  * session.rollback();
  *
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"A001"</font> );
- * session.executeUpdate( <font color='green'>"DELETE FROM TABLE WHERE id = <font color=red>#{id}</font>"</font>, <font color=blue>"B002"</font> );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"A001"</font> );
+ * session.executeUpdate( <font style="color:green">"DELETE FROM TABLE WHERE id = <font style="color:red">#{id}</font>"</font>, <font style="color:blue">"B002"</font> );
  *
  * session.commit();
  *

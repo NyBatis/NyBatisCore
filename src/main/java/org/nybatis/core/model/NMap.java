@@ -101,6 +101,7 @@ public class NMap extends LinkedHashMap {
 	 * convert data to specific Bean
 	 *
 	 * @param klass	Class type to convert
+	 * @param <T> expected class of return value
 	 * @return converted bean
 	 */
 	public <T> T toBean( Class<T> klass ) {
@@ -231,6 +232,7 @@ public class NMap extends LinkedHashMap {
 	/**
 	 * get value (auto type casting)
 	 * @param key key
+	 * @param <T> expected class of return value
 	 * @return value
 	 */
 	public <T> T getAs( Object key ) {
