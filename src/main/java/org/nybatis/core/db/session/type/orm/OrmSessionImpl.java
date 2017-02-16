@@ -8,7 +8,6 @@ import org.nybatis.core.db.sql.reader.DbTableReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.validation.Assertion;
 
 /**
@@ -69,22 +68,21 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     @Override
     public int merge( Object parameter ) {
 
-        T param = Reflector.toBeanFrom( parameter, domainClass );
-
-        boolean prev = properties.allowNonPkParameter();
+        boolean previousPkAllowance = properties.allowNonPkParameter();
 
         properties.allowNonPkParameter( false );
 
         try {
 
-            if( selectMap(param).size() == 0 ) {
+            int updateCount = update( parameter );
+            if( updateCount == 0 ) {
                 return insert( parameter );
-            } else {
-                return update( parameter );
             }
 
+            return updateCount;
+
         } finally {
-            properties.allowNonPkParameter( prev );
+            properties.allowNonPkParameter( previousPkAllowance );
         }
 
     }
