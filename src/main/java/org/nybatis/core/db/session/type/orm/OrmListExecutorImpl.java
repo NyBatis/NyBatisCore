@@ -55,7 +55,8 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> where( String sqlExpression ) {
-        return where( sqlExpression );
+        properties.addWhere( sqlExpression, null );
+        return this;
     }
 
     @Override
