@@ -33,10 +33,6 @@ public class DbTableReader {
     private Lock readLocker = new ReentrantLock();
 
     public void read( String environmentId, String tableName ) {
-        read( environmentId, tableName, null, null );
-    }
-
-    public void read( String environmentId, String tableName, String cacheId, Integer flush ) {
 
         Assertion.isNotNull( environmentId, new SqlConfigurationException( "environmentId is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
         Assertion.isNotNull( tableName, new SqlConfigurationException( "tableName is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
@@ -55,12 +51,12 @@ public class DbTableReader {
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout ),   cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ), cacheId, flush );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout ),   cacheId, flush );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ) );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ) );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout )   );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ) );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ) );
+            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )   );
 
         } finally {
             readLocker.unlock();
@@ -68,7 +64,7 @@ public class DbTableReader {
 
     }
 
-    private void read( String environmentId, String mainId, String subId, String xmlSql, String cacheId, Integer flush ) {
+    private void read( String environmentId, String mainId, String subId, String xmlSql ) {
 
         String sqlId = mainId + subId;
 
@@ -81,9 +77,6 @@ public class DbTableReader {
             SqlNode sqlNode = reader.read( environmentId, sqlId, xmlSql );
 
             SqlProperties properties = sqlNode.getProperties();
-
-            if( cacheId != null ) properties.setCacheId( cacheId );
-            if( flush   != null ) properties.setFetchSize( flush );
 
             sqlNode.setMainId( mainId );
 

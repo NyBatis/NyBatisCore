@@ -33,10 +33,7 @@ public class DbTableReaderTest {
         String tableName     = "TEST_ORM_PROD";
 
         DbTableReader dbTableReader = new DbTableReader();
-
-        dbTableReader.read( environmentId, tableName, "lru", 6000 );
-//        dbTableReader.read( environmentId, tableName );
-
+        dbTableReader.read( environmentId, tableName );
         printLoadedOrmSql( environmentId, tableName );
 
     }

@@ -195,37 +195,6 @@ public interface SessionExecutor {
 	NMap getParameters();
 
 	/**
-	 * Disable statements cache functionality.
-	 *
-	 * @return self instance
-	 */
-	SessionExecutor disableCache();
-
-	/**
-	 * Enable statements cache functionality.
-	 *
-	 * @param cacheId	cache id
-	 * @return self instance
-	 */
-	SessionExecutor enableCache( String cacheId );
-
-	/**
-	 * Enable statements cache functionality.
-	 *
-	 * @param cacheId		cache id
-	 * @param flushCycle	cache flush cycle (seconds)
-	 * @return self instance
-	 */
-	SessionExecutor enableCache( String cacheId, Integer flushCycle );
-
-	/**
-	 * Clear cache
-	 *
-	 * @return self instance
-	 */
-	SessionExecutor clearCache();
-
-	/**
 	 * Get name of database connected with session.
 	 *
 	 * @return database name

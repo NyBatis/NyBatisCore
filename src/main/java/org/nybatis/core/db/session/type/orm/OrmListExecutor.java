@@ -85,37 +85,6 @@ public interface OrmListExecutor<T> {
     OrmListExecutor<T> setLobPrefetchSize( int size );
 
     /**
-     * Cache statements should not be cached at once when has been executed.
-     *
-     * @return self instance
-     */
-    OrmListExecutor<T> disableCache();
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId   cache id
-     * @return self instance
-     */
-    OrmListExecutor<T> enableCache( String cacheId );
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId cache id
-     * @param flushSeconds cache flush cycle (unit:seconds)
-     * @return self instance
-     */
-    OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds );
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    OrmListExecutor<T> clearCache();
-
-    /**
      * Set sql exeution mode to page and it's limit.
      *
      * @param start start rownum

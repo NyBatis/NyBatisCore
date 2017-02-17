@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.1" xsi:schemaLocation="urn:nybatis.mapper:1.1 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
 <sql id="select" fetch="50" cache="fifo" >
   SELECT  *
@@ -10,7 +10,7 @@
   LIMIT 0, #{rowNum:int}
 </sql>
 
-<sql id="selectKey" fetch="50" cache="lru" flush="60" lobPrefetch="1000" >
+<sql id="selectKey" fetch="50" lobPrefetch="1000" >
   <key id="listId" >
     SELECT 'A001' FROM PROD
   </key>
@@ -135,7 +135,7 @@ WHERE rownum &lt;= 10
     SELECT  *
     FROM    TABLE_SAMPLE
     WHERE   1=1
-    <foreach key="#{names}" open="AND (" close=")" delimeter="UNION ALL" indexKey="#{index}">
+    <foreach key="#{names}" open="AND (" close=")" delimeter="UNION ALL" indexKey="index">
       SELECT #{index} AS index, #{names} AS name FROM DUAL
     </foreach>
     ORDER BY title
@@ -145,7 +145,7 @@ WHERE rownum &lt;= 10
     SELECT  *
     FROM    TABLE_SAMPLE
     WHERE   1=1
-    <foreach key="#{names}" open="#{AND} (" close="#{CLOSE} )" delimeter="#{DELIMETER} - " indexKey="#{index}">
+    <foreach key="#{names}" open="#{AND} (" close="#{CLOSE} )" delimeter="#{DELIMETER} - " indexKey="index">
       SELECT #{index} AS index, #{names} AS name FROM DUAL
     </foreach>
     ORDER BY title
@@ -158,7 +158,7 @@ WHERE rownum &lt;= 10
     <if test="#{age} is not empty ">
       AND     age > #{age}
     </if>
-    <foreach key="#{names}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+    <foreach key="#{names}" open="AND (" close=")" delimeter="OR" indexKey="index">
       names LIKE '%' || #{names} || '%' || #{index} -- #{index}
     </foreach>
     ORDER BY title
@@ -317,5 +317,5 @@ WHERE rownum &lt;= 10
   WHERE   1=1
   AND     age >= #{condition.limit.age}
   </sql>
-
+  
 </mapper>

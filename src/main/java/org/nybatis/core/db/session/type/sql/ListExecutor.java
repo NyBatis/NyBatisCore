@@ -83,37 +83,6 @@ public interface ListExecutor {
     ListExecutor setLobPrefetchSize( int size );
 
     /**
-     * Disable statements cache functionality.
-     *
-     * @return self instance
-     */
-    ListExecutor disableCache();
-
-    /**
-     * Enable statements cache functionality.
-     *
-     * @param cacheId	cache id
-     * @return self instance
-     */
-    ListExecutor enableCache( String cacheId );
-
-    /**
-     * Enable statements cache functionality.
-     *
-     * @param cacheId		cache id
-     * @param flushCycle	cache flush cycle (seconds)
-     * @return self instance
-     */
-    ListExecutor enableCache( String cacheId, Integer flushCycle );
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    ListExecutor clearCache();
-
-    /**
      * Set sql exeution mode to page and it's limit.
      *
      * @param start start rownum
