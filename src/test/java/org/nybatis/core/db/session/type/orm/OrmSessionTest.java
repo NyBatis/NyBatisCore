@@ -228,51 +228,6 @@ public class OrmSessionTest {
 
     }
 
-    @Test
-    public void z_cacheTest() {
-
-        OrmSession ormSession = SessionManager.openOrmSession( NybatisTest.class );
-
-        ormSession.enableCache( "lru" );
-
-        NybatisTest domain = new NybatisTest();
-        domain.setListId( "RNK00000" );
-        domain.setProdId( "70" );
-
-        for( int i = 0; i < 50; i++ ) {
-            NLogger.debug( ormSession.select( domain ) );
-        }
-
-    }
-
-    @Test
-    public void z_cacheTest_refresh() {
-
-        OrmSession<NybatisTest> ormSession = SessionManager.openOrmSession( NybatisTest.class );
-
-        ormSession.enableCache( "lru" );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( "PROD-70", getData( "RNK00000", "70" ).getProdName() );
-
-        NybatisTest domain = new NybatisTest();
-        domain.setListId( "RNK00000" );
-        domain.setProdId( "70" );
-        domain.setProdName( "2" );
-
-        ormSession.update( domain );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( "2", getData( "RNK00000", "70" ).getProdName() );
-
-        ormSession.delete( domain );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( null, getData( "RNK00000", "70" ).getProdName() );
-
-
-    }
-
     private NybatisTest getData( String listId, String prodId ) {
 
         OrmSession<NybatisTest> ormSession = SessionManager.openOrmSession( NybatisTest.class );

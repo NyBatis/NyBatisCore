@@ -139,37 +139,6 @@ public interface OrmSession<T> extends Cloneable {
     OrmSession<T> setEnvironmentId( String id );
 
     /**
-     * Cache statements should not be cached at once when has been executed.
-     *
-     * @return self instance
-     */
-    OrmSession<T> disableCache();
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    OrmSession<T> clearCache();
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId   cache id
-     * @return self instance
-     */
-    OrmSession<T> enableCache( String cacheId );
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId       cache id
-     * @param flushSeconds  cache flush cycle (unit:seconds)
-     * @return self instance
-     */
-    OrmSession<T> enableCache( String cacheId, Integer flushSeconds );
-
-    /**
      * Get native sql sqlSession
      *
      * @return native sql sqlSession

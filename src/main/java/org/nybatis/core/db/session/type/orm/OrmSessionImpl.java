@@ -1,11 +1,9 @@
 package org.nybatis.core.db.session.type.orm;
 
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SessionExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.db.sql.reader.DbTableReader;
-import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
@@ -59,7 +57,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         try {
             return getSessionExecutor( properties.sqlIdInsertPk() ).execute();
         } finally {
-            refreshCache();
             properties.clear();
         }
 
@@ -96,7 +93,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         try {
             return getSessionExecutor( properties.sqlIdUpdatePk() ).execute();
         } finally {
-            refreshCache();
             properties.clear();
         }
 
@@ -111,10 +107,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         String sqlId = isPkSql() ? properties.sqlIdDeletePk() : properties.sqlIdDelete();
 
         int cnt = getSessionExecutor( sqlId ).execute();
-
-        if( isPkSql() ) {
-            refreshCache();
-        }
 
         properties.clear();
 
@@ -159,12 +151,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     private SessionExecutor getSessionExecutor( String sqlId ) {
         return sqlSession.sqlId( sqlId, properties.getParameter() );
-    }
-
-    private void refreshCache() {
-        if( SqlRepository.getProperties( properties.sqlIdSelectPk() ).isCacheEnable() ) {
-            sqlSession.sqlId( properties.sqlIdSelectPk(), properties.getParameter() ).clearCache().select( domainClass );
-        }
     }
 
     @Override
@@ -223,29 +209,6 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         sqlSession.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         createOrmSql();
-        return this;
-    }
-
-    @Override
-    public OrmSession<T> disableCache() {
-        CacheManager.disableCache( properties.sqlIdSelectPk() );
-        return this;
-    }
-
-    @Override
-    public OrmSession<T> enableCache( String cacheId ) {
-        return enableCache( cacheId, null );
-    }
-
-    @Override
-    public OrmSession<T> enableCache( String cacheId, Integer flushSeconds ) {
-        CacheManager.enableCache( properties.sqlIdSelectPk(), cacheId, flushSeconds );
-        return this;
-    }
-
-    @Override
-    public OrmSession<T> clearCache() {
-        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 

@@ -1,7 +1,5 @@
 package org.nybatis.core.db.session.executor;
 
-import org.nybatis.core.db.cache.CacheManager;
-import org.nybatis.core.db.session.executor.util.CacheResultsetController;
 import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.ResultsetController;
 import org.nybatis.core.db.session.executor.util.StatementController;
@@ -17,33 +15,20 @@ import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.worker.Pipe;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class SqlExecutor {
 
 	private String  token;
 	private SqlBean sqlBean;
-
 	private String  sqlId;
-	private boolean isCacheEnable = false;
-	private boolean isCacheClear  = false;
 
 	public SqlExecutor( String token, SqlBean sqlBean ) {
-
 		this.token   = token;
 		this.sqlBean = sqlBean;
 		this.sqlId   = sqlBean.getSqlId();
-
-		isCacheEnable = CacheManager.isCacheSql( sqlId );
-		isCacheClear  = sqlBean.getProperties().isCacheClear();
-
 	}
 
 	private void execute( SqlBean sqlBean, SqlHandler sqlHandler ) {
@@ -96,13 +81,10 @@ public class SqlExecutor {
 		execute( sqlBean, ( injectedSqlBean, connection ) -> {
 
             PreparedStatement preparedStatement = connection.prepareStatement( injectedSqlBean.getSql() );
-
             StatementController stmtHandler = new StatementController( injectedSqlBean );
-
             stmtHandler.setParameter( preparedStatement );
             stmtHandler.setFetchSize( preparedStatement, rowFetchSize );
 			stmtHandler.setLobPrefetchSize( preparedStatement );
-
             ResultSet rs = stmtHandler.executeQuery( preparedStatement );
 
             new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler, true );
@@ -111,34 +93,7 @@ public class SqlExecutor {
 
 	}
 
-	private void executeQueryForCache( String method, RowHandler rowHandler, Integer rowFetchSize ) {
-
-		List<NMap> result = new ArrayList<>();
-
-		RowHandler rowHandlerForCache = new RowHandler() {
-			public void handle( NMap row ) {
-				result.add( row );
-			}
-		};
-
-		executeQuery( sqlBean, rowHandlerForCache, rowFetchSize );
-
-		Set header = rowHandlerForCache.getHeader();
-
-		setCache( method, new NList(result, header) );
-
-		rowHandler.setHeader( header );
-
-		new ResultsetController( sqlBean.getEnvironmentId() ).toList( result, rowHandler );
-
-	}
-
     public NMap call( Class<?>... resultSetReturnType ) {
-
-		if( isCacheEnable && ! isCacheClear) {
-			NMap cacheValue = (NMap) getCache( "call" );
-			if( cacheValue != null ) return cacheValue;
-		}
 
     	Pipe<NMap> pipe = new Pipe<>();
 
@@ -149,22 +104,14 @@ public class SqlExecutor {
 		execute( sqlBean, ( injectedSqlBean, connection ) -> {
 
             CallableStatement callableStatement = connection.prepareCall( injectedSqlBean.getSql().trim() );
-
             StatementController stmtHandler = new StatementController( injectedSqlBean );
-
             stmtHandler.setParameter( callableStatement );
-
             boolean hasResultSet = stmtHandler.execute( callableStatement );
-
             NMap result = stmtHandler.getOutParameter( injectedSqlBean, callableStatement, hasResultSet, resultSetReturnType );
 
             pipe.set( result );
 
         } );
-
-		if( isCacheEnable ) {
-			setCache( "call", pipe.get() );
-		}
 
 		return pipe.get();
 
@@ -196,67 +143,30 @@ public class SqlExecutor {
 	}
 
 	public void selectList( RowHandler rowHandler ) {
-
-		if( isCacheEnable && ! isCacheClear) {
-
-            NList cacheValue = (NList) getCache( "selectList" );
-
-			if( cacheValue != null ) {
-				new CacheResultsetController().toList( cacheValue, rowHandler );
-				return;
-			}
-
-		}
-
 		selectKeys();
-
 		sqlBean.build();
-
-		if( isCacheEnable ) {
-			executeQueryForCache( "selectList", rowHandler, null );
-		} else {
-			executeQuery( sqlBean, rowHandler, null );
-		}
-
+		executeQuery( sqlBean, rowHandler, sqlBean.getProperties().getFetchSize() );
 	}
 
 
 	public NMap select() {
-
-		if( isCacheEnable && ! isCacheClear) {
-			NMap cacheValue = (NMap) getCache( "select" );
-			if( cacheValue != null ) return cacheValue;
-		}
-
 		selectKeys();
-
 		sqlBean.build();
-
 		Pipe<NMap> pipe = new Pipe<>( new NMap() );
-
 		executeQuery( sqlBean, new RowHandler() {
 			public void handle( NMap row ) {
 				pipe.set( row );
 				stop();
 			}
 		}, 1 );
-
-
-		if( isCacheEnable ) {
-			setCache( "select", pipe.get() );
-		}
-
 		return pipe.get();
-
 	}
 
 	public int update() {
 
-		Pipe<Integer> pipe = new Pipe<>();
-
 		selectKeys();
-
 		sqlBean.build();
+		Pipe<Integer> pipe = new Pipe<>();
 
 		// When update, Transaction is startup automatically
 		TransactionManager.begin( token );
@@ -264,16 +174,12 @@ public class SqlExecutor {
 		execute( sqlBean, ( injectedSqlBean, connection ) -> {
 
             PreparedStatement preparedStatement = connection.prepareStatement( injectedSqlBean.getSql() );
-
             StatementController stmtHandler = new StatementController( injectedSqlBean );
-
             stmtHandler.setParameter( preparedStatement );
-
             int affectedCount = stmtHandler.executeUpdate( preparedStatement );
-
             pipe.set( affectedCount );
 
-        } );
+        });
 
 		return pipe.get();
 
@@ -312,15 +218,12 @@ public class SqlExecutor {
 	public NList selectNList() {
 
 		List<NMap> result = new ArrayList<>();
-
 		RowHandler rowHandler = new RowHandler() {
 			public void handle( NMap row ) {
 				result.add( row );
 			}
 		};
-
 		selectList( rowHandler );
-
 		return new NList( result, rowHandler.getHeader() );
 
 	}
@@ -355,15 +258,6 @@ public class SqlExecutor {
 
     public NMap selectKeys() {
 		return new SelectKeyExecutor( token ).selectKeys( sqlBean );
-	}
-
-	private Object getCache( String method ) {
-		sqlBean.build();
-		return CacheManager.getCache( sqlId ).get( sqlBean.getCacheKey(method) );
-	}
-
-	private void setCache( String method, Object value ) {
-		CacheManager.getCache( sqlId ).put( sqlBean.getCacheKey(method), value );
 	}
 
 }

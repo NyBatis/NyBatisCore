@@ -216,18 +216,6 @@ public class SqlBean {
 
 	}
 
-	private Integer baseCacheKey = null;
-
-	public Integer getCacheKey( String methodName ) {
-
-		if( baseCacheKey == null ) {
-			baseCacheKey = String.format( "%s::%d::%d", getEnvironmentId(), getUniqueKeyQuery(), getUniqueKeyParameter() ).hashCode();
-		}
-
-		return String.format( "%s::%s", baseCacheKey, methodName ).hashCode();
-
-	}
-
 	/**
 	 * Set database parameter to original parameters
 	 *

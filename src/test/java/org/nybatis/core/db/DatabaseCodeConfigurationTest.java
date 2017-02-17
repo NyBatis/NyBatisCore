@@ -30,6 +30,8 @@ public class DatabaseCodeConfigurationTest {
 
         new EnvironmentBuilder( environmentId ).setJdbcDatasource( JDBC.class, url, "username", "password" );
 
+        new EnvironmentBuilder( "" ).setJndiDatasource( "" );
+
     }
 
     @Test

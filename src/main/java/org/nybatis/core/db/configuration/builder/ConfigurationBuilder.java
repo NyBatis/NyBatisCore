@@ -35,20 +35,10 @@ public class ConfigurationBuilder {
 
 				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
 
-				CacheBuilder cacheBuilder = new CacheBuilder( propertyResolver );
-
-				for( Node cache : root.getChildElements("cache") ) {
-					cacheBuilder.setCache( cache );
-				}
-
-				cacheBuilder.setDefaultCache();
-
 				for( Node environment : root.getChildElements("environment") ) {
 					new EnvironmentBuilder( environment, propertyResolver );
 					new SqlBuilder( propertyResolver, getDirectory(file) ).setSql( environment );
 				}
-
-				cacheBuilder.checkEachSqlCache();
 
 				loadedFiles.add( file.toString() );
 

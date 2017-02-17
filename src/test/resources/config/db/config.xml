@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.0" xsi:schemaLocation="urn:nybatis.configuration:1.0 http://nybatis.github.io/schema/nybatis-config.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.1" xsi:schemaLocation="urn:nybatis.configuration:1.1 http://nybatis.github.io/schema/nybatis-config.xsd">
 
   <properties path="config.properties" />
-
-  <cache id="fifo"   class="org.nybatis.core.cache.implement.FifoCache"   size="512"  flush="60000" />
-  <cache id="lru"    class="org.nybatis.core.cache.implement.LruCache"    size="1024" />
 
   <environment id="sqlite01" default="true" >
     <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
@@ -42,6 +39,13 @@
     </sqlPath>
   </environment>
 
+  <environment id="jta">
+    <datasourceJdbcUnpooled>
+      <driver>#{driver}</driver>
+      <url></url>
+    </datasourceJdbcUnpooled>
+  </environment>
+  
   <!--<environment id="oracle" >-->
     <!--<datasourceJdbc ping="true" pingCycle="60" >-->
       <!--<driver>oracle.jdbc.driver.OracleDriver</driver>-->

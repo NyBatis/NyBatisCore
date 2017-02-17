@@ -1,10 +1,8 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.SqlExecutor;
 import org.nybatis.core.db.session.handler.RowHandler;
-import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 
@@ -67,29 +65,6 @@ public class ListExecutorImpl implements ListExecutor {
     @Override
     public ListExecutor setLobPrefetchSize( int size ) {
         sqlSession.getProperties().setLobPrefetchSize( size );
-        return this;
-    }
-
-    @Override
-    public ListExecutor disableCache() {
-        CacheManager.disableCache( sqlBean.getSqlId() );
-        return this;
-    }
-
-    @Override
-    public ListExecutor enableCache( String cacheId ) {
-        return enableCache( cacheId, null );
-    }
-
-    @Override
-    public ListExecutor enableCache( String cacheId, Integer flushCycle ) {
-        CacheManager.enableCache( sqlBean.getSqlId(), cacheId, flushCycle );
-        return this;
-    }
-
-    @Override
-    public ListExecutor clearCache() {
-        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 

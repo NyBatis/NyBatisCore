@@ -9,6 +9,7 @@ import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.file.vo.User;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
