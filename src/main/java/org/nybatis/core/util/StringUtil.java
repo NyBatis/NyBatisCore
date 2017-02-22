@@ -1361,4 +1361,90 @@ public class StringUtil {
 
 	}
 
+	/**
+	 * clear XSS in text
+	 *
+	 * @param value target value
+	 * @return escaped string
+	 */
+	public static String clearXss( Object value ) {
+
+		if( isEmpty(value) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		for( char ch : value.toString().toCharArray() ) {
+
+			switch( ch ) {
+				case '<' :  sb.append("&lt;");   break;
+				case '>' :  sb.append("&gt;");   break;
+				case '"' :  sb.append("&#34;");  break;
+				case '\'':  sb.append("&#39;");  break;
+				case '(' :  sb.append("&#40;");  break;
+				case ')' :  sb.append("&#41;");  break;
+				case '{' :  sb.append("&#123;"); break;
+				case '}' :  sb.append("&#125;"); break;
+				default:
+					sb.append( ch );
+			}
+
+		}
+
+		return sb.toString();
+
+	}
+
+	/**
+	 * unclear XSS in text
+	 *
+	 * @param value target value
+	 * @return unescaped string
+	 */
+	public static String unclearXss( Object value ) {
+
+		if( isEmpty(value) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		char[] chars = value.toString().toCharArray();
+
+		for( int i = 0, limit = chars.length - 1; i <= limit; i++ ) {
+
+			if( chars[i] != '&' ) {
+				sb.append( chars[i] );
+				continue;
+			}
+
+			String code = String.format( "&%c%c%c%c%c"
+				,chars[ Math.min(i + 1,limit) ]
+				,chars[ Math.min(i + 2,limit) ]
+				,chars[ Math.min(i + 3,limit) ]
+				,chars[ Math.min(i + 4,limit) ]
+				,chars[ Math.min(i + 5,limit) ]
+			);
+
+			if( code.startsWith( "&lt;" ) ) {
+				sb.append( '<' ); i+=3;
+			} else if ( code.startsWith( "&gt;" ) ) {
+				sb.append( '>' ); i+=3;
+			} else if ( code.startsWith( "&#34;" ) ) {
+				sb.append( '"' ); i+=4;
+			} else if ( code.startsWith( "&#39;" ) ) {
+				sb.append( '\'' ); i+=4;
+			} else if ( code.startsWith( "&#40;" ) ) {
+				sb.append( '(' ); i+=4;
+			} else if ( code.startsWith( "&#41;" ) ) {
+				sb.append( ')' ); i+=4;
+			} else if ( code.startsWith( "&#123;" ) ) {
+				sb.append( '{' ); i+=5;
+			} else if ( code.startsWith( "&#125;" ) ) {
+				sb.append( '}' ); i+=5;
+			}
+
+		}
+
+		return sb.toString();
+
+	}
+
 }

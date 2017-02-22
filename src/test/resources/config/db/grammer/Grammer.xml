@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.1" xsi:schemaLocation="urn:nybatis.mapper:1.1 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
-<sql id="select" fetch="50" cache="fifo" >
+<sql id="select" fetch="50" >
   SELECT  *
   FROM    PROD
   WHERE   list_id  = #{listId}
@@ -76,7 +76,7 @@ WHERE rownum &lt;= 10
   ORDER BY title
 </sql>
 
-<sql id="test" fetch="50" cache="true" flush="60" >
+<sql id="test" fetch="50" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   rownum &lt;= 10
