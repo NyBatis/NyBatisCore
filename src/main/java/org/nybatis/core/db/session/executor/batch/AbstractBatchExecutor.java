@@ -35,11 +35,11 @@ public abstract class AbstractBatchExecutor {
 		this.properties = properties;
 	}
 
-	public int executeSql( List<?> parameters, Integer commitCount ) {
+	public int executeSql( List<?> parameters, Integer commitCount ) throws SqlException {
 		return executeSql( null, parameters, commitCount );
 	}
 
-	public int executeSql( SqlNode sqlNode, List<?> parameters, Integer commitCount ) {
+	public int executeSql( SqlNode sqlNode, List<?> parameters, Integer commitCount ) throws SqlException {
 
 		if( parameters == null || parameters.size() == 0 ) return 0;
 

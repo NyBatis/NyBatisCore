@@ -9,6 +9,7 @@ import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
@@ -70,7 +71,7 @@ public class BatchExecutorImpl implements BatchExecutor {
     }
 
     @Override
-    public int execute() {
+    public int execute() throws SqlException {
 
         try {
             if( sqlNode == null ) {
