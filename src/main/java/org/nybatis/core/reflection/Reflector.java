@@ -799,7 +799,7 @@ public class Reflector {
 			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<LinkedHashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
 		} catch( JsonParseException e ) {
-			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
+			throw new JsonIOException( e, "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
 		} catch( IOException e ) {
 			throw new JsonIOException( e );
 		}
