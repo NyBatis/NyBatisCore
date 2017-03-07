@@ -1,8 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.annotation.NotSupportCache;
-import org.nybatis.core.db.annotation.SupportCache;
-import org.nybatis.core.db.annotation.SupportCacheOnlyResult;
 import org.nybatis.core.model.NMap;
 
 /**
@@ -36,7 +33,6 @@ public interface SessionExecutor {
 	 *
 	 * @return single row data
 	 */
-	@SupportCache
 	NMap select();
 
 	/**
@@ -46,7 +42,6 @@ public interface SessionExecutor {
 	 * @param <T> 			expected class of return
 	 * @return single row or single value
 	 */
-	@SupportCache
 	<T> T select( Class<T> returnType );
 
 	/**
@@ -54,7 +49,6 @@ public interface SessionExecutor {
 	 *
 	 * @return list executor
 	 */
-	@SupportCache
 	ListExecutor list();
 
 	/**
@@ -66,7 +60,6 @@ public interface SessionExecutor {
 	 *
 	 * @return affected count by execute (insert, update, delete ... )
 	 */
-	@NotSupportCache
 	int execute();
 
 	/**
@@ -97,7 +90,6 @@ public interface SessionExecutor {
 	 *
 	 * @return result of out parameters
 	 */
-	@SupportCacheOnlyResult
 	NMap call();
 
 	/**
@@ -129,7 +121,6 @@ public interface SessionExecutor {
 	 * @param listReturnTypes return type of ResultSet(s). basic return type is NMap.
 	 * @return result of out parameters
 	 */
-	@SupportCacheOnlyResult
 	NMap call( Class<?>... listReturnTypes );
 
 	/**
@@ -157,7 +148,6 @@ public interface SessionExecutor {
 	 * @param <T>				expected class of return
 	 * @return result of function or precedure
 	 */
-	@SupportCacheOnlyResult
 	<T> T call( Class<T> returnType, Class<?>... listReturnTypes );
 
 	/**

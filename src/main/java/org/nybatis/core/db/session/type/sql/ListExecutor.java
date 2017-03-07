@@ -1,6 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.annotation.SupportCache;
 import org.nybatis.core.db.session.handler.RowHandler;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
@@ -20,7 +19,6 @@ public interface ListExecutor {
      *
      * @return list NList
      */
-    @SupportCache
     NList selectNList();
 
     /**
@@ -28,7 +26,6 @@ public interface ListExecutor {
      *
      * @return list consist with Map
      */
-    @SupportCache
     List<NMap> select();
 
     /**
@@ -38,7 +35,6 @@ public interface ListExecutor {
      * @param <T> expected class of return
      * @return list consist with row or value
      */
-    @SupportCache
     <T> List<T> select( Class<T> returnType );
 
     /**
@@ -46,7 +42,6 @@ public interface ListExecutor {
      *
      * @param rowHandler  RowHandler to treat single row data
      */
-    @SupportCache
     void select( RowHandler rowHandler );
 
     /**
