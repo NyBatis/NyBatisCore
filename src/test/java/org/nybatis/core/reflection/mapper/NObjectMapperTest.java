@@ -1,17 +1,14 @@
 package org.nybatis.core.reflection.mapper;
 
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.databind.jsonFormatVisitors.*;
-import org.nybatis.core.log.NLogger;
+import com.fasterxml.jackson.databind.BeanDescription;
+import com.fasterxml.jackson.databind.JavaType;
 import org.nybatis.core.reflection.vo.Person;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
 
-import static org.testng.Assert.*;
-
 /**
- * @author nayasis@onestorecorp.com
+ * @author nayasis@gmail.com
  * @since 2017-02-17
  */
 public class NObjectMapperTest {
