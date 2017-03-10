@@ -243,6 +243,17 @@ public class ReflectorTest {
 		assertEquals( testVo.toString(), json );
 	}
 
+	@Test
+	public void nullValueTest() {
+
+		int a = 0;
+		assertTrue( a == NullValue.INTEGER );
+
+		Integer b = 0;
+		assertFalse( b == NullValue.INTEGER );
+
+	}
+
 
 	@Test
 	public void setNybatisDbNullValueTest() {
@@ -251,13 +262,15 @@ public class ReflectorTest {
 
 		person.firstName = "HWASU";
 		person.lastName  = "JUNG";
-		person.age       = 12;
+		person.age       = 0;
 		person.weight    = 25L;
 		person.birthDate = new Date();
 		person.birthNDate = new NDate();
 
 		person.profileNList.add( "key1", "val1" );
 		person.profileNList.add( "key2", "val2" );
+
+		assertTrue( person.age != NullValue.INTEGER, "age must be defined as Integer class." );
 
 		NLogger.debug( Reflector.toJson( person ) );
 
@@ -287,8 +300,6 @@ public class ReflectorTest {
 		assertEquals( map.get( "weight" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "phoneList" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "previousAddresses" ).toString(), NullValue.STRING );
-		assertEquals( map.get( "profileNMap" ).toString(), NullValue.STRING );
-		assertEquals( map.get( "profileMap" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "profileNList" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "profileSet" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "birthDate" ).toString(), NullValue.STRING );
