@@ -108,6 +108,11 @@ OR
       <artifactId>json-path</artifactId>
       <version>2.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-all</artifactId>
+      <version>4.2</version>
+    </dependency>
 
     <!-- Zip Handler -->
     <dependency>

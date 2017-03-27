@@ -1,7 +1,7 @@
 package org.nybatis.core.clone.vo;
 
 /**
- * @author nayasis@onestorecorp.com
+ * @author nayasis@gmail.com
  * @since 2017-03-24
  */
 public class Product extends AbstractProduct {
@@ -9,6 +9,13 @@ public class Product extends AbstractProduct {
     private String prodId;
     private Integer price;
     private ProductMeta meta;
+
+    public Product() {}
+
+    public Product( String prodId, String prodNm ) {
+        setProdId( prodId );
+        setProdName( prodNm );
+    }
 
     public String getProdId() {
         return prodId;
