@@ -1,7 +1,7 @@
 package org.nybatis.core.reflection;
 
+import com.rits.cloning.Cloner;
 import org.adrianwalker.multilinestring.Multiline;
-import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;

@@ -120,7 +120,7 @@ public class ClassUtil {
 	    return ( object == null ) ? null : getTopSuperClass( object.getClass() );
 	}
 
-	public static <T> T createInstance( Class<T> klass ) {
+	public static <T> T createInstance( Class<T> klass ) throws ClassCastingException {
 		try {
 			return instanceCreator.newInstance( klass );
 		} catch( Exception e ) {
@@ -168,7 +168,7 @@ public class ClassUtil {
 	 * @return true if inspect instance is extended of implemented by found class
 	 */
 	public static boolean isExtendedBy( Object inspectInstance, Class<?> foundClass ) {
-		return ( inspectInstance == null ) ? false : isExtendedBy( inspectInstance.getClass(), foundClass );
+		return inspectInstance != null && isExtendedBy( inspectInstance.getClass(), foundClass );
 	}
 
 	/**

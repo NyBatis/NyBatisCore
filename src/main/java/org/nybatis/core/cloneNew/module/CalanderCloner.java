@@ -15,7 +15,7 @@ import java.util.*;
  */
 public class CalanderCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner ) {
+    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
 
         Calendar source = (Calendar) object;
         Calendar target = ClassUtil.createInstance( source.getClass() );

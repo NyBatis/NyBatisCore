@@ -35,7 +35,7 @@ public class BaseRuntimeException extends RuntimeException {
      * Constructor
      *
      * @param message       error message ( or message code )
-     * @param messageParam  parameter binding with '{}' phrase
+     * @param messageParam  parameters binding with '{}' phrase
      */
     public BaseRuntimeException( String message, Object... messageParam ) {
         super( Message.get(message, messageParam) );
@@ -46,7 +46,7 @@ public class BaseRuntimeException extends RuntimeException {
      *
      * @param rootCause     root cause
      * @param message       error message ( or message code )
-     * @param messageParam  parameter binding with '{}' phrase
+     * @param messageParam  parameters binding with '{}' phrase
      */
     public BaseRuntimeException( Throwable rootCause, String message, Object... messageParam ) {
         super( Message.get(message, messageParam), rootCause );

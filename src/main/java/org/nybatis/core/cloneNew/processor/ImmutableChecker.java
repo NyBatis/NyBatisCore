@@ -108,7 +108,7 @@ public class ImmutableChecker {
             }
             imutableField.putIfAbsent( field, Boolean.FALSE );
         }
-        return imutableMethod.get( field );
+        return imutableField.get( field );
     }
 
 
