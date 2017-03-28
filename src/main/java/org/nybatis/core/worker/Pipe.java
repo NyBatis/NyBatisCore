@@ -61,7 +61,7 @@ public class Pipe<T> {
 		} else if( klass == Object.class ) {
 			set( (T) new Object() );
 		} else {
-			set( (T) new ClassUtil().getInstance( klass ) );
+			set( (T) new ClassUtil().createInstance( klass ) );
 		}
 
 	}

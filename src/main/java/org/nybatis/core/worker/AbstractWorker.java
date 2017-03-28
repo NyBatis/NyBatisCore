@@ -24,7 +24,7 @@ public abstract class AbstractWorker<T> {
 
     	try {
 
-    		pipe = ClassUtil.getInstance( type );
+    		pipe = ClassUtil.createInstance( type );
 
     	} catch( ClassNotFoundException e ) {
     		NLogger.warn( e );
