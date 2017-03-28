@@ -4,6 +4,7 @@ import org.nybatis.core.cloneNew.NewCloner;
 import org.nybatis.core.cloneNew.interfaces.DeepCloner;
 
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Set cloner
@@ -13,7 +14,7 @@ import java.util.Date;
  */
 public class DateCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner ) {
+    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
         Date source = (Date) object;
         return new Date( source.getTime() );
     }

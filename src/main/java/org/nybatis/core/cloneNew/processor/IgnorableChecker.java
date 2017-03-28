@@ -61,7 +61,7 @@ public class IgnorableChecker {
             }
             ignorableField.putIfAbsent( field, Boolean.FALSE );
         }
-        return ignorableMethod.get( field );
+        return ignorableField.get( field );
     }
 
 

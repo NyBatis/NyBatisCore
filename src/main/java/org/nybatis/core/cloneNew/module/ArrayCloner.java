@@ -4,6 +4,7 @@ import org.nybatis.core.cloneNew.NewCloner;
 import org.nybatis.core.cloneNew.interfaces.DeepCloner;
 
 import java.lang.reflect.Array;
+import java.util.Map;
 
 /**
  * Array cloner
@@ -13,7 +14,7 @@ import java.lang.reflect.Array;
  */
 public class ArrayCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner ) {
+    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
 
         Class<?> klass = object.getClass();
         int length = Array.getLength( object );
@@ -24,7 +25,7 @@ public class ArrayCloner implements DeepCloner {
             System.arraycopy( object, 0, newArray, 0, length );
         } else {
             for( int i = 0; i < length; i++ ) {
-                Object value = cloner.cloneObject( Array.get(object, i) );
+                Object value = cloner.cloneObject( Array.get(object, i), valueReference );
                 Array.set( newArray, i, value );
             }
         }

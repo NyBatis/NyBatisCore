@@ -1,5 +1,6 @@
 package org.nybatis.core.clone;
 
+import org.nybatis.core.exception.unchecked.InvalidAccessException;
 import org.nybatis.core.exception.unchecked.ReflectiveException;
 
 import java.lang.reflect.Constructor;
@@ -48,7 +49,7 @@ public class CoreReflector {
                 field.set( bean, value );
             }
         } catch( IllegalAccessException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new InvalidAccessException( e );
         }
 
     }
@@ -67,7 +68,7 @@ public class CoreReflector {
             }
             return val == null ? null : (T) val;
         } catch( IllegalAccessException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
+            throw new InvalidAccessException( e );
         }
 
     }

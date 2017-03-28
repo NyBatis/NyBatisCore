@@ -5,6 +5,7 @@ import org.nybatis.core.cloneNew.interfaces.DeepCloner;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * Set cloner
@@ -14,13 +15,13 @@ import java.util.Collection;
  */
 public class CollectionCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner ) {
+    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
 
         Collection source = (Collection) object;
         Collection target = ClassUtil.createInstance( source.getClass() );
 
         for( Object val : source ) {
-            target.add( cloner.cloneObject( val ) );
+            target.add( cloner.cloneObject(val, valueReference) );
         }
 
         return target;

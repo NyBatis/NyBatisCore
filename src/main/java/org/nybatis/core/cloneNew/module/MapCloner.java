@@ -14,15 +14,15 @@ import java.util.Map;
  */
 public class MapCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner ) {
+    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
 
         Map<Object,Object> source = (Map) object;
         Map target = ClassUtil.createInstance( source.getClass() );
 
         for( Map.Entry e : source.entrySet() ) {
 
-            Object key = cloner.cloneObject( e.getKey() );
-            Object val = cloner.cloneObject( e.getValue() );
+            Object key = cloner.cloneObject( e.getKey(), valueReference );
+            Object val = cloner.cloneObject( e.getValue(), valueReference );
 
             target.put( key, val );
         }

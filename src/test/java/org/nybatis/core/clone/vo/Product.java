@@ -1,5 +1,7 @@
 package org.nybatis.core.clone.vo;
 
+import org.nybatis.core.reflection.Reflector;
+
 /**
  * @author nayasis@gmail.com
  * @since 2017-03-24
@@ -48,4 +50,9 @@ public class Product extends AbstractProduct {
     public void setMeta( ProductMeta meta ) {
         this.meta = meta;
     }
+
+    public String toString(){
+        return Reflector.toJson( this, true );
+    }
+
 }

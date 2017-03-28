@@ -12,16 +12,16 @@ import java.util.*;
  */
 public class FastCloners {
 
-    private Map<Class,DeepCloner> cloners = new HashMap<>();
-
-    private ArrayCloner arrayConler = new ArrayCloner();
+    private Map<Class,DeepCloner> cloners     = new HashMap<>();
+    private ArrayCloner           arrayCloner = new ArrayCloner();
 
     public FastCloners() {
-        add( Calendar.class, new CalanderCloner() );
-        add( List.class,     new ListCloner()     );
-        add( Date.class,     new DateCloner()     );
-        add( Map.class,      new MapCloner()      );
-        add( Set.class,      new SetCloner()      );
+        add( Calendar.class,   new CalanderCloner() );
+        add( List.class,       new ListCloner()     );
+        add( Collection.class, new ListCloner()     );
+        add( Date.class,       new DateCloner()     );
+        add( Map.class,        new MapCloner()      );
+        add( Set.class,        new SetCloner()      );
     }
 
     public FastCloners add( Class klass, DeepCloner cloner ) {
@@ -46,7 +46,7 @@ public class FastCloners {
 
     public DeepCloner getCloner( Object object ) {
         if( object == null ) return null;
-        if( object.getClass().isArray() ) return arrayConler;
+        if( object.getClass().isArray() ) return arrayCloner;
         return getCloner( object.getClass() );
     }
 
