@@ -9,6 +9,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
@@ -25,34 +26,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ParameterNameReader {
 
-    private final ConcurrentHashMap<Class,ClassNode>     cacheClassNode   = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<Method,List<String>> cacheMethodNames = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Class,ClassNode>          cacheClassNode   = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Method,List<String>>      cacheMethod      = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Constructor,List<String>> cacheConstructor = new ConcurrentHashMap<>();
 
     /**
      * Read method's parameter name
      *
      * @param method
-     * @return
+     * @return parameter names
      */
     public List<String> read( Method method ) {
-
-        if( ! cacheMethodNames.containsKey( method ) ) {
-
-            if( method.getParameterCount() < 2 ) {
-                cacheMethodNames.putIfAbsent( method, getNamesByReflection(method) );
+        if( method == null ) new ArrayList<>();
+        if( ! cacheMethod.containsKey( method ) ) {
+            ClassNode classNode = getClassNode( method );
+            if( classNode == null ) {
+                cacheMethod.putIfAbsent( method, getNamesByReflection(method) );
             } else {
-                ClassNode classNode = getClassNode( method );
-                if( classNode == null ) {
-                    cacheMethodNames.putIfAbsent( method, getNamesByReflection(method) );
-                } else {
-                    cacheMethodNames.putIfAbsent( method, getNamesByAsm(method, classNode ) );
-                }
+                cacheMethod.putIfAbsent( method, getNamesByAsm(method, classNode ) );
             }
-
         }
-
-        return cacheMethodNames.get( method );
-
+        return cacheMethod.get( method );
     }
 
     private List<String> getNamesByReflection( Method method ) {
@@ -90,10 +84,70 @@ public class ParameterNameReader {
         return null;
     }
 
+    private List<String> getNamesByReflection( Constructor constructor ) {
+        List<String> names = new ArrayList<>();
+        for( Parameter parameter : constructor.getParameters() ) {
+            names.add( parameter.getName() );
+        }
+        return names;
+    }
+
+    /**
+     * Read constructor's parameter name
+     *
+     * @param constructor
+     * @return parameter names
+     */
+    public List<String> read( Constructor constructor ) {
+        if( constructor == null ) new ArrayList<>();
+        if( ! cacheConstructor.containsKey( constructor ) ) {
+            ClassNode classNode = getClassNode( constructor );
+            if( classNode == null ) {
+                cacheConstructor.putIfAbsent( constructor, getNamesByReflection(constructor) );
+            } else {
+                cacheConstructor.putIfAbsent( constructor, getNamesByAsm(constructor, classNode ) );
+            }
+        }
+        return cacheConstructor.get( constructor );
+    }
+
+    private List<String> getNamesByAsm( Constructor constructor, ClassNode classNode ) {
+
+        List<String> names           = new ArrayList<>();
+        MethodNode   constructorNode = getConstructorNode( constructor, classNode );
+
+        if( constructorNode == null ) {
+            return getNamesByReflection( constructor );
+        }
+
+        for( LocalVariableNode variableNode : (List<LocalVariableNode>) constructorNode.localVariables ) {
+            names.add( variableNode.name );
+        }
+
+        return names;
+
+    }
+
+    private MethodNode getConstructorNode( Constructor constructor, ClassNode classNode ) {
+        String descriptor = Type.getConstructorDescriptor( constructor );
+        for( MethodNode methodNode : (List<MethodNode>) classNode.methods ) {
+            // ASM parse constructor as method and name it to "<init>"
+            if( "<init>".equals(methodNode.name) && methodNode.desc.equals(descriptor) ) return methodNode;
+        }
+        return null;
+    }
 
     private ClassNode getClassNode( Method method ) {
-
         Class klass = method.getDeclaringClass();
+        return getClassNode( klass );
+    }
+
+    private ClassNode getClassNode( Constructor constructor ) {
+        Class klass = constructor.getDeclaringClass();
+        return getClassNode( klass );
+    }
+
+    private ClassNode getClassNode( Class klass ) {
 
         if( ! cacheClassNode.containsKey( klass ) ) {
 
