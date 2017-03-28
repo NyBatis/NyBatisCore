@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.rits.cloning.Cloner;
+import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.exception.unchecked.ReflectiveException;
@@ -180,13 +180,13 @@ public class Reflector {
 	 */
     public static void setFieldValueTo( Object bean, String fieldName, Object value ) {
 
-        Field field;
-
         try {
 
-            field = bean.getClass().getField( fieldName );
+			Field field = bean.getClass().getField( fieldName );
 
-            field.setAccessible( true );
+			if( ! field.isAccessible() ) {
+            	field.setAccessible( true );
+			}
 
             field.set(bean, value);
 

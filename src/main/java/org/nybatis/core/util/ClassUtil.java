@@ -5,6 +5,8 @@ import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.validation.Validator;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +31,8 @@ import java.util.jar.JarFile;
  * @author nayasis@gmail.com
  */
 public class ClassUtil {
+
+	private static final Objenesis instanceCreator = new ObjenesisStd();
 
 	/**
 	 * Get class for name
@@ -116,17 +120,17 @@ public class ClassUtil {
 	    return ( object == null ) ? null : getTopSuperClass( object.getClass() );
 	}
 
-	public static <T> T getInstance( Class<T> klass ) {
+	public static <T> T createInstance( Class<T> klass ) {
 		try {
-			return klass.newInstance();
-		} catch( InstantiationException | IllegalAccessException e ) {
+			return instanceCreator.newInstance( klass );
+		} catch( Exception e ) {
         	throw new ClassCastingException( e );
         }
 	}
 
 	@SuppressWarnings( "unchecked" )
-    public static <T> T getInstance( Type type ) throws ClassNotFoundException {
-		return (T) getInstance( getClass( type ) );
+    public static <T> T createInstance( Type type ) throws ClassNotFoundException {
+		return (T) createInstance( getClass( type ) );
 	}
 
 	/**

@@ -12,6 +12,10 @@ public class Product extends AbstractProduct {
 
     public Product() {}
 
+    public Product( String prodId ) {
+        setProdId( prodId );
+    }
+
     public Product( String prodId, String prodNm ) {
         setProdId( prodId );
         setProdName( prodNm );
@@ -23,6 +27,10 @@ public class Product extends AbstractProduct {
 
     public void setProdId( String prodId ) {
         this.prodId = prodId;
+    }
+
+    public void setProdId( String prodId, String dummyParameter ) {
+        setProdId( prodId );
     }
 
     public Integer getPrice() {

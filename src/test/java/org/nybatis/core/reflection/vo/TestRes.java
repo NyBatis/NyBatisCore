@@ -16,6 +16,8 @@ public class TestRes {
     private Date date;
     private Map etcProp;
     private List<TestSubItem> productList;
+    private List<TestSubItem> subList;
+    private TestSubItem sub;
 
     public String getName() {
         return name;
@@ -55,5 +57,21 @@ public class TestRes {
 
     public void setProductList( List<TestSubItem> productList ) {
         this.productList = productList;
+    }
+
+    public List<TestSubItem> getSubList() {
+        return subList;
+    }
+
+    public void setSubList( List<TestSubItem> subList ) {
+        this.subList = subList;
+    }
+
+    public TestSubItem getSub() {
+        return sub;
+    }
+
+    public void setSub( TestSubItem sub ) {
+        this.sub = sub;
     }
 }
