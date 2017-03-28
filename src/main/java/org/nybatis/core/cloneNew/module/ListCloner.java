@@ -13,7 +13,7 @@ import java.util.Map;
 /**
  * List cloner
  *
- * @author nayasis@onestorecorp.com
+ * @author nayasis@gmail.com
  * @since 2017-03-28
  */
 public class ListCloner implements DeepCloner {
@@ -24,19 +24,14 @@ public class ListCloner implements DeepCloner {
 
         Class<? extends List> klass = source.getClass();
 
-        List target = null;
+        List target;
+
         // it is very special ArrayList that does not reveal to public
         if( "java.util.Arrays$ArrayList".equals(klass.getName()) ) {
             target = new ArrayList();
         } else {
             target = ClassUtil.createInstance( klass );
         }
-
-//        try {
-//            target = ClassUtil.createInstance( source.getClass() );
-//        } catch( ClassCastingException e ) {
-//            target = new ArrayList();
-//        }
 
         for( Object val : source ) {
             target.add( cloner.cloneObject( val, valueReference ) );
