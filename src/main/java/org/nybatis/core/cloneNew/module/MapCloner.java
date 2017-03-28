@@ -9,7 +9,7 @@ import java.util.Map;
 /**
  * Set cloner
  *
- * @author nayasis@onestorecorp.com
+ * @author nayasis@gmail.com
  * @since 2017-03-28
  */
 public class MapCloner implements DeepCloner {
