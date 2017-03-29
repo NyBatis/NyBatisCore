@@ -1,10 +1,10 @@
-package org.nybatis.core.cloneNew;
+package org.nybatis.core.clone;
 
-import org.nybatis.core.clone.CoreReflector;
-import org.nybatis.core.cloneNew.interfaces.DeepCloner;
-import org.nybatis.core.cloneNew.processor.FastCloners;
-import org.nybatis.core.cloneNew.processor.IgnorableChecker;
-import org.nybatis.core.cloneNew.processor.ImmutableChecker;
+import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
+import org.nybatis.core.clone.processor.FastCloners;
+import org.nybatis.core.clone.processor.IgnorableChecker;
+import org.nybatis.core.clone.processor.ImmutableChecker;
+import org.nybatis.core.exception.unchecked.CloningException;
 import org.nybatis.core.exception.unchecked.InvalidAccessException;
 import org.nybatis.core.util.ClassUtil;
 
@@ -25,8 +25,7 @@ public class NewCloner {
     private ImmutableChecker immutableChecker = new ImmutableChecker();
     private IgnorableChecker ignorableChecker = new IgnorableChecker();
     private FastCloners      fastCloners      = new FastCloners();
-
-    private CoreReflector reflector;
+    private CoreReflector    reflector        = null;
 
     public NewCloner(){
         this.reflector = new CoreReflector();
@@ -34,6 +33,25 @@ public class NewCloner {
 
     public NewCloner( CoreReflector reflector ) {
         this.reflector = reflector;
+    }
+
+    public <T> T deepClone( T object ) throws CloningException {
+        if( object == null ) return null;
+        Map valueReference = new IdentityHashMap<>();
+        try {
+            return cloneObject( object, valueReference );
+        } catch( InvalidAccessException e ) {
+            throw new CloningException( "error on cloning object : {}", object, e );
+        }
+    }
+
+    public <T> T shallowClone( T object ) throws CloningException {
+        if( object == null ) return null;
+        try {
+            return cloneObject( object, null );
+        } catch( InvalidAccessException e ) {
+            throw new CloningException( "error on cloning object : {}", object, e );
+        }
     }
 
     public <T> T cloneObject( T object, Map valueReference ) throws InvalidAccessException {
@@ -47,9 +65,7 @@ public class NewCloner {
             return (T) valueReference.get( object );
         }
 
-        Class klass = object.getClass();
-
-        DeepCloner cloner = fastCloners.getCloner( klass );
+        DeepCloner cloner = fastCloners.getCloner( object );
         if( cloner != null ) {
             Object copiedValue = cloner.clone( object, this, valueReference );
             if( valueReference != null ) {
@@ -78,19 +94,19 @@ public class NewCloner {
 
         for( Field field : fields ) {
 
-            if( Modifier.isStatic(field.getModifiers()) ) continue;
-            if( Modifier.isTransient(field.getModifiers()) ) continue;
-            if( isAnonymousClass(field) ) continue;
-            if( field.isEnumConstant() ) continue;
-            if( ignorableChecker.isIgnorable(field) ) continue;
+            if( isExclusive(field) ) continue;
 
             Object originalValue = reflector.getFieldValue( bean, field );
 
             if( field.isSynthetic() || immutableChecker.isImmutable(field) || immutableChecker.isImmutable(originalValue) ) {
                 reflector.setField( newBean, field, originalValue );
             } else {
-                Object copiedValue = cloneObject( originalValue, valueReference );
-                reflector.setField( newBean, field, copiedValue );
+                if( valueReference == null ) {
+                    reflector.setField( newBean, field, originalValue );
+                } else {
+                    Object copiedValue = cloneObject( originalValue, valueReference );
+                    reflector.setField( newBean, field, copiedValue );
+                }
             }
 
         }
@@ -105,6 +121,14 @@ public class NewCloner {
 
     public ImmutableChecker getImmutableChecker() {
         return immutableChecker;
+    }
+
+    private boolean isExclusive( Field field ) {
+        if( Modifier.isStatic(field.getModifiers()) ) return true;
+        if( isAnonymousClass(field) ) return true;
+        if( field.isEnumConstant() ) return true;
+        if( ignorableChecker.isIgnorable(field) ) return true;
+        return false;
     }
 
 }

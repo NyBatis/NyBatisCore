@@ -11,6 +11,9 @@ public class CloningException extends BaseRuntimeException {
 
     private static final long serialVersionUID = 6848966904417509380L;
 
+    /**
+     * Constructor
+     */
     public CloningException() {
         super();
     }
