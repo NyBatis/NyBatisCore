@@ -1,12 +1,11 @@
-package org.nybatis.core.cloneNew.module;
+package org.nybatis.core.clone.module.clone.implement;
 
-import org.nybatis.core.cloneNew.NewCloner;
-import org.nybatis.core.cloneNew.interfaces.DeepCloner;
+import org.nybatis.core.clone.NewCloner;
+import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +25,10 @@ public class ListCloner implements DeepCloner {
 
         List target;
 
-        // it is very special ArrayList that does not reveal to public
-        if( "java.util.Arrays$ArrayList".equals(klass.getName()) ) {
-            target = new ArrayList();
-        } else {
+        try {
             target = ClassUtil.createInstance( klass );
+        } catch( ClassCastingException e ) {
+            target = new ArrayList();
         }
 
         for( Object val : source ) {

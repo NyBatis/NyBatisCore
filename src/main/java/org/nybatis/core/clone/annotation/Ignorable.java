@@ -1,4 +1,4 @@
-package org.nybatis.core.cloneNew.annotation;
+package org.nybatis.core.clone.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

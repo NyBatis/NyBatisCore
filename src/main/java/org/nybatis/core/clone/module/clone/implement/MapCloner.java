@@ -1,9 +1,11 @@
-package org.nybatis.core.cloneNew.module;
+package org.nybatis.core.clone.module.clone.implement;
 
-import org.nybatis.core.cloneNew.NewCloner;
-import org.nybatis.core.cloneNew.interfaces.DeepCloner;
+import org.nybatis.core.clone.NewCloner;
+import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.util.ClassUtil;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -17,7 +19,13 @@ public class MapCloner implements DeepCloner {
     public Object clone( Object object, NewCloner cloner, Map valueReference ) {
 
         Map<Object,Object> source = (Map) object;
-        Map target = ClassUtil.createInstance( source.getClass() );
+
+        Map target;
+        try {
+            target = ClassUtil.createInstance( source.getClass() );
+        } catch( ClassCastingException e ) {
+            target = new LinkedHashMap();
+        }
 
         for( Map.Entry e : source.entrySet() ) {
 

@@ -1,6 +1,6 @@
-package org.nybatis.core.cloneNew.processor;
+package org.nybatis.core.clone.processor;
 
-import org.nybatis.core.cloneNew.annotation.Ignorable;
+import org.nybatis.core.clone.annotation.Ignorable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

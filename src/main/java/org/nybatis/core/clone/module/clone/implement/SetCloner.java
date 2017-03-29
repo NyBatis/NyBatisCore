@@ -1,7 +1,7 @@
-package org.nybatis.core.cloneNew.module;
+package org.nybatis.core.clone.module.clone.implement;
 
-import org.nybatis.core.cloneNew.NewCloner;
-import org.nybatis.core.cloneNew.interfaces.DeepCloner;
+import org.nybatis.core.clone.NewCloner;
+import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.Map;

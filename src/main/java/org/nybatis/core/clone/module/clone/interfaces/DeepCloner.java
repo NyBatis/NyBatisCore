@@ -1,6 +1,6 @@
-package org.nybatis.core.cloneNew.interfaces;
+package org.nybatis.core.clone.module.clone.interfaces;
 
-import org.nybatis.core.cloneNew.NewCloner;
+import org.nybatis.core.clone.NewCloner;
 
 import java.util.Map;
 
