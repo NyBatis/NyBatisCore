@@ -1,4 +1,4 @@
-package org.nybatis.core.clone;
+package org.nybatis.core.reflection.core;
 
 import org.nybatis.core.log.NLogger;
 import org.objectweb.asm.ClassReader;

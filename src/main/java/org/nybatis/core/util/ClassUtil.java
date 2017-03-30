@@ -16,11 +16,7 @@ import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -32,7 +28,7 @@ import java.util.jar.JarFile;
  */
 public class ClassUtil {
 
-	private static final Objenesis instanceCreator = new ObjenesisStd();
+	private static Objenesis classCreator = new ObjenesisStd();
 
 	/**
 	 * Get class for name
@@ -122,7 +118,7 @@ public class ClassUtil {
 
 	public static <T> T createInstance( Class<T> klass ) throws ClassCastingException {
 		try {
-			return instanceCreator.newInstance( klass );
+			return classCreator.newInstance( klass );
 		} catch( Exception e ) {
         	throw new ClassCastingException( e );
         }
@@ -130,7 +126,7 @@ public class ClassUtil {
 
 	@SuppressWarnings( "unchecked" )
     public static <T> T createInstance( Type type ) throws ClassNotFoundException {
-		return (T) createInstance( getClass( type ) );
+		return (T) createInstance( getClass(type) );
 	}
 
 	/**

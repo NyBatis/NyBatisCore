@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.rits.cloning.Cloner;
+import org.nybatis.core.clone.Cloner;
+import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
-import org.nybatis.core.exception.unchecked.ReflectiveException;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
@@ -22,7 +22,6 @@ import org.nybatis.core.validation.Validator;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.*;
 
@@ -36,186 +35,6 @@ public class Reflector {
 
 	private static NObjectMapper objectMapper       = new NObjectMapper( false );
 	private static NObjectMapper objectMapperSorted = new NObjectMapper( true );
-
-	/**
-	 * Get fields in bean
-	 *
-	 * @param bean bean to extract fields
-	 * @return fields
-	 */
-    public static List<Field> getFieldsFrom( Object bean ) {
-
-    	List<Field> result = new ArrayList<>();
-
-    	if( bean != null ) {
-    		for( Field field : bean.getClass().getDeclaredFields() ) {
-
-    			// Skip Synthetic Field
-    			if( (field.getModifiers() & 0x00001000 ) != 0 ) continue;
-
-    			result.add( field );
-
-    		}
-    	}
-
-        return result;
-
-    }
-
-	/**
-	 * Get methods in bean
-	 *
-	 * @param bean bean to extract methods
-	 * @return methods
-	 */
-    public static List<Method> getMethodsFrom( Object bean ) {
-
-    	List<Method> result = new ArrayList<>();
-
-    	if( bean != null ) {
-    		for( Method method : bean.getClass().getDeclaredMethods() ) {
-    			result.add( method );
-    		}
-    	}
-
-        return result;
-
-    }
-
-	/**
-	 * Get field names in bean
-	 *
-	 * @param bean bean to extract field names
-	 * @return field names
-	 */
-    public static List<String> getFieldNamesFrom( Object bean ) {
-
-    	List<Field>  from = getFieldsFrom( bean );
-    	List<String> to   = new ArrayList<>( from.size() );
-
-    	for( Field field : from ) {
-    		to.add( field.getName() );
-    	}
-
-        return to;
-
-    }
-
-	/**
-	 * Get value of field
-	 *
-	 * @param bean		target bean to extact value
-	 * @param field		field in target bean
-	 * @param <T>		value's generic type
-	 * @return	value
-	 * @throws ReflectiveException	fail on access field
-	 */
-    public static <T> T getFieldValueFrom( Object bean, Field field ) {
-
-        field.setAccessible( true );
-
-        try {
-
-			Object val = field.get( bean );
-			return val == null ? null : (T) val;
-
-        } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e );
-        }
-
-    }
-
-	/**
-	 * Get value of field by name
-	 *
-	 * @param bean		target bean to extact value
-	 * @param fieldName	field in target bean
-	 * @param <T>		value's generic type
-	 * @return	value
-	 * @throws ReflectiveException	fail on access field
-	 */
-    public static <T> T getFieldValueFrom( Object bean, String fieldName ) {
-
-        try {
-            Field field = bean.getClass().getDeclaredField( fieldName );
-			return getFieldValueFrom( bean, field );
-
-        } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e );
-        }
-
-    }
-
-	/**
-	 * Set value on field
-	 * @param bean		target bean to set value
-	 * @param field		field in target bean
-	 * @param value		value to set on field
-	 * @throws ReflectiveException	fail on access field
-	 */
-    public static void setFieldValueTo( Object bean, Field field, Object value ) {
-
-        field.setAccessible( true );
-
-        try {
-            field.set( bean, value );
-
-        } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
-        }
-
-    }
-
-	/**
-	 * Set value on field by name
-	 * @param bean		target bean to set value
-	 * @param fieldName	field name in target bean
-	 * @param value		value to set on field
-	 * @throws ReflectiveException	fail on access field
-	 */
-    public static void setFieldValueTo( Object bean, String fieldName, Object value ) {
-
-        try {
-
-			Field field = bean.getClass().getField( fieldName );
-
-			if( ! field.isAccessible() ) {
-            	field.setAccessible( true );
-			}
-
-            field.set(bean, value);
-
-        } catch ( ReflectiveOperationException e ) {
-            throw new ReflectiveException( e.getMessage(), e );
-        }
-
-    }
-
-	/**
-	 * Get fields information paired with key and value
-	 * @param bean	target bean to inspect
-	 * @return fields information paired with key and value
-	 * @throws ReflectiveException	fail on access field
-	 */
-    public static Map<String, Object> getFields( Object bean ) {
-
-        Map<String, Object> result = new HashMap<String, Object>();
-
-        for( Field field : getFieldsFrom(bean) ) {
-
-            field.setAccessible( true );
-
-            try {
-                result.put( field.getName(), field.get(bean) );
-            } catch ( ReflectiveOperationException e ) {
-                throw new ReflectiveException( e.getMessage(), e );
-            }
-
-        }
-
-        return result;
-
-    }
 
 	/**
 	 * Creates and returnes a copy of object
@@ -240,10 +59,10 @@ public class Reflector {
 		if( source == null || target == null ) return;
 
 		if( ClassUtil.isExtendedBy(target.getClass(), source.getClass()) ) {
-    		new Cloner().copyPropertiesOfInheritedClass( source, target );
+    		new Cloner().copy( source, target );
 		} else {
 			Object newTarget = toBeanFrom( source, target.getClass() );
-			new Cloner().copyPropertiesOfInheritedClass( newTarget, target );
+			new Cloner().copy( newTarget, target );
 		}
 
     }
@@ -338,9 +157,11 @@ public class Reflector {
 	 */
     public static String toString( Object bean ) {
 
+		CoreReflector coreReflector = new CoreReflector();
+
     	NList result = new NList();
 
-        for( Field field : getFieldsFrom(bean) ) {
+        for( Field field : coreReflector.getFields(bean) ) {
 
         	if( ! field.isAccessible() ) field.setAccessible( true );
 

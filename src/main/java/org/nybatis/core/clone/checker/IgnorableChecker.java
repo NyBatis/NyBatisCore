@@ -1,4 +1,4 @@
-package org.nybatis.core.clone.processor;
+package org.nybatis.core.clone.checker;
 
 import org.nybatis.core.clone.annotation.Ignorable;
 

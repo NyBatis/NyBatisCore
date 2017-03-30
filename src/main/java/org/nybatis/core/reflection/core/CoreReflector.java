@@ -1,12 +1,13 @@
-package org.nybatis.core.clone;
+package org.nybatis.core.reflection.core;
 
 import org.nybatis.core.exception.unchecked.InvalidAccessException;
-import org.nybatis.core.exception.unchecked.ReflectiveException;
+import org.nybatis.core.validation.Validator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,9 +26,9 @@ public class CoreReflector {
     private final ConcurrentHashMap<Class,Set<Method>>      cacheMethod      = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<Class,Set<Constructor>> cacheConstructor = new ConcurrentHashMap<>();
 
-    public CoreReflector() {}
-
     private ParameterNameReader parameterNameReader = new ParameterNameReader();
+
+    public CoreReflector() {}
 
     public void setField( Object bean, Field field, Object value ) {
 
@@ -49,10 +50,8 @@ public class CoreReflector {
     }
 
     public <T> T getFieldValue( Object bean, Field field ) {
-
-        if( field == null ) return null;
+        if( bean == null || field == null ) return null;
         setAccessible( field );
-
         Object val;
         try {
             if( Modifier.isStatic(field.getModifiers()) ){
@@ -67,12 +66,26 @@ public class CoreReflector {
 
     }
 
+    public <T> T getFieldValue( Object bean, String fieldNameRegexpPattern ) {
+        if( bean == null || Validator.isEmpty( fieldNameRegexpPattern ) ) return null;
+        Set<Field> fields = getFields( bean, fieldNameRegexpPattern );
+        if( fields.size() == 0 ) return null;
+        List<Field> list = new ArrayList<>( fields );
+        return getFieldValue( bean, list.get(0) );
+    }
+
     private void setAccessible( Field field ) {
         if( ! field.isAccessible() ) {
             field.setAccessible( true );
         }
     }
 
+    /**
+     * Get fields in object
+     *
+     * @param object    object to extract fields
+     * @return fields
+     */
     public  Set<Field> getFields( Object object ) {
         if( object == null ) return new LinkedHashSet<>();
         return getFields( object.getClass() );
@@ -103,6 +116,22 @@ public class CoreReflector {
 
         return cacheField.get( klass );
 
+    }
+
+    public Set<Field> getFields( Object object, String fieldNameRegexpPattern ) {
+        if( object == null ) return new LinkedHashSet<>();
+        return getFields( object.getClass(), fieldNameRegexpPattern );
+    }
+
+    public Set<Field> getFields( Class klass, String fieldNameRegexpPattern ) {
+        if( Validator.isEmpty(fieldNameRegexpPattern) ) return new LinkedHashSet<>();
+        Set<Field> result = new LinkedHashSet<>();
+        for( Field field : getFields(klass) ) {
+            if( field.getName().matches(fieldNameRegexpPattern) ) {
+                result.add( field );
+            }
+        }
+        return result;
     }
 
     private boolean isExclusive( Field field ) {
@@ -143,6 +172,22 @@ public class CoreReflector {
 
         return cacheMethod.get( klass );
 
+    }
+
+    public Set<Method> getMethods( Object object, String methodNameRegexpPattern ) {
+        if( object == null ) return new LinkedHashSet<>();
+        return getMethods( object.getClass(), methodNameRegexpPattern );
+    }
+
+    public Set<Method> getMethods( Class klass, String methodNameRegexpPattern ) {
+        if( Validator.isEmpty(methodNameRegexpPattern) ) return new LinkedHashSet<>();
+        Set<Method> result = new LinkedHashSet<>();
+        for( Method method : getMethods(klass) ) {
+            if( method.getName().matches(methodNameRegexpPattern) ) {
+                result.add( method );
+            }
+        }
+        return result;
     }
 
     public  Set<Constructor> getContructors( Object object ) {

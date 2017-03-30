@@ -1,7 +1,7 @@
-package org.nybatis.core.clone.module.clone.implement;
+package org.nybatis.core.clone.fastcloner.implement;
 
-import org.nybatis.core.clone.NewCloner;
-import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
+import org.nybatis.core.clone.Cloner;
+import org.nybatis.core.clone.fastcloner.interfaces.DeepCloner;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.Map;
@@ -15,7 +15,7 @@ import java.util.Set;
  */
 public class SetCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
+    public Object clone( Object object, Cloner cloner, Map valueReference ) {
 
         Set source = (Set) object;
         Set target = ClassUtil.createInstance( source.getClass() );
