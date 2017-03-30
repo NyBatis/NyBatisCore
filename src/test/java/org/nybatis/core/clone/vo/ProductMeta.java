@@ -1,9 +1,7 @@
 package org.nybatis.core.clone.vo;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author nayasis@gmail.com.com
@@ -13,6 +11,7 @@ public class ProductMeta {
 
     private String description;
     private List<String> author;
+    private Set<String> newAuthor;
 
     private static String descriptionStatic;
     private static String nameStatic;
@@ -37,8 +36,15 @@ public class ProductMeta {
         this.author = author;
     }
 
-    @JsonAnyGetter
-    public static void setDescriptionStaticaly( @JsonProperty String description, String name ) {
+    public Set<String> getNewAuthor() {
+        return newAuthor;
+    }
+
+    public void setNewAuthor( Set<String> newAuthor ) {
+        this.newAuthor = newAuthor;
+    }
+
+    public static void setDescriptionStaticaly( String description, String name ) {
         descriptionStatic = description;
         nameStatic = name;
     }

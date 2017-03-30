@@ -1,13 +1,16 @@
 package org.nybatis.core.clone;
 
-import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
-import org.nybatis.core.clone.processor.FastCloners;
-import org.nybatis.core.clone.processor.IgnorableChecker;
-import org.nybatis.core.clone.processor.ImmutableChecker;
+import org.nybatis.core.clone.checker.IgnorableChecker;
+import org.nybatis.core.clone.checker.ImmutableChecker;
+import org.nybatis.core.clone.fastcloner.FastCloners;
+import org.nybatis.core.clone.fastcloner.interfaces.DeepCloner;
 import org.nybatis.core.exception.unchecked.CloningException;
 import org.nybatis.core.exception.unchecked.InvalidAccessException;
+import org.nybatis.core.exception.unchecked.InvalidArgumentException;
+import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.util.ClassUtil;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
@@ -15,23 +18,23 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * Bean Cloner
+ *
  * @author nayasis@gmail.com
  * @since 2017-03-28
  */
-public class NewCloner {
+public class Cloner {
 
-//    private Map<Object, Object> valueReference = new IdentityHashMap<>();
-
-    private ImmutableChecker immutableChecker = new ImmutableChecker();
-    private IgnorableChecker ignorableChecker = new IgnorableChecker();
-    private FastCloners      fastCloners      = new FastCloners();
+    private ImmutableChecker immutableChecker = new   ImmutableChecker();
+    private IgnorableChecker ignorableChecker = new   IgnorableChecker();
+    private FastCloners      fastCloners      = new   FastCloners();
     private CoreReflector    reflector        = null;
 
-    public NewCloner(){
+    public Cloner(){
         this.reflector = new CoreReflector();
     }
 
-    public NewCloner( CoreReflector reflector ) {
+    public Cloner( CoreReflector reflector ) {
         this.reflector = reflector;
     }
 
@@ -56,7 +59,7 @@ public class NewCloner {
 
     public <T> T cloneObject( T object, Map valueReference ) throws InvalidAccessException {
 
-        if( object == null || object instanceof NewCloner ) return null;
+        if( object == null || object instanceof Cloner ) return null;
         if( object instanceof Enum ) return object;
         if( ignorableChecker.isIgnorable(object) ) return null;
         if( immutableChecker.isImmutable(object) ) return object;
@@ -90,11 +93,9 @@ public class NewCloner {
             valueReference.put( bean, newBean );
         }
 
-        Set<Field> fields = reflector.getFields( klass );
-
-        for( Field field : fields ) {
-
+        for( Field field : reflector.getFields(klass) ) {
             if( isExclusive(field) ) continue;
+            if( ignorableChecker.isIgnorable(field) ) continue;
 
             Object originalValue = reflector.getFieldValue( bean, field );
 
@@ -108,10 +109,39 @@ public class NewCloner {
                     reflector.setField( newBean, field, copiedValue );
                 }
             }
-
         }
 
         return newBean;
+
+    }
+
+    public <T, E extends T> void copy( T source, E target ) {
+
+        if( source == null ) throw new InvalidArgumentException( "source can not be null" );
+        if( target == null ) throw new InvalidArgumentException( "target can not be null" );
+
+        Class sourceClass = source.getClass();
+        Class targetClass = target.getClass();
+
+        if( sourceClass.isArray() ) {
+            if( ! targetClass.isArray() ) {
+                throw new InvalidArgumentException( "can not copy from Array({}) to Non-Array({})", sourceClass, targetClass );
+            }
+            int length = Math.min( Array.getLength(source), Array.getLength(target) );
+            for( int i = 0; i < length; i++ ) {
+                Object val = Array.get( source, i );
+                Array.set( target, i, val );
+            }
+            return;
+        }
+
+        Set<Field> fields = reflector.getFields( sourceClass );
+
+        for( Field field : fields ) {
+            if( isExclusive(field) ) continue;
+            Object value = reflector.getFieldValue( source, field );
+            reflector.setField( target, field, value );
+        }
 
     }
 
@@ -127,7 +157,6 @@ public class NewCloner {
         if( Modifier.isStatic(field.getModifiers()) ) return true;
         if( isAnonymousClass(field) ) return true;
         if( field.isEnumConstant() ) return true;
-        if( ignorableChecker.isIgnorable(field) ) return true;
         return false;
     }
 

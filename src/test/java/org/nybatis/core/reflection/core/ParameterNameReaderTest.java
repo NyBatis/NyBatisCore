@@ -1,7 +1,9 @@
-package org.nybatis.core.clone;
+package org.nybatis.core.reflection.core;
 
 import org.nybatis.core.clone.vo.Product;
 import org.nybatis.core.clone.vo.ProductMeta;
+import org.nybatis.core.reflection.core.CoreReflector;
+import org.nybatis.core.reflection.core.ParameterNameReader;
 import org.testng.annotations.Test;
 
 import java.lang.reflect.Constructor;

@@ -1,7 +1,5 @@
-package org.nybatis.core.cloneNew;
+package org.nybatis.core.clone;
 
-import com.rits.cloning.Cloner;
-import org.nybatis.core.clone.NewCloner;
 import org.nybatis.core.clone.vo.Product;
 import org.nybatis.core.clone.vo.ProductMeta;
 import org.testng.annotations.Test;
@@ -12,42 +10,24 @@ import java.util.Arrays;
  * @author nayasis@gmail.com
  * @since 2017-03-29
  */
-public class NewClonerTest {
+public class ClonerTest {
 
 
     @Test
     public void test() {
 
-        NewCloner cloner = new NewCloner();
-        Cloner originalCloner = new Cloner();
+        Cloner cloner = new Cloner();
 
         Product product1 = getSample();
-        Product product2 = originalCloner.deepClone( product1 );
-        Product product3 = originalCloner.shallowClone( product1 );
-        Product product4 = cloner.deepClone( product1 );
-        Product product5 = cloner.shallowClone( product1 );
+        Product product2 = cloner.deepClone( product1 );
+        Product product3 = cloner.shallowClone( product1 );
 
         product1.getMeta().getAuthor().set( 0, "Not Jim !!" );
-
 
         System.out.println( product1 );
         System.out.println( "-------------");
         System.out.println( product2 );
         System.out.println( product3 );
-
-        System.out.println( "-------------");
-        System.out.println( product4 );
-        System.out.println( product5 );
-
-    }
-
-    @Test
-    public void booleanTest() {
-
-        System.out.println( true ^ true );
-        System.out.println( true ^ false );
-        System.out.println( false ^ true );
-        System.out.println( false ^ false );
 
     }
 

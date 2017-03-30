@@ -69,7 +69,7 @@ OR
 
   <developers>
     <developer>
-      <name>Jung Hwasu</name>
+      <name>Hwasu Jung</name>
       <email>nayasis@gmail.com</email>
       <id>nayasis</id>
       <roles>
@@ -106,19 +106,19 @@ OR
       <version>2.8.3</version>
     </dependency>
     <dependency>
-      <groupId>uk.com.robust-it</groupId>
-      <artifactId>cloning</artifactId>
-      <version>1.9.2</version>
+      <groupId>org.ow2.asm</groupId>
+      <artifactId>asm-all</artifactId>
+      <version>4.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.objenesis</groupId>
+      <artifactId>objenesis</artifactId>
+      <version>2.5.1</version>
     </dependency>
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
       <version>2.2.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.ow2.asm</groupId>
-      <artifactId>asm-all</artifactId>
-      <version>4.2</version>
     </dependency>
 
     <!-- Zip Handler -->
@@ -174,32 +174,6 @@ OR
       <version>3.7.15-M1</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- deploy -->
-    <!--<dependency>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-gpg-plugin</artifactId>-->
-      <!--<version>1.6</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-javadoc-plugin</artifactId>-->
-      <!--<version>2.10.4</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.apache.maven.plugins</groupId>-->
-      <!--<artifactId>maven-source-plugin</artifactId>-->
-      <!--<version>3.0.1</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
-    <!--<dependency>-->
-      <!--<groupId>org.sonatype.plugins</groupId>-->
-      <!--<artifactId>nexus-staging-maven-plugin</artifactId>-->
-      <!--<version>1.6.7</version>-->
-      <!--<scope>test</scope>-->
-    <!--</dependency>-->
 
   </dependencies>
 

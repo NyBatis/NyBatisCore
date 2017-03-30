@@ -1,7 +1,7 @@
-package org.nybatis.core.clone.module.clone.implement;
+package org.nybatis.core.clone.fastcloner.implement;
 
-import org.nybatis.core.clone.NewCloner;
-import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
+import org.nybatis.core.clone.Cloner;
+import org.nybatis.core.clone.fastcloner.interfaces.DeepCloner;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.*;
@@ -14,7 +14,7 @@ import java.util.*;
  */
 public class CalanderCloner implements DeepCloner {
     @Override
-    public Object clone( Object object, NewCloner cloner, Map valueReference ) {
+    public Object clone( Object object, Cloner cloner, Map valueReference ) {
 
         Calendar source = (Calendar) object;
         Calendar target = ClassUtil.createInstance( source.getClass() );

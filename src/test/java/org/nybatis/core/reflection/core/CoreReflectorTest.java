@@ -1,17 +1,19 @@
-package org.nybatis.core.clone;
+package org.nybatis.core.reflection.core;
 
 import org.nybatis.core.clone.vo.Product;
 import org.nybatis.core.clone.vo.ProductMeta;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.reflection.core.CoreReflector;
+import org.nybatis.core.reflection.core.ParameterNameReader;
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,6 +51,34 @@ public class CoreReflectorTest {
 
     }
 
+
+    @Test
+    public void inspect() {
+
+        Product sample = getSample();
+
+        Map map = Reflector.toMapFrom( sample );
+
+        System.out.println( map );
+    }
+
+    @Test
+    public void findMethodByName() {
+
+        CoreReflector reflector = new CoreReflector();
+
+        Product product = getSample();
+
+        Set<Method> methods = reflector.getMethods( product, "set.*?" );
+
+        for( Method method : methods ) {
+            System.out.printf( "%s : %s\n", method, Arrays.toString(method.getParameters()) );
+        }
+
+        Assert.assertTrue( methods.size() == 6 );
+
+    }
+
     private Product getSample() {
 
         Product product = new Product();
@@ -61,6 +91,7 @@ public class CoreReflectorTest {
 
         meta.setAuthor( Arrays.asList("Jim", "Gray", "Nayasis") );
         meta.setDescription( "simple description" );
+        meta.setNewAuthor( new HashSet( Arrays.asList("Jim", "Gray", "Nayasis") ) );
 
         product.setMeta( meta );
 

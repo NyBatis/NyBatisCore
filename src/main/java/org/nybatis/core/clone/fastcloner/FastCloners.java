@@ -1,13 +1,15 @@
-package org.nybatis.core.clone.processor;
+package org.nybatis.core.clone.fastcloner;
 
-import org.nybatis.core.clone.module.clone.implement.*;
-import org.nybatis.core.clone.module.clone.interfaces.DeepCloner;
+import org.nybatis.core.clone.fastcloner.implement.*;
+import org.nybatis.core.clone.fastcloner.interfaces.DeepCloner;
 import org.nybatis.core.util.ClassUtil;
 
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
+ * Cloner repository
+ *
  * @author nayasis@gmail.com
  * @since 2017-03-28
  */
@@ -22,8 +24,8 @@ public class FastCloners {
         ListCloner listCloner       = new ListCloner();
         CollectionCloner collectionCloner = new CollectionCloner();
         DateCloner dateCloner       = new DateCloner();
-        MapCloner        mapCloner        = new MapCloner();
-        SetCloner        setCloner        = new SetCloner();
+        MapCloner mapCloner        = new MapCloner();
+        SetCloner setCloner        = new SetCloner();
 
         add( GregorianCalendar.class,   calanderCloner   );
         add( Date.class,                dateCloner       );
