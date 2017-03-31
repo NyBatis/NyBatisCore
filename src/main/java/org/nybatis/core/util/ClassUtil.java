@@ -118,9 +118,13 @@ public class ClassUtil {
 
 	public static <T> T createInstance( Class<T> klass ) throws ClassCastingException {
 		try {
-			return classCreator.newInstance( klass );
+			return klass.newInstance();
 		} catch( Exception e ) {
-        	throw new ClassCastingException( e );
+			try {
+				return classCreator.newInstance( klass );
+			} catch( Exception finalException ) {
+				throw new ClassCastingException( finalException );
+			}
         }
 	}
 

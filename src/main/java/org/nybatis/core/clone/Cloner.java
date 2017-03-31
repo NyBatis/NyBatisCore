@@ -135,10 +135,12 @@ public class Cloner {
             return;
         }
 
-        Set<Field> fields = reflector.getFields( sourceClass );
+        Set<Field> sourceFields = reflector.getFields( sourceClass );
+        Set<Field> targetFields = reflector.getFields( targetClass );
 
-        for( Field field : fields ) {
+        for( Field field : sourceFields ) {
             if( isExclusive(field) ) continue;
+            if( ! targetFields.contains(field) ) continue;
             Object value = reflector.getFieldValue( source, field );
             reflector.setField( target, field, value );
         }
