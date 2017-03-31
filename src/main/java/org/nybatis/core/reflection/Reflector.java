@@ -58,7 +58,7 @@ public class Reflector {
 
 		if( source == null || target == null ) return;
 
-		if( ClassUtil.isExtendedBy(target.getClass(), source.getClass()) ) {
+		if( ClassUtil.isExtendedBy(target.getClass(),source.getClass()) || ClassUtil.isExtendedBy(source.getClass(),target.getClass()) ) {
     		new Cloner().copy( source, target );
 		} else {
 			Object newTarget = toBeanFrom( source, target.getClass() );
