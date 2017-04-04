@@ -28,7 +28,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void mariaSelect() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -53,7 +53,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure01() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -64,7 +64,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure02() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -75,7 +75,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure03() {
 
 		SqlSession sqlSession = SessionManager.openSession();

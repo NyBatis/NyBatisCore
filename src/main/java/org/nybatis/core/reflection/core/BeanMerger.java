@@ -2,7 +2,6 @@ package org.nybatis.core.reflection.core;
 
 import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.exception.unchecked.InvalidArgumentException;
-import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.validation.Validator;
@@ -17,6 +16,8 @@ import java.util.*;
  * @since 2017-03-30
  */
 public class BeanMerger {
+
+    private UnmodifiableChecker unmodifiableChecker = new UnmodifiableChecker();
 
     /**
      * Merge bean contents.<br><br>
@@ -51,21 +52,16 @@ public class BeanMerger {
             throw new InvalidArgumentException( "can not merge array to non-array (source:{}, target:{})", sourceClass, targetClass );
         }
 
-        if( isAssignable(sourceClass, targetClass) ) {
-            new Cloner().copy( source, target );
-            return target;
-        }
-
         if( isMap(source) && isMap(target) ) {
-            return (T) merge( (Map) source, (Map) target, skipEmpty );
+            return (T) merge( toMap(source), toModifiableMap(target), skipEmpty );
         } else if( isCollection(source) && isCollection(target) ) {
-            return (T) merge( (Collection) source, (Collection) target, skipEmpty );
+            return (T) merge( toCollection(source), toModifiableCollection(target), skipEmpty );
         } else if( isArrayOrCollection(source) && isArrayOrCollection(target) ) {
             return (T) mergeArray( source, target, skipEmpty );
         }
 
-        Map sourceMap = new NMap( Reflector.toMapFrom(source) ).rebuildKeyForJsonPath();
-        Map targetMap = new NMap( Reflector.toMapFrom(target) ).rebuildKeyForJsonPath();
+        Map sourceMap = toMap( source );
+        Map targetMap = toModifiableMap( target );
         targetMap = merge( sourceMap, targetMap );
 
         Object mergedBean = Reflector.toBeanFrom( targetMap, targetClass );
@@ -102,6 +98,8 @@ public class BeanMerger {
 
         if( Validator.isEmpty(source) ) return target;
         if( Validator.isEmpty(target) ) return source;
+
+        target = toModifiableMap( target );
 
         for( Object key : source.keySet() ) {
 
@@ -144,7 +142,7 @@ public class BeanMerger {
      * @param target    target object to extend. it will receive the new properties
      * @return merged collection
      */
-    public <T extends Collection> T merge( Collection source, T target ) {
+    public Collection merge( Collection source, Collection target ) {
         return merge( source, target, true );
     }
 
@@ -158,18 +156,17 @@ public class BeanMerger {
      * @param skipEmpty if false, skip merging when source value is null. if true, skip merging when source vale is null or empty.
      * @return merged collection
      */
-    public <T extends Collection> T merge( Collection source, T target, boolean skipEmpty ) {
+    public Collection merge( Collection source, Collection target, boolean skipEmpty ) {
 
         if( Validator.isEmpty(source) ) return target;
+        if( Validator.isEmpty(target) ) return source;
 
-        if( target == null ) {
-            return (T) source;
-        }
+        target = toModifiableCollection( target );
 
         Iterator sourceIterator = source.iterator();
         Iterator targetIterator = target.iterator();
 
-        T result = (T) ClassUtil.createInstance( target.getClass() );
+        Collection result = ClassUtil.createInstance( target.getClass() );
 
         while( sourceIterator.hasNext() || targetIterator.hasNext() ) {
 
@@ -202,10 +199,10 @@ public class BeanMerger {
             if( targetVal == null ) {
                 result.add( sourceVal );
             } else if( isMap(sourceVal) && isMap(targetVal) ) {
-                Map merged = merge( (Map) sourceVal, (Map) targetVal, skipEmpty );
+                Map merged = merge( toMap(sourceVal), toModifiableMap(targetVal), skipEmpty );
                 result.add( merged );
             } else if( isCollection(sourceVal) && isCollection(targetVal) ) {
-                Collection merged = merge( (Collection) sourceVal, (Collection) targetVal, skipEmpty );
+                Collection merged = merge( toCollection(sourceVal), toModifiableCollection(targetVal), skipEmpty );
                 result.add( merged );
             } else if( isArrayOrCollection(sourceVal) && isArrayOrCollection(targetVal) ) {
                 Object merged = mergeArray( sourceVal, targetVal, skipEmpty );
@@ -221,7 +218,7 @@ public class BeanMerger {
     }
 
     private Object mergeArray( Object source, Object target, boolean skipEmpty ) {
-        Collection merged = merge( toCollection(source), toCollection(target), skipEmpty );
+        Collection merged = merge( toCollection(source), toModifiableCollection(target), skipEmpty );
         if( isArray(target) ) {
             Object array = Array.newInstance( target.getClass().getComponentType(), merged.size() );
             Iterator iterator = merged.iterator();
@@ -278,4 +275,32 @@ public class BeanMerger {
         }
         return new ArrayList();
     }
+
+    private Collection toModifiableCollection( Object value ) {
+        Collection collection = toCollection( value );
+        if( unmodifiableChecker.isUnmodifiable(collection) ) {
+            String json = Reflector.toJson( value );
+            return Reflector.toListFromJson( json );
+        } else {
+            return collection;
+        }
+    }
+
+    private Map toMap( Object value ) {
+        if( isMap(value) ) return (Map) value;
+        return Reflector.toMapFrom( value );
+    }
+
+    private Map toModifiableMap( Object value ) {
+        Map map = toMap( value );
+        if( unmodifiableChecker.isUnmodifiable( map ) ) {
+            Map converted = new LinkedHashMap();
+            for( Object key : map.keySet() ) {
+                converted.put( key, map.get( key ) );
+            }
+            return converted;
+        }
+        return map;
+    }
+
 }

@@ -5,12 +5,13 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import org.nybatis.core.clone.Cloner;
-import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
+import org.nybatis.core.reflection.core.BeanMerger;
+import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
@@ -55,99 +56,37 @@ public class Reflector {
 	 * @param target	bean as target
 	 */
     public static void copy( Object source, Object target ) {
-
 		if( source == null || target == null ) return;
-
 		if( ClassUtil.isExtendedBy(target.getClass(),source.getClass()) || ClassUtil.isExtendedBy(source.getClass(),target.getClass()) ) {
     		new Cloner().copy( source, target );
 		} else {
 			Object newTarget = toBeanFrom( source, target.getClass() );
 			new Cloner().copy( newTarget, target );
 		}
-
     }
 
 	/**
 	 * Merge data in instance
 	 *
-	 * @param fromBean  jsonString, Map or bean as source
-	 * @param toBean	Map or bean as target
+     * @param source    source containing additional properties to merge in
+     * @param target    target object to extend. it will receive the new properties
 	 * @return merged Map
 	 */
-	public static Map merge( Object fromBean, Object toBean ) {
-		return merge( fromBean, toBean, true );
+	public static <T> T merge( Object source, T target ) {
+		return merge( source, target, true );
 	}
 
 	/**
 	 * Merge data in instance
 	 *
-	 * @param fromBean  jsonString, Map or bean as source
-	 * @param toBean	Map or bean as target
-	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
+     * @param source    source containing additional properties to merge in
+     * @param target    target object to extend. it will receive the new properties
+     * @param skipEmpty if false, skip merging when source value is null. if true, skip merging when source vale is null or empty.
 	 * @return merged Map
 	 */
-    public static Map merge( Object fromBean, Object toBean, boolean strict ) {
-
-    	if( fromBean == null || toBean == null ) return new HashMap();
-
-		if ( fromBean instanceof Map && toBean instanceof Map ) {
-			return merge( (Map)fromBean, (Map)toBean, strict );
-		}
-
-		Map fromMap = new NMap( toMapFrom( fromBean ) ).rebuildKeyForJsonPath();
-		Map toMap   = new NMap( toMapFrom( toBean ) ).rebuildKeyForJsonPath();
-
-		merge( fromMap, toMap, strict );
-
-		copy( toMap, toBean );
-
-		return toMap;
-
+    public static <T> T merge( Object source, T target, boolean skipEmpty ) {
+        return new BeanMerger().merge( source, target, skipEmpty );
     }
-
-	/**
-	 * Merge data between Map
-	 *
-	 * @param fromMap	Map to merge
-	 * @param toMap		Map to be merged
-	 * @param strict    if true, skip merge when data is null. whereas if false, skip merge when data is empty
-	 * @return merged Map
-	 */
-	private static Map merge( Map fromMap, Map toMap, boolean strict ) {
-
-		if( fromMap == null || toMap == null ) return new HashMap();
-
-		for( Object key : fromMap.keySet() ) {
-
-			Object fromValue = fromMap.get( key );
-			Object toValue   = toMap.get( key );
-
-			if( strict ) {
-				if( Validator.isNull(fromValue) ) continue;
-			} else {
-				if( Validator.isEmpty(fromValue) ) continue;
-			}
-
-			if( ! toMap.containsKey(key) || toValue == null ) {
-				toMap.put( key, fromValue );
-
-			} else if( fromValue instanceof Map && toValue instanceof Map ) {
-				toMap.put( key, merge( (Map) fromValue, (Map) toValue, strict ) );
-
-			} else if( fromValue instanceof Collection && toValue instanceof Collection ) {
-				Collection toChild   = (Collection) toValue;
-				Collection fromChild = (Collection) fromValue;
-				fromChild.stream().filter( each -> ! toChild.contains( each ) ).forEach( toChild::add );
-
-			} else {
-				toMap.put( key, fromValue );
-			}
-
-		}
-
-		return toMap;
-
-	}
 
 	/**
 	 * Get inspection result of fields within instance
@@ -162,17 +101,14 @@ public class Reflector {
     	NList result = new NList();
 
         for( Field field : coreReflector.getFields(bean) ) {
-
         	if( ! field.isAccessible() ) field.setAccessible( true );
 
+			String typeName = field.getType().getName();
+
         	result.add( "field", field.getName() );
+			result.add( "type", typeName );
 
         	try {
-
-        		String typeName = field.getType().getName();
-
-        		result.add( "type", typeName );
-
         		switch( typeName ) {
         			case "[C" :
         				result.add( "value", "[" + new String( (char[]) field.get( bean ) ) + "]" );
@@ -181,7 +117,6 @@ public class Reflector {
         				result.add( "value", field.get( bean ) );
 
         		}
-
         	} catch( IllegalArgumentException | IllegalAccessException e ) {
         		result.add( "value", e.getMessage() );
             }
@@ -202,21 +137,15 @@ public class Reflector {
 	 * @return json text
 	 */
 	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
-
 		if( fromBean == null ) return null;
-
 		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
-
 		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
-
 		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
-
 		try {
 			return writer.writeValueAsString( fromBean );
 		} catch( IOException e ) {
         	throw new JsonIOException( e );
         }
-
 	}
 
 	/**
@@ -285,15 +214,10 @@ public class Reflector {
 	 * @return map with flattern key
 	 */
 	public static Map<String, Object> toMapWithFlattenKey( Object object ) {
-
 		Map<String, Object> map = new HashMap<>();
-
 		if( Validator.isNull(object) ) return map;
-
 		flattenKeyRecursivly( "", toMapFrom( object ), map );
-
 		return map;
-
 	}
 
 	private static void flattenKeyRecursivly( String currentPath, Object json, Map result ) {
@@ -651,17 +575,14 @@ public class Reflector {
 	 * @throws ClassCastingException if beanToUnwrapProxy is not proxy bean.
 	 */
 	public static <T> T unwrapProxy( T beanToUnwrapProxy ) {
-
-		if( beanToUnwrapProxy == null || ! Proxy.isProxyClass( beanToUnwrapProxy.getClass() ) ) return beanToUnwrapProxy;
-
+		if( beanToUnwrapProxy == null || ! Proxy.isProxyClass( beanToUnwrapProxy.getClass() ) ) {
+			return beanToUnwrapProxy;
+		}
 		InvocationHandler invocationHandler = Proxy.getInvocationHandler( beanToUnwrapProxy );
-
 		if( ! (invocationHandler instanceof  NInvocationHandler) ) {
 			throw new ClassCastingException( "Only proxy instance to generated by nayasis.common.reflection.Refector can be unwraped." );
 		}
-
 		return (T) ((NInvocationHandler) invocationHandler).getOriginalInstance();
-
 	}
 
 	/**
@@ -670,13 +591,9 @@ public class Reflector {
 	 * @return true if value is json date format
 	 */
 	public static boolean isJsonDate( Object value ) {
-
 		if( Types.isNotString(value) ) return false;
-
 		String val = value.toString();
-
 		return Validator.isMatched( val, "\\d{4}-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.\\d{3}[+-]([0-1][0-9]|2[0-4])[0-5][0-9]" );
-
 	}
 
 }

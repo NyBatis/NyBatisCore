@@ -18,17 +18,20 @@ import org.nybatis.core.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SqlBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_SQL );
 
-	private SqlNode        sqlNode       = null;
-	private SqlProperties  properties    = null;
-	private QueryParameter sqlParam      = null;
-	private NMap           inputParam    = new NMap();
+	private SqlNode        sqlNode        = null;
+	private SqlProperties  properties     = null;
+	private QueryParameter sqlParam       = null;
+	private NMap           inputParam     = new NMap();
+	private Set            originalParams = new HashSet<>();
 
 	private QueryResolver queryResolver = null;
 
@@ -50,40 +53,37 @@ public class SqlBean {
 	 * @return self instance
 	 */
 	public SqlBean setParameter( Object parameter ) {
-
 		if( parameter != null ) {
-
 			inputParam.clear();
-
+			originalParams.clear();
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
 				inputParam.bind( parameter );
+				originalParams.add( parameter );
 			}
-
 		}
-
 		return this;
-
 	}
 
 	public SqlBean addParameter( Object parameter ) {
-
 		if( parameter != null ) {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
 				NMap newParam = new NMap().bind( parameter );
-				Reflector.merge( newParam, inputParam );
+				Reflector.merge( newParam, inputParam, false );
+				originalParams.add( parameter );
 			}
 		}
-
 		return this;
-
 	}
 
 	public SqlBean addParameter( String key, Object parameter ) {
 		inputParam.put( key, parameter );
+		if( ! DbUtils.isPrimitive(parameter) ) {
+			originalParams.add( parameter );
+		}
 		return this;
 	}
 
@@ -161,7 +161,7 @@ public class SqlBean {
 	}
 
 	public String getSqlId() {
-		return sqlNode.getSqlId();
+		return sqlNode == null ? null : sqlNode.getSqlId();
 	}
 
 	public String getSql() {
@@ -196,24 +196,22 @@ public class SqlBean {
 		return inputParam;
 	}
 
+	public SqlBean mergeSelectKeys( NMap result ) {
+		if( result != null && ! result.isEmpty() ) {
+			Reflector.merge( result, inputParam );
+			for( Object originalParam : originalParams ) {
+				Reflector.merge( result, originalParam );
+			}
+		}
+		return this;
+	}
+
 	public NMap getParams() {
 		return sqlParam;
 	}
 
 	public int getUniqueKeyQuery() {
 		return String.format( "%s::%s::%s", getSqlId(), getEnvironmentId(), getSql() ).hashCode();
-	}
-
-	private int getUniqueKeyParameter() {
-
-		NMap map = new NMap();
-
-		for( BindParam bindParam : getBindParams() ) {
-			map.put( bindParam.getKey(), bindParam.getValue() );
-		}
-
-		return map.getValueHash();
-
 	}
 
 	/**

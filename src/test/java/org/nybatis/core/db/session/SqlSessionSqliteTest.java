@@ -351,4 +351,71 @@ public class SqlSessionSqliteTest {
 
 	}
 
+	@Test
+	public void case13_OrmInsert() {
+
+		case10_initTable();
+
+		OrmSession<OrmEntity> session = getSession().openOrmSession( OrmEntity.class );
+
+		OrmEntity entity = new OrmEntity();
+
+		entity.listId = "A";
+		entity.prodId = "1";
+		entity.prodName = "INPUTED DATA";
+
+		session.insert( entity );
+
+		OrmEntity selectParam = new OrmEntity();
+		selectParam.listId = "A";
+		selectParam.prodId = "1";
+
+		NLogger.debug( session.select( selectParam ) );
+
+	}
+
+	@Test
+	public void case14_arrayParameterBind() {
+
+		case10_initDummyDataByStatementBatch();
+
+		SqlSession sqlSession = getSession();
+
+		String sql = "SELECT * FROM ${tableName} WHERE prod_id IN ( #{prodId} )";
+
+		Map param = new HashMap();
+
+		param.put( "tableName", TABLE_NAME );
+		param.put( "prodId", Arrays.asList( 0,1,2,3,4,5 ) );
+
+		List<OrmEntity> list = sqlSession.sql( sql, param ).list().select( OrmEntity.class );
+
+		NLogger.debug( list );
+
+		assertEquals( 6, list.size() );
+
+	}
+
+	@Test
+	public void case15_selectKey() {
+
+		case10_initTable();
+
+		String selectKey = String.format( "<key id=\"prodId\">SELECT IFNULL(MAX(prod_id),0) + 1 FROM %s WHERE list_id = #{listId}</key>", TABLE_NAME );
+		String sql = String.format( "%s\nINSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", selectKey, TABLE_NAME );
+
+		SqlSession session = getSession();
+
+		OrmEntity param = new OrmEntity();
+		param.listId = "A";
+		param.prodName = "UNKNOWN";
+
+		session.sql( sql, param ).execute();
+
+		NLogger.debug( param );
+
+		assertEquals( param.prodId, "1" );
+
+	}
+
 }

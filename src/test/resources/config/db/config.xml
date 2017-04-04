@@ -39,12 +39,12 @@
     </sqlPath>
   </environment>
 
-  <environment id="jta">
-    <datasourceJdbcUnpooled>
-      <driver>#{driver}</driver>
-      <url></url>
-    </datasourceJdbcUnpooled>
-  </environment>
+  <!--<environment id="jta">-->
+    <!--<datasourceJdbcUnpooled>-->
+      <!--<driver>#{driver}</driver>-->
+      <!--<url></url>-->
+    <!--</datasourceJdbcUnpooled>-->
+  <!--</environment>-->
   
   <!--<environment id="oracle" >-->
     <!--<datasourceJdbc ping="true" pingCycle="60" >-->

@@ -3,15 +3,14 @@ package org.nybatis.core.db.datasource;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
 import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 import javax.sql.DataSource;
-import java.util.Collections;
 import java.util.Hashtable;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,13 +22,18 @@ public class DatasourceManager {
 
 	private static String defaultEnvironmentId;
 
-	public void set( String environmentId, DataSource datasource ) {
+	public void set( String environmentId, DataSource datasource ) throws DatabaseConfigurationException {
 
 		if( StringUtil.isEmpty( defaultEnvironmentId ) && datasourceRepository.size() == 0 ) {
 			defaultEnvironmentId = environmentId;
 		}
 
-		DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
+		DatabaseAttribute databaseAttribute;
+		try {
+			databaseAttribute = DatabaseAttributeManager.get( datasource );
+		} catch( DatabaseConfigurationException e ) {
+			throw new DatabaseConfigurationException( e, "Error on initializing datasoure environment(id:{})", environmentId );
+		}
 
 		setPingQuery( datasource, databaseAttribute.getPingQuery() );
 
