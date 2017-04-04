@@ -1,15 +1,17 @@
 package org.nybatis.core.db.session.executor;
 
-import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.util.StringUtil;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * @author Administrator
+ * Sql select key node executor
+ *
+ * @author nayasis@gmail.com
  * @since 2015-09-12
  */
 public class SelectKeyExecutor {
@@ -21,17 +23,9 @@ public class SelectKeyExecutor {
     }
 
     public NMap selectKeys( SqlBean sqlBean ) {
-
         NMap selectKeys = selectKeys( sqlBean.getKeySqls(), sqlBean.getParams(), sqlBean.getProperties() );
-
-        mergeSelectKeysToInputParams( sqlBean, selectKeys );
-
+        sqlBean.mergeSelectKeys( selectKeys );
         return selectKeys;
-
-    }
-
-    private void mergeSelectKeysToInputParams( SqlBean sqlBean, NMap selectKeys ) {
-        Reflector.merge( selectKeys, sqlBean.getInputParams() );
     }
 
     private NMap selectKeys( Map<String, SqlNode> keySqls, NMap sqlParam, SqlProperties properties ) {
@@ -45,8 +39,8 @@ public class SelectKeyExecutor {
             String key = keySqlBean.getSqlId();
             Object val = selectKey( keySqlBean );
 
-            result.put( key, val );
-            sqlParam.put( key, val );
+            setValue( key, val, result );
+            setValue( key, val, sqlParam );
 
         }
 
@@ -57,5 +51,31 @@ public class SelectKeyExecutor {
     private Object selectKey( SqlBean sqlBean ) {
         return new SqlExecutor( token, sqlBean ).select( Object.class );
     }
+
+
+    private void setValue( String key, Object value, NMap map ) {
+
+        List<String> subKeys = StringUtil.split( key, "\\." );
+
+        NMap current = map;
+
+        for( int i = 0, iCnt = subKeys.size() - 1; i < iCnt; i++ ) {
+            String subKey = subKeys.get( i );
+            Object subVal = current.get( subKey );
+
+            if( subVal instanceof NMap ) {
+                current = (NMap) subVal;
+            } else {
+                NMap nmap = new NMap();
+                current.put( subKey, nmap );
+                current = nmap;
+            }
+        }
+
+        String subKey = subKeys.get( subKeys.size() - 1 );
+        current.put( subKey, value );
+
+    }
+
 
 }

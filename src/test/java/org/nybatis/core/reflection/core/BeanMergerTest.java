@@ -43,6 +43,19 @@ public class BeanMergerTest {
     }
 
     @Test
+    public void testMergeJsonToBean() throws Exception {
+
+        A a = Reflector.toBeanFrom( json1, A.class );
+
+        System.out.println( a );
+        A merge = merger.merge( json2, a );
+
+        System.out.println( merge );
+        assertEquals( merge.toString(), "{\"name\":\"another name\",\"age\":18,\"dept\":\"No Dept\",\"profile\":[{\"name\":\"q1\",\"age\":1},{\"name\":\"q2\",\"age\":2},{\"name\":\"q3\",\"age\":3},{\"name\":\"p4\",\"age\":4}],\"meta\":{\"key\":\"meta1\",\"id\":1234,\"locale\":\"korean\"}}" );
+
+    }
+
+    @Test
     public void testMergeCollection() throws Exception {
 
         List a = new ArrayList();
@@ -57,8 +70,8 @@ public class BeanMergerTest {
         b.add( "" );
         b.add( "3" );
 
-        List merge01 = merger.merge( b, a );
-        List merge02 = merger.merge( b, null );
+        List merge01 = (List) merger.merge( b, a );
+        List merge02 = (List) merger.merge( b, null );
 
         System.out.println( merge01 );
         System.out.println( merge02 );

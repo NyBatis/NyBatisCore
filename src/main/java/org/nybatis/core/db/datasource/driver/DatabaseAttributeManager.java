@@ -24,7 +24,7 @@ public class DatabaseAttributeManager {
         driverRepository.put( databaseAttribute.getDatabase(), databaseAttribute );
     }
 
-    public static DatabaseAttribute get( DataSource datasource ) {
+    public static DatabaseAttribute get( DataSource datasource ) throws DatabaseConfigurationException {
 
         Connection  connection = null;
 
