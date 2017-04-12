@@ -221,8 +221,21 @@ public class Validator {
     public static boolean isFound( String value, String pattern ) {
     	if( value == null || pattern == null ) return false;
     	Pattern regexp  = Pattern.compile( pattern, Pattern.MULTILINE | Pattern.DOTALL );
-    	Matcher matcher = regexp.matcher( value );
-    	return matcher.find();
+    	return isFound( value, regexp );
+    }
+
+    /**
+     * check whether regular expression pattern is found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @return true if regular expression pattern is found in value.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isFound( String value, Pattern pattern ) {
+        if( pattern == null ) return false;
+        Matcher matcher = pattern.matcher( value );
+        return matcher.find();
     }
 
     /**
@@ -243,6 +256,18 @@ public class Validator {
      * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotFound( String value, String pattern ) {
+        return ! isFound( value, pattern );
+    }
+
+    /**
+     * check whether regular expression pattern is not found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @return true if regular expression pattern is not found in value.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isNotFound( String value, Pattern pattern ) {
         return ! isFound( value, pattern );
     }
 
