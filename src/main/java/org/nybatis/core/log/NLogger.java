@@ -247,6 +247,14 @@ public class NLogger {
 		return getLogger().setCallerDepth( depth );
 	}
 
+	public static void setLevel( Level newLevel ) {
+		getLogger().setLevel( newLevel );
+	}
+
+	public static void setAdditive( boolean additive ) {
+		getLogger().setAdditive( additive );
+	}
+
 	public static boolean isTraceEnabled() {
 		return getLogger().isEnabledFor( Level.TRACE );
 	}
