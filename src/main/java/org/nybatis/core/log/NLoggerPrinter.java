@@ -41,6 +41,14 @@ public class NLoggerPrinter {
 		logger = (Logger) LoggerFactory.getLogger( loggerName );
 	}
 
+	public void setLevel( Level newLevel ) {
+		logger.setLevel( newLevel );
+	}
+
+	public void setAdditive( boolean additive ) {
+		logger.setAdditive( additive );
+	}
+
 	public void trace( Object message ) {
 		log( null, Level.TRACE, message );
 	}
