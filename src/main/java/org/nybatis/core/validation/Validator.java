@@ -233,7 +233,7 @@ public class Validator {
      * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isFound( String value, Pattern pattern ) {
-        if( pattern == null ) return false;
+        if( pattern == null || value == null ) return false;
         Matcher matcher = pattern.matcher( value );
         return matcher.find();
     }
