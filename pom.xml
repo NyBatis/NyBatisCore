@@ -47,6 +47,16 @@ OR
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <name>Hwasu Jung</name>
+      <email>nayasis@gmail.com</email>
+      <roles>
+        <role>author</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <scm>
     <url>github.com/NyBatis/NyBatisCore</url>
     <connection>scm:git:ssh://github.com/NyBatis/NyBatisCore.git</connection>
@@ -57,7 +67,6 @@ OR
     <url>https://github.com/NyBatis/NyBatisCore/issues</url>
   </issueManagement>
 
-
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
@@ -66,17 +75,6 @@ OR
     <github.global.server>github</github.global.server>
     <skipTests>true</skipTests>
   </properties>
-
-  <developers>
-    <developer>
-      <name>Hwasu Jung</name>
-      <email>nayasis@gmail.com</email>
-      <id>nayasis</id>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
 
   <repositories>
     <repository>
