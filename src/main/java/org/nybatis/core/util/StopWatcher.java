@@ -16,7 +16,8 @@ public class StopWatcher {
 		return elapsedNanoSeconds() / 1_000_000_000.0;
 	}
 
-	public void reset() {
+	public StopWatcher reset() {
 	    initTime = System.nanoTime();
+	    return this;
 	}
 }
