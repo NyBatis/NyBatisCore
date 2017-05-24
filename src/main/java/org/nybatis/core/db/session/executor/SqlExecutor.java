@@ -1,5 +1,12 @@
 package org.nybatis.core.db.session.executor;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.session.executor.util.ResultsetController;
 import org.nybatis.core.db.session.executor.util.StatementController;
@@ -13,11 +20,8 @@ import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.worker.Pipe;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SqlExecutor {
 
@@ -89,7 +93,7 @@ public class SqlExecutor {
 
             new ResultsetController( injectedSqlBean.getEnvironmentId() ).toList( rs, rowHandler, true );
 
-        } );
+        });
 
 	}
 
@@ -125,8 +129,8 @@ public class SqlExecutor {
 
 			case 0 :
 				try {
-					return returnType.newInstance();
-				} catch( InstantiationException | IllegalAccessException e ) {
+					return ClassUtil.createInstance( returnType );
+				} catch( ClassCastingException e ) {
 					throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
 				}
 			case 1 :
@@ -152,7 +156,7 @@ public class SqlExecutor {
 	public NMap select() {
 		selectKeys();
 		sqlBean.build();
-		Pipe<NMap> pipe = new Pipe<>( new NMap() );
+		Pipe<NMap> pipe = new Pipe<>();
 		executeQuery( sqlBean, new RowHandler() {
 			public void handle( NMap row ) {
 				pipe.set( row );
@@ -232,26 +236,18 @@ public class SqlExecutor {
 
 		NMap result = select();
 
+		if( result == null ) return null;
+
 		if( DbUtils.isPrimitive( returnType ) ) {
-
-			PrimitiveConverter converter;
-
-			if( result == null || result.size() == 0 ) {
-				converter = new PrimitiveConverter();
-			} else {
-				converter = new PrimitiveConverter( result.getByIndex( 0 ) );
-			}
-
+			PrimitiveConverter converter = new PrimitiveConverter( result.getByIndex( 0 ) );
 			return (T) converter.cast( returnType );
 
 		} else {
-
 			try {
-	            return result == null ? returnType.newInstance() : result.toBean( returnType );
-            } catch( InstantiationException | IllegalAccessException e ) {
+	            return result.toBean( returnType );
+            } catch( Exception e ) {
 	            throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
             }
-
 		}
 
 	}
