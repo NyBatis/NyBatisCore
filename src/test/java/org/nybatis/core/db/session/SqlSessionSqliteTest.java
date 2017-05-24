@@ -213,11 +213,11 @@ public class SqlSessionSqliteTest {
 
 			NLogger.debug( "loop : {}", i );
 
-			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) != null );
 
 			sqlSession.sql( SQL_DELETE, param ).execute();
 
-			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 			sqlSession.rollback();
 
@@ -240,11 +240,11 @@ public class SqlSessionSqliteTest {
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 		String SQL_DELETE = "DELETE   FROM ${tableName} WHERE prod_id = #{prodId}";
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) != null );
 
 		sqlSession.sql( SQL_DELETE, param ).execute();
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 		sqlSession.commit();
 
@@ -264,7 +264,7 @@ public class SqlSessionSqliteTest {
 
 		NLogger.debug( ">>> [{}]", sqlSession.sql( SQL_SELECT, param ).select( Map.class ) );
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 	}
 
