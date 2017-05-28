@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.validation.Assertion;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -118,6 +119,26 @@ public class NDateTest {
 
         NLogger.debug( new NDate() );
         NLogger.debug( new NDate().toString("YYYY-MM-DD'T'HH:MI:SS") );
+
+    }
+
+    @Test
+    public void truncate(){
+
+        NDate truncate = new NDate().truncate();
+
+        NLogger.debug( truncate );
+
+        Assert.assertEquals( 0, truncate.getHour() );
+        Assert.assertEquals( 0, truncate.getMinute() );
+        Assert.assertEquals( 0, truncate.getSecond() );
+        Assert.assertEquals( 0, truncate.getMillisecond() );
+
+        String truncatedDateString = truncate.toString( "YYYY-MM-DD" );
+        NDate ndate = new NDate( truncatedDateString );
+        NLogger.debug( truncate.compareTo( ndate ) );
+
+        Assert.assertEquals( 0, truncate.compareTo( ndate ) );
 
     }
 

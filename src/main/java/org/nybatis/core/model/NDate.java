@@ -330,6 +330,15 @@ public class NDate implements Serializable {
     }
 
     /**
+     * truncate date's hour/minute/second/millisecond and remain it's date related properties only
+     *
+     * @return
+     */
+    public NDate truncate() {
+        return setHour( 0 ).setMinute( 0 ).setSecond( 0 ).setMillisecond( 0 );
+    }
+
+    /**
      * get year
      *
      * @return year
