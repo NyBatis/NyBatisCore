@@ -219,4 +219,18 @@ public class StringUtilTest {
 
 	}
 
+	@Test
+	public void mask() {
+
+		String word = "01031155023";
+
+		assertEquals( "", StringUtil.mask( "", word ) );
+		assertEquals( "010_3115_5023", StringUtil.mask( "***_****_****", word ) );
+		assertEquals( "010_3115_502", StringUtil.mask( "***_****_***", word ) );
+		assertEquals( "*010_3115_502", StringUtil.mask( "\\****_****_***", word ) );
+		assertEquals( "010_3115_502*", StringUtil.mask( "***_****_***\\*", word ) );
+		assertEquals( "010_3115_502", StringUtil.mask( "***_****_***\\", word ) );
+
+	}
+
 }

@@ -747,7 +747,6 @@ public class StringUtil {
 
     	}
 
-
     	for( int[] index : indexes ) {
     		result.add( workVal.substring( index[0], index[1] ) );
     	}
@@ -762,16 +761,16 @@ public class StringUtil {
      * @param phoneNumber phone number
 	 * @return phone number delimeted with '-'
      */
-    public static String getPhoneNumber( Object phoneNumber ) {
+	public static String getPhoneNumber( Object phoneNumber ) {
     	if( isEmpty(phoneNumber) ) return "";
     	return nvl(phoneNumber).replaceAll( "\\D*(02|\\d{3})\\D*(\\d{3,4})\\D*(\\d{4})", "$1-$2-$3" );
     }
 
     /**
-     * 문자열의 첫글자를 소문자로 바꾼다.
+     * change word's first character to upper case
      *
-     * @param text 처리할 문자열
-     * @return 변환된 문자열
+     * @param text text to change
+     * @return uncapitalized text
      */
     public static String uncapitalize( Object text ) {
 
@@ -786,10 +785,10 @@ public class StringUtil {
     }
 
     /**
-     * 문자열의 첫글자를 대문자로 바꾼다.
+     * change word's first character to lower case
      *
-     * @param text 처리할 문자열
-     * @return 변환된 문자열
+     * @param text text to change
+     * @return capitalized text
      */
     public static String capitalize( Object text ) {
 
@@ -855,10 +854,10 @@ public class StringUtil {
 	}
 
     /**
-     * 객체를 텍스트로 encode 한다.
+     * encode object to text
      *
-     * @param value 텍스트로 만들 객체
-     * @return encode된 텍스트
+     * @param value object to encode
+     * @return encoded text
      * @throws UncheckedIOException if I/O exception occurs.
      */
     public static String encode( Object value ) {
@@ -883,10 +882,10 @@ public class StringUtil {
     }
 
     /**
-     * 텍스트를 객체로 decode 한다.
+     * decode text to object
      *
-     * @param value 객체로 만들 text
-     * @return decode된 객체
+     * @param value text to decode as object
+     * @return decoded object
      * @throws UncheckedIOException if I/O exception occurs.
      * @throws ClassNotExistException if class is not found in class loader.
      */
@@ -946,10 +945,10 @@ public class StringUtil {
     }
 
     /**
-	 * 문자열에서 숫자만 추출한다.
+	 * extract number characters from word
 	 *
-	 * @param string 작업할 대상 문자열
-	 * @return 숫자만 추출된 문자열
+	 * @param string word
+	 * @return number characters
 	 */
 	public static String extractNumber( String string ) {
 		if( isEmpty( string ) ) return "";
@@ -957,10 +956,10 @@ public class StringUtil {
 	}
 
 	/**
-	 * 문자열에서 대문자만 추출한다.
+	 * extracter upper characters from word
 	 *
-	 * @param string 작업할 대상 문자열
-	 * @return 대문자만 추출된 문자열
+	 * @param string word
+	 * @return upper characters
 	 */
 	public static String extractUpperCharacters( String string ) {
 		if( isEmpty( string ) ) return "";
@@ -1445,6 +1444,60 @@ public class StringUtil {
 
 		return sb.toString();
 
+	}
+
+	/**
+	 * apply mask pattern to word
+	 *
+	 * <pre>
+	 * String word = "01031155023";
+	 *
+	 * StringUtil.mask( "",                word ) ); -> ""
+	 * StringUtil.mask( "***_****_****",   word ) ); -> "010_3115_5023"
+	 * StringUtil.mask( "***_****_***",    word ) ); -> "010_3115_502"
+	 * StringUtil.mask( "\\****_****_***", word ) ); -> "*010_3115_502"
+	 * StringUtil.mask( "***_****_***\\*", word ) ); -> "010_3115_502*"
+	 * StringUtil.mask( "***_****_***\\",  word ) ); -> "010_3115_502"
+	 * </pre>
+	 *
+	 * @param maskPattern	mask pattern to apply. only '*' character is substitute with word.
+	 *                     if you want to print '*' character itself, set pattern as '\\*'
+	 * @param word
+	 * @return
+	 */
+	public static String mask( String maskPattern, String word ) {
+
+		if( isEmpty(maskPattern) || isEmpty(word) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		int k = 0;
+
+		int lastIdxMask = maskPattern.length() - 1;
+		int lastIdxWord = word.length() - 1;
+
+		for( int i = 0; i <= lastIdxMask; i++ ) {
+
+			char curr = maskPattern.charAt( i );
+			char next = ( i == lastIdxMask ) ? '\n' : maskPattern.charAt( i + 1 );
+
+			if( curr == '\\' ) {
+				if( i != lastIdxMask ) sb.append( next );
+				i++;
+				continue;
+			}
+
+			if( curr == '*' ) {
+				sb.append( word.charAt( k ) );
+				k++;
+				if( k > lastIdxWord ) break;
+			} else {
+				sb.append( curr );
+			}
+
+		}
+
+		return sb.toString();
 	}
 
 }
