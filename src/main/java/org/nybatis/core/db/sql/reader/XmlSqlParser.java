@@ -17,6 +17,7 @@ import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 import org.nybatis.core.xml.node.Node;
 
 import java.util.LinkedHashMap;
@@ -108,7 +109,11 @@ public class XmlSqlParser {
 								child.getAttrIgnoreCase("key"),
 								child.getAttrIgnoreCase("open"),
 								child.getAttrIgnoreCase("close"),
-								child.getAttrIgnoreCase("delimeter"),
+							    Validator.nvl(
+									child.getAttrIgnoreCase("delimeter"),
+									child.getAttrIgnoreCase("concater")
+								)
+								,
 								child.getAttrIgnoreCase("indexKey")
 						);
 						break;
@@ -117,7 +122,10 @@ public class XmlSqlParser {
 						nodeToAppend = new GroupSqlElement(
 								child.getAttrIgnoreCase("open"),
 								child.getAttrIgnoreCase("close"),
-								child.getAttrIgnoreCase("delimeter")
+								Validator.nvl(
+									child.getAttrIgnoreCase("delimeter"),
+									child.getAttrIgnoreCase("concater")
+								)
 						);
 						break;
 				}

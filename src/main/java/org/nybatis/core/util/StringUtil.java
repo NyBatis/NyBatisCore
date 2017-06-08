@@ -1438,6 +1438,8 @@ public class StringUtil {
 				sb.append( '{' ); i+=5;
 			} else if ( code.startsWith( "&#125;" ) ) {
 				sb.append( '}' ); i+=5;
+			} else {
+				sb.append( chars[i] );
 			}
 
 		}

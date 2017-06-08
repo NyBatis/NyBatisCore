@@ -212,10 +212,12 @@ public class StringUtilTest {
 		String word01 = "<script>";
 		String word02 = "&lt;script&gt;";
 		String word03 = "<script>aaa(\"aaa\",'b'){}</script>";
+		String word04 = "066&";
 
 		assertEquals( word02, StringUtil.clearXss( word01 ) );
 		assertEquals( word01, StringUtil.unclearXss( word02 ) );
 		assertEquals( word03, StringUtil.unclearXss( word03 ) );
+		assertEquals( word04, StringUtil.unclearXss( word04 ) );
 
 	}
 
