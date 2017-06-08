@@ -22,15 +22,15 @@ public class ForEachSqlElement extends SqlElement {
 	private String paramKey;
 	private String open;
 	private String close;
-	private String delimeter;
+	private String concater;
 	private String indexKey;
 
-	public ForEachSqlElement( String key, String open, String close, String delimeter, String indexKey ) {
+	public ForEachSqlElement( String key, String open, String close, String concater, String indexKey ) {
 
 		this.paramKey    = StringUtil.trim( key ).replaceFirst( "^#\\{", "" ).replaceFirst( "\\}$", "" );
 		this.open        = StringUtil.trim( open );
 		this.close       = StringUtil.trim( close );
-		this.delimeter   = StringUtil.trim( delimeter );
+		this.concater    = StringUtil.trim( concater );
 		this.indexKey    = StringUtil.trim( indexKey ).replaceFirst( "^#\\{", "" ).replaceFirst( "\\}$", "" );
 
 	}
@@ -38,7 +38,7 @@ public class ForEachSqlElement extends SqlElement {
 	@Override
     public String toString( QueryParameter inputParam ) throws SqlParseException {
 
-		boolean delimiterOn    = StringUtil.isNotEmpty( getDelimeter( inputParam ) );
+		boolean delimiterOn    = StringUtil.isNotEmpty( getConcater( inputParam ) );
 		boolean indexKeyOn     = StringUtil.isNotEmpty( indexKey );
 		boolean hasSingleParam = hasSingleParameter( inputParam );
 
@@ -69,7 +69,7 @@ public class ForEachSqlElement extends SqlElement {
 			sql.append( innerSql );
 
 			if( delimiterOn && i != iCnt && ! StringUtil.isBlank(innerSql) ) {
-				sql.append( ' ' ).append( getDelimeter( inputParam ) ).append( ' ' );
+				sql.append( ' ' ).append( getConcater( inputParam ) ).append( ' ' );
 			}
 
 		}
@@ -137,8 +137,8 @@ public class ForEachSqlElement extends SqlElement {
 
 	}
 
-	private String getDelimeter( Map param ) {
-		return StringUtil.bindParam( delimeter, param );
+	private String getConcater( Map param ) {
+		return StringUtil.bindParam( concater, param );
 	}
 
 	private String getClose( Map param ) {
