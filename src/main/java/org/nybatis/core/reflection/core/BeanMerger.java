@@ -24,6 +24,7 @@ public class BeanMerger {
      *
      * @param source    source containing additional properties to merge in
      * @param target    target object to extend. it will receive the new properties
+     * @param <T> target's generic type
      * @return merged bean
      */
     public <T> T merge( Object source, T target ) {
@@ -36,6 +37,7 @@ public class BeanMerger {
      * @param source    source containing additional properties to merge in
      * @param target    target object to extend. it will receive the new properties
      * @param skipEmpty if false, skip merging when source value is null. if true, skip merging when source vale is null or empty.
+     * @param <T> source's generic type
      * @return merged bean
      */
     public <T> T merge( Object source, T target, boolean skipEmpty ) {
