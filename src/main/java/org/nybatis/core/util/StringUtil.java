@@ -1454,18 +1454,18 @@ public class StringUtil {
 	 * <pre>
 	 * String word = "01031155023";
 	 *
-	 * StringUtil.mask( "",                word ) ); -> ""
-	 * StringUtil.mask( "***_****_****",   word ) ); -> "010_3115_5023"
-	 * StringUtil.mask( "***_****_***",    word ) ); -> "010_3115_502"
-	 * StringUtil.mask( "\\****_****_***", word ) ); -> "*010_3115_502"
-	 * StringUtil.mask( "***_****_***\\*", word ) ); -> "010_3115_502*"
-	 * StringUtil.mask( "***_****_***\\",  word ) ); -> "010_3115_502"
+	 * StringUtil.mask( "",                word ) ); -&gt; ""
+	 * StringUtil.mask( "***_****_****",   word ) ); -&gt; "010_3115_5023"
+	 * StringUtil.mask( "***_****_***",    word ) ); -&gt; "010_3115_502"
+	 * StringUtil.mask( "\\****_****_***", word ) ); -&gt; "*010_3115_502"
+	 * StringUtil.mask( "***_****_***\\*", word ) ); -&gt; "010_3115_502*"
+	 * StringUtil.mask( "***_****_***\\",  word ) ); -&gt; "010_3115_502"
 	 * </pre>
 	 *
 	 * @param maskPattern	mask pattern to apply. only '*' character is substitute with word.
 	 *                     if you want to print '*' character itself, set pattern as '\\*'
-	 * @param word
-	 * @return
+	 * @param word  word to mask
+	 * @return masked text
 	 */
 	public static String mask( String maskPattern, String word ) {
 

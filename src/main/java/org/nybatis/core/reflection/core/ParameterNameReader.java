@@ -33,7 +33,7 @@ public class ParameterNameReader {
     /**
      * Read method's parameter name
      *
-     * @param method
+     * @param method method to inspect parameter name
      * @return parameter names
      */
     public List<String> read( Method method ) {
@@ -95,7 +95,7 @@ public class ParameterNameReader {
     /**
      * Read constructor's parameter name
      *
-     * @param constructor
+     * @param constructor constructor to inspect parameter name
      * @return parameter names
      */
     public List<String> read( Constructor constructor ) {
