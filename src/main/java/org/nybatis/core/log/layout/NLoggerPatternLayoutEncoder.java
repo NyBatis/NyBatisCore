@@ -11,7 +11,7 @@ public class NLoggerPatternLayoutEncoder extends PatternLayoutEncoderBase<ILoggi
 
 		boolean hasMessagePatternFlag = StringUtil.nvl(getPattern()).indexOf( "%m" ) >= 0;
 
-		NLoggerPatternLayout patternLayout = hasMessagePatternFlag ? new NLoggerPatternLayout() : new NLoggerBasicPatternLayout();
+		NLoggerPatternLayout patternLayout = hasMessagePatternFlag ? new NLoggerBasicPatternLayout() : new NLoggerPatternLayout();
 
 		patternLayout.setContext( context );
 		patternLayout.setPattern( StringUtil.nvl(getPattern(), " ") );

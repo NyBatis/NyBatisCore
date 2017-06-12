@@ -120,7 +120,7 @@ public class TestExpressionParserTest {
 
 			NLogger.debug( "Parse  : {}", nodes );
 			
-			List<Node> postfix = calculator.getPostfix( nodes );
+			List<Node> postfix = calculator.toPostfix( nodes );
 			
 			NLogger.debug( "Posix  : {}", postfix );
 

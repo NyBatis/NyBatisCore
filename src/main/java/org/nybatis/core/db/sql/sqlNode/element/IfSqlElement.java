@@ -40,7 +40,7 @@ public class IfSqlElement extends SqlElement {
 
 			} else {
 				PostfixCalculator calculator = new PostfixCalculator();
-				testCondition = calculator.getPostfix( nodes );
+				testCondition = calculator.toPostfix( nodes );
 
 			}
 
