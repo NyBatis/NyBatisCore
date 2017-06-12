@@ -17,7 +17,7 @@ import org.nybatis.core.util.StringUtil;
 
 public class PostfixCalculator {
 
-	public List<Node> getPostfix( List<Node> infixNodes ) {
+	public List<Node> toPostfix( List<Node> infixNodes ) {
 		
 		List<Node> result = new ArrayList<>();
 		
