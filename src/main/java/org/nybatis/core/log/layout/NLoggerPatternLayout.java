@@ -1,32 +1,16 @@
 package org.nybatis.core.log.layout;
 
 import ch.qos.logback.classic.pattern.*;
-import java.util.HashMap;
-import java.util.Map;
-
-import ch.qos.logback.classic.spi.ThrowableProxyUtil;
-import org.nybatis.core.log.converter.*;
 import ch.qos.logback.classic.pattern.color.HighlightingCompositeConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxyUtil;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.pattern.PatternLayoutBase;
-import ch.qos.logback.core.pattern.color.BlackCompositeConverter;
-import ch.qos.logback.core.pattern.color.BlueCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldBlueCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldCyanCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldGreenCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldMagentaCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldRedCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldWhiteCompositeConverter;
-import ch.qos.logback.core.pattern.color.BoldYellowCompositeConverter;
-import ch.qos.logback.core.pattern.color.CyanCompositeConverter;
-import ch.qos.logback.core.pattern.color.GrayCompositeConverter;
-import ch.qos.logback.core.pattern.color.GreenCompositeConverter;
-import ch.qos.logback.core.pattern.color.MagentaCompositeConverter;
-import ch.qos.logback.core.pattern.color.RedCompositeConverter;
-import ch.qos.logback.core.pattern.color.WhiteCompositeConverter;
-import ch.qos.logback.core.pattern.color.YellowCompositeConverter;
+import ch.qos.logback.core.pattern.color.*;
 import ch.qos.logback.core.pattern.parser.Parser;
+import java.util.HashMap;
+import java.util.Map;
+import org.nybatis.core.log.converter.*;
 
 public class NLoggerPatternLayout extends PatternLayoutBase<ILoggingEvent> {
 
@@ -110,8 +94,6 @@ public class NLoggerPatternLayout extends PatternLayoutBase<ILoggingEvent> {
 		defaultConverterMap.put( "boldCyan",    BoldCyanCompositeConverter.class.getName()     );
 		defaultConverterMap.put( "boldWhite",   BoldWhiteCompositeConverter.class.getName()    );
 		defaultConverterMap.put( "highlight",   HighlightingCompositeConverter.class.getName() );
-
-		defaultConverterMap.put( "lsn",         LocalSequenceNumberConverter.class.getName())   ;
 
 	}
 
