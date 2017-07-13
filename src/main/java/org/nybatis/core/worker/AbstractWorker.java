@@ -1,7 +1,6 @@
 package org.nybatis.core.worker;
 
-import java.lang.reflect.Type;
-
+import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.ClassUtil;
 
@@ -15,18 +14,12 @@ public abstract class AbstractWorker<T> {
 
 	protected T pipe;
 
-    @SuppressWarnings( "unchecked" )
     public AbstractWorker() {
 
-    	ClassUtil classUtil = new ClassUtil();
-
-    	Type type = this.getClass().getGenericSuperclass();
-
     	try {
-
-    		pipe = ClassUtil.createInstance( type );
-
-    	} catch( ClassNotFoundException e ) {
+			Class genericClass = ClassUtil.getGenericClass( this.getClass() );
+			pipe = ClassUtil.createInstance( (Class<T>) genericClass );
+    	} catch( ClassCastingException e ) {
     		NLogger.warn( e );
         }
 

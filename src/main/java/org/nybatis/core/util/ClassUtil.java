@@ -1,5 +1,6 @@
 package org.nybatis.core.util;
 
+import java.lang.reflect.ParameterizedType;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
@@ -75,7 +76,7 @@ public class ClassUtil {
 	 *
 	 * Type type = this.getClass().getGenericSuperclass();
 	 *
-	 * Class&lt;?&gt; klass = new ClassUtil().getClass( type );
+	 * Class&lt;?&gt; klass = ClassUtil.getClass( type );
 	 * </pre>
 	 *
 	 * @param type class type
@@ -99,6 +100,41 @@ public class ClassUtil {
 		if( startIndex >= 0 ) typeClassName = typeClassName.substring( 0, startIndex );
 
 		return getClass( typeClassName );
+
+	}
+
+	/**
+	 * get generic class from another class.
+	 *
+	 * it only works when used in class itself.
+	 *
+	 * <pre>
+	 * public class Test&lt;T&gt; {
+	 *     public Test() {
+	 *         Class genericClass = ClassUtil.getGenericClass( this.getClass() );
+	 *         -> it returns type of <b>T</b> exactly.
+	 *     }
+	 * }
+	 *
+	 * Test&lt;HashMap&gt; test = new Test&lt;&gt;();
+	 * Class genericClass = ClassUtil.getGenericClass( test.getClass() );
+	 * -> it returns <b>Object.class</b> only because instance has no information about Generic.
+	 * </pre>
+	 *
+	 * @param klass class to inspect
+	 * @return generic class of klass
+     */
+	public static Class getGenericClass( Class klass ) {
+
+		if( klass == null ) return null;
+
+		try {
+			Type genericSuperclass = klass.getGenericSuperclass();
+			Type[] types = ( (ParameterizedType) genericSuperclass ).getActualTypeArguments();
+			return (Class) types[ 0 ];
+		} catch( Exception e ) {
+			return Object.class;
+		}
 
 	}
 
