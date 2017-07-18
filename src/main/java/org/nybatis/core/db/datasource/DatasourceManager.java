@@ -91,6 +91,22 @@ public class DatasourceManager {
 		return datasourceRepository.keySet();
 	}
 
+	public static void runHealthChecker() {
+		for( DataSource dataSource : datasourceRepository.values() ) {
+			if( dataSource instanceof JdbcDataSource ) {
+				((JdbcDataSource) dataSource).runHealthChecker();
+			}
+		}
+	}
+
+	public static void stopHealthChecker() {
+		for( DataSource dataSource : datasourceRepository.values() ) {
+			if( dataSource instanceof JdbcDataSource ) {
+				((JdbcDataSource) dataSource).stopHealthChecker();
+			}
+		}
+	}
+
 	public static void printStatus() {
 
 		if( ! NLogger.isTraceEnabled() ) return;

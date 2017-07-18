@@ -27,6 +27,8 @@ public class JdbcDataSource implements DataSource {
 	protected final Stack<ProxyConnection> connectionPoolIdle   = new Stack<>();
 	protected final Stack<ProxyConnection> connectionPoolActive = new Stack<>();
 
+	private ConnectionHealthChecker healthChecker;
+
 	private static final long THREAD_WAIT_MILI_SECONDS = 200;
 
 	public JdbcDataSource( JdbcDatasourceProperties datasourceProperties, JdbcConnectionProperties connectionProperties ) {
@@ -34,9 +36,7 @@ public class JdbcDataSource implements DataSource {
 		this.datasourceProperties = datasourceProperties;
 		this.connectionProperties = connectionProperties;
 
-		if( datasourceProperties.isPingEnable() ) {
-			new ConnectionHealthChecker( this ).run();
-		}
+		runHealthChecker();
 
 	}
 
@@ -94,7 +94,7 @@ public class JdbcDataSource implements DataSource {
 						break;
 					}
 
-					if( !connectionPoolIdle.isEmpty() ) break;
+					if( ! connectionPoolIdle.isEmpty() ) break;
 
 					tryCount++;
 
@@ -231,5 +231,21 @@ public class JdbcDataSource implements DataSource {
     public boolean isWrapperFor( Class<?> iface ) throws SQLException {
 	    return false;
     }
+
+	public boolean runHealthChecker() {
+		if( healthChecker == null && datasourceProperties.isPingEnable() ) {
+			healthChecker = new ConnectionHealthChecker( this );
+			healthChecker.run();
+			return true;
+		}
+		return true;
+	}
+
+	public boolean stopHealthChecker() {
+		if( healthChecker == null ) return false;
+		healthChecker.interrupt();
+		healthChecker = null;
+		return true;
+	}
 
 }
