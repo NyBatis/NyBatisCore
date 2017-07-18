@@ -122,7 +122,7 @@ public class ProxyConnection {
 	        return realConnection.isClosed();
         } catch( SQLException e ) {
 			NLogger.error( e );
-	        return false;
+	        return true;
         }
     }
 

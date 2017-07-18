@@ -18,24 +18,21 @@ public class ConnectionHealthChecker {
 	private JdbcDataSource        dataSource    = null;
 	private LimitedQueue<Integer> poolStatistic = new LimitedQueue<>( 10 );
 	private LimitedQueue<Integer> idleStatistic = new LimitedQueue<>( 10 );
+	private boolean               shutdown      = false;
 
 	private Thread healthChecker = new Thread( () -> {
-        while( true ) {
+        while( ! shutdown ) {
             pingConnections();
-			sleep( 1_000 );
+			try { Thread.sleep( 1_000 ); } catch( InterruptedException e ) { Thread.currentThread().interrupt(); return; }
         }
     }, generateThreadName("healthChecker") );
 
 	private Thread idleConnectionShrinker = new Thread( () -> {
-        while( true ) {
+        while( ! Thread.currentThread().isInterrupted() ) {
             shrinkConnections();
-			sleep( 30_000 );
+			try { Thread.sleep( 30_000 ); } catch( InterruptedException e ) { Thread.currentThread().interrupt(); return; }
         }
     }, generateThreadName("idleConnectionShrinker") );
-
-	private void sleep( long millis ) {
-		try { Thread.sleep( millis ); } catch( InterruptedException e ) {}
-	}
 
 	private String generateThreadName( String name ) {
 		return String.format( "%s.%s.%s", ConnectionHealthChecker.class.getName(), name, UUID.randomUUID().toString() );
@@ -51,6 +48,11 @@ public class ConnectionHealthChecker {
 			idleConnectionShrinker.start();
 			NLogger.trace( "Connection HealthChecker is started." );
 		}
+	}
+
+	public void interrupt() {
+		healthChecker.interrupt();
+		idleConnectionShrinker.interrupt();
 	}
 
 	private void pingConnections() {
