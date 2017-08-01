@@ -48,6 +48,7 @@ public class Transaction {
 	}
 
 	public void commit( String token ) {
+		if( ! TransactionManager.canExecuteCommit() ) return;
 		for( Connection conn : getStoredConnections(token).values() ) {
 			try {
                 conn.commit();
@@ -58,6 +59,7 @@ public class Transaction {
 	}
 
 	public void commit() {
+		if( ! TransactionManager.canExecuteCommit() ) return;
 		for( String token : transactionPool.keySet() ) {
 			commit( token );
 		}
