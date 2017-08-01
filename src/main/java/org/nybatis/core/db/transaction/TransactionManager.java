@@ -17,6 +17,11 @@ public class TransactionManager implements Observer {
 	 */
 	private static Map<String, Transaction> managedPool = new Hashtable<>();
 
+	/**
+	 * global parameter to control commit execution
+	 */
+	private static boolean commitExecution = true;
+
 	static {
 		NThreadLocal.addObserver( new TransactionManager() );
 	}
@@ -79,4 +84,21 @@ public class TransactionManager implements Observer {
 
 	}
 
+	/**
+	 * figure out whether or not to execute commit
+	 *
+	 * @return if it false,, Transcation does not commit transaction.
+     */
+	public static boolean canExecuteCommit() {
+		return commitExecution;
+	}
+
+	/**
+	 * set commit execution flag.
+	 *
+	 * @param commitExecution if it false, Transcation does not commit through entire process. (default is 'true')
+     */
+	public static void setCommitExecution( boolean commitExecution ) {
+		TransactionManager.commitExecution = commitExecution;
+	}
 }
