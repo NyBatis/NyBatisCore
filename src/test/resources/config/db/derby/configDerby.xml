@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.1" xsi:schemaLocation="urn:nybatis.configuration:1.1 http://nybatis.github.io/schema/nybatis-config.xsd">
+
+  <environment id="derby">
+    <datasourceJdbc poolMin="1" poolMax="10" ping="true" pingCycle="600" >
+      <driver>org.apache.derby.jdbc.EmbeddedDriver</driver>
+      <url>jdbc:derby:TestDB;create=true;user=admin;password=admin</url>
+    </datasourceJdbc>
+    <sqlPath>
+      <path>sqlRepository</path>
+    </sqlPath>
+  </environment>
+
+</configuration>
