@@ -22,11 +22,8 @@ public class ConfigurationBuilderTest {
 		try {
 
 			DataSource dataSource = DatasourceManager.get();
-
 			Connection conn = dataSource.getConnection();
-
 	        PreparedStatement psmt = conn.prepareStatement( "SELECT * FROM TB_DP_LIST_PROD WHERE tenant_id = ? AND rownum < 10" );
-
 	        ResultSet rs = psmt.executeQuery();
 
 	        while( rs.next() ) {
@@ -37,11 +34,15 @@ public class ConfigurationBuilderTest {
 	        psmt.close();
 	        conn.close();
 
-
         } catch( SQLException e ) {
         	NLogger.error( e );
-        }
+		}
 
+	}
+
+	@Test
+	public void derby() {
+		new ConfigurationBuilder().readFrom( Const.path.getConfigDatabase() + "/derby/configDerby.xml" );
 	}
 
 }

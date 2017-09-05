@@ -172,6 +172,12 @@ OR
       <version>3.7.15-M1</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.13.1.1</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
