@@ -45,13 +45,11 @@ public class ClassUtil {
 		className = className.replaceAll( " ", "" );
 
 		int invalidCharacterIndex = className.indexOf( '<' );
-
 		if( invalidCharacterIndex >= 0 ) {
 			className = className.substring( 0, invalidCharacterIndex );
 		}
 
 		ClassLoader classLoader = getClassLoader();
-
 		try {
 	        return classLoader.loadClass( className );
         } catch( ClassNotFoundException e ) {
@@ -84,23 +82,17 @@ public class ClassUtil {
 	 * @throws ClassNotFoundException if class is not founded in class loader.
 	 */
 	public static Class<?> getClass( Type type ) throws ClassNotFoundException {
-
 		if( type == null ) return Object.class;
 
 		String typeInfo = type.toString();
-
 		int startIndex = typeInfo.indexOf( '<' );
-
 		if( startIndex < 0 ) return Object.class;
 
 		String typeClassName = typeInfo.substring( startIndex + 1, typeInfo.length() - 1 );
-
 		startIndex = typeClassName.indexOf( '<' );
-
 		if( startIndex >= 0 ) typeClassName = typeClassName.substring( 0, startIndex );
 
 		return getClass( typeClassName );
-
 	}
 
 	/**
@@ -125,9 +117,7 @@ public class ClassUtil {
 	 * @return generic class of klass
      */
 	public static Class getGenericClass( Class klass ) {
-
 		if( klass == null ) return null;
-
 		try {
 			Type genericSuperclass = klass.getGenericSuperclass();
 			Type[] types = ( (ParameterizedType) genericSuperclass ).getActualTypeArguments();
@@ -135,7 +125,6 @@ public class ClassUtil {
 		} catch( Exception e ) {
 			return Object.class;
 		}
-
 	}
 
 	public static Class<?> getClass( Object object ) {
@@ -179,15 +168,12 @@ public class ClassUtil {
 	public static boolean isExtendedBy( Class<?> inspectClass, Class<?> foundClass ) {
 
 		if( inspectClass == null || foundClass == null ) return false;
-
 		if( inspectClass == foundClass ) return true;
-
 		for( Class<?> klass : inspectClass.getInterfaces() ) {
 			if( klass == foundClass ) return true;
 		}
 
 		Class<?> superclass = inspectClass.getSuperclass();
-
 		if( superclass != Object.class ) {
 			if( isExtendedBy( superclass, foundClass ) ) return true;
 		}
@@ -283,9 +269,7 @@ public class ClassUtil {
 				if( addAll ) {
 					resourceNamesInJar.add( entry.getName() );
 				} else {
-
 					Path targetPath = Paths.get( entry.getName() );
-
 					for( PathMatcher matcher : matchers ) {
 						if( matcher.matches( targetPath )) {
 							resourceNamesInJar.add( entry.getName() );
@@ -298,12 +282,10 @@ public class ClassUtil {
 		}
 
 		List<Path> paths = FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) );
-
 		for( Path path : paths ) {
 			String pathVal = FileUtil.nomalizeSeparator( path.toString() );
 			resourceNamesInFileSystem.add( pathVal.replace( Const.path.getBase(), "" ).replaceFirst( "^/", "" ) );
 		}
-
 		resourceNamesInJar.addAll( resourceNamesInFileSystem );
 
 		return new ArrayList<>( resourceNamesInJar );
@@ -316,15 +298,10 @@ public class ClassUtil {
 	 * @return true if it is running in jar.
 	 */
 	public static boolean isRunningInJar() {
-
 		URL root = getClassLoader().getResource( "" );
-
 		if( root == null ) return true;
-
 		String file = root.getFile();
-
 		return Validator.isMatched( file, "(?i).*\\.(jar|war)$" );
-
 	}
 
 	private static String[] toFilePattern( String[] pattern ) {
