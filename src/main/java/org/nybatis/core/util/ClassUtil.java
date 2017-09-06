@@ -112,13 +112,13 @@ public class ClassUtil {
 	 * public class Test&lt;T&gt; {
 	 *     public Test() {
 	 *         Class genericClass = ClassUtil.getGenericClass( this.getClass() );
-	 *         -> it returns type of <b>T</b> exactly.
+	 *         -&gt; it returns type of <b>T</b> exactly.
 	 *     }
 	 * }
 	 *
 	 * Test&lt;HashMap&gt; test = new Test&lt;&gt;();
 	 * Class genericClass = ClassUtil.getGenericClass( test.getClass() );
-	 * -> it returns <b>Object.class</b> only because instance has no information about Generic.
+	 * -&gt; it returns <b>Object.class</b> only because instance has no information about Generic.
 	 * </pre>
 	 *
 	 * @param klass class to inspect
