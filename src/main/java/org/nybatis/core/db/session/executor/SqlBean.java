@@ -121,8 +121,8 @@ public class SqlBean {
 			queryResolver = new QueryResolver( query, sqlParam );
 			return this;
 
-		} catch( StringIndexOutOfBoundsException e ) {
-			throw new SqlParseException( e, "{} Error on parameter binding because of invalid sql parameter syntax.({})\n>> Error SQL :\n{}", toString(), e.getMessage(), query );
+		} catch( StringIndexOutOfBoundsException | SqlParseException e ) {
+			throw new SqlParseException( e, "{} Error on parameter binding because of invalid sql parameter syntax.\n>> Error Message :\n{}\n>> Error SQL :\n{}", toString(), e.getMessage(), query );
 
 		} catch( IllegalArgumentException | SqlConfigurationException e ) {
 			throw new SqlConfigurationException( e, "{} {}", toString(), e.getMessage() );
