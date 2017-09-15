@@ -86,32 +86,33 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public int update( Object entity ) {
-
         properties.setEntityParameter( entity );
         checkPkNotNull();
+        return update();
+    }
 
+    @Override
+    public int update() {
         try {
             return getSessionExecutor( properties.sqlIdUpdatePk() ).execute();
         } finally {
             properties.clear();
         }
-
     }
 
     @Override
     public int delete( Object parameter ) {
-
         properties.setEntityParameter( parameter );
         checkPkNotNull();
+        return delete();
+    }
 
+    @Override
+    public int delete() {
         String sqlId = isPkSql() ? properties.sqlIdDeletePk() : properties.sqlIdDelete();
-
         int cnt = getSessionExecutor( sqlId ).execute();
-
         properties.clear();
-
         return cnt;
-
     }
 
     private boolean isPkSql() {
