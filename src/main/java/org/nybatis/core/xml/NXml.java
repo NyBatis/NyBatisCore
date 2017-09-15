@@ -109,6 +109,16 @@ public class NXml {
 	}
 
 	/**
+	 * Create new document from XML string.
+	 *
+	 * @param xml XML inputstream
+	 * @param ignoreDtd ignore XML's DTD ruleset
+	 */
+	public NXml( InputStream xml, boolean ignoreDtd ) throws ParseException, UncheckedIOException {
+		readFrom( xml, ignoreDtd );
+	}
+
+	/**
 	 * Get document's root node. <br>
 	 *
 	 * If root node is not exist, It returns null node.

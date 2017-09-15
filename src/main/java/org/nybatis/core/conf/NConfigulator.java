@@ -1,11 +1,13 @@
 package org.nybatis.core.conf;
 
+import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.node.Node;
@@ -461,28 +463,28 @@ public class NConfigulator {
 	 * @return text binded defined default value
 	 */
     public static String getValue( Node node ) {
-
     	if( node.isNull() ) return "";
-
     	String xpath = node.getXpath();
-
     	if( cached.containsKey(xpath) ) return cached.get(xpath);
-
     	return getBindingValue( xpath, node.getValue() );
-
     }
 
 	/**
 	 * Refresh cache and reload configuration from file.
 	 */
     public static void refresh() {
-    	cached.clear();
     	loadXml();
     }
 
     private static void loadXml() {
-    	conf = new NXml( Paths.get(Const.path.getConfig(), Const.profile.apply( "common.xml" )), true );
+		loadXml( Paths.get(Const.path.getConfig(), Const.profile.apply( "common.xml" )).toString() );
     }
+
+	public static void loadXml( String resourcePath ) {
+		InputStream resource = FileUtil.getResourceAsStream( resourcePath );
+		cached.clear();
+		conf = new NXml( resource, true );
+	}
 
 	/**
 	 * Get configuration file path to load xml
