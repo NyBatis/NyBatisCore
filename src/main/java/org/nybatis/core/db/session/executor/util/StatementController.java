@@ -158,7 +158,7 @@ public class StatementController {
 				oracleStatementController.setLobPrefetchCount( statement, size );
 				NLogger.trace( "setLobPreFetchSize : {}", size );
 
-			} catch( NoClassDefFoundError e ) {
+			} catch( NoClassDefFoundError | ClassCastException e ) {
 				NLogger.info( "Environment(id:{}) is not support Lob Prefetch.", sqlBean.getEnvironmentId() );
 				sqlBean.getDatasourceAttribute().enableToDoLobPrefetch( false );
 			}
