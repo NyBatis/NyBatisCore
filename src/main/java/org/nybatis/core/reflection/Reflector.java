@@ -519,7 +519,7 @@ public class Reflector {
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @return	Map filled by object's value
 	 */
-	public static Map<String, Object> toMapFrom( Object object ) {
+	public static Map<String, Object> toMapFrom( Object object ) throws JsonIOException {
 
 		if( object == null ) return new HashMap<>();
 
@@ -536,7 +536,7 @@ public class Reflector {
 	 * @param jsonString	json text
 	 * @return	Map filled by object's value
 	 */
-	public static Map<String, Object> toMapFromJson( String jsonString ) {
+	public static Map<String, Object> toMapFromJson( String jsonString ) throws JsonIOException {
 		try {
 			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<LinkedHashMap<String, Object>>() {} );
 			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
@@ -552,7 +552,7 @@ public class Reflector {
 	 * @param object	json text (type can be String, StringBuffer, StringBuilder), Map or bean to convert
 	 * @return	NMap filled by object's value
 	 */
-	public static NMap toNMapFrom( Object object ) {
+	public static NMap toNMapFrom( Object object ) throws JsonIOException {
 		return new NMap( toMapFrom( object ) );
 	}
 
