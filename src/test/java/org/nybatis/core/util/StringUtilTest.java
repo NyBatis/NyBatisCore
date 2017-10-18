@@ -95,6 +95,10 @@ public class StringUtilTest {
 		assertEquals( 2, capturedList.size() );
 		assertEquals( Arrays.asList( "Merong", "Nayasis" ), capturedList );
 
+		value = "< Ref id=\"refOrigin2\" />";
+		List<String> refIds = StringUtil.capturePatterns( value, "(?i)< *?ref +?id *?= *?['\"](.*?)['\"] *?\\/>" );
+		assertEquals( "[refOrigin2]", refIds.toString() );
+
 	}
 
 	@Test
@@ -234,5 +238,6 @@ public class StringUtilTest {
 		assertEquals( "010_3115_502", StringUtil.mask( "***_****_***\\", word ) );
 
 	}
+
 
 }

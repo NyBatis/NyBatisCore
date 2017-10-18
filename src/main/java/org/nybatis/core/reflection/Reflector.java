@@ -463,22 +463,16 @@ public class Reflector {
 	}
 
 	/**
-	 * Convert as List from json text
+	 * convert json to list
 	 *
 	 * @param jsonString	json text
-	 * @param typeReference	type to return
-	 * 	<pre>
-	 *	  Examples are below.
-	 *	  	- new TypeReference&lt;List&lt;HashMap&lt;String, Object&gt;&gt;&gt;() {}
-	 *	    - new TypeReference&lt;List&lt;String&gt;&gt;() {}
-	 *	    - new TypeReference&lt;List&gt;() {}
-	 * 	</pre>
-	 * @param <T> return type
-	 * @return List
-	 */
-	public static <T> List<T> toListFromJsonAs( String jsonString, TypeReference typeReference ) {
+	 * @param typeClass   	list's generic type
+	 * @param <T> generic type
+     * @return list
+     */
+	public static <T> List<T> toListFromJson( String jsonString, Class<T> typeClass ) {
 		try {
-			return objectMapper.readValue( getArrayContent(jsonString), typeReference );
+			return objectMapper.readValue( getArrayContent(jsonString), objectMapper.getTypeFactory().constructCollectionType(List.class, typeClass) );
 		} catch( JsonParseException e ) {
 			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
 		} catch( IOException e ) {
@@ -487,22 +481,13 @@ public class Reflector {
 	}
 
 	/**
-	 * Convert as List&lt;Map&gt;
-	 * @param json	json text
-	 * @return List
-	 */
-    public static List<Map<String,Object>> toListFromJsonAsMap( String json ) {
-    	return toListFromJsonAs( json, new TypeReference<List<HashMap<String, Object>>>() {} );
-    }
-
-	/**
 	 * Convert as List
 	 *
 	 * @param json json text
 	 * @return List
 	 */
 	public static List toListFromJson( String json ) {
-		return toListFromJsonAs( json, new TypeReference<List>() {} );
+		return toListFromJson( json, Object.class );
 	}
 
 	/**
@@ -511,7 +496,7 @@ public class Reflector {
 	 * @return List
 	 */
 	public static List<String> toListFromJsonAsString( String json ) {
-		return toListFromJsonAs( json, new TypeReference<List<String>>() {} );
+		return toListFromJson( json, String.class );
 	}
 
 	/**
