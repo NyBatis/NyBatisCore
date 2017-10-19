@@ -482,6 +482,7 @@ public class NConfigulator {
 
 	public static void loadXml( String resourcePath ) {
 		InputStream resource = FileUtil.getResourceAsStream( resourcePath );
+		if( resource == null ) return;
 		cached.clear();
 		conf = new NXml( resource, true );
 	}
