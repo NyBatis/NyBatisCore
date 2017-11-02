@@ -1,6 +1,5 @@
 package org.nybatis.core.util;
 
-import java.lang.reflect.ParameterizedType;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
@@ -9,9 +8,12 @@ import org.nybatis.core.validation.Validator;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
@@ -219,8 +221,7 @@ public class ClassUtil {
 	 * @return refined resource name
 	 */
 	private static String refineResourceName( String name ) {
-		name = StringUtil.nvl( name ).replaceFirst( "^/", "" );
-		return name;
+		return StringUtil.nvl( name ).replaceFirst( "^/", "" );
 	}
 
 	/**
@@ -322,14 +323,20 @@ public class ClassUtil {
 
 	private static JarFile getJarFile( URL url ) {
 
-		String filePath = FileUtil.nomalizeSeparator( url.getFile() );
-		filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
-
 		try {
+
+			String filePath = new File( url.toURI().getSchemeSpecificPart() ).getPath();
+
+			filePath = FileUtil.nomalizeSeparator( filePath );
+			filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
+
             return new JarFile( filePath );
+
         } catch( IOException e ) {
             throw new UncheckedIOException( e );
-        }
+        } catch( URISyntaxException e ) {
+			throw new UncheckedIOException( e );
+		}
 
 	}
 
