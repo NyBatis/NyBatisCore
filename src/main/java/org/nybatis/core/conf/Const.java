@@ -189,7 +189,7 @@ public class Const {
 		 * @return resource path
 		 */
 		public static String toResourceName( String filePath ) {
-			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
+			return FileUtil.nomalizeSeparator( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
 		}
 	}
 

@@ -5,40 +5,9 @@
   <artifactId>NyBatisCore</artifactId>
   <version>0.5.0-SNAPSHOT</version>
   <name>NyBatisCore</name>
-  <description><![CDATA[
+  <description>
     Nybatis Data Mapper Framework
-
-1. Logging
-    based on logback but further simple
-2. Configuration
-3. Message
-4. Database
-    It can substitute iBasit or MyBatis.
-    It is very simple but powerful to use
-5. Util
-   It provides following utility class
-   - FileUtil
-   - StringUtil
-   - ClassUtil
-   - Reflector
-   - Validator
-   - StopWatcher
-   - ExcelFileUtil
-     this module will run when including following optinal dependency
-
-    <dependency>
-      <groupId>org.apache.poi</groupId>
-      <artifactId>poi-ooxml</artifactId>
-      <version>3.11</version>
-    </dependency>
-OR
-    <dependency>
-      <groupId>net.sourceforge.jexcelapi</groupId>
-      <artifactId>jxl</artifactId>
-      <version>2.6.12</version>
-    </dependency>
-
-]]></description>
+  </description>
   <url>http://nybatis.github.io</url>
   <licenses>
     <license>
@@ -82,7 +51,7 @@ OR
       <url>https://code.lds.org/nexus/content/groups/main-repo</url>
     </repository>
     <repository>
-      <id>MultilineAnnotation</id>
+      <id>bintray</id>
       <url>http://jcenter.bintray.com</url>
       <snapshots>
         <enabled>false</enabled>
@@ -151,7 +120,7 @@ OR
     <dependency>
       <groupId>org.adrianwalker</groupId>
       <artifactId>multiline-string</artifactId>
-      <version>0.1.1</version>
+      <version>0.1.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
