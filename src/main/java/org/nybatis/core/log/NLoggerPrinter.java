@@ -5,6 +5,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.log.converter.StackTracer;
 import org.nybatis.core.model.NList;
@@ -224,7 +225,7 @@ public class NLoggerPrinter {
 
 					try {
 						printLog( marker, level, logger, new NList( (List) format ).toString() );
-					} catch( JsonIOException e ) {
+					} catch( Exception e ) {
 						printLog( marker, level, logger, format.toString() );
 					}
 
