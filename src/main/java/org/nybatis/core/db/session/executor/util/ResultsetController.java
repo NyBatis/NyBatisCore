@@ -146,7 +146,7 @@ public class ResultsetController {
 
 		for( int i = 1; i <= columnCount; i++ ) {
 
-			String name = StringUtil.toCamel( metaData.getColumnName( i ) );
+			String name = StringUtil.toCamel( metaData.getColumnLabel(i) );
 
 			if( header.contains( name ) ) duplicatedKeys.add( name );
 
