@@ -7,9 +7,12 @@ import org.nybatis.core.db.datasource.DatasourceFactory;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSourceFactory;
 import org.nybatis.core.db.datasource.factory.jndi.JndiDatasourceFactory;
+import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
+
+import static com.sun.tools.javac.jvm.ByteCodes.pop;
 
 /**
  * Database connection Environment builder
@@ -43,6 +46,8 @@ public class EnvironmentBuilder {
 		setUnpooledJdbcDatasource( environment );
 		setJndiDatasource( environment );
 
+		setOrmTableCreationPossibility( environment );
+
 	}
 
 	public void setDefault() {
@@ -53,10 +58,16 @@ public class EnvironmentBuilder {
 		return StringUtil.isTrue( environment.getAttrIgnoreCase( "default" ) );
 	}
 
+	private void setOrmTableCreationPossibility( Node environment ) {
+		Node node = environment.getChildElement( "createTable" );
+		if( node.isNull() ) return;
+		String val = prop.getValue( environment, "createTable" );
+		TableLayoutRepository.setEnableToCreateTable( environmentId, StringUtil.toBoolean(val) );
+	}
+
 	private void setJdbcDatasource( Node environment ) {
 
 		Node datasource = environment.getChildElement( "datasourceJdbc" );
-
 		if( datasource.isNull() ) return;
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
@@ -163,6 +174,14 @@ public class EnvironmentBuilder {
 
 	public void setJndiDatasource( String jndiName ) {
 		setJndiDatasource( new JndiConnectionProperties( jndiName ) );
+	}
+
+	public void setEnableToCreateTable( boolean posssibility ) {
+		TableLayoutRepository.setEnableToCreateTable( environmentId, posssibility );
+	}
+
+	public boolean isEnableToCreateTable() {
+		return TableLayoutRepository.isEnableToCreateTable( environmentId );
 	}
 
 }

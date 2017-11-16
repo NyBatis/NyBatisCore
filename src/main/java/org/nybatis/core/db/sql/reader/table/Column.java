@@ -1,4 +1,4 @@
-package org.nybatis.core.db.sql.repository;
+package org.nybatis.core.db.sql.reader.table;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.util.StringUtil;
@@ -17,6 +17,7 @@ public class Column {
     private boolean nullable;
     private boolean pk;
     private int     size;
+    private int     precison; // used in Number type column
 
     public String getKey() {
         return key;
@@ -100,5 +101,13 @@ public class Column {
 
     public void setSize( int size ) {
         this.size = size;
+    }
+
+    public int getPrecison() {
+        return precison;
+    }
+
+    public void setPrecison( int precison ) {
+        this.precison = precison;
     }
 }

@@ -1,10 +1,9 @@
-package org.nybatis.core.db.sql.reader;
+package org.nybatis.core.db.sql.reader.table;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.constant.NullValue;
-import org.nybatis.core.db.sql.repository.Column;
+import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
-import org.nybatis.core.db.sql.repository.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;

@@ -20,7 +20,7 @@
   </environment>
 
   <environment id="sqlite02" >
-    <datasourceJdbc ping="true" pingCycle="60" >
+    <datasourceJdbc ping="#{nono}" pingCycle="60" >
       <driver>#{driver}</driver>
       <url>jdbc:sqlite:#{default.root}/localDb/TestDb02</url>
     </datasourceJdbc>

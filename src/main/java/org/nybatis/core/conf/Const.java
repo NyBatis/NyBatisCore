@@ -108,7 +108,7 @@ public class Const {
 				NLogger.warn( "base path({}) does not exists in file system.", path );
 			}
 
-			base = path;
+			base = FileUtil.nomalizeSeparator( path );
 
 		}
 

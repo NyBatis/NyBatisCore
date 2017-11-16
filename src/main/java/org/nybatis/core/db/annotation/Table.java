@@ -38,4 +38,11 @@ public @interface Table {
      */
     String environmentId() default Const.db.DEFAULT_ENVIRONMENT_ID;
 
+    /**
+     * index attribute
+     *
+     * @return additional index when create table
+     */
+    Index[] indexs() default {};
+
 }

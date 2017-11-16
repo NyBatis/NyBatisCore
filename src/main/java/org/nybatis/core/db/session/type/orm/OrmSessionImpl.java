@@ -3,7 +3,7 @@ package org.nybatis.core.db.session.type.orm;
 import org.nybatis.core.db.session.type.sql.SessionExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
-import org.nybatis.core.db.sql.reader.DbTableReader;
+import org.nybatis.core.db.sql.reader.table.DbTableReader;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;

@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.type.sql.SqlSession;
+import org.nybatis.core.db.sql.reader.table.DbTableReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.log.NLogger;
 import org.testng.annotations.BeforeClass;
