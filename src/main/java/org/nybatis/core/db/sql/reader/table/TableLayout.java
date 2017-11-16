@@ -1,9 +1,11 @@
-package org.nybatis.core.db.sql.repository;
+package org.nybatis.core.db.sql.reader.table;
 
 import org.nybatis.core.model.NList;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.sun.tools.javac.jvm.ByteCodes.ret;
 
 /**
  * @author nayasis@gmail.com
@@ -11,10 +13,11 @@ import java.util.List;
  */
 public class TableLayout {
 
-    private String        environmentId;
-    private String        tableName;
-    private List<Column>  pkColumns = new ArrayList<>();
-    private List<Column>  columns   = new ArrayList<>();
+    private String            environmentId;
+    private String            tableName;
+    private List<Column>      pkColumns      = new ArrayList<>();
+    private List<Column>      columns        = new ArrayList<>();
+    private List<IndexLayout> indices        = new ArrayList<>();
 
     public String getTableName() {
         return tableName;
@@ -44,8 +47,23 @@ public class TableLayout {
         return columns;
     }
 
+    public boolean hasColumnName( String name ) {
+        for( Column column : columns ) {
+            if( column.getName().equals(column) ) return true;
+        }
+        return false;
+    }
+
     public void addColumn( Column column ) {
         columns.add( column );
+    }
+
+    public List<IndexLayout> getIndices() {
+        return indices;
+    }
+
+    public void setIndices( List<IndexLayout> indices ) {
+        this.indices = indices;
     }
 
     public String toString() {
@@ -55,7 +73,11 @@ public class TableLayout {
         sb.append( "EnvironmentId : " ).append( environmentId ).append( '\n' );
         sb.append( "Table         : " ).append( tableName ).append( '\n' );
         sb.append( "PK List       : " ).append( pkColumnsList() ).append( '\n' );
-        sb.append( "Columns       : \n" ).append( new NList( columns ).toString() );
+        sb.append( "Columns       :\n" ).append( new NList( columns ).toString() );
+        sb.append( "Indexes       :" );
+        for( IndexLayout index : indices ) {
+            sb.append( "\n\t " ).append( index );
+        }
 
         return sb.toString();
 

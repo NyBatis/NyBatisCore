@@ -1,4 +1,4 @@
-package org.nybatis.core.db.sql.repository;
+package org.nybatis.core.db.sql.reader.table;
 
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;

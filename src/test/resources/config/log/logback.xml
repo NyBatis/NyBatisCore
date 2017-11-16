@@ -23,7 +23,7 @@
     </encoder>
   </appender>
 
-  <logger name="org.nybatis" level="debug">
+  <logger name="org.nybatis" level="trace">
     <appender-ref ref="console" />
   </logger>
 
@@ -33,11 +33,11 @@
     <appender-ref ref="console" />
   </logger>
 
-  <logger name="nybatis.sql" level="debug">
+  <logger name="nybatis.sql" level="trace">
     <appender-ref ref="console" />
   </logger>
 
-  <logger name="nybatis.batch" level="debug">
+  <logger name="nybatis.batch" level="trace">
     <appender-ref ref="console" />
   </logger>
 

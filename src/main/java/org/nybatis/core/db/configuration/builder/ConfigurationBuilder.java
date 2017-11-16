@@ -1,9 +1,12 @@
 package org.nybatis.core.db.configuration.builder;
 
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.ParseException;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
@@ -29,10 +32,15 @@ public class ConfigurationBuilder {
 
 			synchronized( loadedFiles ) {
 
-				NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom( file ) );
+				String xml = FileUtil.readResourceFrom( file );
+
+				if( StringUtil.isEmpty(xml) ) {
+					throw new DatabaseConfigurationException( "there is no contents in file path({})", file );
+				}
+
+				NXml xmlReader = new NXmlDeformed( xml );
 
 				Node root = xmlReader.getRoot();
-
 				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
 
 				for( Node environment : root.getChildElements("environment") ) {
@@ -43,7 +51,6 @@ public class ConfigurationBuilder {
 				loadedFiles.add( file.toString() );
 
             }
-
 
 		} catch( ParseException | UncheckedIOException e ) {
 	        throw new ParseException( e, "Error on reading Database configuration file({})\n\t{}", file, e.getMessage() );

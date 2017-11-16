@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @author nayasis@gmail.com
  *
  */
-@Target( ElementType.FIELD ) // Allow to class and interface
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Pk {
 }
