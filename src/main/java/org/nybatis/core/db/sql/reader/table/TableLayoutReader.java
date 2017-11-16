@@ -47,7 +47,7 @@ public class TableLayoutReader {
 
                     c.setKey( StringUtil.toCamel( column.getString( "columnName" ) ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
-                    c.setNullable( column.getInt( "nullable" ) > 0 );
+                    c.setNotNull( column.getInt( "nullable" ) <= 0 );
                     c.setPk( pkList.contains( c.getKey() ) );
                     c.setSize( column.getInt("columnSize") );
 

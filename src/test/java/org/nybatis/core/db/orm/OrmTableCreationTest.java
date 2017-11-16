@@ -3,7 +3,11 @@ package org.nybatis.core.db.orm;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.orm.entity.Employee;
+import org.nybatis.core.db.sql.reader.table.EntityLayoutReader;
+import org.nybatis.core.db.sql.reader.table.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
+import org.nybatis.core.reflection.Reflector;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -29,6 +33,23 @@ public class OrmTableCreationTest {
 
         boolean enableToCreateTable = TableLayoutRepository.isEnableToCreateTable( envirionmentId );
         Assert.assertEquals( enableToCreateTable, true );
+
+    }
+
+    @Test
+    public void readEntityLayout() {
+
+        Employee employee = new Employee( "key", "name", 10, 1000, "800523-2111023", "dummy", "thinFilm" );
+
+        String json = Reflector.toJson( employee );
+
+        System.out.println( json );
+
+
+        EntityLayoutReader reader = new EntityLayoutReader();
+        TableLayout tableLayout = reader.getTableLayout( Employee.class );
+
+        System.out.println( tableLayout );
 
     }
 
