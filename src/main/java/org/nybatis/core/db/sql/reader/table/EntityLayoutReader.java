@@ -106,27 +106,7 @@ public class EntityLayoutReader {
         }
 
         if( field.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) ) {
-
-            org.nybatis.core.db.annotation.Column columnAnnotation = field.getAnnotation( org.nybatis.core.db.annotation.Column.class );
-            column.setComment( columnAnnotation.comment() );
-
-            if( columnAnnotation.type() != Integer.MIN_VALUE ) {
-                column.setDataType( columnAnnotation.type() );
-            }
-
-            if( columnAnnotation.length() > 0 && canAssignLength(column) ) {
-                column.setSize( columnAnnotation.length() );
-            }
-            if( columnAnnotation.precision() > 0 && canAssignPrecision(column) ) {
-                column.setPrecison( columnAnnotation.precision() );
-            }
-
-            if( StringUtil.isNotBlank( columnAnnotation.comment() ) ) {
-                column.setComment( columnAnnotation.comment() );
-            }
-
-            column.setNotNull( columnAnnotation.notNull() );
-
+            setColumn( column, field.getAnnotation( org.nybatis.core.db.annotation.Column.class ) );
         }
 
         return column;
@@ -154,31 +134,32 @@ public class EntityLayoutReader {
         }
 
         if( method.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) ) {
-
-            org.nybatis.core.db.annotation.Column columnAnnotation = method.getAnnotation( org.nybatis.core.db.annotation.Column.class );
-            column.setComment( columnAnnotation.comment() );
-
-            if( columnAnnotation.type() != Integer.MIN_VALUE ) {
-                column.setDataType( columnAnnotation.type() );
-            }
-
-            if( columnAnnotation.length() > 0 && canAssignLength(column) ) {
-                column.setSize( columnAnnotation.length() );
-            }
-            if( columnAnnotation.precision() > 0 && canAssignPrecision(column) ) {
-                column.setPrecison( columnAnnotation.precision() );
-            }
-
-            if( StringUtil.isNotBlank( columnAnnotation.comment() ) ) {
-                column.setComment( columnAnnotation.comment() );
-            }
-
-            column.setNotNull( columnAnnotation.notNull() );
-
+            setColumn( column, method.getAnnotation( org.nybatis.core.db.annotation.Column.class ) );
         }
 
         return column;
 
+    }
+
+    private void setColumn( Column column, org.nybatis.core.db.annotation.Column columnAnnotation ) {
+        column.setComment( columnAnnotation.comment() );
+
+        if( columnAnnotation.type() != Integer.MIN_VALUE ) {
+            column.setDataType( columnAnnotation.type() );
+        }
+
+        if( columnAnnotation.length() > 0 && canAssignLength(column) ) {
+            column.setSize( columnAnnotation.length() );
+        }
+        if( columnAnnotation.precision() > 0 && canAssignPrecision(column) ) {
+            column.setPrecison( columnAnnotation.precision() );
+        }
+
+        if( StringUtil.isNotBlank( columnAnnotation.comment() ) ) {
+            column.setComment( columnAnnotation.comment() );
+        }
+
+        column.setNotNull( columnAnnotation.notNull() );
     }
 
     private boolean canAssignLength( Column column ) {
