@@ -1,5 +1,6 @@
 package org.nybatis.core.db.orm.entity;
 
+import java.sql.Types;
 import org.nybatis.core.db.annotation.Column;
 
 /**
@@ -15,6 +16,7 @@ public class Employee extends Persion {
         this.department = department;
     }
 
+    @Column( type = Types.CLOB )
     private String department;
 
     public String getDepartment() {

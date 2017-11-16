@@ -6,7 +6,7 @@ import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.session.type.orm.OrmSessionImpl;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
-import org.nybatis.core.db.sql.reader.table.EntityLayoutReader;
+import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionToken;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
@@ -70,7 +70,7 @@ public class SessionCreator {
 	}
 
 	private Table getTableAnnotation( Class domainClass ) {
-		return new EntityLayoutReader().getTableAnnotation( domainClass );
+		return EntityLayoutReader.getTableAnnotation( domainClass );
 	}
 
 	public <T> OrmSession<T> createDefaultOrmSession( String environmentId, String tableName, Class<T> domainClass ) {

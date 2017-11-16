@@ -4,7 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.type.sql.SqlSession;
-import org.nybatis.core.db.sql.reader.table.DbTableReader;
+import org.nybatis.core.db.sql.orm.sqlmaker.OrmSqlMaker;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.log.NLogger;
 import org.testng.annotations.BeforeClass;
@@ -14,7 +14,7 @@ import org.testng.annotations.Test;
  * @author nayasis@gmail.com
  * @since 2015-09-09
  */
-public class DbTableReaderTest {
+public class OrmSqlMakerTest {
 
     @BeforeClass
     public void init() {
@@ -33,8 +33,8 @@ public class DbTableReaderTest {
         String environmentId = "sqlite";
         String tableName     = "TEST_ORM_PROD";
 
-        DbTableReader dbTableReader = new DbTableReader();
-        dbTableReader.read( environmentId, tableName );
+        OrmSqlMaker ormSqlMaker = new OrmSqlMaker();
+        ormSqlMaker.readTable( environmentId, tableName );
         printLoadedOrmSql( environmentId, tableName );
 
     }

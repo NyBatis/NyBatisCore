@@ -1,11 +1,11 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.vo;
 
+import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.IndexLayout;
 import org.nybatis.core.model.NList;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.sun.tools.javac.jvm.ByteCodes.ret;
 
 /**
  * @author nayasis@gmail.com

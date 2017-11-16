@@ -1,19 +1,25 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.reader;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import org.nybatis.core.db.annotation.ColumnIgnore;
 import org.nybatis.core.db.annotation.Index;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
 import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.IndexLayout;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
 /**
+ * Table creation layout reader from Entity
+ *
  * @author nayasis@gmail.com
  * @since 2017-11-16
  */
@@ -92,7 +98,8 @@ public class EntityLayoutReader {
 
     private Column toColumnModel( Field field ) {
 
-        if( field.isAnnotationPresent(JsonIgnore.class) ) return null;
+        if( field.isAnnotationPresent(JsonIgnore.class)   ) return null;
+        if( field.isAnnotationPresent(ColumnIgnore.class) ) return null;
 
         SqlType sqlType = SqlType.find( field.getType() );
 
@@ -142,20 +149,18 @@ public class EntityLayoutReader {
     }
 
     private void setColumn( Column column, org.nybatis.core.db.annotation.Column columnAnnotation ) {
-        column.setComment( columnAnnotation.comment() );
-        if( columnAnnotation.type() != Integer.MIN_VALUE ) {
-            column.setDataType( columnAnnotation.type() );
-        }
-        if( columnAnnotation.length() > 0 && canAssignLength(column) ) {
-            column.setSize( columnAnnotation.length() );
-        }
-        if( columnAnnotation.precision() > 0 && canAssignPrecision(column) ) {
-            column.setPrecison( columnAnnotation.precision() );
-        }
-        if( StringUtil.isNotBlank( columnAnnotation.comment() ) ) {
+
+        if( columnAnnotation.type() != Integer.MIN_VALUE ) column.setDataType( columnAnnotation.type() );
+        if( StringUtil.isNotBlank( columnAnnotation.comment() ) )
             column.setComment( columnAnnotation.comment() );
-        }
+
+        if( columnAnnotation.precision() > 0 ) column.setPrecison( columnAnnotation.precision() );
+        if( columnAnnotation.length()    > 0 ) column.setSize( columnAnnotation.length() );
+        if( ! canAssignLength(column)    ) column.setSize( null );
+        if( ! canAssignPrecision(column) ) column.setPrecison( null );
+
         column.setNotNull( columnAnnotation.notNull() );
+
     }
 
     private boolean canAssignLength( Column column ) {
@@ -190,7 +195,7 @@ public class EntityLayoutReader {
     }
 
 
-    public Table getTableAnnotation( Class klass ) {
+    public static Table getTableAnnotation( Class klass ) {
         if( klass == null ) return null;
         Class cursor = klass;
         while( true ) {

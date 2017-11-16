@@ -1,4 +1,4 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.vo;
 
 import java.util.LinkedHashSet;
 import java.util.List;

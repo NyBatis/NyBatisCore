@@ -1,4 +1,4 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.vo;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.util.StringUtil;

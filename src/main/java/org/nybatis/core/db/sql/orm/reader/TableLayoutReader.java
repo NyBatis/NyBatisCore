@@ -1,8 +1,10 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.reader;
 
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
+import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
