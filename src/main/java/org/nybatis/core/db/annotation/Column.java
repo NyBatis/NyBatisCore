@@ -28,9 +28,18 @@ public @interface Column {
     /**
      * length
      *
-     * @return column's length (default : 100)
+     * @return column's length
      */
-    double length() default 100;
+    int length() default Integer.MIN_VALUE;
+
+    /**
+     * precision on floating point
+     *
+     * used in Number type column definition
+     *
+     * @return column's precision
+     */
+    int precision() default Integer.MIN_VALUE;
 
     /**
      * comment

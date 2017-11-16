@@ -5,6 +5,7 @@ import org.nybatis.core.clone.vo.ProductMeta;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.reflection.core.ParameterNameReader;
+import org.nybatis.core.reflection.core.testClass.Employee;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -98,5 +99,27 @@ public class CoreReflectorTest {
         return product;
 
     }
+
+    @Test
+    public void getFieldInExtendClass() {
+
+        CoreReflector reflector = new CoreReflector();
+
+        Set<Field> fields = reflector.getFields( Employee.class );
+        for( Field field : fields ) {
+            System.out.println( field.getName() );
+        }
+        System.out.println("-----------------------------------");
+
+        Set<Method> methods = reflector.getMethods( Employee.class );
+        for( Method method : methods ) {
+            System.out.printf( "klass:%s,\t\tmethodName:%s\n", method.getDeclaringClass(), method.getName() );
+        }
+
+        Assert.assertEquals( fields.size(), 3 );
+        Assert.assertEquals( methods.size(), 7 );
+
+    }
+
 
 }

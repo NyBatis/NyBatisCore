@@ -14,10 +14,11 @@ public class Column {
     private String  key;
     private int     dataType;
     private String  dataTypeName;
-    private boolean nullable;
+    private boolean notNull;
     private boolean pk;
-    private int     size;
-    private int     precison; // used in Number type column
+    private Integer size;
+    private Integer precison; // used in Number type column
+    private String  comment;
 
     public String getKey() {
         return key;
@@ -48,6 +49,10 @@ public class Column {
         return dataTypeName;
     }
 
+    public void setDataType( int type ) {
+        setDataType( type, null );
+    }
+
     public void setDataType( int type, String typeName ) {
 
         SqlType sqlType = SqlType.find( typeName );
@@ -60,18 +65,18 @@ public class Column {
             this.dataType     = type;
             this.dataTypeName = typeName;
         } else {
-            this.dataType     = sqlType.toCode();
-            this.dataTypeName = sqlType.name();
+            this.dataType     = sqlType.code;
+            this.dataTypeName = sqlType.name;
         }
 
     }
 
-    public boolean isNullable() {
-        return nullable;
+    public boolean isNotNull() {
+        return notNull;
     }
 
-    public void setNullable( boolean nullable ) {
-        this.nullable = nullable;
+    public void setNotNull( boolean notNull ) {
+        this.notNull = notNull;
     }
 
     public boolean isPk() {
@@ -80,6 +85,7 @@ public class Column {
 
     public void setPk( boolean pk ) {
         this.pk = pk;
+        this.notNull = true;
     }
 
     public String getDataTypeForSqlMaking() {
@@ -95,19 +101,27 @@ public class Column {
 
     }
 
-    public int getSize() {
+    public Integer getSize() {
         return size;
     }
 
-    public void setSize( int size ) {
+    public void setSize( Integer size ) {
         this.size = size;
     }
 
-    public int getPrecison() {
+    public Integer getPrecison() {
         return precison;
     }
 
-    public void setPrecison( int precison ) {
+    public void setPrecison( Integer precison ) {
         this.precison = precison;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment( String comment ) {
+        this.comment = StringUtil.trim( comment );
     }
 }

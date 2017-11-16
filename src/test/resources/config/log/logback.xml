@@ -23,21 +23,19 @@
     </encoder>
   </appender>
 
-  <logger name="org.nybatis" level="trace">
+  <logger name="org.nybatis" level="debug">
     <appender-ref ref="console" />
   </logger>
 
-  <!--<logger name="com.jayway.jsonpath.internal.path.CompiledPath" level="off" />-->
-
-  <logger name="specific.test.log" level="trace">
+  <logger name="specific.test.log" level="debug">
     <appender-ref ref="console" />
   </logger>
 
-  <logger name="nybatis.sql" level="trace">
+  <logger name="nybatis.sql" level="debug">
     <appender-ref ref="console" />
   </logger>
 
-  <logger name="nybatis.batch" level="trace">
+  <logger name="nybatis.batch" level="debug">
     <appender-ref ref="console" />
   </logger>
 
