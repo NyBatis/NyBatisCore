@@ -4,7 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.SqlSessionSqliteTest;
-import org.nybatis.core.db.sql.reader.DbTableReaderTest;
+import org.nybatis.core.db.sql.reader.OrmSqlMakerTest;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
@@ -241,7 +241,7 @@ public class OrmSessionTest {
     }
 
     private void printLoadedOrmSql() {
-        new DbTableReaderTest().printLoadedOrmSql( ENVIRONMENT_ID, TABLE_NAME );
+        new OrmSqlMakerTest().printLoadedOrmSql( ENVIRONMENT_ID, TABLE_NAME );
     }
 
     public String sqlIdPrefix() {

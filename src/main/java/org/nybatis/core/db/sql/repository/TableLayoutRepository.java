@@ -1,7 +1,7 @@
 package org.nybatis.core.db.sql.repository;
 
-import org.nybatis.core.db.sql.reader.table.TableLayout;
-import org.nybatis.core.db.sql.reader.table.TableLayoutReader;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
 
@@ -39,6 +39,14 @@ public class TableLayoutRepository {
         return String.format( ".%s::%s", environmentId, tableName );
     }
 
+    /**
+     * get table layout
+     *
+     * @param environmentId
+     * @param tableName
+     * @return table layout
+     * @throws SqlConfigurationException
+     */
     public static TableLayout getLayout( String environmentId, String tableName ) {
 
         String key = getKey( environmentId, tableName );

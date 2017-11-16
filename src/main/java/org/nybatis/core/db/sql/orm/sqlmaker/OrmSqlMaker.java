@@ -1,12 +1,13 @@
-package org.nybatis.core.db.sql.reader.table;
+package org.nybatis.core.db.sql.orm.sqlmaker;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.constant.NullValue;
+import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
-import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
@@ -18,7 +19,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Database Table Layout Reader
+ * Sql maker to be used in ORM entity.
  *
  * <pre>
  * It reads table layout to make ORM based CRUD query.
@@ -27,11 +28,13 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author nayasis@gmail.com
  * @since 2015-09-08
  */
-public class DbTableReader {
+public class OrmSqlMaker {
 
+
+    // TODO : recosider lock mechanism (it does not work!)
     private Lock readLocker = new ReentrantLock();
 
-    public void read( String environmentId, String tableName ) {
+    public void readTable( String environmentId, String tableName ) {
 
         Assertion.isNotNull( environmentId, new SqlConfigurationException( "environmentId is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
         Assertion.isNotNull( tableName, new SqlConfigurationException( "tableName is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
@@ -50,12 +53,12 @@ public class DbTableReader {
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ) );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ) );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout )   );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ) );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ) );
-            read( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )   );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ) );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ) );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout )   );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ) );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ) );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )   );
 
         } finally {
             readLocker.unlock();
@@ -63,7 +66,7 @@ public class DbTableReader {
 
     }
 
-    private void read( String environmentId, String mainId, String subId, String xmlSql ) {
+    private void readTable( String environmentId, String mainId, String subId, String xmlSql ) {
 
         String sqlId = mainId + subId;
 
@@ -74,11 +77,7 @@ public class DbTableReader {
         try {
 
             SqlNode sqlNode = reader.read( environmentId, sqlId, xmlSql );
-
-            SqlProperties properties = sqlNode.getProperties();
-
             sqlNode.setMainId( mainId );
-
             SqlRepository.put( sqlId, sqlNode );
 
         } catch( ParseException | UncheckedIOException | SqlParseException | DatabaseConfigurationException e ) {

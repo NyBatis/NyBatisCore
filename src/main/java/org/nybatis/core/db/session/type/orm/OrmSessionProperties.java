@@ -2,8 +2,8 @@ package org.nybatis.core.db.session.type.orm;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
-import org.nybatis.core.db.sql.reader.table.Column;
-import org.nybatis.core.db.sql.reader.table.TableLayout;
+import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.model.NMap;

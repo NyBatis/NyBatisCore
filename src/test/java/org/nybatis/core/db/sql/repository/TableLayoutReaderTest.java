@@ -1,7 +1,7 @@
 package org.nybatis.core.db.sql.repository;
 
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
-import org.nybatis.core.db.sql.reader.table.TableLayoutReader;
+import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
 import org.nybatis.core.log.NLogger;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;

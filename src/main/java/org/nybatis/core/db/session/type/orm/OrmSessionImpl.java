@@ -3,7 +3,7 @@ package org.nybatis.core.db.session.type.orm;
 import org.nybatis.core.db.session.type.sql.SessionExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
-import org.nybatis.core.db.sql.reader.table.DbTableReader;
+import org.nybatis.core.db.sql.orm.sqlmaker.OrmSqlMaker;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
@@ -43,7 +43,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private void createOrmSql() {
-        new DbTableReader().read( properties.getEnvironmentId(), properties.getTableName() );
+        new OrmSqlMaker().readTable( properties.getEnvironmentId(), properties.getTableName() );
     }
 
     @Override
