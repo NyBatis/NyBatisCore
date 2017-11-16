@@ -143,22 +143,18 @@ public class EntityLayoutReader {
 
     private void setColumn( Column column, org.nybatis.core.db.annotation.Column columnAnnotation ) {
         column.setComment( columnAnnotation.comment() );
-
         if( columnAnnotation.type() != Integer.MIN_VALUE ) {
             column.setDataType( columnAnnotation.type() );
         }
-
         if( columnAnnotation.length() > 0 && canAssignLength(column) ) {
             column.setSize( columnAnnotation.length() );
         }
         if( columnAnnotation.precision() > 0 && canAssignPrecision(column) ) {
             column.setPrecison( columnAnnotation.precision() );
         }
-
         if( StringUtil.isNotBlank( columnAnnotation.comment() ) ) {
             column.setComment( columnAnnotation.comment() );
         }
-
         column.setNotNull( columnAnnotation.notNull() );
     }
 
