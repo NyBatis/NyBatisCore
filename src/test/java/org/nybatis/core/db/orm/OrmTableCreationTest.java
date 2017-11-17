@@ -58,7 +58,7 @@ public class OrmTableCreationTest {
     @Test
     public void readPreviousTableLayout() {
         printTableLayout( "oracle",    "TB_DEV_SQL" );
-        printTableLayout( "callChain", "TB_SQL" );
+//        printTableLayout( "callChain", "TB_SQL" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {

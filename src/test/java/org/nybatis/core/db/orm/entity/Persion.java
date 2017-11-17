@@ -12,7 +12,7 @@ import org.nybatis.core.db.annotation.Table;
  * @since 2017-11-16
  */
 @Table( value = "Tb_tAbLe", indices = {
-    @Index( name = "test1", columns = {"age","lastName"} ),
+    @Index( name = "test1", columns = {"age","lastName desc"} ),
     @Index( name = "test2", columns = {"age","income","key"} )
 })
 public class Persion {
