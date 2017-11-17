@@ -12,13 +12,13 @@ import org.nybatis.core.util.StringUtil;
 public class Column {
 
     private String  key;
-    private int     dataType;
+    private Integer dataType;
     private String  dataTypeName;
     private boolean notNull;
     private boolean pk;
     private Integer size;
     private Integer precison; // used in Number type column
-    private String  comment;
+    private boolean definedByAnnotation = false;
 
     public String getKey() {
         return key;
@@ -69,6 +69,9 @@ public class Column {
             this.dataTypeName = sqlType.name;
         }
 
+        if( ! canAssignLength()    ) size     = null;
+        if( ! canAssignPrecision() ) precison = null;
+
     }
 
     public boolean isNotNull() {
@@ -85,11 +88,12 @@ public class Column {
 
     public void setPk( boolean pk ) {
         this.pk = pk;
-        this.notNull = true;
+        if( pk ) {
+            this.notNull = true;
+        }
     }
 
     public String getDataTypeForSqlMaking() {
-
         switch( dataTypeName ) {
             case "BLOB" :
             case "CLOB" :
@@ -98,7 +102,6 @@ public class Column {
             default :
                 return "";
         }
-
     }
 
     public Integer getSize() {
@@ -106,6 +109,7 @@ public class Column {
     }
 
     public void setSize( Integer size ) {
+        if( ! canAssignLength() ) return;
         this.size = size;
     }
 
@@ -114,14 +118,65 @@ public class Column {
     }
 
     public void setPrecison( Integer precison ) {
+        if( ! canAssignPrecision() ) return;
         this.precison = precison;
     }
 
-    public String getComment() {
-        return comment;
+    public boolean isDefinedByAnnotation() {
+        return definedByAnnotation;
     }
 
-    public void setComment( String comment ) {
-        this.comment = StringUtil.trim( comment );
+    public void setDefinedByAnnotation( boolean definedByAnnotation ) {
+        this.definedByAnnotation = definedByAnnotation;
     }
+
+    public boolean isEqual( Column column ) {
+        return isEqual( column, true );
+    }
+
+    public boolean isEqual( Column column, boolean checkPkDifference ) {
+        if( column == null ) return false;
+        if( StringUtil.isNotEqual(key, column.key) )                   return false;
+        if( dataType != column.dataType ) return false;
+        if( notNull  != column.notNull  ) return false;
+        if( checkPkDifference && pk != column.pk ) return false;
+        if( size     != column.size     ) return false;
+        if( precison != column.precison ) return false;
+        return true;
+    }
+
+    private boolean canAssignLength() {
+        if( dataType == null ) return true;
+        switch( dataType ) {
+            case java.sql.Types.BIT :
+            case java.sql.Types.TINYINT :
+            case java.sql.Types.SMALLINT :
+            case java.sql.Types.INTEGER :
+            case java.sql.Types.BIGINT :
+            case java.sql.Types.FLOAT :
+            case java.sql.Types.REAL :
+            case java.sql.Types.DOUBLE :
+            case java.sql.Types.NUMERIC :
+            case java.sql.Types.DECIMAL :
+            case java.sql.Types.CHAR :
+            case java.sql.Types.VARCHAR :
+            case java.sql.Types.LONGVARCHAR :
+                return true;
+        }
+        return false;
+    }
+
+    private boolean canAssignPrecision() {
+        if( dataType == null ) return true;
+        switch( dataType ) {
+            case java.sql.Types.FLOAT :
+            case java.sql.Types.REAL :
+            case java.sql.Types.DOUBLE :
+            case java.sql.Types.NUMERIC :
+            case java.sql.Types.DECIMAL :
+                return true;
+        }
+        return false;
+    }
+
 }

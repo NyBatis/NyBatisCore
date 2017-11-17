@@ -33,15 +33,16 @@ public class EntityLayoutReader {
         if( tableAnnotation == null ) return null;
 
         TableLayout tableLayout = new TableLayout();
-        tableLayout.setTableName( getTableName( klass,tableAnnotation) );
+        tableLayout.setTableName( getTableName(klass) );
         setColumnMeta( klass, tableLayout );
         setIndices( klass,tableAnnotation,tableLayout );
 
         return tableLayout;
     }
 
-    private String getTableName( Class klass, Table tableAnnotation ) {
-        String tableName = Validator.nvl( tableAnnotation.value(), tableAnnotation.name() );
+    public static String getTableName( Class klass ) {
+        Table annotation = getTableAnnotation( klass );
+        String tableName = Validator.nvl( annotation.value(), annotation.name() );
         if( StringUtil.isEmpty(tableName) ) {
             tableName = StringUtil.toUncamel( klass.getSimpleName() );
         }
@@ -59,9 +60,12 @@ public class EntityLayoutReader {
             if( incices.containsKey(index.name()) )
                 throw new SqlConfigurationException( "there is duplicated Index name({}) on klass({}).", index.name(), klass.getName() );
             hasIndexProperColumnName( klass, index, tableLayout );
+            tableLayout.addIndex( new IndexLayout( index.name(), index.columns() ) );
             indices.add( new IndexLayout( index.name(), index.columns() ) );
         }
-        tableLayout.setIndices( indices );
+        for( IndexLayout indexLayout : indices ) {
+            tableLayout.addIndex( indexLayout );
+        }
     }
 
     private void hasIndexProperColumnName( Class klass, Index index, TableLayout tableLayout ) {
@@ -91,7 +95,7 @@ public class EntityLayoutReader {
 
         for( Column column : columns.values() ) {
             if( column == null ) continue;
-            tableLayout.getColumns().add( column );
+            tableLayout.addColumn( column );
         }
 
     }
@@ -149,51 +153,12 @@ public class EntityLayoutReader {
     }
 
     private void setColumn( Column column, org.nybatis.core.db.annotation.Column columnAnnotation ) {
-
         if( columnAnnotation.type() != Integer.MIN_VALUE ) column.setDataType( columnAnnotation.type() );
-        if( StringUtil.isNotBlank( columnAnnotation.comment() ) )
-            column.setComment( columnAnnotation.comment() );
-
         if( columnAnnotation.precision() > 0 ) column.setPrecison( columnAnnotation.precision() );
         if( columnAnnotation.length()    > 0 ) column.setSize( columnAnnotation.length() );
-        if( ! canAssignLength(column)    ) column.setSize( null );
-        if( ! canAssignPrecision(column) ) column.setPrecison( null );
-
         column.setNotNull( columnAnnotation.notNull() );
-
+        column.setDefinedByAnnotation( true );
     }
-
-    private boolean canAssignLength( Column column ) {
-        switch( column.getDataType() ) {
-            case java.sql.Types.BIT :
-            case java.sql.Types.TINYINT :
-            case java.sql.Types.SMALLINT :
-            case java.sql.Types.INTEGER :
-            case java.sql.Types.BIGINT :
-            case java.sql.Types.FLOAT :
-            case java.sql.Types.REAL :
-            case java.sql.Types.DOUBLE :
-            case java.sql.Types.NUMERIC :
-            case java.sql.Types.DECIMAL :
-            case java.sql.Types.CHAR :
-            case java.sql.Types.VARCHAR :
-            case java.sql.Types.LONGVARCHAR :
-                return true;
-        }
-        return false;
-    }
-
-    private boolean canAssignPrecision( Column column ) {
-        switch( column.getDataType() ) {
-            case java.sql.Types.FLOAT :
-            case java.sql.Types.REAL :
-            case java.sql.Types.DOUBLE :
-            case java.sql.Types.NUMERIC :
-                return true;
-        }
-        return false;
-    }
-
 
     public static Table getTableAnnotation( Class klass ) {
         if( klass == null ) return null;

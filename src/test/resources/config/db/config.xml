@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.1" xsi:schemaLocation="urn:nybatis.configuration:1.1 http://nybatis.github.io/schema/nybatis-config.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.configuration:1.2" xsi:schemaLocation="urn:nybatis.configuration:1.2 http://nybatis.github.io/schema/nybatis-config.xsd">
 
   <properties path="config.properties" />
 

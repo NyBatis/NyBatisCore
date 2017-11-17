@@ -9,11 +9,33 @@
       <url>jdbc:h2:file:#{default.root}/localDb/tableCreation/h2;AUTO_SERVER=TRUE</url>
       <username>sys</username>
       <password>sys</password>
-      <createTable>true</createTable>
     </datasourceJdbc>
     <sqlPath>
       <path>./mapper</path>
     </sqlPath>
+    <createTable>true</createTable>
+  </environment>
+
+  <environment id="oracle">
+    <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
+      <driver>oracle.jdbc.driver.OracleDriver</driver>
+      <url>jdbc:oracle:thin:@172.21.196.27:1521/DEVSP</url>
+      <username>STORE_DEV</username>
+      <password>qaspbis*36!</password>
+    </datasourceJdbc>
+    <sqlPath>
+      <path>./mapper</path>
+    </sqlPath>
+    <createTable>true</createTable>
+  </environment>
+
+  <environment id="callChain" >
+    <datasourceJdbc poolMax="10" ping="true" pingCycle="600">
+      <driver>org.h2.Driver</driver>
+      <url>jdbc:h2:file:c:/NIDE/workspace/NayasisCore/AnatestViewer/target/test-classes/sampleDb/AnaTest;AUTO_SERVER=TRUE</url>
+      <username>sys</username>
+      <password>sys</password>
+    </datasourceJdbc>
   </environment>
 
 </configuration>

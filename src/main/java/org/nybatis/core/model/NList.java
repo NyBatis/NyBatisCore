@@ -1,6 +1,7 @@
 package org.nybatis.core.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.*;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
@@ -11,16 +12,6 @@ import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Spliterator;
 import java.util.function.Consumer;
 
 /**
@@ -69,7 +60,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      *
      * @param list   list
      */
-    public NList( List list ) {
+    public NList( Collection list ) {
     	this( list, null );
     }
 
@@ -79,7 +70,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param list      list
      * @param header    specific header
      */
-    public NList( List list, Set<?> header ) {
+    public NList( Collection list, Set<?> header ) {
 
         boolean headerExist = Validator.isNotEmpty( header );
 
@@ -360,7 +351,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
         return this;
 	}
 
-    private void _addRows( List list, boolean syncronizeHeaderData ) {
+    private void _addRows( Collection list, boolean syncronizeHeaderData ) {
         if( list != null ) {
             for( Object e : list ) {
                 _addRow( e, syncronizeHeaderData );
