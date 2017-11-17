@@ -3,7 +3,10 @@ package org.nybatis.core.db.sql.orm.vo;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
+
+import static org.nybatis.core.util.StringUtil.nvl;
 
 /**
  * @author nayasis@gmail.com
@@ -58,6 +61,13 @@ public class IndexLayout {
 
     public String toString() {
         return String.format( "{name:'%s', columns:'%s'}", name, columnNames );
+    }
+
+    public boolean isEqual( IndexLayout another ) {
+        if( another == null ) return false;
+        if( StringUtil.isNotEqual( name, another.name ) ) return false;
+        if( columnNames.size() != another.columnNames.size() ) return false;
+        return columnNames.toString().equals( another.columnNames.toString() );
     }
 
 }

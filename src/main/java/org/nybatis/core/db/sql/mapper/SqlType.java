@@ -69,8 +69,8 @@ public enum SqlType {
 	public final Integer length;
 	public final String  name;
 
-	private static Map<Integer, SqlType> codes = new LinkedHashMap<Integer, SqlType>();
-	private static Map<String,  SqlType> names = new LinkedHashMap<String,  SqlType>();
+	private static Map<Integer, SqlType> codes = new LinkedHashMap<>();
+	private static Map<String,  SqlType> names = new LinkedHashMap<>();
 
 	static {
 		for( SqlType type : SqlType.values() ) {
@@ -116,22 +116,41 @@ public enum SqlType {
 		if( klass == StringBuffer.class  ) return SqlType.VARCHAR;
 		if( klass == char.class          ) return SqlType.CHAR;
 		if( klass == Character.class     ) return SqlType.CHAR;
-		if( klass == int.class           ) return SqlType.INTEGER;
-		if( klass == Integer.class       ) return SqlType.INTEGER;
-		if( klass == double.class        ) return SqlType.DOUBLE;
-		if( klass == Double.class        ) return SqlType.DOUBLE;
-		if( klass == float.class         ) return SqlType.FLOAT;
-		if( klass == Float.class         ) return SqlType.FLOAT;
 		if( klass == boolean.class       ) return SqlType.BOOLEAN;
 		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
-		if( klass == byte.class          ) return SqlType.TINYINT;
-		if( klass == Byte.class          ) return SqlType.TINYINT;
-		if( klass == short.class         ) return SqlType.SMALLINT;
-		if( klass == Short.class         ) return SqlType.SMALLINT;
-		if( klass == long.class          ) return SqlType.BIGINT;
-		if( klass == Long.class          ) return SqlType.BIGINT;
-		if( klass == BigInteger.class    ) return SqlType.BIGINT;
-		if( klass == BigDecimal.class    ) return SqlType.NUMERIC;
+
+//		if( klass == int.class           ) return SqlType.INTEGER;
+//		if( klass == Integer.class       ) return SqlType.INTEGER;
+//		if( klass == double.class        ) return SqlType.DOUBLE;
+//		if( klass == Double.class        ) return SqlType.DOUBLE;
+//		if( klass == float.class         ) return SqlType.FLOAT;
+//		if( klass == Float.class         ) return SqlType.FLOAT;
+//		if( klass == boolean.class       ) return SqlType.BOOLEAN;
+//		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
+//		if( klass == byte.class          ) return SqlType.TINYINT;
+//		if( klass == Byte.class          ) return SqlType.TINYINT;
+//		if( klass == short.class         ) return SqlType.SMALLINT;
+//		if( klass == Short.class         ) return SqlType.SMALLINT;
+//		if( klass == long.class          ) return SqlType.BIGINT;
+//		if( klass == Long.class          ) return SqlType.BIGINT;
+//		if( klass == BigInteger.class    ) return SqlType.BIGINT;
+//		if( klass == BigDecimal.class    ) return SqlType.NUMERIC;
+
+		if( klass == int.class           ) return SqlType.DECIMAL;
+		if( klass == Integer.class       ) return SqlType.DECIMAL;
+		if( klass == double.class        ) return SqlType.DECIMAL;
+		if( klass == Double.class        ) return SqlType.DECIMAL;
+		if( klass == float.class         ) return SqlType.DECIMAL;
+		if( klass == Float.class         ) return SqlType.DECIMAL;
+		if( klass == byte.class          ) return SqlType.DECIMAL;
+		if( klass == Byte.class          ) return SqlType.DECIMAL;
+		if( klass == short.class         ) return SqlType.DECIMAL;
+		if( klass == Short.class         ) return SqlType.DECIMAL;
+		if( klass == long.class          ) return SqlType.DECIMAL;
+		if( klass == Long.class          ) return SqlType.DECIMAL;
+		if( klass == BigInteger.class    ) return SqlType.DECIMAL;
+		if( klass == BigDecimal.class    ) return SqlType.DECIMAL;
+
 		if( klass == byte[].class        ) return SqlType.BLOB;
 		if( klass == Byte[].class        ) return SqlType.BLOB_BOXED;
 		if( klass == Date.class          ) return SqlType.DATE;

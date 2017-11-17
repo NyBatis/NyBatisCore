@@ -130,6 +130,28 @@ public class StringUtil {
 	}
 
 	/**
+	 * check if there are equal without null difference
+	 *
+	 * @param value		value to check differenc
+	 * @param another	another value to check difference
+	 * @return true if equals
+	 */
+	public static boolean isEqual( Object value, Object another ) {
+		return StringUtil.nvl(value).equals( StringUtil.nvl(another) );
+	}
+
+	/**
+	 * check if there are not equal without null difference
+	 *
+	 * @param value		value to check differenc
+	 * @param another	another value to check difference
+	 * @return true if not equals
+	 */
+	public static boolean isNotEqual( Object value, Object another ) {
+		return ! isEqual( value, another );
+	}
+
+	/**
 	 * 문자열이 비어있지 않은지 여부를 확인한다.
 	 *
 	 * <pre>

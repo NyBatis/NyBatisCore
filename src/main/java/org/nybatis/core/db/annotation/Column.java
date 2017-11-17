@@ -42,13 +42,6 @@ public @interface Column {
     int precision() default Integer.MIN_VALUE;
 
     /**
-     * comment
-     *
-     * @return column's comment
-     */
-    String comment() default "";
-
-    /**
      * default value
      *
      * @return column's default value

@@ -5,6 +5,7 @@ import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
@@ -40,26 +41,32 @@ public class TableLayoutReader {
                 Set<String> pkList = new LinkedHashSet<>();
 
                 for( NMap pk : toList( metaData.getPrimaryKeys(null, table.scheme, table.name), false ) ) {
+                    layout.setPkName( pk.getString( "pkName" ) );;
                     pkList.add( StringUtil.toCamel(pk.getString("columnName")) );
                 }
 
                 for( NMap column : toList( metaData.getColumns(null, table.scheme, table.name, null), false ) ) {
 
                     Column c = new Column();
-
                     c.setKey( StringUtil.toCamel( column.getString( "columnName" ) ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
                     c.setNotNull( column.getInt( "nullable" ) <= 0 );
                     c.setPk( pkList.contains( c.getKey() ) );
                     c.setSize( column.getInt("columnSize") );
+                    int precision = column.getInt( "decimalDigits" );
+                    if( precision > 0  ) {
+                        c.setPrecison( precision );
+                    }
 
                     layout.addColumn( c );
 
-                    if( c.isPk() ) {
-                        layout.addPkColumn( c );
-                    }
-
                 }
+
+//                for( NMap rows : toList( metaData.getTables(null, table.scheme, table.name, null), false ) ) {
+//                    NLogger.debug( rows );
+//                    NLogger.debug( "-----------------------------" );
+//                }
+
 
             }
         });

@@ -5,6 +5,7 @@ import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.orm.entity.Employee;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
+import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.reflection.Reflector;
@@ -40,17 +41,25 @@ public class OrmTableCreationTest {
     public void readEntityLayout() {
 
         Employee employee = new Employee( "key", "name", 10, 1000, "800523-2111023", "dummy", "thinFilm" );
-
         String json = Reflector.toJson( employee );
-
         System.out.println( json );
-
 
         EntityLayoutReader reader = new EntityLayoutReader();
         TableLayout tableLayout = reader.getTableLayout( Employee.class );
-
         System.out.println( tableLayout );
 
+    }
+
+    @Test
+    public void readPreviousTableLayout() {
+        printTableLayout( "oracle",    "TB_DEV_SQL" );
+        printTableLayout( "callChain", "TB_SQL" );
+    }
+
+    private void printTableLayout( String envirionmentId, String tableName ) {
+        TableLayoutReader reader = new TableLayoutReader();
+        TableLayout tableLayout = reader.getTableLayout( envirionmentId, tableName );
+        System.out.println( tableLayout );
     }
 
 }
