@@ -56,6 +56,8 @@ public class TableLayout {
     }
 
     public boolean hasColumnName( String name ) {
+        if( StringUtil.isEmpty(name) ) return false;
+        name = name.replaceFirst( " .*$", "" );
         return columns.containsKey( name );
     }
 
@@ -164,6 +166,45 @@ public class TableLayout {
             }
         }
         return columns;
+    }
+
+    public List<TableIndex> getIndicesToAdd( TableLayout another ) {
+        if( another == null )
+            return new ArrayList<>( this.indices.values() );
+        List<TableIndex> indices = new ArrayList<>();
+        for( String key : this.indices.keySet() ) {
+            if( ! another.indices.containsKey(key) ) {
+                indices.add( this.indices.get(key) );
+            }
+        }
+        return indices;
+    }
+
+    public List<TableIndex> getIndicesToDelete( TableLayout another ) {
+        if( another == null )
+            return new ArrayList<>( this.indices.values() );
+        List<TableIndex> indices = new ArrayList<>();
+        for( String key : another.indices.keySet() ) {
+            if( ! this.indices.containsKey(key) ) {
+                indices.add( this.indices.get(key) );
+            }
+        }
+        return indices;
+    }
+
+    public List<TableIndex> getIndicesToUpdate( TableLayout another ) {
+        if( another == null )
+            return new ArrayList<>( this.indices.values() );
+        List<TableIndex> indices = new ArrayList<>();
+        for( String key : this.indices.keySet() ) {
+            if( another.columns.containsKey(key) ) {
+                // do not check PK dirrefence
+                if( ! this.indices.get(key).isEqual( another.indices.get(key) ) ) {
+                    indices.add( this.indices.get(key) );
+                }
+            }
+        }
+        return indices;
     }
 
     public boolean isPkEqual( TableLayout another ) {
