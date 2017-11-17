@@ -1,5 +1,6 @@
 package org.nybatis.core.util;
 
+import java.util.*;
 import org.nybatis.core.exception.unchecked.ClassNotExistException;
 import org.nybatis.core.exception.unchecked.EncodingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
@@ -16,12 +17,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -631,7 +626,7 @@ public class StringUtil {
      * @param concator 엘리먼트 사이를 연결시킬 구분 문자열
      * @return joined text
      */
-    public static String join( List<?> list, String concator ) {
+    public static String join( Collection<?> list, String concator ) {
 
     	if( list == null || list.size() == 0 ) return "";
 
@@ -639,39 +634,34 @@ public class StringUtil {
     	int           index = list.size();
 
     	for( Object e : list ) {
-
     		index--; if( e == null ) continue;
-
     		sb.append( e.toString() );
-
     		if( index > 0 ) sb.append( concator );
-
     	}
-
     	return sb.toString();
 
     }
 
-	/**
-	 * concat set values
-	 *
-	 * @param set		values to concat
-	 * @param concator  concator
-	 * @return joined text
-	 */
-	public static String join( Set<?> set, String concator ) {
-		if( set == null || set.size() == 0 ) return "";
-		return join( new ArrayList(set), concator );
-	}
-
-	public static String join( Stack<?> stack, String delimeter ) {
-
-		List list = new ArrayList<>();
-		list.addAll( stack );
-
-		return join( list, delimeter );
-
-	}
+//	/**
+//	 * concat set values
+//	 *
+//	 * @param set		values to concat
+//	 * @param concator  concator
+//	 * @return joined text
+//	 */
+//	public static String join( Set<?> set, String concator ) {
+//		if( set == null || set.size() == 0 ) return "";
+//		return join( new ArrayList(set), concator );
+//	}
+//
+//	public static String join( Stack<?> stack, String delimeter ) {
+//
+//		List list = new ArrayList<>();
+//		list.addAll( stack );
+//
+//		return join( list, delimeter );
+//
+//	}
 
 	/**
 	 * Split string around matches of the given <a href="../util/regex/Pattern.html#sum">regular expression</a>.

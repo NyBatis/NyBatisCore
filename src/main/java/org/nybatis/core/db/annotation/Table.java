@@ -43,6 +43,6 @@ public @interface Table {
      *
      * @return additional index when create table
      */
-    Index[] indexs() default {};
+    Index[] indices() default {};
 
 }

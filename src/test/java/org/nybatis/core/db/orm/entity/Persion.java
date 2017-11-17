@@ -3,6 +3,7 @@ package org.nybatis.core.db.orm.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.nybatis.core.db.annotation.Column;
+import org.nybatis.core.db.annotation.Index;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
 
@@ -10,7 +11,10 @@ import org.nybatis.core.db.annotation.Table;
  * @author nayasis@gmail.com
  * @since 2017-11-16
  */
-@Table( "TB_TABLE" )
+@Table( value = "Tb_tAbLe", indices = {
+    @Index( name = "test1", columns = {"age","lastName"} ),
+    @Index( name = "test2", columns = {"age","income","key"} )
+})
 public class Persion {
 
     @Pk
@@ -28,8 +32,7 @@ public class Persion {
         return key;
     }
 
-    public Persion() {
-    }
+    public Persion() {}
 
     public Persion( String key, String lastName, int age, double income, String id, String dummy ) {
         this.key    = key;

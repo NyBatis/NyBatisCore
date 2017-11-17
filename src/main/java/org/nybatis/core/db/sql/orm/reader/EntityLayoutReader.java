@@ -11,11 +11,13 @@ import org.nybatis.core.db.annotation.Table;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.orm.vo.Column;
-import org.nybatis.core.db.sql.orm.vo.IndexLayout;
+import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
+
+import static org.nybatis.core.util.StringUtil.toUncamel;
 
 /**
  * Table creation layout reader from Entity
@@ -32,51 +34,53 @@ public class EntityLayoutReader {
         Table tableAnnotation = getTableAnnotation( klass );
         if( tableAnnotation == null ) return null;
 
-        TableLayout tableLayout = new TableLayout();
-        tableLayout.setTableName( getTableName(klass) );
-        setColumnMeta( klass, tableLayout );
-        setIndices( klass,tableAnnotation,tableLayout );
+        TableLayout table = new TableLayout();
+        table.setName( getTableName(klass) );
+        setColumnMeta( klass, table );
+        setIndices( tableAnnotation.indices(),table, klass );
 
-        return tableLayout;
+        return table;
     }
 
     public static String getTableName( Class klass ) {
         Table annotation = getTableAnnotation( klass );
         String tableName = Validator.nvl( annotation.value(), annotation.name() );
         if( StringUtil.isEmpty(tableName) ) {
-            tableName = StringUtil.toUncamel( klass.getSimpleName() );
+            tableName = toUncamel( klass.getSimpleName() );
         }
-        return tableName;
+        return tableName.toUpperCase();
     }
 
-    private void setIndices( Class klass, Table tableAnnotation, TableLayout tableLayout ) {
-        Map<String,IndexLayout> incices = new LinkedHashMap<>();
-        List<IndexLayout> indices = new ArrayList<>();
-        for( Index index : tableAnnotation.indexs() ) {
+    private void setIndices( Index[] annotations, TableLayout table, Class klass ) {
+        Map<String,TableIndex> indices = new LinkedHashMap<>();
+        for( Index index : annotations ) {
             if( StringUtil.isEmpty(index.name()) )
                 throw new SqlConfigurationException( "Index(at klass:{}) must have name.", klass.getName() );
             if( index.columns().length == 0 )
                 throw new SqlConfigurationException( "Index(at klass:{}) must have columns.", klass.getName() );
-            if( incices.containsKey(index.name()) )
+            if( indices.containsKey(index.name()) )
                 throw new SqlConfigurationException( "there is duplicated Index name({}) on klass({}).", index.name(), klass.getName() );
-            hasIndexProperColumnName( klass, index, tableLayout );
-            tableLayout.addIndex( new IndexLayout( index.name(), index.columns() ) );
-            indices.add( new IndexLayout( index.name(), index.columns() ) );
+            hasIndexProperColumnName( klass, index, table );
+            indices.put( index.name(), new TableIndex( index.name(), index.columns() ) );
         }
-        for( IndexLayout indexLayout : indices ) {
-            tableLayout.addIndex( indexLayout );
+        for( TableIndex index : indices.values() ) {
+            String prefix = "IDX_" + table.getName() + "_";
+            String indexName = StringUtil.toUncamel( index.getName() ).toUpperCase();
+            indexName = prefix + indexName.replace( prefix, "" );
+            index.setName( indexName );
+            table.addIndex( index );
         }
     }
 
-    private void hasIndexProperColumnName( Class klass, Index index, TableLayout tableLayout ) {
+    private void hasIndexProperColumnName( Class klass, Index index, TableLayout table ) {
         for( String columnName : index.columns() ) {
-            if( ! tableLayout.hasColumnName(columnName) ) {
-                throw new SqlConfigurationException( "there is no column name[{}] in index[{}] at klass[{}]", columnName, index.name(), klass.getName() );
+            if( ! table.hasColumnName(columnName) ) {
+                throw new SqlConfigurationException( "there is no column[{}] in index[{}] at \"{}\"", columnName, index.name(), klass.getName() );
             }
         }
     }
 
-    private void setColumnMeta( Class klass, TableLayout tableLayout ) {
+    private void setColumnMeta( Class klass, TableLayout table ) {
 
         CoreReflector reflector = new CoreReflector();
 
@@ -95,7 +99,7 @@ public class EntityLayoutReader {
 
         for( Column column : columns.values() ) {
             if( column == null ) continue;
-            tableLayout.addColumn( column );
+            table.addColumn( column );
         }
 
     }
@@ -130,7 +134,7 @@ public class EntityLayoutReader {
         if( ! method.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) && ! method.isAnnotationPresent(Pk.class) ) return null;
 
         String key = method.getName().replaceFirst( "^(get|set)", "" );
-        key = StringUtil.toUncamel( key );
+        key = toUncamel( key );
         key = StringUtil.toCamel( key );
 
         SqlType sqlType = SqlType.find( method.getReturnType() );
@@ -152,11 +156,12 @@ public class EntityLayoutReader {
 
     }
 
-    private void setColumn( Column column, org.nybatis.core.db.annotation.Column columnAnnotation ) {
-        if( columnAnnotation.type() != Integer.MIN_VALUE ) column.setDataType( columnAnnotation.type() );
-        if( columnAnnotation.precision() > 0 ) column.setPrecison( columnAnnotation.precision() );
-        if( columnAnnotation.length()    > 0 ) column.setSize( columnAnnotation.length() );
-        column.setNotNull( columnAnnotation.notNull() );
+    private void setColumn( Column column, org.nybatis.core.db.annotation.Column annotation ) {
+        if( annotation.type() != Integer.MIN_VALUE ) column.setDataType( annotation.type() );
+        if( StringUtil.isNotEmpty(annotation.defaultValue()) ) column.setDefaultValue( annotation.defaultValue() );
+        if( annotation.precision() > 0 ) column.setPrecison( annotation.precision() );
+        if( annotation.length()    > 0 ) column.setSize( annotation.length() );
+        column.setNotNull( annotation.notNull() );
         column.setDefinedByAnnotation( true );
     }
 

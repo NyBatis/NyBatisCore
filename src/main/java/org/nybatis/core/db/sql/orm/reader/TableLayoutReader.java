@@ -5,7 +5,6 @@ import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
@@ -31,7 +30,7 @@ public class TableLayoutReader {
         TableLayout layout = new TableLayout();
 
         layout.setEnvironmentId( environmentId );
-        layout.setTableName( tableName );
+        layout.setName( tableName );
 
         sqlSession.useConnection( new ConnectionHandler() {
             public void execute( Connection connection ) throws Throwable {

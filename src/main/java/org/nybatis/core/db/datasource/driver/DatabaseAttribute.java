@@ -37,7 +37,8 @@ public class DatabaseAttribute {
     /**
      * Driver Attributes
      *
-     * @param database Driver name (oracle, mysql, h2, sqlite, etc...)
+     * @see DatabaseName
+     * @param database Driver name (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
      * @param patternToMatchClassName Driver name pattern to match with Database name. It must be regular expression.
      */
     public DatabaseAttribute( String database, String patternToMatchClassName ) {
@@ -46,9 +47,22 @@ public class DatabaseAttribute {
     }
 
     /**
+     * Driver Attributes
+     *
+     * @see DatabaseName
+     * @param database Driver name (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
+     */
+    public DatabaseAttribute( DatabaseName database ) {
+        setDatabase( database.name );
+        setPatternToMatchClassName( database.driverNamePattern );
+    }
+
+
+    /**
      * get database type
      *
-     * @return database type ( oracle, mysql, h2, sqlite, etc... )
+     * @see DatabaseName
+     * @return database type (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
      */
     public String getDatabase() {
         return database;
