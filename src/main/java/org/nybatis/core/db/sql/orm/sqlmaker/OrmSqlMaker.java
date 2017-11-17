@@ -90,7 +90,7 @@ public class OrmSqlMaker {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_PK, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
         for( Column column : layout.getPkColumns() ) {
 
@@ -116,7 +116,7 @@ public class OrmSqlMaker {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
         for( Column column : layout.getColumns() ) {
 
@@ -148,7 +148,7 @@ public class OrmSqlMaker {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName()) );
+        sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE_PK, layout.getEnvironmentId(), layout.getName(), layout.getName()) );
         sb.append( "<group delimeter=\",\">\n" );
 
         for( Column column : layout.getColumns() ) {
@@ -195,7 +195,7 @@ public class OrmSqlMaker {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
         for( Column column : layout.getColumns() ) {
 
@@ -226,7 +226,7 @@ public class OrmSqlMaker {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName() ) );
+        sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
         for( Column column : layout.getPkColumns() ) {
 
@@ -285,7 +285,7 @@ public class OrmSqlMaker {
         structureValues.append( "</group>\n" );
 
         sb.append( String.format( "INSERT /*+ %s.%s.%s */ INTO %s (\n%s) VALUES (\n%s)",
-                Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT_PK, layout.getEnvironmentId(), layout.getTableName(), layout.getTableName(),
+                Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT_PK, layout.getEnvironmentId(), layout.getName(), layout.getName(),
                 structureDefine,
                 structureValues
         ) );

@@ -69,8 +69,8 @@ public enum SqlType {
 	public final Integer length;
 	public final String  name;
 
-	private static Map<Integer, SqlType> codes = new LinkedHashMap<>();
-	private static Map<String,  SqlType> names = new LinkedHashMap<>();
+	private static Map<Integer,SqlType> codes = new LinkedHashMap<>();
+	private static Map<String,SqlType>  names = new LinkedHashMap<>();
 
 	static {
 		for( SqlType type : SqlType.values() ) {

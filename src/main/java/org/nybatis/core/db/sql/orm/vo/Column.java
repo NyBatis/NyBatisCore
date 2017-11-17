@@ -18,6 +18,7 @@ public class Column {
     private boolean pk;
     private Integer size;
     private Integer precison; // used in Number type column
+    private String  defaultValue;
     private boolean definedByAnnotation = false;
 
     public String getKey() {
@@ -122,6 +123,14 @@ public class Column {
         this.precison = precison;
     }
 
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue( String defaultValue ) {
+        this.defaultValue = defaultValue;
+    }
+
     public boolean isDefinedByAnnotation() {
         return definedByAnnotation;
     }
@@ -136,7 +145,8 @@ public class Column {
 
     public boolean isEqual( Column column, boolean checkPkDifference ) {
         if( column == null ) return false;
-        if( StringUtil.isNotEqual(key, column.key) )                   return false;
+        if( StringUtil.isNotEqual(key, column.key) ) return false;
+        if( StringUtil.isNotEqual(defaultValue, column.defaultValue) ) return false;
         if( dataType != column.dataType ) return false;
         if( notNull  != column.notNull  ) return false;
         if( checkPkDifference && pk != column.pk ) return false;

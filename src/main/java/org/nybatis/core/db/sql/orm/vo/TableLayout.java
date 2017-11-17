@@ -3,7 +3,6 @@ package org.nybatis.core.db.sql.orm.vo;
 import java.util.*;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.validation.Validator;
 
 /**
  * Table Layout
@@ -14,26 +13,22 @@ import org.nybatis.core.validation.Validator;
 public class TableLayout {
 
     private String                  environmentId;
-    private String                  tableName;
+    private String                  name;
     private String                  pkName;
     private Map<String,Column>      pkColumns      = new LinkedHashMap<>();
     private Map<String,Column>      columns        = new LinkedHashMap<>();
-    private Map<String,IndexLayout> indices        = new LinkedHashMap<>();
+    private Map<String,TableIndex> indices        = new LinkedHashMap<>();
 
-    public String getTableName() {
-        return tableName;
+    public String getName() {
+        return name;
     }
 
-    public void setTableName( String tableName ) {
-        this.tableName = tableName;
+    public void setName( String name ) {
+        this.name = name;
     }
 
     public String getPkName() {
-        if( Validator.isEmpty(pkName) ) {
-            return String.format( "PK_%s", tableName );
-        } else {
-            return pkName;
-        }
+        return pkName;
     }
 
     public void setPkName( String pkName ) {
@@ -52,6 +47,10 @@ public class TableLayout {
         return new ArrayList<>( pkColumns.values() );
     }
 
+    public Set<String> getPkColumnNames() {
+        return pkColumns.keySet();
+    }
+
     public List<Column> getColumns() {
         return new ArrayList<>( columns.values() );
     }
@@ -68,11 +67,11 @@ public class TableLayout {
         }
     }
 
-    public List<IndexLayout> getIndices() {
+    public List<TableIndex> getIndices() {
         return new ArrayList<>( indices.values() );
     }
 
-    public void addIndex( IndexLayout index ) {
+    public void addIndex( TableIndex index ) {
         if( index == null ) return;
         indices.put( index.getName(), index );
     }
@@ -80,11 +79,11 @@ public class TableLayout {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append( "EnvironmentId : " ).append( environmentId ).append( '\n' );
-        sb.append( "Table         : " ).append( tableName ).append( '\n' );
+        sb.append( "Table         : " ).append( name ).append( '\n' );
         sb.append( "PK index      : " ).append( getPkName() ).append( " / " ).append( pkColumnsList() ).append( '\n' );
         sb.append( "Columns       :\n" ).append( new NList( columns.values() ).toString() );
         sb.append( "Indexes       :" );
-        for( IndexLayout index : indices.values() ) {
+        for( TableIndex index : indices.values() ) {
             sb.append( "\n\t " ).append( index );
         }
         return sb.toString();
@@ -100,7 +99,7 @@ public class TableLayout {
 
     public boolean isEqual( TableLayout another ) {
         if( another == null ) return false;
-        if( ! StringUtil.nvl(tableName).equals( StringUtil.nvl(another.tableName) ) ) return false;
+        if( ! StringUtil.nvl( name ).equals( StringUtil.nvl(another.name ) ) ) return false;
         if( ! isEqualColumns( columns, another.columns ) ) return false;
         if( ! isEqualIncies( indices, another.indices ) ) return false;
         return true;
@@ -117,12 +116,12 @@ public class TableLayout {
         return true;
     }
 
-    private boolean isEqualIncies( Map<String,IndexLayout> map1, Map<String,IndexLayout> map2 ) {
+    private boolean isEqualIncies( Map<String,TableIndex> map1, Map<String,TableIndex> map2 ) {
         if( map1.size() != map2.size() ) return false;
         for( String key : map1.keySet() ) {
             if( ! map2.containsKey( key ) ) return false;
-            IndexLayout idx1 = map1.get( key );
-            IndexLayout idx2 = map2.get( key );
+            TableIndex idx1 = map1.get( key );
+            TableIndex idx2 = map2.get( key );
             if( ! idx1.isEqual(idx2) ) return false;
         }
         return true;

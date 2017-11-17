@@ -6,6 +6,7 @@ import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.orm.entity.Employee;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
+import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.reflection.Reflector;
@@ -44,10 +45,14 @@ public class OrmTableCreationTest {
         String json = Reflector.toJson( employee );
         System.out.println( json );
 
-        EntityLayoutReader reader = new EntityLayoutReader();
-        TableLayout tableLayout = reader.getTableLayout( Employee.class );
+        TableLayout tableLayout = getSampleTableLayout();
         System.out.println( tableLayout );
 
+    }
+
+    private TableLayout getSampleTableLayout() {
+        EntityLayoutReader reader = new EntityLayoutReader();
+        return reader.getTableLayout( Employee.class );
     }
 
     @Test
@@ -60,6 +65,16 @@ public class OrmTableCreationTest {
         TableLayoutReader reader = new TableLayoutReader();
         TableLayout tableLayout = reader.getTableLayout( envirionmentId, tableName );
         System.out.println( tableLayout );
+    }
+
+    @Test
+    public void creatSql() {
+
+        TableLayout layout = getSampleTableLayout();
+
+        OrmTableSqlMaker sqlMaker = new OrmTableSqlMaker( envirionmentId );
+        System.out.println( sqlMaker.sqlCreateTable(layout) );
+
     }
 
 }
