@@ -119,22 +119,52 @@ public enum SqlType {
 		if( klass == boolean.class       ) return SqlType.BOOLEAN;
 		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
 
-//		if( klass == int.class           ) return SqlType.INTEGER;
-//		if( klass == Integer.class       ) return SqlType.INTEGER;
-//		if( klass == double.class        ) return SqlType.DOUBLE;
-//		if( klass == Double.class        ) return SqlType.DOUBLE;
-//		if( klass == float.class         ) return SqlType.FLOAT;
-//		if( klass == Float.class         ) return SqlType.FLOAT;
-//		if( klass == boolean.class       ) return SqlType.BOOLEAN;
-//		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
-//		if( klass == byte.class          ) return SqlType.TINYINT;
-//		if( klass == Byte.class          ) return SqlType.TINYINT;
-//		if( klass == short.class         ) return SqlType.SMALLINT;
-//		if( klass == Short.class         ) return SqlType.SMALLINT;
-//		if( klass == long.class          ) return SqlType.BIGINT;
-//		if( klass == Long.class          ) return SqlType.BIGINT;
-//		if( klass == BigInteger.class    ) return SqlType.BIGINT;
-//		if( klass == BigDecimal.class    ) return SqlType.NUMERIC;
+		if( klass == int.class           ) return SqlType.INTEGER;
+		if( klass == Integer.class       ) return SqlType.INTEGER;
+		if( klass == double.class        ) return SqlType.DOUBLE;
+		if( klass == Double.class        ) return SqlType.DOUBLE;
+		if( klass == float.class         ) return SqlType.FLOAT;
+		if( klass == Float.class         ) return SqlType.FLOAT;
+		if( klass == boolean.class       ) return SqlType.BOOLEAN;
+		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
+		if( klass == byte.class          ) return SqlType.TINYINT;
+		if( klass == Byte.class          ) return SqlType.TINYINT;
+		if( klass == short.class         ) return SqlType.SMALLINT;
+		if( klass == Short.class         ) return SqlType.SMALLINT;
+		if( klass == long.class          ) return SqlType.BIGINT;
+		if( klass == Long.class          ) return SqlType.BIGINT;
+		if( klass == BigInteger.class    ) return SqlType.BIGINT;
+		if( klass == BigDecimal.class    ) return SqlType.NUMERIC;
+
+		if( klass == byte[].class        ) return SqlType.BLOB;
+		if( klass == Byte[].class        ) return SqlType.BLOB_BOXED;
+		if( klass == Date.class          ) return SqlType.DATE;
+		if( klass == Calendar.class      ) return SqlType.DATE;
+		if( klass == NDate.class         ) return SqlType.DATE;
+		if( Types.isMap(klass)           ) return SqlType.JAVA_OBJECT;
+		if( Types.isArrayOrList(klass)   ) return SqlType.LIST;
+
+		return SqlType.VARCHAR;
+
+	}
+
+	/**
+	 * get SqlType for column creation
+	 *
+	 * @param klass	matched class
+	 * @return SqlType
+     */
+	public static SqlType findForColumnType( Class<?> klass ) {
+
+		if( klass == null ) return SqlType.NULL;
+
+		if( klass == String.class        ) return SqlType.VARCHAR;
+		if( klass == StringBuilder.class ) return SqlType.VARCHAR;
+		if( klass == StringBuffer.class  ) return SqlType.VARCHAR;
+		if( klass == char.class          ) return SqlType.CHAR;
+		if( klass == Character.class     ) return SqlType.CHAR;
+		if( klass == boolean.class       ) return SqlType.BOOLEAN;
+		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
 
 		if( klass == int.class           ) return SqlType.DECIMAL;
 		if( klass == Integer.class       ) return SqlType.DECIMAL;
@@ -152,7 +182,7 @@ public enum SqlType {
 		if( klass == BigDecimal.class    ) return SqlType.DECIMAL;
 
 		if( klass == byte[].class        ) return SqlType.BLOB;
-		if( klass == Byte[].class        ) return SqlType.BLOB_BOXED;
+		if( klass == Byte[].class        ) return SqlType.BLOB;
 		if( klass == Date.class          ) return SqlType.DATE;
 		if( klass == Calendar.class      ) return SqlType.DATE;
 		if( klass == NDate.class         ) return SqlType.DATE;

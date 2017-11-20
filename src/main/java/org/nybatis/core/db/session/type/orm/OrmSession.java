@@ -81,6 +81,14 @@ public interface OrmSession<T> extends Cloneable {
      */
     OrmListExecutor<T> list();
 
+
+    /**
+     * get ORM table handler
+     *
+     * @return OrmTableHandler
+     */
+    OrmTableHandler<T> table();
+
     /**
      * Get batch executor
      *

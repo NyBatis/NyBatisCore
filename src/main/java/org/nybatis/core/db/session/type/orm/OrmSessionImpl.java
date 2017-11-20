@@ -9,6 +9,8 @@ import org.nybatis.core.model.NMap;
 import org.nybatis.core.validation.Assertion;
 
 /**
+ * Orm Session Implement
+ *
  * @author nayasis@gmail.com
  * @since 2015-09-21
  */
@@ -24,16 +26,11 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     public void init( SqlSessionImpl sqlSession, String tableName ) {
-
         Assertion.isNotNull( tableName, new SqlConfigurationException( "TableName is null." ) );
-
         this.sqlSession = sqlSession;
-
         properties.setEnvironmentId( sqlSession.getProperties().getRepresentativeEnvironmentId() );
         properties.setTableName( tableName );
-
         createOrmSql();
-
     }
 
     public OrmSession<T> clone() {
@@ -48,40 +45,29 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public int insert( Object entity ) {
-
         Assertion.isNotNull( entity, new SqlConfigurationException( "OrmSession input parameter is null." ) );
-
         properties.setEntityParameter( entity );
         checkPkNotNull();
-
         try {
             return getSessionExecutor( properties.sqlIdInsertPk() ).execute();
         } finally {
             properties.clear();
         }
-
     }
 
     @Override
     public int merge( Object parameter ) {
-
         boolean previousPkAllowance = properties.allowNonPkParameter();
-
         properties.allowNonPkParameter( false );
-
         try {
-
             int updateCount = update( parameter );
             if( updateCount == 0 ) {
                 return insert( parameter );
             }
-
             return updateCount;
-
         } finally {
             properties.allowNonPkParameter( previousPkAllowance );
         }
-
     }
 
     @Override
@@ -121,33 +107,25 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
 
     @Override
     public T select( Object parameter ) {
-
         properties.setEntityParameter( parameter );
         checkPkNotNull();
-
         String sqlId = isPkSql() ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
-
         try {
             return getSessionExecutor( sqlId ).select( domainClass );
         } finally {
             properties.clear();
         }
-
     }
 
     @Override
     public NMap selectMap( Object parameter ) {
-
         properties.setEntityParameter( parameter );
-
         String sqlId = isPkSql() ? properties.sqlIdSelectPk() : properties.sqlIdSelect();
-
         try {
             return getSessionExecutor( sqlId ).select();
         } finally {
             properties.clear();
         }
-
     }
 
     private SessionExecutor getSessionExecutor( String sqlId ) {
@@ -157,6 +135,11 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     @Override
     public OrmListExecutor<T> list() {
         return new OrmListExecutorImpl<>( domainClass, sqlSession, properties.newInstance().allowNonPkParameter(true) );
+    }
+
+    @Override
+    public OrmTableHandler<T> table() {
+        return new OrmTableHandlerImpl<>( sqlSession, properties.clone(), domainClass );
     }
 
     @Override
