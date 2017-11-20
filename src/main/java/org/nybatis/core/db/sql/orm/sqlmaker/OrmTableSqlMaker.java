@@ -27,10 +27,10 @@ public class OrmTableSqlMaker {
     private String environmentId;
 
     public OrmTableSqlMaker( String environmentId ) {
-        this.environmentId = environmentId;
+        setEnvironmentId( environmentId );
     }
 
-    private TableLayout getTableLayout( Class klass ) {
+    public TableLayout getTableLayout( Class klass ) {
         try {
             return TableLayoutRepository.getLayout( environmentId, EntityLayoutReader.getTableName(klass) );
         } catch( SqlConfigurationException e ) {
@@ -38,9 +38,35 @@ public class OrmTableSqlMaker {
         }
     }
 
-    private TableLayout getEntityLayout( Class klass ) {
+    public void refreshTableLayout( Class klass ) {
+        TableLayoutRepository.clearLayout( environmentId, EntityLayoutReader.getTableName(klass) );
+        getTableLayout( klass );
+    }
+
+    public boolean exists( Class klass ) {
+        try {
+            getTableLayout( klass );
+            return true;
+        } catch( SqlConfigurationException e ) {
+            return false;
+        }
+    }
+
+    public boolean notExists( Class klass ) {
+        return ! exists( klass );
+    }
+
+    public TableLayout getEntityLayout( Class klass ) {
         EntityLayoutReader reader = new EntityLayoutReader();
         return reader.getTableLayout( klass );
+    }
+
+    public String getEnvironmentId() {
+        return environmentId;
+    }
+
+    public void setEnvironmentId( String environmentId ) {
+        this.environmentId = environmentId;
     }
 
     public String sqlCreateTable( TableLayout tableLayout ) {
@@ -146,7 +172,15 @@ public class OrmTableSqlMaker {
 
     public String sqlModifyColumn( Column column, TableLayout table ) {
         StringBuilder sb = new StringBuilder();
-        sb.append( String.format("ALTER TABLE %s (\n", table.getName()) );
+        sb.append( String.format("ALTER TABLE %s MODIFY(\n", table.getName()) );
+        sb.append( toColumnString( column ) );
+        sb.append( "\n)" );
+        return toString();
+    }
+
+    public String sqlAddColumn( Column column, TableLayout table ) {
+        StringBuilder sb = new StringBuilder();
+        sb.append( String.format("ALTER TABLE %s ADD(\n", table.getName()) );
         sb.append( toColumnString( column ) );
         sb.append( "\n)" );
         return toString();
@@ -170,7 +204,7 @@ public class OrmTableSqlMaker {
             tableLayout.getName(), tableLayout.getPkName(), StringUtil.join(tableLayout.getPkColumnNames(),",") );
     }
 
-    public String sqlDropIndex( TableIndex index ) {
+    public String sqlDropIndex( TableIndex index, TableLayout table ) {
         return String.format( "DROP INDEX %s", index.getName() );
     }
 

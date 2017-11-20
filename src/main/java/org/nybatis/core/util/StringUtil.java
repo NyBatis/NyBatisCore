@@ -1,32 +1,27 @@
 package org.nybatis.core.util;
 
-import java.util.*;
-import org.nybatis.core.exception.unchecked.ClassNotExistException;
-import org.nybatis.core.exception.unchecked.EncodingException;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import javax.xml.bind.DatatypeConverter;
+import org.nybatis.core.exception.unchecked.ClassNotExistException;
+import org.nybatis.core.exception.unchecked.EncodingException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 
 
 /**
- * 문자열 처리용 유틸리티 클래스
+ * String Hadling Utility
  *
- * @author 	nayasis
+ * @author nayasis@gmail.com
  */
 public class StringUtil {
 
@@ -91,12 +86,10 @@ public class StringUtil {
      * @return String Padding 된 문자열
 	 */
 	public static String rpadCJK( Object value, int length, char padChar ) {
-
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
 		return rpad( value, adjustLength, padChar );
-
 	}
 
 	/**
@@ -582,23 +575,16 @@ public class StringUtil {
     }
 
     private static String getUnescapedUnicodeChar( String escapedString ) {
-
     	try {
-
     		String hex = escapedString.substring( 2 );
-
     		int hexNumber = Integer.parseInt( hex, 16 );
-
     		return Character.toString( (char) hexNumber );
-
     	} catch( StringIndexOutOfBoundsException e ) {
     		throw new StringIndexOutOfBoundsException( String.format( "Char to unescape unicode : [%s]", escapedString ) );
     	}
-
     }
 
     private static String getUnescapedSequence( String escapedString ) {
-
     	switch( escapedString.charAt(0) ) {
     		case 'b' : return "\b";
     		case 't' : return "\t";
@@ -606,9 +592,7 @@ public class StringUtil {
     		case 'f' : return "\f";
     		case 'r' : return "\r";
     	}
-
     	return escapedString;
-
     }
 
     /**
@@ -641,27 +625,6 @@ public class StringUtil {
     	return sb.toString();
 
     }
-
-//	/**
-//	 * concat set values
-//	 *
-//	 * @param set		values to concat
-//	 * @param concator  concator
-//	 * @return joined text
-//	 */
-//	public static String join( Set<?> set, String concator ) {
-//		if( set == null || set.size() == 0 ) return "";
-//		return join( new ArrayList(set), concator );
-//	}
-//
-//	public static String join( Stack<?> stack, String delimeter ) {
-//
-//		List list = new ArrayList<>();
-//		list.addAll( stack );
-//
-//		return join( list, delimeter );
-//
-//	}
 
 	/**
 	 * Split string around matches of the given <a href="../util/regex/Pattern.html#sum">regular expression</a>.
@@ -724,11 +687,11 @@ public class StringUtil {
 
 
 	/**
-     * 문자열을 구분자로 끊어 목록으로 변환한다.
+     * tokenize text by seperator
      *
-     * @param value     값
-     * @param separator 구분자
-     * @return 구분자로 끊어진 문자열 목록
+     * @param value     value to tokenize
+     * @param separator sepertator to tokenize
+     * @return tokenized word list
      */
     public static List<String> tokenize( Object value, String separator ) {
 
@@ -738,25 +701,23 @@ public class StringUtil {
 
     	String workVal = value.toString();
 
-    	if( isEmpty(separator) ) return Arrays.asList( workVal );
+    	if( isEmpty(separator) ) {
+			result.add( workVal );
+			return result;
+		}
 
     	int fromIndex = 0, toIndex = 0, separatorLength = separator.length();
 
     	List<int[]> indexes = new ArrayList<>();
 
     	while( true ) {
-
     		toIndex = workVal.indexOf( separator, fromIndex );
-
     		if( toIndex < 0 ) {
     			indexes.add( new int[] {fromIndex, workVal.length()} );
     			break;
     		}
-
     		indexes.add( new int[] {fromIndex, toIndex} );
-
     		fromIndex = toIndex + separatorLength;
-
     	}
 
     	for( int[] index : indexes ) {
@@ -785,15 +746,10 @@ public class StringUtil {
      * @return uncapitalized text
      */
     public static String uncapitalize( Object text ) {
-
     	if( isEmpty(text) ) return "";
-
     	char[] array = nvl( text ).toCharArray();
-
     	array[ 0 ] = Character.toLowerCase( array[0] );
-
     	return new String( array );
-
     }
 
     /**
@@ -803,15 +759,10 @@ public class StringUtil {
      * @return capitalized text
      */
     public static String capitalize( Object text ) {
-
     	if( isEmpty(text) ) return "";
-
     	char[] array = nvl( text ).toCharArray();
-
     	array[ 0 ] = Character.toUpperCase( array[0] );
-
     	return new String( array );
-
     }
 
     /**
@@ -879,7 +830,6 @@ public class StringUtil {
     	try (
     		ByteArrayOutputStream bos = new ByteArrayOutputStream();
     		ObjectOutputStream    oos = new ObjectOutputStream( bos )
-
 		) {
     		oos.writeObject( value );
     		oos.close();
@@ -910,7 +860,6 @@ public class StringUtil {
     	try (
     		ByteArrayInputStream bis = new ByteArrayInputStream( o );
     		ObjectInputStream    ois = new ObjectInputStream( bis )
-
 		) {
     		vo = ois.readObject();
 
@@ -931,13 +880,11 @@ public class StringUtil {
 	 * @throws EncodingException	if an encoding error occurs.
 	 */
     public static String encodeUrl( Object url ) throws EncodingException {
-
     	try {
 			return URLEncoder.encode( nvl(url), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
-
     }
 
 	/**
@@ -947,13 +894,11 @@ public class StringUtil {
 	 * @throws EncodingException	if an decoding error occurs.
 	 */
     public static String decodeUrl( Object url ) throws EncodingException {
-
     	try {
     		return URLDecoder.decode( nvl( url ), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
-
     }
 
     /**
@@ -990,62 +935,47 @@ public class StringUtil {
 	}
 
 	/**
-	 * 문자열을 압축한다.
+	 * compress text
 	 *
-	 * @param value 압축할 문자열
-	 * @return 압축한 문자열
+	 * @param value text value
+	 * @return compressed text
 	 */
 	public static String compress( String value ) {
-
 		if( isEmpty(value) ) return "";
-
         try(
         	ByteArrayOutputStream out  = new ByteArrayOutputStream();
         	GZIPOutputStream      gzip = new GZIPOutputStream( out )
 		) {
-
         	gzip.write( value.getBytes() );
         	gzip.close();
-
         	return out.toString( StandardCharsets.ISO_8859_1.toString() );
-
         } catch( IOException e ) {
         	throw new UncheckedIOException( e );
         }
-
 	}
 
 	/**
-	 * 압축된 문자열을 해제한다.
+	 *  decompress text
 	 *
-	 * @param value 압축을 해제할 문자열
-	 * @return 압축이 해제된 문자열
+	 * @param value text value
+	 * @return decompressed text
 	 */
 	public static String decompress( String value ) {
-
 		if( isEmpty(value) ) return "";
-
         try(
         	ByteArrayInputStream input        = new ByteArrayInputStream( value.getBytes( StandardCharsets.ISO_8859_1 ));
         	GZIPInputStream      gzip         = new GZIPInputStream( input );
         	BufferedReader       bufferReader = new BufferedReader( new InputStreamReader( gzip ) )
-
 		) {
-
         	StringBuilder sb = new StringBuilder();
-
         	String line;
-
         	while( (line = bufferReader.readLine()) != null ) {
         		sb.append( line );
         	}
-
         	return sb.toString();
-
         } catch( IOException e ) {
         	throw new UncheckedIOException( e );
         }
-
 	}
 
 	/**

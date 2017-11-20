@@ -109,7 +109,7 @@ public class EntityLayoutReader {
         if( field.isAnnotationPresent(JsonIgnore.class)   ) return null;
         if( field.isAnnotationPresent(ColumnIgnore.class) ) return null;
 
-        SqlType sqlType = SqlType.find( field.getType() );
+        SqlType sqlType = SqlType.findForColumnType( field.getType() );
 
         Column column = new Column();
         column.setKey( field.getName() );

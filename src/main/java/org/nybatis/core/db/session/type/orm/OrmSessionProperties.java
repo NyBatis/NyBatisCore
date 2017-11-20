@@ -33,14 +33,11 @@ public class OrmSessionProperties implements Cloneable {
     public OrmSessionProperties() {}
 
     public OrmSessionProperties newInstance() {
-
         OrmSessionProperties newProperties = new OrmSessionProperties();
         newProperties.environmentId        = environmentId;
         newProperties.tableName            = tableName;
         newProperties.allowNonPkParameter  = allowNonPkParameter;
-
         return newProperties;
-
     }
 
     public OrmSessionProperties clear() {

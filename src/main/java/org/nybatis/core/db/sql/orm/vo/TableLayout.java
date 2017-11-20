@@ -141,7 +141,7 @@ public class TableLayout {
         return columns;
     }
 
-    public List<Column> getColumnsToDelete( TableLayout another ) {
+    public List<Column> getColumnsToDrop( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.columns.values() );
         List<Column> columns = new ArrayList<>();
@@ -153,7 +153,7 @@ public class TableLayout {
         return columns;
     }
 
-    public List<Column> getColumnsToUpdate( TableLayout another ) {
+    public List<Column> getColumnsToModify( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.columns.values() );
         List<Column> columns = new ArrayList<>();
@@ -180,7 +180,7 @@ public class TableLayout {
         return indices;
     }
 
-    public List<TableIndex> getIndicesToDelete( TableLayout another ) {
+    public List<TableIndex> getIndicesToDrop( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();
@@ -192,7 +192,7 @@ public class TableLayout {
         return indices;
     }
 
-    public List<TableIndex> getIndicesToUpdate( TableLayout another ) {
+    public List<TableIndex> getIndicesToModify( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();

@@ -42,8 +42,8 @@ public class TableLayoutRepository {
     /**
      * get table layout
      *
-     * @param environmentId
-     * @param tableName
+     * @param environmentId environment id
+     * @param tableName     table name
      * @return table layout
      * @throws SqlConfigurationException
      */
@@ -69,6 +69,19 @@ public class TableLayoutRepository {
 
         return layout;
 
+    }
+
+    /**
+     * clear table layout
+     *
+     * @param environmentId environment id
+     * @param tableName     table name
+     */
+    public static void clearLayout( String environmentId, String tableName ) {
+        String key = getKey( environmentId, tableName );
+        synchronized( lock ) {
+            tableLayoutRepository.remove( key );
+        }
     }
 
 }

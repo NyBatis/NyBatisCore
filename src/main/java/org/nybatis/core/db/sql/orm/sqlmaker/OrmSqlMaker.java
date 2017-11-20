@@ -30,7 +30,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class OrmSqlMaker {
 
-
     // TODO : recosider lock mechanism (it does not work!)
     private Lock readLocker = new ReentrantLock();
 
