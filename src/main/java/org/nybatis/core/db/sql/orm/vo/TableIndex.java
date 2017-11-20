@@ -41,19 +41,19 @@ public class TableIndex {
         return columnNames;
     }
 
+    public Set<String> getUncameledColumnNames() {
+        Set<String> names = new LinkedHashSet<>();
+        for( String name : columnNames ) {
+            names.add( StringUtil.toUncamel(name) );
+        }
+        return names;
+    }
+
     public void setColumnNames( Set<String> columnNames ) {
         this.columnNames = columnNames;
     }
 
     public void setColumnNames( String[] columnNames ) {
-        this.columnNames.clear();
-        if( Validator.isEmpty(columnNames) ) return;
-        for( String columnName : columnNames ) {
-            this.columnNames.add( StringUtil.toUncamel(columnName).toLowerCase() );
-        }
-    }
-
-    public void setColumnNames( List<String> columnNames ) {
         this.columnNames.clear();
         if( Validator.isEmpty(columnNames) ) return;
         for( String columnName : columnNames ) {

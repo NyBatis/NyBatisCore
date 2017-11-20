@@ -13,6 +13,7 @@ import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.validation.Assertion;
 
 import java.util.concurrent.locks.Lock;
@@ -46,8 +47,9 @@ public class OrmSqlMaker {
 
             TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
 
-            if( layout.isEmpty() ) {
-                throw new SqlConfigurationException( "There is no table. (environmentId:{}, tableName:{})", environmentId, tableName );
+            if( layout == null ) {
+                NLogger.error( "There is no table. (environmentId:{}, tableName:{})", environmentId, tableName );
+                return;
             }
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );

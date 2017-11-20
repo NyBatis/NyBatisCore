@@ -61,27 +61,37 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     @Override
-    public void drop() {
-        String sql = tableSqlMaker.sqlDropTable( entityLayout );
-        sqlSession.sql( sql ).execute();
+    public OrmTableHandler<T> drop() {
+        if( exists() ) {
+            String sql = tableSqlMaker.sqlDropTable( entityLayout );
+            sqlSession.sql( sql ).execute();
+            refreshLayout();
+        }
+        return this;
     }
 
     @Override
-    public void set() {
+    public OrmTableHandler<T> set() {
         if( ! TableLayoutRepository.isEnableToCreateTable( getEnvironmentId() ) ) {
             NLogger.warn( "ORM table modification option is off on environment(id:{})", getEnvironmentId() );
-            return;
-        }
-        if( notExists() ) {
+        } else if( notExists() ) {
             createTable();
-            tableSqlMaker.refreshTableLayout( domainClass );
+            refreshLayout();
         } else {
             if( isChanged() ) {
+                NLogger.debug( ">> previous table layout" );
+                NLogger.debug( getLayout() );
+                NLogger.debug( ">> current table layout" );
+                NLogger.debug( entityLayout );
                 modifiyTable();
-                tableSqlMaker.refreshTableLayout( domainClass );
+                refreshLayout();
             }
         }
+        return this;
+    }
 
+    private void refreshLayout() {
+        tableSqlMaker.refreshTableLayout( domainClass );
     }
 
     private boolean isChanged() {
@@ -92,7 +102,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
     private void createTable() {
         sqlSession.sql( tableSqlMaker.sqlCreateTable(entityLayout) ).execute();
-        sqlSession.sql( tableSqlMaker.sqlAddPkIndex(entityLayout) ).execute();
+        sqlSession.sql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) ).execute();
         for( TableIndex index : entityLayout.getIndices() ) {
             sqlSession.sql( tableSqlMaker.sqlCreateIndex(index, entityLayout) ).execute();
         }
@@ -155,8 +165,14 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     private void modifyPk() {
-        sqlSession.sql( tableSqlMaker.sqlDropPkIndex(entityLayout) ).execute();
-        sqlSession.sql( tableSqlMaker.sqlAddPkIndex(entityLayout) ).execute();
+        if( ! entityLayout.hasPk() ) {
+            TableLayout prevLayout = getLayout();
+            if( prevLayout != null && prevLayout.hasPk() ) {
+                entityLayout.setPkName( prevLayout.getPkName() );
+                sqlSession.sql( tableSqlMaker.sqlDropPrimaryKey(entityLayout) ).execute();
+            }
+        }
+        sqlSession.sql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) ).execute();
     }
 
 }

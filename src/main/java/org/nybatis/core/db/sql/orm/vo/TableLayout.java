@@ -12,11 +12,11 @@ import org.nybatis.core.util.StringUtil;
  */
 public class TableLayout {
 
-    private String                  environmentId;
-    private String                  name;
-    private String                  pkName;
-    private Map<String,Column>      pkColumns      = new LinkedHashMap<>();
-    private Map<String,Column>      columns        = new LinkedHashMap<>();
+    private String                 environmentId;
+    private String                 name;
+    private String                 pkName;
+    private Map<String,Column>     pkColumns      = new LinkedHashMap<>();
+    private Map<String,Column>     columns        = new LinkedHashMap<>();
     private Map<String,TableIndex> indices        = new LinkedHashMap<>();
 
     public String getName() {
@@ -29,6 +29,10 @@ public class TableLayout {
 
     public String getPkName() {
         return pkName;
+    }
+
+    public boolean hasPk() {
+        return pkColumns.size() > 0;
     }
 
     public void setPkName( String pkName ) {
@@ -146,7 +150,7 @@ public class TableLayout {
             return new ArrayList<>( this.columns.values() );
         List<Column> columns = new ArrayList<>();
         for( String key : another.columns.keySet() ) {
-            if( ! this.columns.containsKey(key) ) {
+            if( ! another.columns.containsKey(key) ) {
                 columns.add( this.columns.get(key) );
             }
         }
@@ -186,7 +190,7 @@ public class TableLayout {
         List<TableIndex> indices = new ArrayList<>();
         for( String key : another.indices.keySet() ) {
             if( ! this.indices.containsKey(key) ) {
-                indices.add( this.indices.get(key) );
+                indices.add( another.indices.get(key) );
             }
         }
         return indices;
@@ -197,7 +201,7 @@ public class TableLayout {
             return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();
         for( String key : this.indices.keySet() ) {
-            if( another.columns.containsKey(key) ) {
+            if( another.indices.containsKey(key) ) {
                 // do not check PK dirrefence
                 if( ! this.indices.get(key).isEqual( another.indices.get(key) ) ) {
                     indices.add( this.indices.get(key) );

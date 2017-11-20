@@ -7,6 +7,7 @@ import org.nybatis.core.log.NLogger;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.nybatis.core.util.StringUtil;
 
 /**
  * TableLayout Repository to handle ORM
@@ -49,25 +50,24 @@ public class TableLayoutRepository {
      */
     public static TableLayout getLayout( String environmentId, String tableName ) {
 
+        tableName = StringUtil.toUpperCase( tableName );
         String key = getKey( environmentId, tableName );
 
         synchronized( lock ) {
             if( ! tableLayoutRepository.containsKey( key ) ) {
-                TableLayout tableLayout = new TableLayoutReader().getTableLayout( environmentId, tableName );
-                if( ! tableLayout.isEmpty() ) {
-                    tableLayoutRepository.put( key, tableLayout );
-                    NLogger.debug( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                try {
+                    TableLayout tableLayout = new TableLayoutReader().getTableLayout( environmentId, tableName );
+                    if( ! tableLayout.isEmpty() ) {
+                        tableLayoutRepository.put( key, tableLayout );
+                        NLogger.debug( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                    }
+                } catch( Exception e ) {
+                    NLogger.error( e, "Table Layout failed to be Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
                 }
             }
         }
 
-        TableLayout layout = tableLayoutRepository.get( key );
-
-        if( layout == null ) {
-            throw new SqlConfigurationException( "Fail to find table layout. (environmentId:{}, tableName:{})", environmentId, tableName );
-        }
-
-        return layout;
+        return tableLayoutRepository.get( key );
 
     }
 
@@ -78,6 +78,7 @@ public class TableLayoutRepository {
      * @param tableName     table name
      */
     public static void clearLayout( String environmentId, String tableName ) {
+        tableName = StringUtil.toUpperCase( tableName );
         String key = getKey( environmentId, tableName );
         synchronized( lock ) {
             tableLayoutRepository.remove( key );

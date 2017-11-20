@@ -147,11 +147,11 @@ public class Column {
         if( column == null ) return false;
         if( StringUtil.isNotEqual(key, column.key) ) return false;
         if( StringUtil.isNotEqual(defaultValue, column.defaultValue) ) return false;
-        if( dataType != column.dataType ) return false;
+        if( dataType != null && column.dataType != null && ! dataType.equals(column.dataType) ) return false;
         if( notNull  != column.notNull  ) return false;
         if( checkPkDifference && pk != column.pk ) return false;
-        if( size     != column.size     ) return false;
-        if( precison != column.precison ) return false;
+        if( size != null && column.size != null && ! size.equals(column.size) ) return false;
+        if( precison != null && column.precison != null && ! precison.equals(column.precison) ) return false;
         return true;
     }
 

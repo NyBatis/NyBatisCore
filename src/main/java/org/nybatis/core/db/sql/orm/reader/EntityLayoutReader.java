@@ -137,7 +137,7 @@ public class EntityLayoutReader {
         key = toUncamel( key );
         key = StringUtil.toCamel( key );
 
-        SqlType sqlType = SqlType.find( method.getReturnType() );
+        SqlType sqlType = SqlType.findForColumnType( method.getReturnType() );
 
         Column column = new Column();
         column.setKey( key );

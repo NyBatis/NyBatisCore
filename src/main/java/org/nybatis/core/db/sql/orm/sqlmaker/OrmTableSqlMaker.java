@@ -86,11 +86,7 @@ public class OrmTableSqlMaker {
     }
 
     private boolean isDatabase( DatabaseName... dbName ) {
-        String database = DatasourceManager.getAttributes( environmentId ).getDatabase();
-        for( DatabaseName name : dbName ) {
-            if( database.equalsIgnoreCase(name.name) ) return true;
-        }
-        return false;
+        return DatasourceManager.isDatabase( environmentId, dbName );
     }
 
     private boolean isNotDatabase( DatabaseName... dbName ) {
@@ -134,6 +130,7 @@ public class OrmTableSqlMaker {
                 break;
             case Types.NUMERIC :
             case Types.DECIMAL :
+            case Types.DOUBLE :
                 sb.append( "NUMBER" );
                 if( column.getSize() != null ) {
                     sb.append( "(" ).append( column.getSize() );
@@ -172,10 +169,16 @@ public class OrmTableSqlMaker {
 
     public String sqlModifyColumn( Column column, TableLayout table ) {
         StringBuilder sb = new StringBuilder();
-        sb.append( String.format("ALTER TABLE %s MODIFY(\n", table.getName()) );
-        sb.append( toColumnString( column ) );
-        sb.append( "\n)" );
-        return toString();
+        if( isDatabase( ORACLE ) ) {
+            sb.append( String.format("ALTER TABLE %s MODIFY( %s )", table.getName(), toColumnString(column)) );
+        } else if( isDatabase( H2 ) ) {
+            sb.append( String.format("ALTER TABLE %s ALTER COLUMN %s", table.getName(), toColumnString(column)) );
+        } else {
+            sb.append( String.format("ALTER TABLE %s MODIFY(\n", table.getName()) );
+            sb.append( toColumnString( column ) );
+            sb.append( "\n)" );
+        }
+        return sb.toString();
     }
 
     public String sqlAddColumn( Column column, TableLayout table ) {
@@ -183,25 +186,30 @@ public class OrmTableSqlMaker {
         sb.append( String.format("ALTER TABLE %s ADD(\n", table.getName()) );
         sb.append( toColumnString( column ) );
         sb.append( "\n)" );
-        return toString();
+        return sb.toString();
     }
 
     public String sqlDropTable( TableLayout tableLayout ) {
         return String.format( "DROP TABLE %s", tableLayout.getName() );
     }
 
-    public String sqlDropPkIndex( TableLayout tableLayout ) {
-        if( StringUtil.isEmpty(tableLayout.getPkName()) ) return null;
+    public String sqlDropPrimaryKey( TableLayout tableLayout ) {
+        if( tableLayout == null || ! tableLayout.hasPk() ) return null;
         return String.format( "ALTER TABLE %s DROP CONSTRAINT %s", tableLayout.getName(), tableLayout.getPkName() );
     }
 
-    public String sqlAddPkIndex( TableLayout tableLayout ) {
+    public String sqlAddPrimaryKey( TableLayout tableLayout ) {
         String pkName = tableLayout.getPkName();
         if( StringUtil.isEmpty(pkName) ) {
             pkName = "PK_" + tableLayout.getName();
         }
-        return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY_KEY (%s)",
-            tableLayout.getName(), tableLayout.getPkName(), StringUtil.join(tableLayout.getPkColumnNames(),",") );
+        if( isDatabase(ORACLE,H2) ) {
+            return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
+                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNames(),",") );
+        } else {
+            return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
+                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNames(),",") );
+        }
     }
 
     public String sqlDropIndex( TableIndex index, TableLayout table ) {
@@ -209,7 +217,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlCreateIndex( TableIndex index, TableLayout table ) {
-        return String.format( "CREATE INDEX %s ON %s(%s)", index.getName(), table.getName(), StringUtil.join(index.getColumnNames(),",") );
+        return String.format( "CREATE INDEX %s ON %s(%s)", index.getName(), table.getName(), StringUtil.join(index.getUncameledColumnNames(),",") );
     }
 
     private boolean isNumeric( int dataType ) {

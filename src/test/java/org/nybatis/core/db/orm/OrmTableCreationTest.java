@@ -4,6 +4,8 @@ import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.orm.entity.Employee;
+import org.nybatis.core.db.session.SessionManager;
+import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
 import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
@@ -57,8 +59,8 @@ public class OrmTableCreationTest {
 
     @Test
     public void readPreviousTableLayout() {
-        printTableLayout( "oracle",    "TB_DEV_SQL" );
-//        printTableLayout( "callChain", "TB_SQL" );
+//        printTableLayout( "oracle", "TB_DEV_SQL" );
+        printTableLayout( "h2",     "TB_TABLE" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {
@@ -74,6 +76,18 @@ public class OrmTableCreationTest {
 
         OrmTableSqlMaker sqlMaker = new OrmTableSqlMaker( envirionmentId );
         System.out.println( sqlMaker.sqlCreateTable(layout) );
+
+    }
+
+    @Test
+    public void createTable() {
+
+        OrmSession<Employee> session = SessionManager.openOrmSession( Employee.class );
+        session.setEnvironmentId( "h2" );
+        session.table().drop().set().set();
+
+        session.setEnvironmentId( "oracle" );
+        session.table().drop().set().set();
 
     }
 
