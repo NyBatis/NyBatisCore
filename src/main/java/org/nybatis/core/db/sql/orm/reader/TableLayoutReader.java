@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.*;
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
@@ -13,6 +15,8 @@ import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
+
+import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 
 /**
  * Table Layout Reader
@@ -75,13 +79,23 @@ public class TableLayoutReader {
 
                 for( NMap index : indexList ) {
 
-                    String indexName  = index.getString( "indexName" );
-                    int    nonUnique  = index.getInt( "nonUnique" );
-                    String columnName = StringUtil.toCamel( index.getString( "columnName" ) );
-                    String ascOrDesc  = index.getString("ascOrDesc");
-                    int    position   = index.getInt( "ordinalPosition" );
+                    String  indexName  = index.getString( "indexName" );
+                    boolean nonUnique  = true;
+                    String  columnName = StringUtil.toCamel( index.getString( "columnName" ) );
+                    String  ascOrDesc  = index.getString("ascOrDesc");
+                    int     position   = index.getInt( "ordinalPosition" );
 
                     if( StringUtil.isEmpty(indexName) || indexName.equals(layout.getPkName()) ) continue;
+
+                    if( isDatabase(environmentId,H2) ){
+                        nonUnique = index.getBoolean( "nonUnique" );
+                    } else {
+                        nonUnique = ( index.getInt( "nonUnique" ) == 1 );
+                    }
+
+                    if( isDatabase(environmentId,H2) ){
+                        if( nonUnique == false && indexName.startsWith( "PRIMARY_KEY_" ) ) continue;
+                    }
 
                     if( ! indices.containsKey(indexName) ) {
                         indices.put( indexName, new TreeMap<>() );
@@ -89,7 +103,10 @@ public class TableLayoutReader {
 
                     Map<Integer, String> indexMap = indices.get( indexName );
                     if( StringUtil.isNotEmpty(ascOrDesc) ) {
-                        columnName += " " + ascOrDesc;
+                        if( "D".equalsIgnoreCase(ascOrDesc) ) ascOrDesc = "desc";
+                        if( ascOrDesc.equalsIgnoreCase( "desc" ) ) {
+                            columnName += " " + ascOrDesc;
+                        }
                     }
                     indexMap.put( position, columnName );
 
@@ -106,6 +123,10 @@ public class TableLayoutReader {
 
         return layout;
 
+    }
+
+    private boolean isDatabase( String environmentId, DatabaseName... dbName ) {
+        return DatasourceManager.isDatabase( environmentId, dbName );
     }
 
     private class Table {

@@ -2,6 +2,7 @@ package org.nybatis.core.db.datasource;
 
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
@@ -129,6 +130,14 @@ public class DatasourceManager {
 
 		NLogger.trace( sb );
 
+	}
+
+	public static boolean isDatabase( String environmentId, DatabaseName... dbName ) {
+		String database = getAttributes( environmentId ).getDatabase();
+		for( DatabaseName name : dbName ) {
+			if( database.equalsIgnoreCase(name.name) ) return true;
+		}
+		return false;
 	}
 
 }

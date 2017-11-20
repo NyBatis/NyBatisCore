@@ -31,11 +31,11 @@ public interface OrmTableHandler<T> extends Cloneable {
     /**
      * drop table layout on database
      */
-    void drop();
+    OrmTableHandler<T> drop();
 
     /**
      * set table layout on database
      */
-    void set();
+    OrmTableHandler<T> set();
 
 }
