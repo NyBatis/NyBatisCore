@@ -65,7 +65,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         if( exists() ) {
             String sql = tableSqlMaker.sqlDropTable( entityLayout );
             sqlSession.sql( sql ).execute();
-            refreshLayout();
+            clearLayout();
         }
         return this;
     }
@@ -76,7 +76,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
             NLogger.warn( "ORM table modification option is off on environment(id:{})", getEnvironmentId() );
         } else if( notExists() ) {
             createTable();
-            refreshLayout();
+            clearLayout();
         } else {
             if( isChanged() ) {
                 NLogger.debug( ">> previous table layout" );
@@ -84,14 +84,14 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
                 NLogger.debug( ">> current table layout" );
                 NLogger.debug( entityLayout );
                 modifiyTable();
-                refreshLayout();
+                clearLayout();
             }
         }
         return this;
     }
 
-    private void refreshLayout() {
-        tableSqlMaker.refreshTableLayout( domainClass );
+    private void clearLayout() {
+        tableSqlMaker.clearTableLayout( domainClass );
     }
 
     private boolean isChanged() {

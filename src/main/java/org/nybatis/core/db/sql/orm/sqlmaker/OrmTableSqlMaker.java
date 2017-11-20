@@ -38,9 +38,8 @@ public class OrmTableSqlMaker {
         }
     }
 
-    public void refreshTableLayout( Class klass ) {
+    public void clearTableLayout( Class klass ) {
         TableLayoutRepository.clearLayout( environmentId, EntityLayoutReader.getTableName(klass) );
-        getTableLayout( klass );
     }
 
     public boolean exists( Class klass ) {

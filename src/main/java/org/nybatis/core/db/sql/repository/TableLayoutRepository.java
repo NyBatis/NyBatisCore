@@ -59,10 +59,11 @@ public class TableLayoutRepository {
                     TableLayout tableLayout = new TableLayoutReader().getTableLayout( environmentId, tableName );
                     if( ! tableLayout.isEmpty() ) {
                         tableLayoutRepository.put( key, tableLayout );
-                        NLogger.debug( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                        NLogger.info( "Table Layout Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
                     }
                 } catch( Exception e ) {
-                    NLogger.error( e, "Table Layout failed to be Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                    NLogger.info( "Table Layout failed to be Loaded in Nybatis. (environmentId:{}, tableName:{})", environmentId, tableName );
+                    NLogger.trace( e );
                 }
             }
         }
