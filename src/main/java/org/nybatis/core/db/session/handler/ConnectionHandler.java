@@ -35,31 +35,31 @@ public abstract class ConnectionHandler {
 		this.connection = connection;
 	}
 
-	protected SqlBean getSqlBean( String sqlId ) {
-		return getSqlBean( sqlId, null );
+	protected SqlBean getSqlBean( String sqlOrSqlId ) {
+		return getSqlBean( sqlOrSqlId, null );
 	}
 
-	protected SqlBean getSqlBean( String sqlId, Object parameter ) {
+	protected SqlBean getSqlBean( String sqlOrSqlId, Object parameter ) {
 
-		SqlNode sqlNode = null;
+		SqlNode sqlNode;
 
-		if( SqlRepository.isExist( sqlId ) ) {
-			sqlNode = SqlRepository.get( sqlId );
+		if( SqlRepository.isExist( sqlOrSqlId ) ) {
+			sqlNode = SqlRepository.get( sqlOrSqlId );
 		} else {
 			SqlReader sqlReader = new SqlReader();
-			sqlNode = sqlReader.read( sqlId );
+			sqlNode = sqlReader.read( sqlOrSqlId );
 		}
 
 		return new SqlBean( sqlNode, parameter ).init( properties.clone() );
 	}
 
-	protected SqlBean getPagedSqlBean( String sqlId, int start, int end ) {
-		return getPagedSqlBean( sqlId, null, start, end );
+	protected SqlBean getPagedSqlBean( String sqlOrSqlId, int start, int end ) {
+		return getPagedSqlBean( sqlOrSqlId, null, start, end );
 	}
 
-	protected SqlBean getPagedSqlBean( String sqlId, Object parameter, int start, int end ) {
+	protected SqlBean getPagedSqlBean( String sqlOrSqlId, Object parameter, int start, int end ) {
 
-		SqlBean sqlBean = getSqlBean( sqlId, parameter );
+		SqlBean sqlBean = getSqlBean( sqlOrSqlId, parameter );
 
 		properties.setPageSql( start, end );
 

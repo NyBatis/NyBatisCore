@@ -60,7 +60,8 @@ public class OrmTableCreationTest {
     @Test
     public void readPreviousTableLayout() {
 //        printTableLayout( "oracle", "TB_DEV_SQL" );
-        printTableLayout( "h2",     "TB_TABLE" );
+        printTableLayout( "oracle", "TB_TABLE" );
+//        printTableLayout( "h2",     "TB_TABLE" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {

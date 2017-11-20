@@ -12,6 +12,7 @@ import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -121,9 +122,67 @@ public class TableLayoutReader {
 
         });
 
+        if( isDatabase(environmentId, ORACLE) ) {
+            for( TableIndex index : layout.getIndices() ) {
+                replaceIndexNameOnOracle( sqlSession, index );
+            }
+        }
+
         return layout;
 
     }
+
+    private void replaceIndexNameOnOracle( SqlSession sqlSession, TableIndex index ) {
+        if( ! hasSysCreatedIndexName(index) ) return;
+        Map<String, String> indexNames = getOralceCreatedIndexName( sqlSession, index.getName() );
+        Set<String> newColumnNames = new LinkedHashSet<>();
+        for( String columnName : index.getColumnNames() ) {
+            if( columnName.startsWith("sysNc") ) {
+                if( indexNames.containsKey(columnName) ) {
+                    newColumnNames.add( indexNames.get(columnName) );
+                    continue;
+                }
+            }
+            newColumnNames.add( columnName );
+        }
+        index.setColumnNames( newColumnNames );
+    }
+
+    private boolean hasSysCreatedIndexName( TableIndex index ) {
+        for( String columnName : index.getColumnNames() ) {
+            if( columnName.startsWith("sysNc") ) return true;
+        }
+        return false;
+    }
+
+    private Map<String,String> getOralceCreatedIndexName( SqlSession sqlSession, String indexName ) {
+
+        String sql =
+            "SELECT  column_name, column_expression, descend\n" +
+            "FROM    USER_IND_COLUMNS      A\n" +
+            "JOIN    USER_IND_EXPRESSIONS  B\n" +
+            "        USING( index_name, table_name, column_position ) \n" +
+            "WHERE   index_name  = #{indexName}";
+
+        Map<String,String> names = new HashMap<>();
+
+        for( NMap row : sqlSession.sql( sql ).addParameter( "indexName", indexName ).list().select() ) {
+
+            String srcKey = StringUtil.toCamel( row.getString("columnName") );
+            String trgKey = StringUtil.toCamel( row.getString("columnExpression").replaceFirst( "\"(.+?)\"","$1" ) );
+            String desc   = StringUtil.toLowerCase( row.getString( "descend" ) );
+            if( "desc".equals("desc") ) {
+                trgKey += " " + desc;
+            }
+
+            names.put( srcKey, trgKey );
+
+        }
+
+        return names;
+
+    }
+
 
     private boolean isDatabase( String environmentId, DatabaseName... dbName ) {
         return DatasourceManager.isDatabase( environmentId, dbName );
