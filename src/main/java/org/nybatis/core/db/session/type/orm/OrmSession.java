@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.model.NMap;
 
@@ -161,6 +162,13 @@ public interface OrmSession<T> extends Cloneable {
     OrmSession<T> setEnvironmentId( String id );
 
     /**
+     * get representative environment id
+     *
+     * @return environment id
+     */
+    String getEnvironmentId();
+
+    /**
      * Get native sql sqlSession
      *
      * @return native sql sqlSession
@@ -192,5 +200,13 @@ public interface OrmSession<T> extends Cloneable {
      * @return cloned sql session
      */
     OrmSession<T> clone();
+
+    /**
+     * check session environment's database type
+     *
+     * @param dbName database type name
+     * @return true if type is matched
+     */
+    boolean isDatabase( DatabaseName... dbName );
 
 }

@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.type.sql.SessionExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
@@ -37,6 +38,11 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         OrmSessionImpl<T> ormSession = new OrmSessionImpl<>( domainClass, sqlSession, properties.getTableName() );
         ormSession.properties = properties.clone();
         return ormSession;
+    }
+
+    @Override
+    public boolean isDatabase( DatabaseName... dbName ) {
+        return sqlSession.isDatabase( dbName );
     }
 
     private void createOrmSql() {
@@ -194,6 +200,11 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         properties.setEnvironmentId( id );
         createOrmSql();
         return this;
+    }
+
+    @Override
+    public String getEnvironmentId() {
+        return sqlSession.getEnvironmentId();
     }
 
     @Override

@@ -59,10 +59,11 @@ public class TableLayoutReader {
         if( session.isDatabase(SQLITE) ) {
             List<NMap> list = session.sql( String.format( "PRAGMA TABLE_INFO('%s')", table.name ) ).list().select();
             for( NMap row : list ) {
-                int    seq  = row.getInt( "pk" );
+                int  seqPk  = row.getInt( "pk" );
+                int  seqCl  = row.getInt( "cid" );
                 String name = StringUtil.toCamel( row.getString("name") );
-                if( seq > 0 ) {
-                    pkColumnNames.put( seq, name );
+                if( seqPk > 0 ) {
+                    pkColumnNames.put( seqPk * 1000 + seqCl, name );
                 }
             }
         } else {
