@@ -167,7 +167,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlDropColumn( Column column, TableLayout table ) {
-        return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), column.getName() );
+        return String.format( "ALTER TABLE %s DROP COLUMN (%s)", table.getName(), column.getName() );
     }
 
     public String sqlModifyColumn( Column column, boolean type, boolean defaultValue, boolean notNull, TableLayout table ) {
