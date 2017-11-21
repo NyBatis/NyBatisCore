@@ -4,6 +4,7 @@ import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.orm.entity.Employee;
+import org.nybatis.core.db.orm.entity.EmployeeModification;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
@@ -11,6 +12,7 @@ import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
 import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
@@ -35,7 +37,7 @@ public class OrmTableCreationTest {
         DatabaseAttribute attribute = DatasourceManager.getAttributes( "h2" );
         Assert.assertEquals( attribute.getDatabase(), envirionmentId );
 
-        boolean enableToCreateTable = TableLayoutRepository.isEnableToCreateTable( envirionmentId );
+        boolean enableToCreateTable = TableLayoutRepository.isEnableDDL( envirionmentId );
         Assert.assertEquals( enableToCreateTable, true );
 
     }
@@ -54,20 +56,32 @@ public class OrmTableCreationTest {
 
     private TableLayout getSampleTableLayout() {
         EntityLayoutReader reader = new EntityLayoutReader();
-        return reader.getTableLayout( Employee.class );
+        return reader.getTableLayout( EmployeeModification.class );
     }
 
     @Test
     public void readPreviousTableLayout() {
+
+        TableLayout tableLayout = getSampleTableLayout();
+        System.out.println( tableLayout );
+
 //        printTableLayout( "oracle", "TB_DEV_SQL" );
-        printTableLayout( "oracle", "TB_TABLE" );
+//        printTableLayout( "oracle", "TB_TABLE" );
 //        printTableLayout( "h2",     "TB_TABLE" );
+        printTableLayout( "sqlite", "TB_TABLE" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {
+
+        TableLayout entityLayout = getSampleTableLayout();
+
         TableLayoutReader reader = new TableLayoutReader();
         TableLayout tableLayout = reader.getTableLayout( envirionmentId, tableName );
+
+        System.out.printf( ">> is equal : [%s]\n", entityLayout.isEqual(tableLayout) );
+        System.out.println( entityLayout );
         System.out.println( tableLayout );
+
     }
 
     @Test
@@ -81,14 +95,66 @@ public class OrmTableCreationTest {
     }
 
     @Test
-    public void createTable() {
+    public void tableModificationTest() {
+
+//        tableModificationTest( "h2" );
+//        tableModificationTest( "oracle" );
+        tableModificationTest( "sqlite" );
+//        tableModificationTest( "maria" );
+
+    }
+
+    private Employee getSampleTuple() {
+        Employee employee = new Employee();
+        employee.setKey( "RANDOM_KEY" );
+        employee.setLastName( "Jung" );
+        employee.setDepartment( "Human Resources" );
+        employee.setAge( 40 );
+        employee.setIncome( 1000.674 );
+        return employee;
+    }
+
+    private void tableModificationTest( String envirionmentId ) {
 
         OrmSession<Employee> session = SessionManager.openOrmSession( Employee.class );
-        session.setEnvironmentId( "h2" );
+
+        session.setEnvironmentId( envirionmentId );
         session.table().drop().set().set();
 
-        session.setEnvironmentId( "oracle" );
-        session.table().drop().set().set();
+        session.insert( getSampleTuple() );
+        session.commit();
+        Assert.assertEquals( 1, session.list().count() );
+
+        NLogger.debug( session.list().select() );
+
+        // add and change column
+
+        OrmSession<EmployeeModification> anotherSession = SessionManager.openOrmSession( EmployeeModification.class );
+
+        anotherSession.setEnvironmentId( envirionmentId );
+        anotherSession.table().set();
+
+        TableLayout tableLayout = TableLayoutRepository.getLayout( envirionmentId, Employee.class );
+
+        NLogger.debug( tableLayout );
+
+        Assert.assertTrue( tableLayout.hasColumnName("key")        );
+        Assert.assertTrue( tableLayout.hasColumnName("lastName")   );
+        Assert.assertTrue( tableLayout.hasColumnName("age")        );
+        Assert.assertTrue( tableLayout.hasColumnName("income")     );
+        Assert.assertTrue( tableLayout.hasColumnName("id")         );
+        Assert.assertTrue( tableLayout.hasColumnName("department") );
+        Assert.assertTrue( tableLayout.hasColumnName("subKey")     );
+
+        Assert.assertTrue( tableLayout.getColumn("key").isPk() );
+        Assert.assertTrue( tableLayout.getColumn("subKey").isPk() );
+
+        Assert.assertEquals( tableLayout.getColumn( "subKey" ).getDefaultValue(), "1" );
+        Assert.assertEquals( (int) tableLayout.getColumn( "income" ).getSize(), 21 );
+
+        // revert table layout
+        session.table().set();
+
 
     }
 

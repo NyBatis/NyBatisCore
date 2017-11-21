@@ -32,14 +32,15 @@ public class OrmTableSqlMaker {
 
     public TableLayout getTableLayout( Class klass ) {
         try {
-            return TableLayoutRepository.getLayout( environmentId, EntityLayoutReader.getTableName(klass) );
+            return TableLayoutRepository.getLayout( environmentId, klass );
         } catch( SqlConfigurationException e ) {
             return null;
         }
     }
 
-    public void clearTableLayout( Class klass ) {
-        TableLayoutRepository.clearLayout( environmentId, EntityLayoutReader.getTableName(klass) );
+    public void refreshTableLayout( Class klass ) {
+        TableLayoutRepository.clearLayout( environmentId, klass );
+        TableLayoutRepository.getLayout( environmentId, klass );
     }
 
     public boolean exists( Class klass ) {
@@ -69,19 +70,12 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlCreateTable( TableLayout tableLayout ) {
-
         StringBuilder sql = new StringBuilder();
-
         sql.append( "CREATE TABLE " );
-        if( isDatabase( MY_SQL, MARIA, SQLITE, H2, DERBY, HSQL, POSTGRE, SYBASE ) ) {
-            sql.append( "IF NOT EXISTS " );
-        }
         sql.append( tableLayout.getName() ).append( " (\n" );
-        sql.append( toColumnString(tableLayout) ).append( "\n" );
+        sql.append( toColumnCreationString(tableLayout) ).append( "\n" );
         sql.append( ")" );
-
         return sql.toString();
-
     }
 
     private boolean isDatabase( DatabaseName... dbName ) {
@@ -92,22 +86,28 @@ public class OrmTableSqlMaker {
         return ! isDatabase( dbName );
     }
 
-    private String toColumnString( TableLayout table ) {
+    private String toColumnCreationString( TableLayout table ) {
         List<String> columns = new ArrayList<>();
         for( Column column : table.getColumns() ) {
-            columns.add( toColumnString( column ) );
+            columns.add( String.format( "\t%s %s", column.getName(), toColumnPropertiesString(column) ) );
+        }
+        if( isDatabase(SQLITE) ) {
+            columns.add( String.format("\tPRIMARY KEY( %s )", StringUtil.join(table.getPkColumnNamesUncameled(),", ")) );
         }
         return StringUtil.join( columns, ",\n" );
     }
 
-    private String toColumnString( Column column ) {
-
-        // number_test   NUMBER(32,3) not null default 12
-
+    private String toColumnPropertiesString( Column column ) {
         StringBuilder sb = new StringBuilder();
-        sb.append( '\t' );
-        sb.append( column.getName() ).append( '\t' );
+        sb.append( toTypeString( column ) );
+        sb.append( toDefaultString( column ) );
+        sb.append( toNotNullString( column ) );
+        return sb.toString();
+    }
 
+    private String toTypeString( Column column ) {
+
+        StringBuilder sb = new StringBuilder( ' ' );
         int dataType = column.getDataType();
         switch( dataType ) {
             case Types.VARCHAR :
@@ -142,50 +142,58 @@ public class OrmTableSqlMaker {
             default :
                 sb.append( SqlType.find(dataType).name );
         }
+        return sb.toString();
 
-        sb.append( " " );
+    }
 
+    private String toNotNullString( Column column ) {
         if( column.isNotNull() ) {
-            sb.append( "NOT NULL " );
+            return " NOT NULL";
         }
+        return "";
+    }
 
+    private String toDefaultString( Column column ) {
+        StringBuilder sb = new StringBuilder();
         if( StringUtil.isNotEmpty(column.getDefaultValue()) ) {
-            sb.append( "DEFAULT " );
-            if( isNumeric(dataType) ) {
+            sb.append( " DEFAULT " );
+            if( isNumeric(column.getDataType()) ) {
                 sb.append( column.getDefaultValue() );
             } else {
                 sb.append( "'" ).append( column.getDefaultValue() ).append( "'" );
             }
         }
-
         return sb.toString();
-
     }
 
     public String sqlDropColumn( Column column, TableLayout table ) {
         return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), column.getName() );
     }
 
-    public String sqlModifyColumn( Column column, TableLayout table ) {
+    public String sqlModifyColumn( Column column, boolean type, boolean defaultValue, boolean notNull, TableLayout table ) {
+
         StringBuilder sb = new StringBuilder();
+        if( type )         sb.append( toTypeString( column ) );
+        if( defaultValue ) sb.append( toDefaultString( column ) );
+        if( notNull )      sb.append( toNotNullString( column ) );
+
+        if( sb.length() == 0 ) return null;
+
         if( isDatabase( ORACLE ) ) {
-            sb.append( String.format("ALTER TABLE %s MODIFY( %s )", table.getName(), toColumnString(column)) );
+            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), column.getName(), sb );
         } else if( isDatabase( H2 ) ) {
-            sb.append( String.format("ALTER TABLE %s ALTER COLUMN %s", table.getName(), toColumnString(column)) );
+            return String.format("ALTER TABLE %s ALTER COLUMN %s %s", table.getName(), column.getName(), sb );
         } else {
-            sb.append( String.format("ALTER TABLE %s MODIFY(\n", table.getName()) );
-            sb.append( toColumnString( column ) );
-            sb.append( "\n)" );
+            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), column.getName(), sb );
         }
-        return sb.toString();
+    }
+
+    public String sqlModifyColumn( Column column, TableLayout table ) {
+        return sqlModifyColumn( column, true, true, true, table  );
     }
 
     public String sqlAddColumn( Column column, TableLayout table ) {
-        StringBuilder sb = new StringBuilder();
-        sb.append( String.format("ALTER TABLE %s ADD(\n", table.getName()) );
-        sb.append( toColumnString( column ) );
-        sb.append( "\n)" );
-        return sb.toString();
+        return String.format("ALTER TABLE %s ADD( %s %s )", table.getName(), column.getName(), toColumnPropertiesString( column ) );
     }
 
     public String sqlDropTable( TableLayout tableLayout ) {
@@ -204,10 +212,13 @@ public class OrmTableSqlMaker {
         }
         if( isDatabase(ORACLE,H2) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
-                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNames(),",") );
+                tableLayout.getName(), pkName, StringUtil.join( tableLayout.getPkColumnNamesUncameled(), "," ) );
+        } else if( isDatabase(SQLITE) ) {
+            return String.format( "ALTER TABLE %s ADD CONSTRAINT %s KEY (%s)",
+                tableLayout.getName(), pkName, StringUtil.join( tableLayout.getPkColumnNamesUncameled(), "," ) );
         } else {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
-                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNames(),",") );
+                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNamesUncameled(),",") );
         }
     }
 

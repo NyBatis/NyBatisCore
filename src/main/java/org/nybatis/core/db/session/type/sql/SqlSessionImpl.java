@@ -1,5 +1,7 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
@@ -47,6 +49,11 @@ public class SqlSessionImpl implements SqlSession {
 
     public SqlSession clone() {
         return new SqlSessionImpl( token, properties );
+    }
+
+    @Override
+    public boolean isDatabase( DatabaseName... dbName ) {
+        return DatasourceManager.isDatabase( getEnvironmentId(), dbName );
     }
 
     public SqlProperties getProperties() {
@@ -174,6 +181,11 @@ public class SqlSessionImpl implements SqlSession {
         originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         return this;
+    }
+
+    @Override
+    public String getEnvironmentId() {
+        return properties.getRepresentativeEnvironmentId();
     }
 
     @Override

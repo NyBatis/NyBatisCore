@@ -14,6 +14,7 @@ import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 
 import java.util.concurrent.locks.Lock;
@@ -46,7 +47,6 @@ public class OrmSqlMaker {
             if( TableLayoutRepository.isExist(environmentId, tableName) ) return;
 
             TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
-
             if( layout == null ) {
                 NLogger.error( "There is no table. (environmentId:{}, tableName:{})", environmentId, tableName );
                 return;

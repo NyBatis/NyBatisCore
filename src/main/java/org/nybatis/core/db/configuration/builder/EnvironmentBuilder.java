@@ -46,7 +46,7 @@ public class EnvironmentBuilder {
 		setUnpooledJdbcDatasource( environment );
 		setJndiDatasource( environment );
 
-		setOrmTableCreationPossibility( environment );
+		setEnableDDL( environment );
 
 	}
 
@@ -58,11 +58,13 @@ public class EnvironmentBuilder {
 		return StringUtil.isTrue( environment.getAttrIgnoreCase( "default" ) );
 	}
 
-	private void setOrmTableCreationPossibility( Node environment ) {
-		Node node = environment.getChildElement( "createTable" );
+	private void setEnableDDL( Node environment ) {
+		Node node = environment.getChildElement( "ddl" );
 		if( node.isNull() ) return;
-		String val = prop.getValue( environment, "createTable" );
-		TableLayoutRepository.setEnableToCreateTable( environmentId, StringUtil.toBoolean(val) );
+		boolean enable = StringUtil.toBoolean( prop.getAttrVal( node, "enable" ) );
+		boolean recreation = StringUtil.toBoolean( prop.getAttrVal( node, "recreation" ) );
+		setEnableDDL( enable );
+		setRecreationDDL( recreation );
 	}
 
 	private void setJdbcDatasource( Node environment ) {
@@ -176,12 +178,20 @@ public class EnvironmentBuilder {
 		setJndiDatasource( new JndiConnectionProperties( jndiName ) );
 	}
 
-	public void setEnableToCreateTable( boolean posssibility ) {
-		TableLayoutRepository.setEnableToCreateTable( environmentId, posssibility );
+	public void setEnableDDL( boolean enable ) {
+		TableLayoutRepository.setEnableDDL( environmentId, enable );
 	}
 
-	public boolean isEnableToCreateTable() {
-		return TableLayoutRepository.isEnableToCreateTable( environmentId );
+	public boolean isEnableDDL() {
+		return TableLayoutRepository.isEnableDDL( environmentId );
+	}
+
+	public void setRecreationDDL( boolean enable ) {
+		TableLayoutRepository.setRecreationDDL( environmentId, enable );
+	}
+
+	public boolean isRecreationDDL() {
+		return TableLayoutRepository.isRecreationDDL( environmentId );
 	}
 
 }

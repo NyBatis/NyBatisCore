@@ -8,6 +8,7 @@ import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 import org.nybatis.core.db.sql.mapper.implement.ByteArrayMapper;
+import org.nybatis.core.db.sql.mapper.implement.StringMapper;
 import org.nybatis.core.db.sql.mapper.implement.TimeMapper;
 import org.nybatis.core.db.sql.mapper.implement.TimeStampMapper;
 import org.nybatis.core.db.sql.sqlMaker.BindParam;
@@ -249,28 +250,12 @@ public class StatementController {
 	}
 
 	private Object getResult( SqlType sqlType, CallableStatement statement, int paramIndex ) throws SQLException {
-
 		try {
 			return TypeMapper.get( sqlBean.getEnvironmentId(), sqlType ).getResult( statement, paramIndex );
 		} catch( JdbcImplementException e ) {
-
-			if( sqlType == SqlType.BLOB ) {
-
-				if( sqlBean.getDatasourceAttribute().enableToGetBlob() ) {
-
-					sqlBean.getDatasourceAttribute().enableToGetBlob( false );
-					TypeMapper.put( sqlBean.getEnvironmentId(), SqlType.BLOB, new ByteArrayMapper() );
-
-					return getResult( sqlType, statement, paramIndex );
-
-				}
-
-			}
-
-			throw (SQLException) e.getCause();
-
+			TypeMapper.setUnimplementedMapper( sqlBean.getEnvironmentId(), sqlType, e );
+			return getResult( sqlType, statement, paramIndex );
 		}
-
 	}
 
 	/**
@@ -289,28 +274,11 @@ public class StatementController {
 
 			TypeMapperIF<Object> typeMapper = TypeMapper.get( environmentId, value.getType() );
 			setParameter( typeMapper, statement, paramIndex++, value );
-
 			return paramIndex;
 
 		} catch( JdbcImplementException e ) {
-
-			if( value.getType() == SqlType.BLOB ) {
-
-				DatabaseAttribute attributes = DatasourceManager.getAttributes( environmentId );
-
-				if( attributes.enableToGetBlob() ) {
-
-					attributes.enableToGetBlob( false );
-					TypeMapper.put( environmentId, SqlType.BLOB, new ByteArrayMapper() );
-
-					return setParameter( environmentId, statement, paramIndex, value );
-
-				}
-
-			}
-
-			throw (SQLException) e.getCause();
-
+			TypeMapper.setUnimplementedMapper( environmentId, value.getType(), e );
+			return setParameter( environmentId, statement, paramIndex, value );
 		}
 
 	}

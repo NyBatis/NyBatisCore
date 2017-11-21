@@ -19,7 +19,6 @@ public class DatabaseAttribute {
     private String  patternToMatchClassName    = "";
 
     private boolean enableToGetParameterType   = true;
-    private boolean enableToGetBLob            = true;
     private boolean enableToDoLobPrefetch      = true;
 
     private String  pageSqlPre                 = "";
@@ -99,12 +98,6 @@ public class DatabaseAttribute {
         this.enableToGetParameterType = enable;
         return this;
     }
-    public boolean enableToGetBlob() {
-        return enableToGetBLob;
-    }
-    public DatabaseAttribute enableToGetBlob( boolean enable ) {
-        this.enableToGetBLob = enable;return this;
-    }
 
     public boolean enableToDoLobPrefetch() {
         return enableToDoLobPrefetch;
@@ -183,7 +176,7 @@ public class DatabaseAttribute {
         attribute.database                 = database;
         attribute.patternToMatchClassName  = patternToMatchClassName;
         attribute.enableToGetParameterType = enableToGetParameterType;
-        attribute.enableToGetBLob          = enableToGetBLob;
+//        attribute.enableToGetBLob          = enableToGetBLob;
         attribute.enableToDoLobPrefetch    = enableToDoLobPrefetch;
         attribute.pageSqlPre               = pageSqlPre;
         attribute.pageSqlPost              = pageSqlPost;

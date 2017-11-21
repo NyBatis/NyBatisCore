@@ -1,5 +1,7 @@
 package org.nybatis.core.db.session.handler;
 
+import java.sql.*;
+import java.util.List;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.util.ResultsetController;
 import org.nybatis.core.db.session.executor.util.StatementController;
@@ -11,14 +13,6 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
-
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
 
 public abstract class ConnectionHandler {
 
@@ -58,29 +52,22 @@ public abstract class ConnectionHandler {
 	}
 
 	protected SqlBean getPagedSqlBean( String sqlOrSqlId, Object parameter, int start, int end ) {
-
 		SqlBean sqlBean = getSqlBean( sqlOrSqlId, parameter );
-
 		properties.setPageSql( start, end );
-
 		return sqlBean.init( properties.clone() );
-
 	}
 
 	protected PreparedStatement getPreparedStatement( SqlBean sqlBean, Integer fetchSize, Integer lobPrefetchSize ) throws SQLException {
 
 		sqlBean.build();
-
 		PreparedStatement preparedStatement = connection.prepareStatement( sqlBean.getSql() );
 
 		StatementController stmtHandler = new StatementController( sqlBean );
-
 		stmtHandler.setParameter( preparedStatement );
 		stmtHandler.setFetchSize( preparedStatement, fetchSize );
 		stmtHandler.setLobPrefetchSize( preparedStatement, lobPrefetchSize );
 
 		NLogger.debug( ">> {}\n{}", sqlBean, sqlBean.getDebugSql() );
-
 		return preparedStatement;
 
 	}
@@ -143,6 +130,28 @@ public abstract class ConnectionHandler {
 
 	protected void toList( ResultSet resultSet, RowHandler rowHandler, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 		new ResultsetController( getEnvironmentId() ).toList( resultSet, rowHandler, raiseErrorOnKeyDuplication );
+	}
+
+	protected NMap toBean( ResultSet resultSet ) throws SQLException {
+		return toBean( resultSet, NMap.class, true );
+	}
+
+	protected NMap toBean( ResultSet resultSet, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		return toBean( resultSet, NMap.class, raiseErrorOnKeyDuplication );
+	}
+
+	protected <T> T toBean( ResultSet resultSet, Class<T> returnType ) throws SQLException {
+		return toBean( resultSet, returnType, true );
+	}
+
+	protected <T> T toBean( ResultSet resultSet, Class<T> returnType, boolean raiseErrorOnKeyDuplication ) throws SQLException {
+		final Object[] map = new Object[1];
+		toList( resultSet, new RowHandler() {
+			public void handle( NMap row ) {
+				map[0] = row.toBean( returnType );
+			}
+		}, raiseErrorOnKeyDuplication );
+		return (T) map[0];
 	}
 
 	protected Statement unwrap( Statement statement ) {
