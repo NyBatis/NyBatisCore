@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.exception.unchecked.BaseRuntimeException;
@@ -144,6 +145,13 @@ public interface SqlSession {
 	SqlSession setEnvironmentId( String id );
 
 	/**
+	 * get representative environment id
+	 *
+	 * @return environment id
+     */
+	String getEnvironmentId();
+
+	/**
 	 * Open ORM Session.
 	 * environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
 	 *
@@ -179,5 +187,13 @@ public interface SqlSession {
 	 * @return cloned sql session
 	 */
 	SqlSession clone();
+
+	/**
+	 * check session environment's database type
+	 *
+	 * @param dbName database type name
+	 * @return true if type is matched
+     */
+	boolean isDatabase( DatabaseName... dbName );
 
 }

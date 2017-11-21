@@ -55,11 +55,11 @@ public class EntityLayoutReader {
         Map<String,TableIndex> indices = new LinkedHashMap<>();
         for( Index index : annotations ) {
             if( StringUtil.isEmpty(index.name()) )
-                throw new SqlConfigurationException( "Index(at klass:{}) must have name.", klass.getName() );
+                throw new SqlConfigurationException( "Index(at class:{}) must have name.", klass.getName() );
             if( index.columns().length == 0 )
-                throw new SqlConfigurationException( "Index(at klass:{}) must have columns.", klass.getName() );
+                throw new SqlConfigurationException( "Index(at class:{}) must have columns.", klass.getName() );
             if( indices.containsKey(index.name()) )
-                throw new SqlConfigurationException( "there is duplicated Index name({}) on klass({}).", index.name(), klass.getName() );
+                throw new SqlConfigurationException( "there is duplicated Index name({}) on '{}'.", index.name(), klass.getName() );
             hasIndexProperColumnName( klass, index, table );
             indices.put( index.name(), new TableIndex( index.name(), index.columns() ) );
         }
@@ -116,13 +116,10 @@ public class EntityLayoutReader {
         column.setDataType( sqlType.code );
         column.setSize( sqlType.length );
 
-        if( field.isAnnotationPresent(Pk.class) ) {
+        if( field.isAnnotationPresent(org.nybatis.core.db.annotation.Column.class) )
+            setColumn( column, field.getAnnotation(org.nybatis.core.db.annotation.Column.class) );
+        if( field.isAnnotationPresent(Pk.class) )
             column.setPk( true );
-        }
-
-        if( field.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) ) {
-            setColumn( column, field.getAnnotation( org.nybatis.core.db.annotation.Column.class ) );
-        }
 
         return column;
 
@@ -131,7 +128,7 @@ public class EntityLayoutReader {
     private Column toColumnModel( Method method ) {
 
         if( method.isAnnotationPresent(JsonIgnore.class) ) return null;
-        if( ! method.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) && ! method.isAnnotationPresent(Pk.class) ) return null;
+        if( ! method.isAnnotationPresent(org.nybatis.core.db.annotation.Column.class) && ! method.isAnnotationPresent(Pk.class) ) return null;
 
         String key = method.getName().replaceFirst( "^(get|set)", "" );
         key = toUncamel( key );
@@ -144,13 +141,10 @@ public class EntityLayoutReader {
         column.setDataType( sqlType.code );
         column.setSize( sqlType.length );
 
-        if( method.isAnnotationPresent(Pk.class) ) {
+        if( method.isAnnotationPresent(org.nybatis.core.db.annotation.Column.class) )
+            setColumn( column, method.getAnnotation(org.nybatis.core.db.annotation.Column.class) );
+        if( method.isAnnotationPresent(Pk.class) )
             column.setPk( true );
-        }
-
-        if( method.isAnnotationPresent( org.nybatis.core.db.annotation.Column.class ) ) {
-            setColumn( column, method.getAnnotation( org.nybatis.core.db.annotation.Column.class ) );
-        }
 
         return column;
 

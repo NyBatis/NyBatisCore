@@ -55,8 +55,24 @@ public class TableLayout {
         return pkColumns.keySet();
     }
 
+    public Set<String> getPkColumnNamesUncameled() {
+        Set<String> names = new LinkedHashSet<>();
+        for( String name : pkColumns.keySet() ) {
+            names.add( StringUtil.toUncamel(name) );
+        }
+        return names;
+    }
+
     public List<Column> getColumns() {
         return new ArrayList<>( columns.values() );
+    }
+
+    public Column getColumn( String name ) {
+        if( StringUtil.isNotEmpty(name) ) {
+            name = name.replaceFirst( " .*$", "" );
+            return columns.get( name );
+        }
+        return null;
     }
 
     public boolean hasColumnName( String name ) {

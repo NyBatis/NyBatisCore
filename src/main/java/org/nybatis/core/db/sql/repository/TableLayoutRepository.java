@@ -1,12 +1,12 @@
 package org.nybatis.core.db.sql.repository;
 
-import org.nybatis.core.db.sql.orm.vo.TableLayout;
-import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
-import org.nybatis.core.exception.unchecked.SqlConfigurationException;
-import org.nybatis.core.log.NLogger;
-
 import java.util.HashMap;
 import java.util.Map;
+import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
+import org.nybatis.core.db.sql.orm.reader.TableLayoutReader;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 
 /**
@@ -17,23 +17,64 @@ import org.nybatis.core.util.StringUtil;
  */
 public class TableLayoutRepository {
 
-    private static Map<String, TableLayout> tableLayoutRepository    = new HashMap<>();
-    private static Map<String, Boolean>     tableCreationPossibility = new HashMap<>();
+    private static Map<String, TableLayout> tableLayoutRepository  = new HashMap<>();
+    private static Map<String, Boolean>     ddlEnable              = new HashMap<>();
+    private static Map<String, Boolean>     ddlRecreation          = new HashMap<>();
 
     private static Object lock = new Object();
 
-    public static boolean isEnableToCreateTable( String enviornmentId ) {
-        return tableCreationPossibility.getOrDefault( enviornmentId, false );
+    /**
+     * check enable to DDL with entity
+     *
+     * @param enviornmentId environment id
+     * @return true if DDL is enable.
+     */
+    public static boolean isEnableDDL( String enviornmentId ) {
+        return ddlEnable.getOrDefault( enviornmentId, false );
     }
 
-    public static void setEnableToCreateTable( String environmentId, boolean possibility ) {
+    /**
+     * set enable to DDL with entity
+     *
+     * @param enviornmentId environment id
+     * @param enable        flag
+     */
+    public static void setEnableDDL( String environmentId, boolean enable ) {
         synchronized( lock ) {
-            tableCreationPossibility.put( environmentId, possibility );
+            ddlEnable.put( environmentId, enable );
         }
     }
 
+    public static boolean isRecreationDDL( String environmentId ) {
+        return ddlRecreation.getOrDefault( environmentId, false );
+    }
+
+    public static void setRecreationDDL( String environmentId, boolean enable ) {
+        synchronized( lock ) {
+            ddlRecreation.put( environmentId, enable );
+        }
+    }
+
+    /**
+     * check entity exists as TABLE in database
+     *
+     * @param environmentId environment id
+     * @param tableName     DB table name
+     * @return true if entity exists as table
+     */
     public static boolean isExist( String environmentId, String tableName ) {
         return tableLayoutRepository.containsKey( getKey( environmentId, tableName ) );
+    }
+
+    /**
+     * check entity exists as TABLE in database
+     *
+     * @param environmentId environment id
+     * @param domainClass   table entity class
+     * @return true if entity exists as table
+     */
+    public static boolean isExist( String environmentId, Class domainClass ) {
+        return isExist( environmentId, EntityLayoutReader.getTableName(domainClass) );
     }
 
     private static String getKey( String environmentId, String tableName ) {
@@ -50,7 +91,6 @@ public class TableLayoutRepository {
      */
     public static TableLayout getLayout( String environmentId, String tableName ) {
 
-        tableName = StringUtil.toUpperCase( tableName );
         String key = getKey( environmentId, tableName );
 
         synchronized( lock ) {
@@ -73,6 +113,18 @@ public class TableLayoutRepository {
     }
 
     /**
+     * get table layout
+     *
+     * @param environmentId environment id
+     * @param domainClass   table entity class
+     * @return table layout
+     * @throws SqlConfigurationException
+     */
+    public static TableLayout getLayout( String environmentId, Class domainClass ) {
+        return getLayout( environmentId, EntityLayoutReader.getTableName(domainClass) );
+    }
+
+    /**
      * clear table layout
      *
      * @param environmentId environment id
@@ -85,5 +137,16 @@ public class TableLayoutRepository {
             tableLayoutRepository.remove( key );
         }
     }
+
+    /**
+     * clear table layout
+     *
+     * @param environmentId environment id
+     * @param domainClass   table entity class
+     */
+    public static void clearLayout( String environmentId, Class domainClass ) {
+        clearLayout( environmentId, EntityLayoutReader.getTableName(domainClass) );
+    }
+
 
 }

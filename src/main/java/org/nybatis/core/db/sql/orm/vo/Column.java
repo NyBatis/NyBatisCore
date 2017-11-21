@@ -1,7 +1,9 @@
 package org.nybatis.core.db.sql.orm.vo;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 
 /**
  * Table Column Layout
@@ -70,8 +72,26 @@ public class Column {
             this.dataTypeName = sqlType.name;
         }
 
-        if( ! canAssignLength()    ) size     = null;
-        if( ! canAssignPrecision() ) precison = null;
+        Integer length    = null;
+        Integer precision = null;
+
+        if( Validator.isMatched( typeName, "\\w+?\\(.+?\\)" ) ) {
+            String[] infos = typeName.replaceFirst( "^.*?\\((.+?)\\)", "$1" ).split( "," );
+            if( infos.length >= 1 ) length    = new PrimitiveConverter( infos[0] ).toInt();
+            if( infos.length >= 2 ) precision = new PrimitiveConverter( infos[1] ).toInt();
+        }
+
+        if( canAssignLength()    ) {
+            size = length;
+        } else {
+            size = null;
+        }
+
+        if( canAssignPrecision() )  {
+            precison = precision;
+        } else {
+            precison = null;
+        }
 
     }
 
@@ -128,7 +148,14 @@ public class Column {
     }
 
     public void setDefaultValue( String defaultValue ) {
-        this.defaultValue = defaultValue;
+        defaultValue = StringUtil.trim( defaultValue );
+        if( StringUtil.isEmpty(defaultValue) ) {
+            this.defaultValue = null;
+        } else if( Validator.isMatched( defaultValue, "'.+?'" ) ) {
+            this.defaultValue = defaultValue.replaceFirst( "'(.+?)'", "$1" );
+        } else {
+            this.defaultValue = defaultValue;
+        }
     }
 
     public boolean isDefinedByAnnotation() {

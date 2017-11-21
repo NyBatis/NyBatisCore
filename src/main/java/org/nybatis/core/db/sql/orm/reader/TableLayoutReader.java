@@ -12,7 +12,6 @@ import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -29,49 +28,108 @@ public class TableLayoutReader {
 
     public TableLayout getTableLayout( String environmentId, String tableName ) {
 
-        SqlSession sqlSession = SessionManager.openSession( environmentId );
+        SqlSession session = SessionManager.openSession( environmentId );
 
         Table table = new Table( tableName );
 
-        TableLayout layout = new TableLayout();
+        TableLayout layout = readColumns( session, table );
         layout.setEnvironmentId( environmentId );
         layout.setName( tableName );
 
-        sqlSession.useConnection( new ConnectionHandler() {
+        if( session.isDatabase(SQLITE) ) {
+            getSqliteIndices( session ).forEach( tableIndex -> layout.addIndex( tableIndex ) );
+        } else {
+            getIndices( session, table, layout.getPkName() ).forEach( tableIndex -> layout.addIndex( tableIndex ) );
+        }
+
+        if( session.isDatabase(ORACLE) ) {
+            for( TableIndex index : layout.getIndices() ) {
+                replaceIndexNameOnOracle( session, index );
+            }
+        }
+
+        return layout;
+
+    }
+
+    private Set<String> getPkColumnNames( SqlSession session, Table table ) {
+
+        Map<Integer,String> pkColumnNames = new TreeMap<>();
+
+        if( session.isDatabase(SQLITE) ) {
+            List<NMap> list = session.sql( String.format( "PRAGMA TABLE_INFO('%s')", table.name ) ).list().select();
+            for( NMap row : list ) {
+                int    seq  = row.getInt( "pk" );
+                String name = StringUtil.toCamel( row.getString("name") );
+                if( seq > 0 ) {
+                    pkColumnNames.put( seq, name );
+                }
+            }
+        } else {
+            session.useConnection( new ConnectionHandler() {
+                public void execute( Connection connection ) throws Throwable {
+                    DatabaseMetaData metaData = connection.getMetaData();
+                    int index = 1;
+                    for( NMap pk : toList( metaData.getPrimaryKeys( null, table.scheme, table.name ), false ) ) {
+                        pkColumnNames.put( index++, StringUtil.toCamel(pk.getString("columnName")) );
+                    }
+                }
+            });
+        }
+
+        return new LinkedHashSet<>( pkColumnNames.values() );
+
+    }
+
+    private TableLayout readColumns( SqlSession session, Table table ) {
+
+        TableLayout layout = new TableLayout();
+        Set<String> pkColumnNames = getPkColumnNames( session, table );
+
+        session.useConnection( new ConnectionHandler() {
             public void execute( Connection connection ) throws Throwable {
                 DatabaseMetaData metaData = connection.getMetaData();
-                readColumns( metaData );
-                // read non-unique index
-                readIndex( toList( metaData.getIndexInfo(null, table.scheme, table.name, false, false), false ) );
-                // read unique index
-                readIndex( toList( metaData.getIndexInfo(null, table.scheme, table.name, true,  false), false ) );
-            }
 
-            private void readColumns( DatabaseMetaData metaData ) throws SQLException {
-
-                Set<String> pkColumnNames = new HashSet<>();
-
-                for( NMap pk : toList( metaData.getPrimaryKeys(null, table.scheme, table.name), false ) ) {
-                    layout.setPkName( pk.getString( "pkName" ) );;
-                    pkColumnNames.add( StringUtil.toCamel(pk.getString("columnName")) );
+                for( NMap pk : toList( metaData.getPrimaryKeys( null, table.scheme, table.name ), false ) ) {
+                    layout.setPkName( pk.getString( "pkName" ) );
+                    break;
                 }
 
-                for( NMap column : toList( metaData.getColumns(null, table.scheme, table.name, null), false ) ) {
+                for( NMap column : toList( metaData.getColumns( null, table.scheme, table.name, null ), false ) ) {
 
                     Column c = new Column();
-                    c.setKey( StringUtil.toCamel(column.getString( "columnName") ) );
+                    c.setKey( StringUtil.toCamel( column.getString( "columnName" ) ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
                     c.setNotNull( column.getInt( "nullable" ) <= 0 );
                     c.setPk( pkColumnNames.contains( c.getKey() ) );
-                    c.setSize( column.getInt("columnSize") );
+                    c.setSize( column.getInt( "columnSize" ) );
+                    c.setDefaultValue( column.getString( "columnDef" ) );
                     int precision = column.getInt( "decimalDigits" );
-                    if( precision > 0  ) {
+                    if( precision > 0 ) {
                         c.setPrecison( precision );
                     }
 
                     layout.addColumn( c );
 
                 }
+            }
+        });
+
+        return layout;
+
+    }
+
+    private List<TableIndex> getIndices( SqlSession session, Table table, String pkName ) {
+
+        List<TableIndex> result = new ArrayList<>();
+
+        session.useConnection( new ConnectionHandler() {
+            public void execute( Connection connection ) throws Throwable {
+                DatabaseMetaData metaData = connection.getMetaData();
+                // read non-unique index
+                readIndex( toList( metaData.getIndexInfo(null, table.scheme, table.name, false, false), false ) );
+                // read unique index
+                readIndex( toList( metaData.getIndexInfo(null, table.scheme, table.name, true,  false), false ) );
             }
 
             private void readIndex( NList indexList ) throws SQLException {
@@ -86,15 +144,15 @@ public class TableLayoutReader {
                     String  ascOrDesc  = index.getString("ascOrDesc");
                     int     position   = index.getInt( "ordinalPosition" );
 
-                    if( StringUtil.isEmpty(indexName) || indexName.equals(layout.getPkName()) ) continue;
+                    if( StringUtil.isEmpty(indexName) || indexName.equals(pkName) ) continue;
 
-                    if( isDatabase(environmentId,H2) ){
+                    if( session.isDatabase(H2) ){
                         nonUnique = index.getBoolean( "nonUnique" );
                     } else {
                         nonUnique = ( index.getInt( "nonUnique" ) == 1 );
                     }
 
-                    if( isDatabase(environmentId,H2) ){
+                    if( session.isDatabase(H2) ){
                         if( nonUnique == false && indexName.startsWith( "PRIMARY_KEY_" ) ) continue;
                     }
 
@@ -116,21 +174,16 @@ public class TableLayoutReader {
                 for( String indexName : indices.keySet() ) {
                     Map<Integer, String> columnInfo = indices.get( indexName );
                     TableIndex index = new TableIndex( indexName, new LinkedHashSet<>( columnInfo.values() ) );
-                    layout.addIndex( index );
+                    result.add( index );
                 }
             }
 
         });
 
-        if( isDatabase(environmentId, ORACLE) ) {
-            for( TableIndex index : layout.getIndices() ) {
-                replaceIndexNameOnOracle( sqlSession, index );
-            }
-        }
-
-        return layout;
+        return result;
 
     }
+
 
     private void replaceIndexNameOnOracle( SqlSession sqlSession, TableIndex index ) {
         if( ! hasSysCreatedIndexName(index) ) return;
@@ -183,10 +236,31 @@ public class TableLayoutReader {
 
     }
 
+    private List<TableIndex> getSqliteIndices( SqlSession sqlSession ) {
 
-    private boolean isDatabase( String environmentId, DatabaseName... dbName ) {
-        return DatasourceManager.isDatabase( environmentId, dbName );
+        String sql =
+            "SELECT  name as index_key, sql as index_columns\n" +
+            "FROM    SQLITE_MASTER\n" +
+            "WHERE   type = 'index'\n" +
+            "AND     sql IS NOT NULL"
+        ;
+
+        List<TableIndex> indices = new ArrayList<>();
+
+        for( NMap row : sqlSession.sql(sql).list().select() ) {
+            String indexName  = row.getString( "indexKey" );
+            String columnInfo = row.getString( "indexColumns" ).replaceFirst( "^.*\\((.+?)\\)$","$1" );
+            Set<String> indexColumns = new LinkedHashSet<>();
+            for( String columnName : StringUtil.split( columnInfo,",") ) {
+                indexColumns.add( StringUtil.toCamel(columnName.toLowerCase()).replaceFirst( " asc$", "" ) );
+            }
+            indices.add( new TableIndex( indexName, indexColumns ) );
+        }
+
+        return indices;
+
     }
+
 
     private class Table {
 
@@ -196,10 +270,10 @@ public class TableLayoutReader {
         public Table( String tableName ) {
             if( tableName.contains(".") ) {
                 int splitIndex = tableName.indexOf( "." );
-                scheme = tableName.substring( 0, splitIndex );
-                name   = tableName.substring( splitIndex + 1 );
+                scheme = tableName.substring( 0, splitIndex ).toUpperCase();
+                name   = tableName.substring( splitIndex + 1 ).toUpperCase();
             } else {
-                name = tableName;
+                name = tableName.toUpperCase();
             }
         }
     }
