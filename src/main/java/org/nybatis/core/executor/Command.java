@@ -34,6 +34,10 @@ public class Command {
 		this.command.add( command );
 	}
 
+	public void addPath( String path ) {
+		this.command.add( String.format("\"%s\"", path) );
+	}
+
 	public String toString() {
 		return StringUtil.join( command, " " );
 	}

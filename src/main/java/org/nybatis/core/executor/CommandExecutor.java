@@ -88,7 +88,7 @@ public class CommandExecutor {
 
 		if( ! command.hasCommand() ) throw new CommandLineException( "there is no command to execute" );
 
-		NLogger.trace( "Command Line : {}", command );
+		NLogger.debug( "Command Line : {}", command );
 
 		try {
 
