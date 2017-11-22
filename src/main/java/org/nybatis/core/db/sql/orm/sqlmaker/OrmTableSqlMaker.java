@@ -1,8 +1,7 @@
 package org.nybatis.core.db.sql.orm.sqlmaker;
 
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.sql.mapper.SqlType;
@@ -12,6 +11,7 @@ import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 
 import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
@@ -40,7 +40,8 @@ public class OrmTableSqlMaker {
 
     public void refreshTableLayout( Class klass ) {
         TableLayoutRepository.clearLayout( environmentId, klass );
-        TableLayoutRepository.getLayout( environmentId, klass );
+        String tableName = EntityLayoutReader.getTableName( klass );
+        new OrmSqlMaker().readTable( environmentId, tableName );
     }
 
     public boolean exists( Class klass ) {
@@ -57,7 +58,7 @@ public class OrmTableSqlMaker {
     }
 
     public TableLayout getEntityLayout( Class klass ) {
-        EntityLayoutReader reader = new EntityLayoutReader();
+        EntityLayoutReader reader = new EntityLayoutReader( environmentId );
         return reader.getTableLayout( klass );
     }
 
@@ -89,12 +90,20 @@ public class OrmTableSqlMaker {
     private String toColumnCreationString( TableLayout table ) {
         List<String> columns = new ArrayList<>();
         for( Column column : table.getColumns() ) {
-            columns.add( String.format( "\t%s %s", column.getName(), toColumnPropertiesString(column) ) );
+            columns.add( String.format( "\t%s %s", getColumnName(column), toColumnPropertiesString(column) ) );
         }
         if( isDatabase(SQLITE) ) {
-            columns.add( String.format("\tPRIMARY KEY( %s )", StringUtil.join(table.getPkColumnNamesUncameled(),", ")) );
+            columns.add( String.format("\tPRIMARY KEY( %s )", serializeColumnNames(table.getPkColumnNames())) );
         }
         return StringUtil.join( columns, ",\n" );
+    }
+
+    private String getColumnName( Column column ) {
+        if( isDatabase( MY_SQL, MARIA ) ) {
+            return column.getQuotedName();
+        } else {
+            return column.getName();
+        }
     }
 
     private String toColumnPropertiesString( Column column ) {
@@ -116,7 +125,7 @@ public class OrmTableSqlMaker {
                 } else {
                     sb.append( SqlType.find(dataType).name );
                 }
-                sb.append( "(" ).append( column.getSize() ).append( ")" );
+                sb.append( toColumnSize(column) );
                 break;
             case Types.DATE :
                 if( isDatabase(H2) ) {
@@ -130,20 +139,38 @@ public class OrmTableSqlMaker {
             case Types.NUMERIC :
             case Types.DECIMAL :
             case Types.DOUBLE :
-                sb.append( "NUMBER" );
-                if( column.getSize() != null ) {
-                    sb.append( "(" ).append( column.getSize() );
-                    if( column.getPrecison() != null ) {
-                        sb.append( "," ).append( column.getPrecison() );
-                    }
-                    sb.append( ")" );
+                if( isDatabase(MY_SQL, MARIA) ) {
+                    sb.append( SqlType.find(dataType).name );
+                } else {
+                    sb.append( "NUMBER" );
+                }
+                sb.append( toColumnSize(column) );
+                break;
+            case Types.VARBINARY :
+            case Types.LONGVARBINARY :
+                if( isDatabase(MY_SQL, MARIA) ) {
+                    sb.append( "TEXT" );
                 }
                 break;
             default :
                 sb.append( SqlType.find(dataType).name );
+                sb.append( toColumnSize(column) );
         }
+
         return sb.toString();
 
+    }
+
+    private String toColumnSize( Column column ) {
+        StringBuilder sb = new StringBuilder();
+        if( column.getSize() != null ) {
+            sb.append( "(" ).append( column.getSize() );
+            if( column.getPrecison() != null ) {
+                sb.append( "," ).append( column.getPrecison() );
+            }
+            sb.append( ")" );
+        }
+        return sb.toString();
     }
 
     private String toNotNullString( Column column ) {
@@ -167,7 +194,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlDropColumn( Column column, TableLayout table ) {
-        return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), column.getName() );
+        return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), getColumnName(column) );
     }
 
     public String sqlModifyColumn( Column column, boolean type, boolean defaultValue, boolean notNull, TableLayout table ) {
@@ -180,11 +207,13 @@ public class OrmTableSqlMaker {
         if( sb.length() == 0 ) return null;
 
         if( isDatabase( ORACLE ) ) {
-            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), column.getName(), sb );
+            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), getColumnName(column), sb );
         } else if( isDatabase( H2 ) ) {
-            return String.format("ALTER TABLE %s ALTER COLUMN %s %s", table.getName(), column.getName(), sb );
+            return String.format("ALTER TABLE %s ALTER COLUMN %s %s", table.getName(), getColumnName(column), sb );
+        } else if( isDatabase(MY_SQL,MARIA) ) {
+            return String.format("ALTER TABLE %s CHANGE %s %s %s", table.getName(), getColumnName(column), getColumnName(column), sb );
         } else {
-            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), column.getName(), sb );
+            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), getColumnName(column), sb );
         }
     }
 
@@ -193,7 +222,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlAddColumn( Column column, TableLayout table ) {
-        return String.format("ALTER TABLE %s ADD( %s %s )", table.getName(), column.getName(), toColumnPropertiesString( column ) );
+        return String.format("ALTER TABLE %s ADD( %s %s )", table.getName(), getColumnName(column), toColumnPropertiesString( column ) );
     }
 
     public String sqlDropTable( TableLayout tableLayout ) {
@@ -202,7 +231,11 @@ public class OrmTableSqlMaker {
 
     public String sqlDropPrimaryKey( TableLayout tableLayout ) {
         if( tableLayout == null || ! tableLayout.hasPk() ) return null;
-        return String.format( "ALTER TABLE %s DROP CONSTRAINT %s", tableLayout.getName(), tableLayout.getPkName() );
+        if( isDatabase(MY_SQL, MARIA) ) {
+            return String.format( "ALTER TABLE %s DROP PRIMARY KEY", tableLayout.getName() );
+        } else {
+            return String.format( "ALTER TABLE %s DROP CONSTRAINT %s", tableLayout.getName(), tableLayout.getPkName() );
+        }
     }
 
     public String sqlAddPrimaryKey( TableLayout tableLayout ) {
@@ -212,22 +245,46 @@ public class OrmTableSqlMaker {
         }
         if( isDatabase(ORACLE,H2) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
-                tableLayout.getName(), pkName, StringUtil.join( tableLayout.getPkColumnNamesUncameled(), "," ) );
+                tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
         } else if( isDatabase(SQLITE) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s KEY (%s)",
-                tableLayout.getName(), pkName, StringUtil.join( tableLayout.getPkColumnNamesUncameled(), "," ) );
+                tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
+        } else if( isDatabase(MY_SQL, MARIA) ) {
+            return String.format( "ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (%s)",
+                tableLayout.getName(), serializeColumnNames( tableLayout.getPkColumnNames() ) );
         } else {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
-                tableLayout.getName(), pkName, StringUtil.join(tableLayout.getPkColumnNamesUncameled(),",") );
+                tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
         }
     }
 
+    private String serializeColumnNames( Collection<String> names ) {
+        boolean needsToPatch = isDatabase( MY_SQL, MARIA, SQLITE );
+        Set<String> columnNames = new LinkedHashSet<>();
+        for( String name : names ) {
+            String[] words = name.split( " " );
+            String key  = words[ 0 ];
+            String desc = words.length > 1 ? " "+ words[1] : "";
+            if( needsToPatch ) {
+                key = "`" + StringUtil.toUncamel( key ) + "`";
+            } else {
+                key = StringUtil.toUncamel( key );
+            }
+            columnNames.add( key + desc );
+        }
+        return StringUtil.join( columnNames, "," );
+    }
+
     public String sqlDropIndex( TableIndex index, TableLayout table ) {
-        return String.format( "DROP INDEX %s", index.getName() );
+        if( isDatabase(MY_SQL,MARIA) ) {
+            return String.format( "DROP INDEX %s ON %s", index.getName(), table.getName() );
+        } else {
+            return String.format( "DROP INDEX %s", index.getName() );
+        }
     }
 
     public String sqlCreateIndex( TableIndex index, TableLayout table ) {
-        return String.format( "CREATE INDEX %s ON %s(%s)", index.getName(), table.getName(), StringUtil.join(index.getUncameledColumnNames(),",") );
+        return String.format( "CREATE INDEX %s ON %s(%s)", index.getName(), table.getName(), serializeColumnNames(index.getColumnNames()) );
     }
 
     private boolean isNumeric( int dataType ) {
@@ -242,15 +299,6 @@ public class OrmTableSqlMaker {
             case java.sql.Types.DOUBLE :
             case java.sql.Types.NUMERIC :
             case java.sql.Types.DECIMAL :
-                return true;
-        }
-        return false;
-    }
-
-    private boolean isString( int dataType ) {
-        switch( dataType ) {
-            case java.sql.Types.VARCHAR :
-            case java.sql.Types.CHAR :
                 return true;
         }
         return false;

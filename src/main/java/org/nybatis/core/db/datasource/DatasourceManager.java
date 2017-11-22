@@ -1,5 +1,10 @@
 package org.nybatis.core.db.datasource;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.sql.DataSource;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
@@ -9,12 +14,6 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
-
-import javax.sql.DataSource;
-import java.util.Hashtable;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 public class DatasourceManager {
 

@@ -29,13 +29,9 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     public SessionExecutor sqlId( String id, Object parameter ) {
-
         SqlNode sqlNode = SqlRepository.get( id );
-
         Assertion.isNotNull( sqlNode, new SqlConfigurationException( "There is no sql id({}) in repository.", id ) );
-
         sqlBean = new SqlBean( sqlNode, parameter );
-
         return this;
     }
 

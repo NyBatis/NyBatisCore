@@ -7,7 +7,9 @@ import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlException;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
@@ -172,7 +174,7 @@ public class OrmSessionProperties implements Cloneable {
     }
 
     public boolean isPkNotNull() {
-        TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
+        TableLayout layout = getLayout();
         for( Column column : layout.getPkColumns() ) {
             Object val = entityParameter.get( Const.db.ORM_PARAMETER_ENTITY + column.getKey() );
             if( val == null ) return false;
@@ -180,8 +182,16 @@ public class OrmSessionProperties implements Cloneable {
         return true;
     }
 
-    public String getPkValues() {
+    private TableLayout getLayout() {
         TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
+        if( layout == null ) {
+            throw new DatabaseConfigurationException( "There is no table(name:{}) in environment(id:{})", tableName, environmentId );
+        }
+        return layout;
+    }
+
+    public String getPkValues() {
+        TableLayout layout = getLayout();
         NMap params = new NMap();
         for( Column column : layout.getPkColumns() ) {
             params.put( column.getKey(), entityParameter.get( Const.db.ORM_PARAMETER_ENTITY + column.getKey() ) );

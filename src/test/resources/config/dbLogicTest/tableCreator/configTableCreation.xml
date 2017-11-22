@@ -26,7 +26,7 @@
     <sqlPath>
       <path>./mapper</path>
     </sqlPath>
-    <ddl enable="true" recreation="true"/>
+    <ddl enable="true" recreation="false"/>
   </environment>
 
   <environment id="sqlite">
@@ -45,9 +45,9 @@
   <environment id="maria">
     <datasourceJdbc poolMin="1" poolMax="1" ping="true" pingCycle="600" >
       <driver>org.mariadb.jdbc.Driver</driver>
-      <url>jdbc:mariadb://localhost:3306</url>
-      <username>root</username>
-      <password>root</password>
+      <url>jdbc:mariadb://localhost:3306/test</url>
+      <username>sys</username>
+      <password>sys</password>
     </datasourceJdbc>
     <sqlPath>
       <path>./mapper</path>

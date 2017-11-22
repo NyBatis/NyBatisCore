@@ -45,6 +45,11 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
         return sqlSession.isDatabase( dbName );
     }
 
+    @Override
+    public boolean isNotDatabase( DatabaseName... dbName ) {
+        return ! isDatabase( dbName );
+    }
+
     private void createOrmSql() {
         new OrmSqlMaker().readTable( properties.getEnvironmentId(), properties.getTableName() );
     }
