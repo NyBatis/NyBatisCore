@@ -139,4 +139,10 @@ public class DatasourceManager {
 		return false;
 	}
 
+	public static DatabaseName getDatabaseName( String environmentId ) {
+		DatabaseAttribute attributes = getAttributes( environmentId );
+		if( attributes == null ) return DatabaseName.NULL;
+		return DatabaseName.get( attributes.getDatabase() );
+	}
+
 }

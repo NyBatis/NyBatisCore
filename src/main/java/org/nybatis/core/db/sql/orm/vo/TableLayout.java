@@ -15,8 +15,8 @@ public class TableLayout {
     private String                 environmentId;
     private String                 name;
     private String                 pkName;
-    private Map<String,Column>     pkColumns      = new LinkedHashMap<>();
-    private Map<String,Column>     columns        = new LinkedHashMap<>();
+    private Map<String,TableColumn>     pkColumns      = new LinkedHashMap<>();
+    private Map<String,TableColumn>     columns        = new LinkedHashMap<>();
     private Map<String,TableIndex> indices        = new LinkedHashMap<>();
 
     public String getName() {
@@ -47,7 +47,7 @@ public class TableLayout {
         this.environmentId = environmentId;
     }
 
-    public List<Column> getPkColumns() {
+    public List<TableColumn> getPkColumns() {
         return new ArrayList<>( pkColumns.values() );
     }
 
@@ -55,11 +55,11 @@ public class TableLayout {
         return pkColumns.keySet();
     }
 
-    public List<Column> getColumns() {
+    public List<TableColumn> getColumns() {
         return new ArrayList<>( columns.values() );
     }
 
-    public Column getColumn( String name ) {
+    public TableColumn getColumn( String name ) {
         if( StringUtil.isNotEmpty(name) ) {
             name = name.replaceFirst( " .*$", "" );
             return columns.get( name );
@@ -73,7 +73,7 @@ public class TableLayout {
         return columns.containsKey( name );
     }
 
-    public void addColumn( Column column ) {
+    public void addColumn( TableColumn column ) {
         if( column == null ) return;
         columns.put( column.getKey(), column );
         if( column.isPk() ) {
@@ -115,16 +115,15 @@ public class TableLayout {
         if( another == null ) return false;
         if( ! StringUtil.nvl( name ).equals( StringUtil.nvl(another.name ) ) ) return false;
         if( ! isEqualColumns( columns, another.columns ) ) return false;
-        if( ! isEqualIncies( indices, another.indices ) ) return false;
-        return true;
+        return isEqualIncies( indices, another.indices );
     }
 
-    private boolean isEqualColumns( Map<String,Column> map1, Map<String,Column> map2 ) {
+    private boolean isEqualColumns( Map<String,TableColumn> map1, Map<String,TableColumn> map2 ) {
         if( map1.size() != map2.size() ) return false;
         for( String key : map1.keySet() ) {
             if( ! map2.containsKey( key ) ) return false;
-            Column c1 = map1.get( key );
-            Column c2 = map2.get( key );
+            TableColumn c1 = map1.get( key );
+            TableColumn c2 = map2.get( key );
             if( ! c1.isEqual(c2) ) return false;
         }
         return true;
@@ -141,10 +140,10 @@ public class TableLayout {
         return true;
     }
 
-    public List<Column> getColumnsToAdd( TableLayout another ) {
+    public List<TableColumn> getColumnsToAdd( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.columns.values() );
-        List<Column> columns = new ArrayList<>();
+        List<TableColumn> columns = new ArrayList<>();
         for( String key : this.columns.keySet() ) {
             if( ! another.columns.containsKey(key) ) {
                 columns.add( this.columns.get(key) );
@@ -153,10 +152,10 @@ public class TableLayout {
         return columns;
     }
 
-    public List<Column> getColumnsToDrop( TableLayout another ) {
+    public List<TableColumn> getColumnsToDrop( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.columns.values() );
-        List<Column> columns = new ArrayList<>();
+        List<TableColumn> columns = new ArrayList<>();
         for( String key : another.columns.keySet() ) {
             if( ! another.columns.containsKey(key) ) {
                 columns.add( this.columns.get(key) );
@@ -165,10 +164,10 @@ public class TableLayout {
         return columns;
     }
 
-    public List<Column> getColumnsToModify( TableLayout another ) {
+    public List<TableColumn> getColumnsToModify( TableLayout another ) {
         if( another == null )
             return new ArrayList<>( this.columns.values() );
-        List<Column> columns = new ArrayList<>();
+        List<TableColumn> columns = new ArrayList<>();
         for( String key : this.columns.keySet() ) {
             if( another.columns.containsKey(key) ) {
                 // do not check PK dirrefence

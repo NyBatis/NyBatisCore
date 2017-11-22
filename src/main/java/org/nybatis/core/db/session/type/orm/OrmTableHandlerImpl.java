@@ -7,7 +7,7 @@ import org.nybatis.core.db.etc.SqlLogHider;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
-import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
@@ -184,24 +184,24 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
     }
 
-    private void addColumns( List<Column> columns ) {
-        for( Column column : columns ) {
+    private void addColumns( List<TableColumn> columns ) {
+        for( TableColumn column : columns ) {
             String sqlDefine = tableSqlMaker.sqlAddColumn( column, entityLayout );
             if( StringUtil.isNotEmpty(sqlDefine) ) sqlSession.sql( sqlDefine ).execute();
         }
     }
 
-    private void modifyColumns( List<Column> columns ) {
-        for( Column column : columns ) {
+    private void modifyColumns( List<TableColumn> columns ) {
+        for( TableColumn column : columns ) {
             sqlSession.sql( tableSqlMaker.sqlModifyColumn(column, entityLayout) ).execute();
         }
     }
 
-    private void modifyColumns( List<Column> columns, TableLayout previousTable ) {
+    private void modifyColumns( List<TableColumn> columns, TableLayout previousTable ) {
 
-        for( Column column : columns ) {
+        for( TableColumn column : columns ) {
 
-            Column prevColumn = previousTable.getColumn( column.getKey() );
+            TableColumn prevColumn = previousTable.getColumn( column.getKey() );
 
             String sqlTypeCurr    = tableSqlMaker.sqlModifyColumn( column,     true, false, false, entityLayout );
             String sqlTypePrev    = tableSqlMaker.sqlModifyColumn( prevColumn, true, false, false, entityLayout );
@@ -219,8 +219,8 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
 
-    private void dropColumns( List<Column> columns ) {
-        for( Column column : columns ) {
+    private void dropColumns( List<TableColumn> columns ) {
+        for( TableColumn column : columns ) {
             sqlSession.sql( tableSqlMaker.sqlDropColumn(column, entityLayout) ).execute();
         }
     }

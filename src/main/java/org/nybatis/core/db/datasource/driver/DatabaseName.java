@@ -9,6 +9,7 @@ import java.util.Map;
  */
 public enum DatabaseName {
 
+    NULL(    "",           ""                            ),
     ORACLE(  "oracle",     "oracle\\.jdbc\\.driver"      ),
     MY_SQL(  "mysql",      "com\\.mysql\\.jdbc"          ),
     MARIA(   "maria",      "org\\.mariadb\\.jdbc"        ),

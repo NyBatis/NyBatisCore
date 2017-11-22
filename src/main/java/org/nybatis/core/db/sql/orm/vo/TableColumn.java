@@ -1,6 +1,8 @@
 package org.nybatis.core.db.sql.orm.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.db.sql.orm.indicator.klass.ClassSqltypeIndicator;
 import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
@@ -11,7 +13,7 @@ import org.nybatis.core.validation.Validator;
  * @author nayasis@gmail.com
  * @since 2015-09-08
  */
-public class Column {
+public class TableColumn {
 
     private String  key;
     private Integer dataType;
@@ -23,7 +25,12 @@ public class Column {
     private String  defaultValue;
     private boolean definedByAnnotation = false;
 
-    public Column() {}
+    @JsonIgnore
+    private TableLayout table;
+
+    public TableColumn( TableLayout tableLayout ) {
+        this.table = tableLayout;
+    }
 
     public String getKey() {
         return key;
@@ -37,8 +44,9 @@ public class Column {
         return StringUtil.toUncamel(key);
     }
 
+    @JsonIgnore
     public String getQuotedName() {
-        return String.format("`%s`", getName() );
+        return String.format( "`%s`", getName() );
     }
 
     /**
@@ -58,10 +66,9 @@ public class Column {
         return dataTypeName;
     }
 
-    public void setDataType( Class klass, String environmentId ) {
-        SqlType sqlType = findColumnType( environmentId, klass );
-        setDataType( sqlType.code, null );
-        setSize( sqlType.length );
+    public void setDataType( Class klass ) {
+        setDataType( findColumnType(klass).code, null );
+        setSize( findColumnLength(klass) );
     }
 
     public void setDataType( int type ) {
@@ -178,11 +185,21 @@ public class Column {
         this.definedByAnnotation = definedByAnnotation;
     }
 
-    public boolean isEqual( Column column ) {
+    @JsonIgnore
+    public TableLayout getTable() {
+        return table;
+    }
+
+    @JsonIgnore
+    public void setTable( TableLayout table ) {
+        this.table = table;
+    }
+
+    public boolean isEqual( TableColumn column ) {
         return isEqual( column, true );
     }
 
-    public boolean isEqual( Column column, boolean checkPkDifference ) {
+    public boolean isEqual( TableColumn column, boolean checkPkDifference ) {
         if( column == null ) return false;
         if( StringUtil.isNotEqual(key, column.key) ) return false;
         if( StringUtil.isNotEqual(defaultValue, column.defaultValue) ) return false;
@@ -190,8 +207,7 @@ public class Column {
         if( notNull  != column.notNull  ) return false;
         if( checkPkDifference && pk != column.pk ) return false;
         if( size != null && column.size != null && ! size.equals(column.size) ) return false;
-        if( precison != null && column.precison != null && ! precison.equals(column.precison) ) return false;
-        return true;
+        return !( precison != null && column.precison != null && !precison.equals( column.precison ) );
     }
 
     private boolean canAssignLength() {
@@ -234,8 +250,12 @@ public class Column {
      * @param klass	matched class
      * @return SqlType
      */
-    private SqlType findColumnType( String environmentId, Class<?> klass ) {
-        return SqlType.findColumnType( environmentId, klass );
+    private SqlType findColumnType( Class<?> klass ) {
+        return ClassSqltypeIndicator.$.getSqlType( klass, table.getEnvironmentId() );
+    }
+
+    private Integer findColumnLength( Class klass ) {
+        return ClassSqltypeIndicator.$.getLength( klass, table.getEnvironmentId() );
     }
 
 }

@@ -4,8 +4,7 @@ import java.util.Hashtable;
 import java.util.Map;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.constant.NullValue;
-import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
@@ -17,15 +16,10 @@ import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.MY_SQL;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
 
 /**
  * Sql maker to be used in ORM entity.
@@ -110,7 +104,7 @@ public class OrmSqlMaker {
 
         sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT_PK, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
-        for( Column column : layout.getPkColumns() ) {
+        for( TableColumn column : layout.getPkColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = toColumnName( column );
@@ -136,7 +130,7 @@ public class OrmSqlMaker {
 
         sb.append( String.format( "SELECT /*+ %s.%s.%s */ * FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_SELECT, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
-        for( Column column : layout.getColumns() ) {
+        for( TableColumn column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = toColumnName( column );
@@ -169,7 +163,7 @@ public class OrmSqlMaker {
         sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE_PK, layout.getEnvironmentId(), layout.getName(), layout.getName()) );
         sb.append( "<group delimeter=\",\">\n" );
 
-        for( Column column : layout.getColumns() ) {
+        for( TableColumn column : layout.getColumns() ) {
 
             if( column.isPk() ) continue;
 
@@ -193,7 +187,7 @@ public class OrmSqlMaker {
         sb.append( "</group>\n" );
         sb.append( "WHERE 1 = 1\n" );
 
-        for( Column column : layout.getPkColumns() ) {
+        for( TableColumn column : layout.getPkColumns() ) {
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = column.getName();
             sb.append( String.format(
@@ -215,7 +209,7 @@ public class OrmSqlMaker {
 
         sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
-        for( Column column : layout.getColumns() ) {
+        for( TableColumn column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = toColumnName( column );
@@ -246,7 +240,7 @@ public class OrmSqlMaker {
 
         sb.append( String.format( "DELETE /*+ %s.%s.%s */ FROM %s WHERE 1=1\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_DELETE, layout.getEnvironmentId(), layout.getName(), layout.getName() ) );
 
-        for( Column column : layout.getPkColumns() ) {
+        for( TableColumn column : layout.getPkColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = toColumnName( column );
@@ -275,7 +269,7 @@ public class OrmSqlMaker {
         structureDefine.append( "<group delimeter=\",\">\n" );
         structureValues.append( "<group delimeter=\",\">\n" );
 
-        for( Column column : layout.getColumns() ) {
+        for( TableColumn column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
             String columnName = toColumnName( column );
@@ -312,7 +306,7 @@ public class OrmSqlMaker {
 
     }
 
-    private String toColumnName( Column column ) {
+    private String toColumnName( TableColumn column ) {
         StringBuilder sb = new StringBuilder();
         sb.append( "<if test=\"#{nybatis.database} =='mysql' || #{nybatis.database} =='maria' || #{nybatis.database} =='sqlite'\">" );
         sb.append( column.getQuotedName() );

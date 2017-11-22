@@ -8,7 +8,7 @@ import org.nybatis.core.db.etc.SqlLogHider;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
-import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.model.NList;
@@ -90,6 +90,7 @@ public class TableLayoutReader {
     private TableLayout readColumns( SqlSession session, Table table ) {
 
         TableLayout layout = new TableLayout();
+        layout.setEnvironmentId( session.getEnvironmentId() );
         Set<String> pkColumnNames = getPkColumnNames( session, table );
 
         session.useConnection( new ConnectionHandler() {
@@ -103,7 +104,7 @@ public class TableLayoutReader {
 
                 for( NMap column : toList( metaData.getColumns( null, table.scheme, table.name, null ), false ) ) {
 
-                    Column c = new Column();
+                    TableColumn c = new TableColumn( layout );
                     c.setKey( StringUtil.toCamel( column.getString( "columnName" ) ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
                     c.setNotNull( column.getInt( "nullable" ) <= 0 );
