@@ -1,7 +1,10 @@
 package org.nybatis.core.db.sql.orm.sqlmaker;
 
+import java.util.Hashtable;
+import java.util.Map;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.constant.NullValue;
+import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.reader.SqlReader;
@@ -20,6 +23,10 @@ import org.nybatis.core.validation.Assertion;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MY_SQL;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
+
 /**
  * Sql maker to be used in ORM entity.
  *
@@ -32,19 +39,20 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class OrmSqlMaker {
 
-    // TODO : recosider lock mechanism (it does not work!)
-    private Lock readLocker = new ReentrantLock();
+    private static Map<String,Lock> locks = new Hashtable<>();
 
     public void readTable( String environmentId, String tableName ) {
 
         Assertion.isNotNull( environmentId, new SqlConfigurationException( "environmentId is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
         Assertion.isNotNull( tableName, new SqlConfigurationException( "tableName is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
 
-        readLocker.lock();
+        if( TableLayoutRepository.isExist(environmentId, tableName) ) return;
+
+        Lock lock = getLock( environmentId, tableName );
 
         try {
 
-            if( TableLayoutRepository.isExist(environmentId, tableName) ) return;
+            lock.lock();
 
             TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
             if( layout == null ) {
@@ -62,10 +70,19 @@ public class OrmSqlMaker {
             readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )   );
 
         } finally {
-            readLocker.unlock();
+            lock.unlock();
         }
 
     }
+
+    private synchronized  Lock getLock( String environmentId, String tableName ) {
+        String key = String.format( ".%s::%s", environmentId, tableName );
+        if( ! locks.containsKey(key) ) {
+            locks.putIfAbsent( key, new ReentrantLock() );
+        }
+        return locks.get( key );
+    }
+
 
     private void readTable( String environmentId, String mainId, String subId, String xmlSql ) {
 
@@ -96,7 +113,7 @@ public class OrmSqlMaker {
         for( Column column : layout.getPkColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             sb.append( String.format(
                     getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
@@ -122,7 +139,7 @@ public class OrmSqlMaker {
         for( Column column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             sb.append( String.format(
                     getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
@@ -157,7 +174,7 @@ public class OrmSqlMaker {
             if( column.isPk() ) continue;
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             sb.append(String.format(
                 getTestNode("#{%s} != null && #{%s} != '%s'", "  %s = #{%s%s}" ),
@@ -201,7 +218,7 @@ public class OrmSqlMaker {
         for( Column column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             sb.append( String.format(
                     getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
@@ -232,7 +249,7 @@ public class OrmSqlMaker {
         for( Column column : layout.getPkColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             sb.append( String.format(
                     getTestNode("#{%s} != null && #{%s} !='%s'","AND %s = #{%s%s}"),
@@ -261,7 +278,7 @@ public class OrmSqlMaker {
         for( Column column : layout.getColumns() ) {
 
             String paramName  = getOverrideKey( column.getKey() );
-            String columnName = column.getName();
+            String columnName = toColumnName( column );
 
             structureDefine.append( String.format(
                     getTestNode( "#{%s} != null || #{%s} == '%s'", " %s" ),
@@ -289,11 +306,20 @@ public class OrmSqlMaker {
                 Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_INSERT_PK, layout.getEnvironmentId(), layout.getName(), layout.getName(),
                 structureDefine,
                 structureValues
-        ) );
-
+        ));
 
         return sb.toString();
 
+    }
+
+    private String toColumnName( Column column ) {
+        StringBuilder sb = new StringBuilder();
+        sb.append( "<if test=\"#{nybatis.database} =='mysql' || #{nybatis.database} =='maria' || #{nybatis.database} =='sqlite'\">" );
+        sb.append( column.getQuotedName() );
+        sb.append( "</if><else>" );
+        sb.append( column.getName() );
+        sb.append( "</else>" );
+        return sb.toString();
     }
 
     private String getOverrideKey( String camelKey ) {

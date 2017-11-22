@@ -23,6 +23,8 @@ public class Column {
     private String  defaultValue;
     private boolean definedByAnnotation = false;
 
+    public Column() {}
+
     public String getKey() {
         return key;
     }
@@ -32,7 +34,11 @@ public class Column {
     }
 
     public String getName() {
-        return StringUtil.toUncamel( key );
+        return StringUtil.toUncamel(key);
+    }
+
+    public String getQuotedName() {
+        return String.format("`%s`", getName() );
     }
 
     /**
@@ -50,6 +56,12 @@ public class Column {
 
     public String getDataTypeName() {
         return dataTypeName;
+    }
+
+    public void setDataType( Class klass, String environmentId ) {
+        SqlType sqlType = findColumnType( environmentId, klass );
+        setDataType( sqlType.code, null );
+        setSize( sqlType.length );
     }
 
     public void setDataType( int type ) {
@@ -214,6 +226,16 @@ public class Column {
                 return true;
         }
         return false;
+    }
+
+    /**
+     * get SqlType for column creation
+     *
+     * @param klass	matched class
+     * @return SqlType
+     */
+    private SqlType findColumnType( String environmentId, Class<?> klass ) {
+        return SqlType.findColumnType( environmentId, klass );
     }
 
 }

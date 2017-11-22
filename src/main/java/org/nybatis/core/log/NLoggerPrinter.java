@@ -5,17 +5,14 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import org.nybatis.core.exception.unchecked.JsonIOException;
+import java.util.Arrays;
+import java.util.List;
 import org.nybatis.core.log.converter.StackTracer;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Common Logger Printer
@@ -40,6 +37,10 @@ public class NLoggerPrinter {
 
 	public NLoggerPrinter( String loggerName ) {
 		logger = (Logger) LoggerFactory.getLogger( loggerName );
+	}
+
+	public Level getLevel() {
+		return logger.getLevel();
 	}
 
 	public void setLevel( Level newLevel ) {

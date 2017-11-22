@@ -3,6 +3,7 @@ package org.nybatis.core.db.orm;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.orm.entity.Employee;
 import org.nybatis.core.db.orm.entity.EmployeeModification;
 import org.nybatis.core.db.session.SessionManager;
@@ -17,6 +18,8 @@ import org.nybatis.core.reflection.Reflector;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
 
 /**
  * @author nayasis@gmail.com
@@ -49,31 +52,29 @@ public class OrmTableCreationTest {
         String json = Reflector.toJson( employee );
         System.out.println( json );
 
-        TableLayout tableLayout = getSampleTableLayout();
+        TableLayout tableLayout = getSampleTableLayout("h2");
         System.out.println( tableLayout );
 
     }
 
-    private TableLayout getSampleTableLayout() {
-        EntityLayoutReader reader = new EntityLayoutReader();
+    private TableLayout getSampleTableLayout( String envirionmentId ) {
+        EntityLayoutReader reader = new EntityLayoutReader(envirionmentId);
         return reader.getTableLayout( EmployeeModification.class );
     }
 
     @Test
     public void readPreviousTableLayout() {
 
-        TableLayout tableLayout = getSampleTableLayout();
-        System.out.println( tableLayout );
-
 //        printTableLayout( "oracle", "TB_DEV_SQL" );
-//        printTableLayout( "oracle", "TB_TABLE" );
+        printTableLayout( "oracle", "TB_TABLE" );
 //        printTableLayout( "h2",     "TB_TABLE" );
-        printTableLayout( "sqlite", "TB_TABLE" );
+//        printTableLayout( "sqlite", "TB_TABLE" );
+//        printTableLayout( "maria", "TB_TABLE" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {
 
-        TableLayout entityLayout = getSampleTableLayout();
+        TableLayout entityLayout = getSampleTableLayout( envirionmentId );
 
         TableLayoutReader reader = new TableLayoutReader();
         TableLayout tableLayout = reader.getTableLayout( envirionmentId, tableName );
@@ -87,7 +88,7 @@ public class OrmTableCreationTest {
     @Test
     public void creatSql() {
 
-        TableLayout layout = getSampleTableLayout();
+        TableLayout layout = getSampleTableLayout( envirionmentId );
 
         OrmTableSqlMaker sqlMaker = new OrmTableSqlMaker( envirionmentId );
         System.out.println( sqlMaker.sqlCreateTable(layout) );
@@ -134,8 +135,9 @@ public class OrmTableCreationTest {
         anotherSession.setEnvironmentId( envirionmentId );
         anotherSession.table().set();
 
-        TableLayout tableLayout = TableLayoutRepository.getLayout( envirionmentId, Employee.class );
+        TableLayout tableLayout = TableLayoutRepository.getLayout( envirionmentId, EmployeeModification.class );
 
+        NLogger.debug( ">>> after second modification" );
         NLogger.debug( tableLayout );
 
         Assert.assertTrue( tableLayout.hasColumnName("key")        );
@@ -145,12 +147,16 @@ public class OrmTableCreationTest {
         Assert.assertTrue( tableLayout.hasColumnName("id")         );
         Assert.assertTrue( tableLayout.hasColumnName("department") );
         Assert.assertTrue( tableLayout.hasColumnName("subKey")     );
+        Assert.assertTrue( tableLayout.hasColumnName("birthDay")   );
 
         Assert.assertTrue( tableLayout.getColumn("key").isPk() );
         Assert.assertTrue( tableLayout.getColumn("subKey").isPk() );
 
         Assert.assertEquals( tableLayout.getColumn( "subKey" ).getDefaultValue(), "1" );
-        Assert.assertEquals( (int) tableLayout.getColumn( "income" ).getSize(), 21 );
+
+        if( session.isNotDatabase(SQLITE) ) {
+            Assert.assertEquals( (int) tableLayout.getColumn( "income" ).getSize(), 21 );
+        }
 
         // revert table layout
         session.table().set();
