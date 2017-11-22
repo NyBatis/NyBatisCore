@@ -6,9 +6,14 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.Types;
+
+import static org.nybatis.core.db.datasource.driver.DatabaseName.H2;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MY_SQL;
 
 public enum SqlType {
 
@@ -153,8 +158,8 @@ public enum SqlType {
 	 *
 	 * @param klass	matched class
 	 * @return SqlType
-     */
-	public static SqlType findForColumnType( Class<?> klass ) {
+	 */
+	public static SqlType findColumnType( String environmentId, Class<?> klass ) {
 
 		if( klass == null ) return SqlType.NULL;
 
@@ -166,31 +171,65 @@ public enum SqlType {
 		if( klass == boolean.class       ) return SqlType.BOOLEAN;
 		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
 
-		if( klass == int.class           ) return SqlType.DECIMAL;
-		if( klass == Integer.class       ) return SqlType.DECIMAL;
-		if( klass == double.class        ) return SqlType.DECIMAL;
-		if( klass == Double.class        ) return SqlType.DECIMAL;
-		if( klass == float.class         ) return SqlType.DECIMAL;
-		if( klass == Float.class         ) return SqlType.DECIMAL;
-		if( klass == byte.class          ) return SqlType.DECIMAL;
-		if( klass == Byte.class          ) return SqlType.DECIMAL;
-		if( klass == short.class         ) return SqlType.DECIMAL;
-		if( klass == Short.class         ) return SqlType.DECIMAL;
-		if( klass == long.class          ) return SqlType.DECIMAL;
-		if( klass == Long.class          ) return SqlType.DECIMAL;
-		if( klass == BigInteger.class    ) return SqlType.DECIMAL;
-		if( klass == BigDecimal.class    ) return SqlType.DECIMAL;
+		if( isDatabase(environmentId,MY_SQL,MARIA) ) {
+			if( klass == int.class           ) return SqlType.INT;
+			if( klass == Integer.class       ) return SqlType.INT;
+			if( klass == double.class        ) return SqlType.DOUBLE;
+			if( klass == Double.class        ) return SqlType.DOUBLE;
+			if( klass == float.class         ) return SqlType.FLOAT;
+			if( klass == Float.class         ) return SqlType.FLOAT;
+			if( klass == byte.class          ) return SqlType.TINYINT;
+			if( klass == Byte.class          ) return SqlType.TINYINT;
+			if( klass == short.class         ) return SqlType.SMALLINT;
+			if( klass == Short.class         ) return SqlType.SMALLINT;
+			if( klass == long.class          ) return SqlType.BIGINT;
+			if( klass == Long.class          ) return SqlType.BIGINT;
+			if( klass == BigInteger.class    ) return SqlType.BIGINT;
+			if( klass == BigDecimal.class    ) return SqlType.REAL;
+		} else {
+			if( klass == int.class           ) return SqlType.DECIMAL;
+			if( klass == Integer.class       ) return SqlType.DECIMAL;
+			if( klass == double.class        ) return SqlType.DECIMAL;
+			if( klass == Double.class        ) return SqlType.DECIMAL;
+			if( klass == float.class         ) return SqlType.DECIMAL;
+			if( klass == Float.class         ) return SqlType.DECIMAL;
+			if( klass == byte.class          ) return SqlType.DECIMAL;
+			if( klass == Byte.class          ) return SqlType.DECIMAL;
+			if( klass == short.class         ) return SqlType.DECIMAL;
+			if( klass == Short.class         ) return SqlType.DECIMAL;
+			if( klass == long.class          ) return SqlType.DECIMAL;
+			if( klass == Long.class          ) return SqlType.DECIMAL;
+			if( klass == BigInteger.class    ) return SqlType.DECIMAL;
+			if( klass == BigDecimal.class    ) return SqlType.DECIMAL;
+		}
 
-		if( klass == byte[].class        ) return SqlType.BLOB;
-		if( klass == Byte[].class        ) return SqlType.BLOB;
-		if( klass == Date.class          ) return SqlType.DATE;
-		if( klass == Calendar.class      ) return SqlType.DATE;
-		if( klass == NDate.class         ) return SqlType.DATE;
+		if( isDatabase(environmentId,MY_SQL, MARIA) ) {
+			if( klass == byte[].class        ) return SqlType.LONGVARBINARY;
+			if( klass == Byte[].class        ) return SqlType.LONGVARBINARY;
+		} else {
+			if( klass == byte[].class        ) return SqlType.BLOB;
+			if( klass == Byte[].class        ) return SqlType.BLOB;
+		}
+
+		if( isDatabase(environmentId,H2) ) {
+			if( klass == Date.class          ) return SqlType.TIMESTAMP;
+			if( klass == Calendar.class      ) return SqlType.TIMESTAMP;
+			if( klass == NDate.class         ) return SqlType.TIMESTAMP;
+		} else {
+			if( klass == Date.class          ) return SqlType.DATE;
+			if( klass == Calendar.class      ) return SqlType.DATE;
+			if( klass == NDate.class         ) return SqlType.DATE;
+		}
+
 		if( Types.isMap(klass)           ) return SqlType.JAVA_OBJECT;
 		if( Types.isArrayOrList(klass)   ) return SqlType.LIST;
 
 		return SqlType.VARCHAR;
 
+	}
+
+	private static boolean isDatabase( String environmentId, DatabaseName... dbName ) {
+		return DatasourceManager.isDatabase( environmentId, dbName );
 	}
 
 }

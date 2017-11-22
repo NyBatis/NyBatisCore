@@ -4,8 +4,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.*;
-import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DatabaseName;
+import org.nybatis.core.db.etc.SqlLogHider;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.sql.SqlSession;
@@ -28,27 +27,33 @@ public class TableLayoutReader {
 
     public TableLayout getTableLayout( String environmentId, String tableName ) {
 
-        SqlSession session = SessionManager.openSession( environmentId );
+        final TableLayout[] layout = new TableLayout[1];
 
-        Table table = new Table( tableName );
+        SqlLogHider.$.hideDebugLog( () -> {
+            SqlSession session = SessionManager.openSession( environmentId );
 
-        TableLayout layout = readColumns( session, table );
-        layout.setEnvironmentId( environmentId );
-        layout.setName( tableName );
+            Table table = new Table( tableName );
 
-        if( session.isDatabase(SQLITE) ) {
-            getSqliteIndices( session ).forEach( tableIndex -> layout.addIndex( tableIndex ) );
-        } else {
-            getIndices( session, table, layout.getPkName() ).forEach( tableIndex -> layout.addIndex( tableIndex ) );
-        }
+            layout[0] = readColumns( session, table );
+            layout[0].setEnvironmentId( environmentId );
+            layout[0].setName( tableName );
 
-        if( session.isDatabase(ORACLE) ) {
-            for( TableIndex index : layout.getIndices() ) {
-                replaceIndexNameOnOracle( session, index );
+            if( session.isDatabase(SQLITE) ) {
+                getSqliteIndices( session ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
+            } else {
+                getIndices( session, table, layout[0].getPkName() ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
             }
-        }
 
-        return layout;
+            if( session.isDatabase(ORACLE) ) {
+                for( TableIndex index : layout[0].getIndices() ) {
+                    replaceIndexNameOnOracle( session, index );
+                }
+            }
+
+
+        });
+
+        return layout[0];
 
     }
 

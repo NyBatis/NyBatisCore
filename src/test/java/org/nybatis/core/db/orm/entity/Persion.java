@@ -6,6 +6,7 @@ import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Index;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
+import org.nybatis.core.model.NDate;
 
 /**
  * @author nayasis@gmail.com
@@ -24,6 +25,7 @@ public class Persion {
     @Column( length = 10, precision = 3 )
     private double income;
     private String id;
+    private NDate  birthDay;
 
     @JsonIgnore
     private String dummy;
@@ -90,5 +92,13 @@ public class Persion {
     @JsonProperty( "dummy" )
     public String dummy() {
         return this.dummy;
+    }
+
+    public NDate getBirthDay() {
+        return birthDay;
+    }
+
+    public void setBirthDay( NDate birthDay ) {
+        this.birthDay = birthDay;
     }
 }
