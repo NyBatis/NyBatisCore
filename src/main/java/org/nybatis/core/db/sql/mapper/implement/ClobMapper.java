@@ -39,7 +39,6 @@ public class ClobMapper implements TypeMapperIF<String> {
     }
 
 	private String toString( Clob clob ) throws SQLException {
-
 		if( clob == null ) return null;
 		return clob.getSubString( 1, (int) clob.length() );
 

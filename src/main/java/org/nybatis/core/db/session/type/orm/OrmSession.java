@@ -202,11 +202,19 @@ public interface OrmSession<T> extends Cloneable {
     OrmSession<T> clone();
 
     /**
-     * check session environment's database type
+     * check if session environment's database type is included
      *
      * @param dbName database type name
      * @return true if type is matched
      */
     boolean isDatabase( DatabaseName... dbName );
+
+    /**
+     * check not if session environment's database type is included
+     *
+     * @param dbName database type name
+     * @return false if type is matched
+     */
+    boolean isNotDatabase( DatabaseName... dbName );
 
 }

@@ -3,20 +3,25 @@ package org.nybatis.core.db.sql.orm.reader;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.nybatis.core.db.annotation.ColumnIgnore;
 import org.nybatis.core.db.annotation.Index;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.sql.mapper.SqlType;
-import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
+import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MY_SQL;
 import static org.nybatis.core.util.StringUtil.toUncamel;
 
 /**
@@ -26,6 +31,12 @@ import static org.nybatis.core.util.StringUtil.toUncamel;
  * @since 2017-11-16
  */
 public class EntityLayoutReader {
+
+    private String environmentId;
+
+    public EntityLayoutReader( String environmentId ) {
+        this.environmentId = environmentId;
+    }
 
     public TableLayout getTableLayout( Class klass ) {
 
@@ -109,12 +120,9 @@ public class EntityLayoutReader {
         if( field.isAnnotationPresent(JsonIgnore.class)   ) return null;
         if( field.isAnnotationPresent(ColumnIgnore.class) ) return null;
 
-        SqlType sqlType = SqlType.findForColumnType( field.getType() );
-
         Column column = new Column();
+        column.setDataType( field.getType(), environmentId );
         column.setKey( field.getName() );
-        column.setDataType( sqlType.code );
-        column.setSize( sqlType.length );
 
         if( field.isAnnotationPresent(org.nybatis.core.db.annotation.Column.class) )
             setColumn( column, field.getAnnotation(org.nybatis.core.db.annotation.Column.class) );
@@ -134,12 +142,9 @@ public class EntityLayoutReader {
         key = toUncamel( key );
         key = StringUtil.toCamel( key );
 
-        SqlType sqlType = SqlType.findForColumnType( method.getReturnType() );
-
         Column column = new Column();
+        column.setDataType( method.getReturnType(), environmentId );
         column.setKey( key );
-        column.setDataType( sqlType.code );
-        column.setSize( sqlType.length );
 
         if( method.isAnnotationPresent(org.nybatis.core.db.annotation.Column.class) )
             setColumn( column, method.getAnnotation(org.nybatis.core.db.annotation.Column.class) );
@@ -151,7 +156,17 @@ public class EntityLayoutReader {
     }
 
     private void setColumn( Column column, org.nybatis.core.db.annotation.Column annotation ) {
-        if( annotation.type() != Integer.MIN_VALUE ) column.setDataType( annotation.type() );
+        if( annotation.type() != Integer.MIN_VALUE ) {
+            SqlType sqlType = SqlType.find( annotation.type() );
+            if( isDatabase(MY_SQL, MARIA) ) {
+                if( sqlType == SqlType.NUMERIC  || sqlType == SqlType.DECIMAL ) {
+                    sqlType = SqlType.REAL;
+                } else if( sqlType == SqlType.CLOB ) {
+                    sqlType = SqlType.LONGVARBINARY;
+                }
+            }
+            column.setDataType( sqlType.code );
+        }
         if( StringUtil.isNotEmpty(annotation.defaultValue()) ) column.setDefaultValue( annotation.defaultValue() );
         if( annotation.precision() > 0 ) column.setPrecison( annotation.precision() );
         if( annotation.length()    > 0 ) column.setSize( annotation.length() );
@@ -173,6 +188,14 @@ public class EntityLayoutReader {
     public org.nybatis.core.db.annotation.Column getColumnAnnotation( Field field ) {
         field.setAccessible( true );
         return field.getAnnotation( org.nybatis.core.db.annotation.Column.class );
+    }
+
+    private boolean isDatabase( DatabaseName... dbName ) {
+        return DatasourceManager.isDatabase( environmentId, dbName );
+    }
+
+    private boolean isNotDatabase( DatabaseName... dbName ) {
+        return ! isDatabase( dbName );
     }
 
 }

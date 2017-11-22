@@ -35,11 +35,9 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     private void init( String token, SqlProperties properties ) {
-
         this.token              = token;
         this.originalProperties = Validator.nvl( properties, new SqlProperties() );
         this.properties         = originalProperties.clone();
-
     }
 
     public SqlSessionImpl initProperties() {
@@ -54,6 +52,16 @@ public class SqlSessionImpl implements SqlSession {
     @Override
     public boolean isDatabase( DatabaseName... dbName ) {
         return DatasourceManager.isDatabase( getEnvironmentId(), dbName );
+    }
+
+    @Override
+    public boolean isNotDatabase( DatabaseName... dbName ) {
+        return ! isDatabase( dbName );
+    }
+
+    public DatabaseName getDatabase() {
+        String database = DatasourceManager.getAttributes( getEnvironmentId() ).getDatabase();
+        return DatabaseName.get( database );
     }
 
     public SqlProperties getProperties() {
@@ -136,44 +144,30 @@ public class SqlSessionImpl implements SqlSession {
         Connection connection = null;
 
         try {
-
             connection = TransactionManager.getConnection( token, properties.getRepresentativeEnvironmentId() );
-
             Connection protectedConnection = getProtectedConnection( connection );
-
             worker.setProperties( properties );
             worker.setConnection( protectedConnection );
-
             worker.execute( protectedConnection );
-
             return this;
-
         } catch( Throwable e ) {
             throw new BaseRuntimeException( e );
-
         } finally {
             TransactionManager.releaseConnection( token, connection );
             initProperties();
-
         }
 
     }
 
     private Connection getProtectedConnection( Connection connection ) {
-
         return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
             public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
-
                 if( "close".equals(method.getName()) ) {
                     throw new DatabaseException( "connection's close method is not supprted in useConnection feature." );
                 }
-
                 return method.invoke( connection, arguments );
-
             }
-
-        } );
-
+        });
     }
 
     @Override

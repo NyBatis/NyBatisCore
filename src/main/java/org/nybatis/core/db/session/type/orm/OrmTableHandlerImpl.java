@@ -3,7 +3,9 @@ package org.nybatis.core.db.session.type.orm;
 import java.util.List;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
+import org.nybatis.core.db.etc.SqlLogHider;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
+import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
 import org.nybatis.core.db.sql.orm.vo.Column;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
@@ -65,46 +67,67 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
     @Override
     public OrmTableHandler<T> drop() {
-        if( exists() ) {
-            sqlSession.sql( tableSqlMaker.sqlDropTable( getLayout() ) ).execute();
-            commit();
-            refreshLayout();
-        }
+        SqlLogHider.$.hideDebugLog( () -> {
+            if( exists() ) {
+                sqlSession.sql( tableSqlMaker.sqlDropTable( getLayout() ) ).execute();
+                commit();
+                refreshLayout();
+            }
+        });
         return this;
     }
 
     @Override
     public OrmTableHandler<T> set() {
         if( ! isDDLExecutable() ) return this;
-        if( notExists() ) {
-            createTable();
-        } else {
-            if( isChanged() ) {
-                NLogger.debug( ">> previous table layout\n{}", getLayout() );
-                NLogger.debug( ">> current  table layout\n{}", entityLayout );
-                try {
-                    modifiyTable();
-                } catch( SqlException e ) {
-                    if( canRecreatTable() ) {
-                        drop();
-                        createTable();
-                    } else {
-                        throw e;
+        SqlLogHider.$.hideDebugLog( () -> {
+            if( notExists() ) {
+                createTable();
+            } else {
+                if( isChanged() ) {
+                    NLogger.trace( ">> previous table layout\n{}", getLayout() );
+                    NLogger.trace( ">> current  table layout\n{}", entityLayout );
+                    try {
+                        modifiyTable();
+                    } catch( SqlException e ) {
+                        if( canRecreatTable() ) {
+                            NLogger.error( e );
+                            NLogger.info( "table({}) will be re-create because DDL was not acceptable in environment(id:{},database:{})",
+                                getTableName(),
+                                getEnvironmentId(),
+                                sqlSession.getDatabase().name
+                            );
+                            drop();
+                            createTable();
+                        } else {
+                            throw new SqlConfigurationException( e,
+                                "table({}) can't be re-create because ORM option[environment(id:{}) > ddl > recreation] is [false]",
+                                getTableName(),
+                                getEnvironmentId()
+                            );
+                        }
                     }
                 }
             }
-        }
-        refreshLayout();
-        commit();
+            refreshLayout();
+            commit();
+        });
         return this;
     }
 
     private boolean isDDLExecutable() {
         if( ! TableLayoutRepository.isEnableDDL( getEnvironmentId() ) ) {
-            NLogger.warn( "ORM table execute option(environment(id:{}) > ddl) is [false].", getEnvironmentId() );
+            NLogger.warn( "table({}) can't be created because ORM option[environment(id:{}) > ddl > enable] is [false].",
+                getTableName(),
+                getEnvironmentId()
+            );
             return false;
         }
         return true;
+    }
+
+    private String getTableName() {
+        return EntityLayoutReader.getTableName( domainClass );
     }
 
     private boolean canRecreatTable() {
