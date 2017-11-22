@@ -66,8 +66,8 @@ public class OrmTableCreationTest {
     public void readPreviousTableLayout() {
 
 //        printTableLayout( "oracle", "TB_DEV_SQL" );
-        printTableLayout( "oracle", "TB_TABLE" );
-//        printTableLayout( "h2",     "TB_TABLE" );
+//        printTableLayout( "oracle", "TB_TABLE" );
+        printTableLayout( "h2",     "TB_TABLE" );
 //        printTableLayout( "sqlite", "TB_TABLE" );
 //        printTableLayout( "maria", "TB_TABLE" );
     }
@@ -98,9 +98,9 @@ public class OrmTableCreationTest {
     @Test
     public void tableModificationTest() {
 
-//        tableModificationTest( "h2" );
+        tableModificationTest( "h2" );
 //        tableModificationTest( "oracle" );
-        tableModificationTest( "sqlite" );
+//        tableModificationTest( "sqlite" );
 //        tableModificationTest( "maria" );
 
     }

@@ -4,12 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
-import org.nybatis.core.db.sql.orm.vo.Column;
+import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
 import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlException;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
@@ -175,7 +174,7 @@ public class OrmSessionProperties implements Cloneable {
 
     public boolean isPkNotNull() {
         TableLayout layout = getLayout();
-        for( Column column : layout.getPkColumns() ) {
+        for( TableColumn column : layout.getPkColumns() ) {
             Object val = entityParameter.get( Const.db.ORM_PARAMETER_ENTITY + column.getKey() );
             if( val == null ) return false;
         }
@@ -193,7 +192,7 @@ public class OrmSessionProperties implements Cloneable {
     public String getPkValues() {
         TableLayout layout = getLayout();
         NMap params = new NMap();
-        for( Column column : layout.getPkColumns() ) {
+        for( TableColumn column : layout.getPkColumns() ) {
             params.put( column.getKey(), entityParameter.get( Const.db.ORM_PARAMETER_ENTITY + column.getKey() ) );
         }
         return params.toJson();
