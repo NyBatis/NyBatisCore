@@ -97,12 +97,10 @@ public class OrmTableCreationTest {
 
     @Test
     public void tableModificationTest() {
-
         tableModificationTest( "h2" );
-//        tableModificationTest( "oracle" );
-//        tableModificationTest( "sqlite" );
-//        tableModificationTest( "maria" );
-
+        tableModificationTest( "sqlite" );
+        tableModificationTest( "oracle" );
+        tableModificationTest( "maria" );
     }
 
     private Employee getSampleTuple() {
@@ -115,11 +113,16 @@ public class OrmTableCreationTest {
         return employee;
     }
 
-    private void tableModificationTest( String envirionmentId ) {
+    private void tableModificationTest( String environmentId ) {
+
+        if( ! DatasourceManager.isExist(environmentId) ) {
+            NLogger.info( "environmentId({}) is not exist", environmentId );
+            return;
+        }
 
         OrmSession<Employee> session = SessionManager.openOrmSession( Employee.class );
 
-        session.setEnvironmentId( envirionmentId );
+        session.setEnvironmentId( environmentId );
         session.table().drop().set().set();
 
         session.insert( getSampleTuple() );
@@ -132,10 +135,10 @@ public class OrmTableCreationTest {
 
         OrmSession<EmployeeModification> anotherSession = SessionManager.openOrmSession( EmployeeModification.class );
 
-        anotherSession.setEnvironmentId( envirionmentId );
+        anotherSession.setEnvironmentId( environmentId );
         anotherSession.table().set();
 
-        TableLayout tableLayout = TableLayoutRepository.getLayout( envirionmentId, EmployeeModification.class );
+        TableLayout tableLayout = TableLayoutRepository.getLayout( environmentId, EmployeeModification.class );
 
         NLogger.debug( ">>> after second modification" );
         NLogger.debug( tableLayout );

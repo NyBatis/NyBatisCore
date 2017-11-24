@@ -3,6 +3,7 @@ package org.nybatis.core.db.session.type.orm;
 import java.util.ArrayList;
 import java.util.List;
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
@@ -184,7 +185,11 @@ public class OrmSessionProperties implements Cloneable {
     private TableLayout getLayout() {
         TableLayout layout = TableLayoutRepository.getLayout( environmentId, tableName );
         if( layout == null ) {
-            throw new DatabaseConfigurationException( "There is no table(name:{}) in environment(id:{})", tableName, environmentId );
+            if( DatasourceManager.isExist(environmentId) ) {
+                throw new DatabaseConfigurationException( "There is no table(name:{}) in environment(id:{})", tableName, environmentId );
+            } else {
+                throw new DatabaseConfigurationException( "There is no environment(id:{})", environmentId );
+            }
         }
         return layout;
     }
