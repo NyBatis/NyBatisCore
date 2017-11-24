@@ -12,12 +12,14 @@ import org.nybatis.core.util.StringUtil;
  */
 public class TableLayout {
 
-    private String                 environmentId;
-    private String                 name;
-    private String                 pkName;
-    private Map<String,TableColumn>     pkColumns      = new LinkedHashMap<>();
-    private Map<String,TableColumn>     columns        = new LinkedHashMap<>();
-    private Map<String,TableIndex> indices        = new LinkedHashMap<>();
+    private String                  environmentId;
+    private String                  name;
+    private String                  pkName;
+    private Map<String,TableColumn> pkColumns      = new LinkedHashMap<>();
+    private Map<String,TableColumn> columns        = new LinkedHashMap<>();
+    private Map<String,TableIndex>  indices        = new LinkedHashMap<>();
+
+    private boolean supportToReadIndex = true;
 
     public String getName() {
         return name;
@@ -115,6 +117,7 @@ public class TableLayout {
         if( another == null ) return false;
         if( ! StringUtil.nvl( name ).equals( StringUtil.nvl(another.name ) ) ) return false;
         if( ! isEqualColumns( columns, another.columns ) ) return false;
+        if( ! supportToReadIndex || ! another.supportToReadIndex ) return true;
         return isEqualIncies( indices, another.indices );
     }
 
@@ -157,8 +160,8 @@ public class TableLayout {
             return new ArrayList<>( this.columns.values() );
         List<TableColumn> columns = new ArrayList<>();
         for( String key : another.columns.keySet() ) {
-            if( ! another.columns.containsKey(key) ) {
-                columns.add( this.columns.get(key) );
+            if( ! this.columns.containsKey(key) ) {
+                columns.add( another.columns.get(key) );
             }
         }
         return columns;
@@ -180,8 +183,8 @@ public class TableLayout {
     }
 
     public List<TableIndex> getIndicesToAdd( TableLayout another ) {
-        if( another == null )
-            return new ArrayList<>( this.indices.values() );
+        if( ! supportToReadIndex || ! another.supportToReadIndex ) return new ArrayList<>();
+        if( another == null ) return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();
         for( String key : this.indices.keySet() ) {
             if( ! another.indices.containsKey(key) ) {
@@ -192,6 +195,7 @@ public class TableLayout {
     }
 
     public List<TableIndex> getIndicesToDrop( TableLayout another ) {
+        if( ! supportToReadIndex || ! another.supportToReadIndex ) return new ArrayList<>();
         if( another == null )
             return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();
@@ -204,6 +208,7 @@ public class TableLayout {
     }
 
     public List<TableIndex> getIndicesToModify( TableLayout another ) {
+        if( ! supportToReadIndex || ! another.supportToReadIndex ) return new ArrayList<>();
         if( another == null )
             return new ArrayList<>( this.indices.values() );
         List<TableIndex> indices = new ArrayList<>();
@@ -223,4 +228,11 @@ public class TableLayout {
         return pkColumns.keySet().toString().equals( another.pkColumns.keySet().toString() );
     }
 
+    public boolean isSupportToReadIndex() {
+        return supportToReadIndex;
+    }
+
+    public void setSupportToReadIndex( boolean supportToReadIndex ) {
+        this.supportToReadIndex = supportToReadIndex;
+    }
 }

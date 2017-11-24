@@ -51,11 +51,15 @@ public class EntityLayoutReader {
 
     public static String getTableName( Class klass ) {
         Table annotation = getTableAnnotation( klass );
-        String tableName = Validator.nvl( annotation.value(), annotation.name() );
-        if( StringUtil.isEmpty(tableName) ) {
-            tableName = toUncamel( klass.getSimpleName() );
+        if( annotation == null ) {
+            return toUncamel( klass.getSimpleName() ).toUpperCase();
+        } else {
+            String tableName = Validator.nvl( annotation.value(), annotation.name() );
+            if( StringUtil.isEmpty(tableName) ) {
+                tableName = toUncamel( klass.getSimpleName() );
+            }
+            return tableName.toUpperCase();
         }
-        return tableName.toUpperCase();
     }
 
     private void setIndices( Index[] annotations, TableLayout table, Class klass ) {

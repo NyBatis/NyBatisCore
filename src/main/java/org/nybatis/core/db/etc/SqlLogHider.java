@@ -16,7 +16,10 @@ public class SqlLogHider {
 
         NLoggerPrinter logger = NLogger.getLogger( Const.db.LOG_SQL );
         Level prevLogLevel = logger.getLevel();
-        logger.setLevel( Level.INFO );
+
+        if( prevLogLevel.levelInt >= Level.DEBUG.levelInt ) {
+            logger.setLevel( Level.INFO );
+        }
 
         try {
             worker.execute();

@@ -11,6 +11,7 @@ import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
@@ -29,19 +30,25 @@ public class TableLayoutReader {
 
         final TableLayout[] layout = new TableLayout[1];
 
-        SqlLogHider.$.hideDebugLog( () -> {
-            SqlSession session = SessionManager.openSession( environmentId );
+        SqlSession session = SessionManager.openSession( environmentId );
 
-            Table table = new Table( tableName );
+        Table table = new Table( tableName );
 
+        new SqlLogHider().hideDebugLog( () -> {
             layout[0] = readColumns( session, table );
             layout[0].setEnvironmentId( environmentId );
             layout[0].setName( tableName );
 
-            if( session.isDatabase(SQLITE) ) {
-                getSqliteIndices( session ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
-            } else {
-                getIndices( session, table, layout[0].getPkName() ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
+            try {
+                if( session.isDatabase(SQLITE) ) {
+                    getSqliteIndices( session ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
+                } else {
+                    getIndices( session, table, layout[0].getPkName() ).forEach( tableIndex -> layout[0].addIndex( tableIndex ) );
+                }
+            } catch( Exception e ) {
+                NLogger.info( "it is not support to retrieve index info from table({}) in environment(id:{})", table.name, environmentId );
+                NLogger.trace( e );
+                layout[0].setSupportToReadIndex( false );
             }
 
             if( session.isDatabase(ORACLE) ) {
@@ -49,8 +56,6 @@ public class TableLayoutReader {
                     replaceIndexNameOnOracle( session, index );
                 }
             }
-
-
         });
 
         return layout[0];
