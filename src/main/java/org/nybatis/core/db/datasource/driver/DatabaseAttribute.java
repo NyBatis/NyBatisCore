@@ -176,7 +176,6 @@ public class DatabaseAttribute {
         attribute.database                 = database;
         attribute.patternToMatchClassName  = patternToMatchClassName;
         attribute.enableToGetParameterType = enableToGetParameterType;
-//        attribute.enableToGetBLob          = enableToGetBLob;
         attribute.enableToDoLobPrefetch    = enableToDoLobPrefetch;
         attribute.pageSqlPre               = pageSqlPre;
         attribute.pageSqlPost              = pageSqlPost;

@@ -32,6 +32,13 @@ public @interface Table {
     String name()  default Const.db.DEFAULT_TABLE_NAME;
 
     /**
+     * schema name
+     *
+     * @return schema name
+     */
+    String schema() default "";
+
+    /**
      * environment id
      *
      * @return environment id

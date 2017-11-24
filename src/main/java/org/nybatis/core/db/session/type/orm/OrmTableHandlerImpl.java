@@ -166,6 +166,11 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         TableLayout currLayout = entityLayout;
 
         addColumns( currLayout.getColumnsToAdd(prevLayout) );
+
+        if( ! currLayout.isPkEqual(prevLayout) ) {
+            modifyPk();
+        }
+
         dropColumns( currLayout.getColumnsToDrop(prevLayout) );
 
         if( isDatabase(ORACLE) ) {
@@ -178,9 +183,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         dropIndices( currLayout.getIndicesToDrop(prevLayout) );
         modifyIndices( currLayout.getIndicesToModify(prevLayout) );
 
-        if( ! currLayout.isPkEqual(prevLayout) ) {
-            modifyPk();
-        }
+
 
     }
 

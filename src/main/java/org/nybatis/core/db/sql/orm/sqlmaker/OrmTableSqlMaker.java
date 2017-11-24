@@ -195,7 +195,11 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlDropColumn( TableColumn column, TableLayout table ) {
-        return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), getColumnName(column) );
+        if( isDatabase(ORACLE) ) {
+            return String.format( "ALTER TABLE %s DROP (%s)", table.getName(), getColumnName(column) );
+        } else {
+            return String.format( "ALTER TABLE %s DROP COLUMN %s", table.getName(), getColumnName(column) );
+        }
     }
 
     public String sqlModifyColumn( TableColumn column, boolean type, boolean defaultValue, boolean notNull, TableLayout table ) {
@@ -214,7 +218,7 @@ public class OrmTableSqlMaker {
         } else if( isDatabase(MY_SQL,MARIA) ) {
             return String.format("ALTER TABLE %s CHANGE %s %s %s", table.getName(), getColumnName(column), getColumnName(column), sb );
         } else {
-            return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), getColumnName(column), sb );
+            return String.format("ALTER TABLE %s MODIFY %s %s", table.getName(), getColumnName(column), sb );
         }
     }
 
