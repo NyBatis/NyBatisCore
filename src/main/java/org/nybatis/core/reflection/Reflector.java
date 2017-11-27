@@ -1,17 +1,11 @@
 package org.nybatis.core.reflection;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.reflection.core.BeanMerger;
 import org.nybatis.core.reflection.core.CoreReflector;
 import org.nybatis.core.reflection.core.JsonConverter;
@@ -19,15 +13,12 @@ import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
 import org.nybatis.core.util.ClassUtil;
-import org.nybatis.core.util.StringUtil;
-import org.nybatis.core.util.Types;
-import org.nybatis.core.validation.Validator;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Reflection Utility
@@ -200,7 +191,7 @@ public class Reflector {
 	 * @param object	json string, Map or bean
 	 * @return map with flattern key
 	 */
-	public static Map<String, Object> toMapWithFlattenKey( Object object ) {
+	public static Map<String, Object> toMapWithFlattenKey( Object object ) throws JsonIOException {
 		return jsonConverter.toMapWithFlattenKey( object );
 	}
 
@@ -226,7 +217,7 @@ public class Reflector {
 	 * @param object	json string, Map or bean
 	 * @return map with flattern key
 	 */
-	public static Map<String, Object> toMapWithUnflattenKey( Object object ) {
+	public static Map<String, Object> toMapWithUnflattenKey( Object object ) throws JsonIOException {
 		return jsonConverter.toMapWithUnflattenKey( object );
 	}
 
@@ -247,7 +238,7 @@ public class Reflector {
 	 * @param <T>		return type
 	 * @return	bean filled by object's value
 	 */
-	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
+	public static <T> T toBeanFrom( Object object, Class<T> toClass ) throws JsonIOException {
 		return jsonConverter.toBeanFrom( object, toClass );
 	}
 
@@ -264,7 +255,7 @@ public class Reflector {
 	 * @param <T>		return type
 	 * @return	bean filled by object's value
 	 */
-	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
+	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) throws JsonIOException {
 		return jsonConverter.toBeanFrom( object, typeReference );
 	}
 
@@ -276,7 +267,7 @@ public class Reflector {
 	 * @param <T> generic type
      * @return list
      */
-	public static <T> List<T> toListFromJson( String jsonString, Class<T> typeClass ) {
+	public static <T> List<T> toListFromJson( String jsonString, Class<T> typeClass ) throws JsonIOException {
 		return jsonConverter.toListFromJson( jsonString, typeClass );
 	}
 
@@ -286,7 +277,7 @@ public class Reflector {
 	 * @param json json text
 	 * @return List
 	 */
-	public static List toListFromJson( String json ) {
+	public static List toListFromJson( String json ) throws JsonIOException {
 		return toListFromJson( json, Object.class );
 	}
 
@@ -295,7 +286,7 @@ public class Reflector {
 	 * @param json	json text
 	 * @return List
 	 */
-	public static List<String> toListFromJsonAsString( String json ) {
+	public static List<String> toListFromJsonAsString( String json ) throws JsonIOException {
 		return toListFromJson( json, String.class );
 	}
 

@@ -1,12 +1,12 @@
 package org.nybatis.core.db.orm.table.customAnnotationInsert.entity;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
 import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
-import org.nybatis.core.reflection.Reflector;
+
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author nayasis@gmail.com
@@ -15,15 +15,11 @@ import org.nybatis.core.reflection.Reflector;
 @Table( "TB_USER" )
 public class Person {
 
-    @Pk @Column( length = 20)
-    private String id;
-    @Column( length = 100)
-    private String name;
-    private int    age;
-    @Column( type = Types.VARCHAR, length = 1)
-    private boolean used;
-    @Column( type = Types.CLOB )
-    private List<PersonProperty> property = new ArrayList<>();
+    @Pk @Column(length=20 )                  private String               id;
+        @Column(length=100 )                 private String               name;
+                                             private int                  age;
+        @Column(type=Types.VARCHAR,length=1) private boolean              used;
+        @Column(type=Types.CLOB )            private List<PersonProperty> property = new ArrayList<>();
 
     public Person() {}
 
@@ -73,7 +69,4 @@ public class Person {
         this.property = property;
     }
 
-    public void setProperty( String property ) {
-        this.property = Reflector.toListFromJson( property, PersonProperty.class );
-    }
 }
