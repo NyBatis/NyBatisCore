@@ -1,11 +1,10 @@
-package org.nybatis.core.db.orm;
+package org.nybatis.core.db.orm.table.create;
 
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
-import org.nybatis.core.db.datasource.driver.DatabaseName;
-import org.nybatis.core.db.orm.entity.Employee;
-import org.nybatis.core.db.orm.entity.EmployeeModification;
+import org.nybatis.core.db.orm.table.create.entity.Employee;
+import org.nybatis.core.db.orm.table.create.entity.EmployeeModification;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;

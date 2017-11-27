@@ -5,18 +5,21 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.io.IOException;
+import java.util.Date;
 import org.nybatis.core.model.NDate;
+import org.nybatis.core.util.StringUtil;
 
-public class NDateDeserializer extends JsonDeserializer<NDate> {
+import static org.nybatis.core.util.StringUtil.toYn;
+
+public class ColumnBooleanDeserializer extends JsonDeserializer<Boolean> {
 
 	@Override
-    public NDate deserialize( JsonParser jp, DeserializationContext ctxt ) throws IOException {
+    public Boolean deserialize( JsonParser jp, DeserializationContext ctxt ) throws IOException {
 		try {
-			long value = jp.getLongValue();
-			return new NDate( value );
+			String val = jp.getValueAsString();
+			return StringUtil.toBoolean( val );
 		} catch( JsonParseException e ) {
-			String value = jp.getValueAsString();
-			return new NDate( value, NDate.ISO_8601_24H_FULL_FORMAT );
+			return jp.getBooleanValue();
 		}
     }
 

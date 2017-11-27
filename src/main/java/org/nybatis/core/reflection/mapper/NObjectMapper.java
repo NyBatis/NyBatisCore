@@ -10,6 +10,9 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import org.nybatis.core.reflection.deserializer.DateDeserializer;
 
 import java.util.Date;
+import org.nybatis.core.reflection.inspector.ColumnAnnotationInspector;
+import org.nybatis.core.reflection.inspector.ExcelReadAnnotationInspector;
+import org.nybatis.core.reflection.inspector.ExcelWriteAnnotationInspector;
 
 
 public class NObjectMapper extends ObjectMapper {
@@ -20,7 +23,11 @@ public class NObjectMapper extends ObjectMapper {
 		setCustomDeserializer();
 	}
 
-	protected NObjectMapper() {}
+	protected NObjectMapper() {
+		init( false );
+		setDefaultFilter();
+		setCustomDeserializer();
+	}
 
 	protected void init( boolean sort ) {
 		configure( JsonParser.Feature.ALLOW_SINGLE_QUOTES, true ); // 문자열 구분기호를 " 뿐만 아니라 ' 도 허용

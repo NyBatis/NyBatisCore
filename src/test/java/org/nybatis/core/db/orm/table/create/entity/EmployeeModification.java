@@ -1,9 +1,8 @@
-package org.nybatis.core.db.orm.entity;
+package org.nybatis.core.db.orm.table.create.entity;
 
 import java.sql.Types;
 import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Pk;
-import org.nybatis.core.db.sql.mapper.SqlType;
 
 /**
  * Table Modification
