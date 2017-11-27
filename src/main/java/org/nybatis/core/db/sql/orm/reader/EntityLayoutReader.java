@@ -160,6 +160,13 @@ public class EntityLayoutReader {
             SqlType sqlType = SqltypeIndicator.$.getSqlType( annotation.type(), environmentId );
             column.setDataType( sqlType.code );
         }
+        if( StringUtil.isNotEmpty(annotation.name()) ) {
+            if( annotation.name().contains( "_" ) ) {
+                column.setKey( StringUtil.toCamel(annotation.name()) );
+            } else {
+                column.setKey( annotation.name() );
+            }
+        }
         if( StringUtil.isNotEmpty(annotation.defaultValue()) ) column.setDefaultValue( annotation.defaultValue() );
         if( annotation.precision() > 0 ) column.setPrecison( annotation.precision() );
         if( annotation.length()    > 0 ) column.setSize( annotation.length() );
