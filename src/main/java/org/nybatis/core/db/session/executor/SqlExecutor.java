@@ -198,17 +198,13 @@ public class SqlExecutor {
 		boolean isPrimitiveReturn = DbUtils.isPrimitive( returnType );
 
 		if( isPrimitiveReturn ) {
-
 			for( NMap row : resultSet ) {
 				result.add( (T) new PrimitiveConverter(row.getByIndex( 0 )).cast(returnType) );
 			}
-
 		} else {
-
 			for( NMap row : resultSet ) {
-				result.add( row.toBean( returnType ) );
+				result.add( DbUtils.jsonConverter.toBeanFrom( row, returnType ) );
 			}
-
 		}
 
 		return result;
@@ -244,7 +240,7 @@ public class SqlExecutor {
 
 		} else {
 			try {
-	            return result.toBean( returnType );
+				return DbUtils.jsonConverter.toBeanFrom( result, returnType );
             } catch( Exception e ) {
 	            throw new ClassCastingException( e, "ClassCastingException at converting result of {}, {}", sqlBean, e.getMessage() );
             }

@@ -56,7 +56,8 @@ public class QueryParameter extends NMap {
             bind( singleParam );
 
         } else {
-            bind( value );
+            Map<String, Object> newParam = DbUtils.jsonConverter.toMapFrom( value );
+            bind( newParam );
         }
 
         // map can contains POJO and then JsonPath is not working.

@@ -59,7 +59,8 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				inputParam.bind( parameter );
+				Map<String, Object> newParam = DbUtils.jsonConverter.toMapFrom( parameter );
+				inputParam.bind( newParam );
 				originalParams.add( parameter );
 			}
 		}
@@ -71,7 +72,7 @@ public class SqlBean {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				NMap newParam = new NMap().bind( parameter );
+				Map<String, Object> newParam = DbUtils.jsonConverter.toMapFrom( parameter );
 				Reflector.merge( newParam, inputParam, false );
 				originalParams.add( parameter );
 			}
