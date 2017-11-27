@@ -278,11 +278,11 @@ public class PrimitiveConverter {
 	}
 
 	private boolean isEmpty() {
-		return val == null ? true : val.toString().length() == 0;
+		return val == null || val.toString().length() == 0;
 	}
 
 	public Map<String, Object> toMap() {
-		return Reflector.toMapFromJson( nvlVal );
+		return Reflector.toMapFrom( nvlVal );
 	}
 
 	public <T> T toBean( Class<T> klass ) {

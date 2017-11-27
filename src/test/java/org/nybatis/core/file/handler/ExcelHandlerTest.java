@@ -73,7 +73,7 @@ public class ExcelHandlerTest {
     }
 
     private NObjectMapper getExcelMapper() {
-        NObjectMapper excelMapper = new NObjectMapper( false );
+        NObjectMapper excelMapper = new NObjectMapper();
 
         excelMapper.setAnnotationIntrospectors(
                 new ExcelReadAnnotationInspector(),

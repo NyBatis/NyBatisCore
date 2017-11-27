@@ -32,7 +32,7 @@ public class ReflectorTest {
 
 		assertEquals( "{\"firstName\":\"Hwasu\",\"lastName\":\"Jung\",\"phone\":{\"code\":2,\"number\":\"322-3493\"},\"fax\":{\"code\":9999,\"number\":\"00100\"},\"phoneList\":[]}", json );
 
-        Map map1 = Reflector.toMapFromJson( json );
+        Map map1 = Reflector.toMapFrom( json );
 
 		NLogger.debug( map1 );
 
@@ -91,7 +91,7 @@ public class ReflectorTest {
 
 		NLogger.debug( jsonText );
 
-		Map<String, Object> map = Reflector.toMapFromJson( jsonText );
+		Map<String, Object> map = Reflector.toMapFrom( jsonText );
 
 		NLogger.debug( map      );
 

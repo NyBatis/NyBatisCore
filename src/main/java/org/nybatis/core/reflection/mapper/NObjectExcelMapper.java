@@ -11,9 +11,8 @@ import java.util.Date;
 
 public class NObjectExcelMapper extends NObjectMapper {
 
-	public NObjectExcelMapper( boolean sort ) {
-		init( sort );
-		setDefaultFilter();
+	public NObjectExcelMapper() {
+		super();
 		setCustomDeserializer();
 		setCustomAnnotationIntrospectors();
 	}
