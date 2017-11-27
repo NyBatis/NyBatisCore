@@ -5,14 +5,12 @@ import org.nybatis.core.reflection.inspector.ColumnAnnotationInspector;
 
 public class NObjectSqlMapper extends NObjectMapper {
 
-	public NObjectSqlMapper( boolean sort ) {
-		init( sort );
-		setDefaultFilter();
-		setCustomDeserializer();
-		setCustomAnnotationIntrospectors();
+	public NObjectSqlMapper() {
+		super();
+		addCustomAnnotationIntrospectors();
 	}
 
-	private void setCustomAnnotationIntrospectors() {
+	private void addCustomAnnotationIntrospectors() {
 		setAnnotationIntrospector(
 			new ColumnAnnotationInspector()
 		);

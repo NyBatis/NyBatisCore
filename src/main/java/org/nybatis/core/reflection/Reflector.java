@@ -14,6 +14,7 @@ import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
 import org.nybatis.core.reflection.core.BeanMerger;
 import org.nybatis.core.reflection.core.CoreReflector;
+import org.nybatis.core.reflection.core.JsonConverter;
 import org.nybatis.core.reflection.mapper.MethodInvocator;
 import org.nybatis.core.reflection.mapper.NInvocationHandler;
 import org.nybatis.core.reflection.mapper.NObjectMapper;
@@ -36,8 +37,7 @@ import java.util.*;
  */
 public class Reflector {
 
-	private static NObjectMapper objectMapper       = new NObjectMapper( false );
-	private static NObjectMapper objectMapperSorted = new NObjectMapper( true );
+	private static JsonConverter jsonConverter = new JsonConverter( new NObjectMapper() );
 
 	/**
 	 * Creates and returnes a copy of object
@@ -99,19 +99,13 @@ public class Reflector {
 	 * @return report of fields' value
 	 */
     public static String toString( Object bean ) {
-
 		CoreReflector coreReflector = new CoreReflector();
-
     	NList result = new NList();
-
         for( Field field : coreReflector.getFields(bean) ) {
         	if( ! field.isAccessible() ) field.setAccessible( true );
-
 			String typeName = field.getType().getName();
-
         	result.add( "field", field.getName() );
 			result.add( "type", typeName );
-
         	try {
         		switch( typeName ) {
         			case "[C" :
@@ -124,11 +118,8 @@ public class Reflector {
         	} catch( IllegalArgumentException | IllegalAccessException e ) {
         		result.add( "value", e.getMessage() );
             }
-
         }
-
         return result.toString();
-
     }
 
 	/**
@@ -140,16 +131,8 @@ public class Reflector {
 	 * @param ignoreNull	whether or not to ignore null value
 	 * @return json text
 	 */
-	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) {
-		if( fromBean == null ) return null;
-		NObjectMapper mapper = sort ? objectMapperSorted : objectMapper;
-		mapper.setSerializationInclusion( ignoreNull ? Include.NON_NULL : Include.ALWAYS );
-		ObjectWriter writer = prettyPrint ? mapper.writerWithDefaultPrettyPrinter() : mapper.writer();
-		try {
-			return writer.writeValueAsString( fromBean );
-		} catch( IOException e ) {
-        	throw new JsonIOException( e );
-        }
+	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) throws JsonIOException {
+		return jsonConverter.toJson( fromBean, prettyPrint, sort, ignoreNull );
 	}
 
 	/**
@@ -159,7 +142,7 @@ public class Reflector {
 	 * @param prettyPrint	whether or not to make json text pretty
 	 * @return json text
 	 */
-	public static String toJson( Object fromBean, boolean prettyPrint ) {
+	public static String toJson( Object fromBean, boolean prettyPrint ) throws JsonIOException {
 		return toJson( fromBean, prettyPrint, false, false );
 
 	}
@@ -170,7 +153,7 @@ public class Reflector {
 	 * @param fromBean		instance to convert as json data
 	 * @return json text
 	 */
-	public static String toJson( Object fromBean ) {
+	public static String toJson( Object fromBean ) throws JsonIOException {
 		return toJson( fromBean, false );
 	}
 
@@ -181,7 +164,7 @@ public class Reflector {
 	 * @param prettyPrint	true if you want to see json text with indentation
 	 * @return json text
 	 */
-	public static String toNullIgnoredJson( Object fromBean, boolean prettyPrint ) {
+	public static String toNullIgnoredJson( Object fromBean, boolean prettyPrint ) throws JsonIOException {
 		return toJson( fromBean, prettyPrint, false, true );
 	}
 
@@ -191,7 +174,7 @@ public class Reflector {
 	 * @param fromBean	instance to convert as json data
 	 * @return json text
 	 */
-	public static String toNullIgnoredJson( Object fromBean ) {
+	public static String toNullIgnoredJson( Object fromBean ) throws JsonIOException {
 		return toNullIgnoredJson( fromBean, false );
 	}
 
@@ -218,57 +201,7 @@ public class Reflector {
 	 * @return map with flattern key
 	 */
 	public static Map<String, Object> toMapWithFlattenKey( Object object ) {
-		Map<String, Object> map = new HashMap<>();
-		if( Validator.isNull(object) ) return map;
-		flattenKeyRecursivly( "", toMapFrom( object ), map );
-		return map;
-	}
-
-	private static void flattenKeyRecursivly( String currentPath, Object json, Map result ) {
-
-		if( json instanceof Map ) {
-
-			Map<String, Object> map = (Map) json;
-
-			String prefix = StringUtil.isEmpty( currentPath ) ? "" : currentPath + ".";
-
-			for( String key : map.keySet() ) {
-				flattenKeyRecursivly( prefix + key, map.get( key ), result );
-			}
-
-		} else if( json instanceof List ) {
-
-			List list = (List) json;
-
-			for( int i = 0, iCnt = list.size(); i < iCnt; i++ ) {
-				flattenKeyRecursivly( String.format( "%s[%d]", currentPath, i ), list.get( i ), result );
-			}
-
-		} else {
-			result.put( currentPath, json );
-		}
-
-	}
-
-	public static JsonNode readTree( String json ) throws JsonIOException {
-
-
-		// TODO : read tree structure
-/**
- *  JsonNode node = mapper.readTree( json );
- *  Iterator<String> names = node.fieldNames();
- *  while (names.hasNext()) {
- *   String name = (String) names.next();
- *   JsonNodeType type = node.get(name).getNodeType();
- *   System.out.println(name+":"+type); //will print id:STRING
- *  }
- */
-
-		try {
-			return objectMapper.readTree( json );
-		} catch( IOException e ) {
-			throw new JsonIOException( e );
-		}
+		return jsonConverter.toMapWithFlattenKey( object );
 	}
 
 	/**
@@ -294,100 +227,7 @@ public class Reflector {
 	 * @return map with flattern key
 	 */
 	public static Map<String, Object> toMapWithUnflattenKey( Object object ) {
-
-		Map<String, Object> map = new HashMap<>();
-
-		if( Validator.isNull(object) ) return map;
-
-		Map<String, Object> objectMap = toMapFrom( object );
-
-		for( String key : objectMap.keySet() ) {
-			unflattenKeyRecursivly( key, objectMap.get( key ), map );
-		}
-
-		return map;
-
-	}
-
-	private static void unflattenKeyRecursivly( String jsonPath, Object value, Map result ) {
-
-		String path  = jsonPath.replaceFirst( "\\[.*\\]", "" ).replaceFirst( "\\..*?$", "" );
-		String index = jsonPath.replaceFirst(  "^(" + path + ")\\[(.*?)\\](.*?)$", "$2" );
-
-		if( index.equals( jsonPath ) ) index = "";
-
-		boolean isArray = ! index.isEmpty();
-
-		String currentPath = String.format( "%s%s", path, isArray ? String.format("[%s]", index) : "" );
-
-		boolean isKey = currentPath.equals( jsonPath );
-
-		if( isKey ) {
-			if( isArray ) {
-				int idx = new PrimitiveConverter( index ).toInt();
-				setValueToListInJson( path, idx, value, result );
-			} else {
-				result.put( path, value );
-			}
-		} else {
-
-			if( ! result.containsKey(path) ) {
-				result.put( path, isArray ? new ArrayList() : new HashMap() );
-			}
-
-			Map newVal;
-
-			if( isArray ) {
-
-				List list = (List) result.get( path );
-
-				int idx = new PrimitiveConverter( index ).toInt();
-
-				if( list.size() <= idx || list.get(idx) == null ) {
-					setValueToListInJson( path, idx, new HashMap(), result );
-				}
-
-				newVal = (Map) list.get( idx );
-
-			} else {
-				newVal = (Map) result.get( path );
-			}
-
-			String recursivePath = jsonPath.replaceFirst( currentPath.replaceAll( "\\[", "\\\\[" ) + ".", "" );
-
-			unflattenKeyRecursivly( recursivePath, value, newVal );
-
-		}
-
-	}
-
-	private static void setValueToListInJson( String key, int idx, Object value, Map json ) {
-
-		if( ! json.containsKey( key ) ) {
-			json.put( key, new ArrayList<>() );
-		}
-
-		List list = (List) json.get( key );
-
-		int listSize = list.size();
-
-		if( idx >= listSize ) {
-			for( int i = listSize; i <= idx; i++ ) {
-				list.add( null );
-			}
-		}
-
-		list.set( idx, value );
-
-	}
-
-
-	private static String getContent( String fromJsonString ) {
-		return StringUtil.isEmpty( fromJsonString ) ? "{}" : fromJsonString;
-	}
-
-	private static String getArrayContent( String fromJsonString ) {
-		return StringUtil.isEmpty( fromJsonString ) ? "[]" : fromJsonString;
+		return jsonConverter.toMapWithUnflattenKey( object );
 	}
 
 	/**
@@ -397,12 +237,7 @@ public class Reflector {
 	 * @return valid or not
 	 */
 	public static boolean isValidJson( String json ) {
-		try {
-			objectMapper.readTree( json );
-			return true;
-		} catch( IOException e ) {
-			return false;
-		}
+		return jsonConverter.isValidJson( json );
 	}
 
 	/**
@@ -413,13 +248,7 @@ public class Reflector {
 	 * @return	bean filled by object's value
 	 */
 	public static <T> T toBeanFrom( Object object, Class<T> toClass ) {
-
-		if( Types.isString( object ) ) {
-			return toBeanFromJson( object.toString(), toClass );
-		} else {
-			return objectMapper.convertValue( object, toClass );
-		}
-
+		return jsonConverter.toBeanFrom( object, toClass );
 	}
 
 	/**
@@ -436,53 +265,7 @@ public class Reflector {
 	 * @return	bean filled by object's value
 	 */
 	public static <T> T toBeanFrom( Object object, TypeReference<T> typeReference ) {
-
-		if( Types.isString( object ) ) {
-			return toBeanFromJson( object.toString(), typeReference );
-		} else {
-			return objectMapper.convertValue( object, typeReference );
-		}
-
-	}
-
-	/**
-	 * Convert as bean from json text
-	 * @param jsonString	json text
-	 * @param toClass		class to return
-	 * @param <T>			return type
-	 * @return bean filled by json value
-	 */
-	private static <T> T toBeanFromJson( String jsonString, Class<T> toClass ) {
-    	try {
-    		return objectMapper.readValue( getContent( jsonString ), toClass );
-        } catch( JsonParseException e ) {
-			throw new JsonIOException( "JsonParseException : {}\n\t- json string :\n{}\n\t- target class : {}", e.getMessage(), jsonString, toClass );
-    	} catch( IOException e ) {
-    		throw new JsonIOException( e );
-    	}
-    }
-
-	/**
-	 * Convert as bean from json text
-	 * @param jsonString	json text
-	 * @param typeReference	type to return
-	 * 	<pre>
-	 *	  Examples are below.
-	 *	  	- new TypeReference<List<HashMap<String, Object>>>() {}
-	 *	    - new TypeReference<List<String>>() {}
-	 *	    - new TypeReference<List>() {}
-	 * 	</pre>
-	 * @param <T>			return type
-	 * @return bean filled by json value
-	 */
-	private static <T> T toBeanFromJson( String jsonString, TypeReference<T> typeReference ) throws JsonIOException {
-		try {
-			return objectMapper.readValue( getContent( jsonString ), typeReference );
-		} catch( JsonParseException e ) {
-			throw new JsonIOException( "JsonParseException : {}\n\t- json string :\n{}", e.getMessage(), jsonString );
-		} catch( IOException e ) {
-			throw new JsonIOException( e );
-		}
+		return jsonConverter.toBeanFrom( object, typeReference );
 	}
 
 	/**
@@ -494,13 +277,7 @@ public class Reflector {
      * @return list
      */
 	public static <T> List<T> toListFromJson( String jsonString, Class<T> typeClass ) {
-		try {
-			return objectMapper.readValue( getArrayContent(jsonString), objectMapper.getTypeFactory().constructCollectionType(List.class, typeClass) );
-		} catch( JsonParseException e ) {
-			throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
-		} catch( IOException e ) {
-			throw new JsonIOException( e );
-		}
+		return jsonConverter.toListFromJson( jsonString, typeClass );
 	}
 
 	/**
@@ -528,31 +305,7 @@ public class Reflector {
 	 * @return	Map filled by object's value
 	 */
 	public static Map<String, Object> toMapFrom( Object object ) throws JsonIOException {
-
-		if( object == null ) return new HashMap<>();
-
-		if( Types.isString(object)  ) {
-			return toMapFromJson( object.toString() );
-		} else {
-			return objectMapper.convertValue( object, Map.class );
-		}
-
-	}
-
-	/**
-	 * Convert as Map from json text
-	 * @param jsonString	json text
-	 * @return	Map filled by object's value
-	 */
-	public static Map<String, Object> toMapFromJson( String jsonString ) throws JsonIOException {
-		try {
-			Map<String, Object> stringObjectMap = objectMapper.readValue( getContent( jsonString ), new TypeReference<LinkedHashMap<String, Object>>() {} );
-			return Validator.nvl( stringObjectMap, new LinkedHashMap<String, Object>() );
-		} catch( JsonParseException e ) {
-			throw new JsonIOException( e, "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
-		} catch( IOException e ) {
-			throw new JsonIOException( e );
-		}
+		return jsonConverter.toMapFrom( object );
 	}
 
 	/**
@@ -601,9 +354,7 @@ public class Reflector {
 	 * @return true if value is json date format
 	 */
 	public static boolean isJsonDate( Object value ) {
-		if( Types.isNotString(value) ) return false;
-		String val = value.toString();
-		return Validator.isMatched( val, "\\d{4}-(0[0-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])T([0-1][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]\\.\\d{3}[+-]([0-1][0-9]|2[0-4])[0-5][0-9]" );
+		return jsonConverter.isJsonDate( value );
 	}
 
 }
