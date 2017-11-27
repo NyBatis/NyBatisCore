@@ -3,7 +3,9 @@ package org.nybatis.core.reflection;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
@@ -248,6 +250,27 @@ public class Reflector {
 
 	}
 
+	public static JsonNode readTree( String json ) throws JsonIOException {
+
+
+		// TODO : read tree structure
+/**
+ *  JsonNode node = mapper.readTree( json );
+ *  Iterator<String> names = node.fieldNames();
+ *  while (names.hasNext()) {
+ *   String name = (String) names.next();
+ *   JsonNodeType type = node.get(name).getNodeType();
+ *   System.out.println(name+":"+type); //will print id:STRING
+ *  }
+ */
+
+		try {
+			return objectMapper.readTree( json );
+		} catch( IOException e ) {
+			throw new JsonIOException( e );
+		}
+	}
+
 	/**
 	 * Get map with unflatten key
 	 *
@@ -452,7 +475,7 @@ public class Reflector {
 	 * @param <T>			return type
 	 * @return bean filled by json value
 	 */
-	private static <T> T toBeanFromJson( String jsonString, TypeReference<T> typeReference ) {
+	private static <T> T toBeanFromJson( String jsonString, TypeReference<T> typeReference ) throws JsonIOException {
 		try {
 			return objectMapper.readValue( getContent( jsonString ), typeReference );
 		} catch( JsonParseException e ) {

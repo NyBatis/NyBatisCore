@@ -1,8 +1,8 @@
 package org.nybatis.core.file.handler;
 
 import org.nybatis.core.exception.unchecked.JsonIOException;
-import org.nybatis.core.file.annotation.ExcelReadAnnotationInspector;
-import org.nybatis.core.file.annotation.ExcelWriteAnnotationInspector;
+import org.nybatis.core.reflection.inspector.ExcelReadAnnotationInspector;
+import org.nybatis.core.reflection.inspector.ExcelWriteAnnotationInspector;
 import org.nybatis.core.file.handler.implement.ExcelHandlerApachePoi;
 import org.nybatis.core.file.vo.User;
 import org.nybatis.core.file.vo.UserForExcelReader;

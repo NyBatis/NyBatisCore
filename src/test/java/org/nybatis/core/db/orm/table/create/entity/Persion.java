@@ -1,4 +1,4 @@
-package org.nybatis.core.db.orm.entity;
+package org.nybatis.core.db.orm.table.create.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

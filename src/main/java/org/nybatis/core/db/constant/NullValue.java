@@ -40,5 +40,34 @@ public class NullValue {
     public static final List         LIST              = new ArrayList<>();
     public static final NList        NLIST             = new NList();
     public static final Set          SET               = new HashSet<>();
+    public static final Map          MAP               = new HashMap();
+    public static final NMap         NMAP              = new NMap();
+
+    public static boolean isNull( Object value ) {
+        if( value == null ) return false;
+        return
+            value == NullValue.STRING            ||
+            value == NullValue.BOOLEAN           ||
+            value == NullValue.INTEGER           ||
+            value == NullValue.LONG              ||
+            value == NullValue.FLOAT             ||
+            value == NullValue.DOUBLE            ||
+            value == NullValue.BIG_DECIMAL       ||
+            value == NullValue.ARRAY_STRING      ||
+            value == NullValue.ARRAY_BOOLEAN     ||
+            value == NullValue.ARRAY_INTEGER     ||
+            value == NullValue.ARRAY_LONG        ||
+            value == NullValue.ARRAY_FLOAT       ||
+            value == NullValue.ARRAY_DOUBLE      ||
+            value == NullValue.ARRAY_BIG_DECIMAL ||
+            value == NullValue.NDATE             ||
+            value == NullValue.DATE              ||
+            value == NullValue.LIST              ||
+            value == NullValue.NLIST             ||
+            value == NullValue.SET               ||
+            value == NullValue.MAP               ||
+            value == NullValue.NMAP
+            ;
+    }
 
 }

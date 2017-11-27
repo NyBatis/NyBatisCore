@@ -91,6 +91,22 @@ public class Types {
         return converter.isPrimitive( klass ) || converter.isWrapper( klass );
     }
 
+    public static boolean isBoolean( Object object ) {
+        return object != null && isBoolean( object.getClass() );
+    }
+
+    public static boolean isNotBoolean( Object object ) {
+        return ! isBoolean( object );
+    }
+
+    public static boolean isBoolean( Class klass ) {
+        return klass == Boolean.class || klass == boolean.class;
+    }
+
+    public static boolean isNotBoolean( Class klass ) {
+        return ! isBoolean( klass );
+    }
+
     public static boolean isNotPrimitive( Class klass ) {
         return ! isPrimitive( klass );
     }
