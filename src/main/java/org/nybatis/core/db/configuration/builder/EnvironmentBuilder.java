@@ -42,10 +42,10 @@ public class EnvironmentBuilder {
 
 		NLogger.trace( "configurate datasource (id:{})", environmentId );
 
+		setStopOnFailConnecting( environment );
 		setJdbcDatasource( environment );
 		setUnpooledJdbcDatasource( environment );
 		setJndiDatasource( environment );
-
 		setEnableDDL( environment );
 
 	}
