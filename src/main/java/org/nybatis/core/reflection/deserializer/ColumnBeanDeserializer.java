@@ -1,7 +1,6 @@
 package org.nybatis.core.reflection.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
 import org.nybatis.core.reflection.Reflector;
@@ -21,10 +20,6 @@ public class ColumnBeanDeserializer extends JsonDeserializer<Object> implements 
 		} else {
 			return objectMapper.readValue( json, javaType );
 		}
-	}
-
-	private ObjectMapper getObjectMapper( JsonParser p ) {
-		return (ObjectMapper) p.getCodec();
 	}
 
 	@Override
