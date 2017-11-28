@@ -3,15 +3,12 @@ package org.nybatis.core.db.sql.sqlMaker;
 import java.math.BigDecimal;
 import java.util.*;
 
-import org.nybatis.core.db.session.executor.util.DbUtils;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
-import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.reflection.Reflector;
-import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.reflection.core.JsonConverter;
 import org.nybatis.core.util.Types;
-import org.w3c.dom.NameList;
 
 /**
  * Parameter Value to bind in SQL
@@ -99,7 +96,7 @@ public class BindParam {
         	return;
         }
 
-		if( Reflector.isJsonDate(value) ) {
+		if( JsonConverter.isJsonDate(value) ) {
 			this.value = value = new NDate( value.toString(), NDate.ISO_8601_24H_FULL_FORMAT ).toDate();
 		}
 
@@ -163,20 +160,19 @@ public class BindParam {
 			if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
 			type = SqlType.DATE;
 
-//		} else if( type == SqlType.BOOLEAN ) {
-//			if( Types.isString(value) ) {
-//				this.value = StringUtil.toBoolean( value );
-//			}
-
 		// Databse Native Array Object (Must be defined it's type in database)
 		} else if( type == SqlType.ARRAY ) {
 			this.value = value;
 
 		} else if( type == SqlType.VARCHAR || type == SqlType.CHAR || type == SqlType.CLOB || type == SqlType.LONGVARBINARY || type == SqlType.LONGNVARCHAR ) {
-			if( value instanceof Collection || value instanceof Map ) {
-				this.value = Reflector.toJson( value );
+			if( Types.isPrimitive(value) ) {
+				this.value = value;
 			} else {
-				this.value = value.toString();
+				try {
+					this.value = Reflector.toJson( value );
+				} catch( Exception e ) {
+					this.value = value.toString();
+				}
 			}
 		}
 

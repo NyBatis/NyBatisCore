@@ -34,6 +34,8 @@ public class Chain {
     private String chainType;
     @Column(type=Types.CLOB)
     private NMap   chainProp = new NMap();
+    @Column(type=Types.CLOB)
+    private Map    etcProp = new HashMap();
     @Column(type=Types.CHAR, length=1 )
     private String skipYn    = "N";
     @Column(type=Types.CHAR,length=1)

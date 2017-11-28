@@ -1,5 +1,6 @@
 package org.nybatis.core.reflection.inspector;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
@@ -11,7 +12,6 @@ import org.nybatis.core.reflection.serializer.column.ColumnBeanSerializer;
 import org.nybatis.core.reflection.serializer.column.ColumnBooleanSerializer;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
-import org.nybatis.core.validation.Validator;
 
 /**
  * Column Annotation Introspector
@@ -53,7 +53,7 @@ public class ColumnAnnotationInspector extends JacksonAnnotationIntrospector {
         try {
             classType = ( (AnnotatedMethod) annotated ).getRawParameterType( 0 );
         } catch( Exception e ) {
-            return super.findDeserializer( annotated );
+            classType = annotated.getRawType();
         }
 
         if( Types.isNotString(classType) ) {
@@ -68,12 +68,8 @@ public class ColumnAnnotationInspector extends JacksonAnnotationIntrospector {
 
     }
 
-    private Column getAnnotation( Annotated annotated ) {
-        return annotated.getAnnotation( Column.class );
-    }
-
     private boolean isStringType( Annotated annotated ) {
-        Column annotation = getAnnotation( annotated );
+        Column annotation = annotated.getAnnotation( Column.class );
         switch( annotation.type() ) {
             case java.sql.Types.VARCHAR :
             case java.sql.Types.CHAR :
@@ -98,14 +94,26 @@ public class ColumnAnnotationInspector extends JacksonAnnotationIntrospector {
     }
 
     private PropertyName getPropertyName( Annotated annotated ) {
-        Column annotation = getAnnotation( annotated );
-        if ( annotation != null && Validator.isNotEmpty(annotation.name()) ) {
-            String name = annotation.name();
+
+        Column column = annotated.getAnnotation( Column.class );
+        if ( column != null && StringUtil.isNotEmpty(annotated.getName()) ) {
+            String name = column.name();
             name = StringUtil.toUncamel( name );
             name = StringUtil.toCamel( name );
             return new PropertyName( name );
         }
+
+        JsonProperty jsonProperty = annotated.getAnnotation( JsonProperty.class );
+        if( jsonProperty != null ) {
+            if( StringUtil.isNotEmpty(jsonProperty.value()) ) {
+                return new PropertyName( jsonProperty.value() );
+            } else {
+                return PropertyName.USE_DEFAULT;
+            }
+        }
+
         return null;
+
     }
 
 }

@@ -34,21 +34,23 @@ public class OrmTableInsertAnnotationTest {
     }
 
     @Test
-    public void jsonTest() {
+    public void basicJsonBind() {
 
-        JsonConverter jsonConverter = new JsonConverter( new NObjectSqlMapper() );
+        JsonConverter $ = new JsonConverter( new NObjectSqlMapper() );
 
-        String json = jsonConverter.toJson( getSampleData(), true );
+        String json = $.toJson( getSampleData(), true );
         NLogger.debug( json );
 
-        Person person = jsonConverter.toBeanFrom( json, Person.class );
-
+        NLogger.debug( ">> convert json from ListString" );
+        Person person = $.toBeanFrom( json, Person.class );
         NLogger.debug( Reflector.toJson( person, true ) );
 
         // convert json from List (not list string)
-        json  = "{\"id\" : \"01001\",\"name\" : \"Jhon Dow\",\"age\" : 21,\"used\" : \"Y\",\"property\" : [{\"id\":\"01001\",\"nation\":\"America\",\"location\":\"Delaware\"}] }";
-        person = jsonConverter.toBeanFrom( json, Person.class );
+        json  = "{\"id\" : \"01001\",\"name\" : \"Jhon Dow\",\"used\" : \"N\",\"age\" : 21,\"property\" : [{\"id\":\"01001\",\"nation\":\"America\",\"location\":\"Delaware\"}], \"mixedProperty\" : {\"test\":{\"id\":\"01001\",\"nation\":\"America\",\"location\":\"Delaware\"}}, \"nmap\" : {\"ichigo\":\"yata\"} }";
+        NLogger.debug( json );
+        person = $.toBeanFrom( json, Person.class );
 
+        NLogger.debug( ">> convert json from List" );
         NLogger.debug( Reflector.toJson( person, true ) );
 
     }
