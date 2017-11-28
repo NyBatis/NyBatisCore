@@ -19,6 +19,7 @@ public class DatasourceManager {
 
 	private static Map<String, DataSource>        datasourceRepository = new Hashtable<>();
 	private static Map<String, DatabaseAttribute> attributeRepository  = new Hashtable<>();
+	private static Map<String, Boolean>           stopOnFailConnecting = new Hashtable<>();
 
 	private static String defaultEnvironmentId;
 
@@ -28,19 +29,19 @@ public class DatasourceManager {
 			defaultEnvironmentId = environmentId;
 		}
 
-		DatabaseAttribute databaseAttribute;
 		try {
-			databaseAttribute = DatabaseAttributeManager.get( datasource );
+			DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
+			setPingQuery( datasource, databaseAttribute.getPingQuery() );
+			datasourceRepository.put( environmentId, datasource );
+			attributeRepository.put( environmentId, databaseAttribute );
 		} catch( DatabaseConfigurationException e ) {
-			throw new DatabaseConfigurationException( e, "Error on initializing datasoure environment(id:{})", environmentId );
+			if( isStopOnFailConnecting(environmentId) ) {
+				throw new DatabaseConfigurationException( e, "Error on initializing datasoure environment(id:{})", environmentId );
+			} else {
+				NLogger.error( "Error on initializing datasoure environment(id:{})", environmentId );
+				NLogger.error( e );
+			}
 		}
-
-		setPingQuery( datasource, databaseAttribute.getPingQuery() );
-
-		datasourceRepository.put( environmentId, datasource );
-		attributeRepository.put( environmentId, databaseAttribute );
-
-		DatabaseAttributeManager.get( datasource );
 
 	}
 
@@ -143,6 +144,14 @@ public class DatasourceManager {
 		DatabaseAttribute attributes = getAttributes( environmentId );
 		if( attributes == null ) return DatabaseName.NULL;
 		return DatabaseName.get( attributes.getDatabase() );
+	}
+
+	public static boolean isStopOnFailConnecting( String environmentId ) {
+		return stopOnFailConnecting.getOrDefault( environmentId, true );
+	}
+
+	public static void setStopOnFailConnecting( String environmentId, boolean state ) {
+		stopOnFailConnecting.put( environmentId, state );
 	}
 
 }

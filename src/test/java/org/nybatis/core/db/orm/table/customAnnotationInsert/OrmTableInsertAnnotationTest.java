@@ -7,6 +7,7 @@ import org.nybatis.core.db.orm.table.customAnnotationInsert.entity.PersonPropert
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.reflection.core.JsonConverter;
 import org.nybatis.core.reflection.mapper.NObjectSqlMapper;
@@ -63,15 +64,20 @@ public class OrmTableInsertAnnotationTest {
 
         session.insert( sampleData );
         List<Person> list = session.list().select();
+        NLogger.debug( list );
 
         Assert.assertEquals( list.size(), 1 );
-        NLogger.debug( list );
+        Assert.assertTrue( list.get(0).getProperty().iterator().next() instanceof PersonProperty );
 
     }
 
     private Person getSampleData() {
+        PersonProperty property = new PersonProperty( "01001", "America", "Delaware" );
+
         Person person = new Person( "01001", "Jhon Dow", 21  );
-        person.getProperty().add( new PersonProperty( "01001", "America", "Delaware" ) );
+        person.getProperty().add( property );
+        person.setNmap( new NMap("{'ichigo':'yata'}") );
+        person.addMixedProperty( "test", property );
         return person;
     }
 

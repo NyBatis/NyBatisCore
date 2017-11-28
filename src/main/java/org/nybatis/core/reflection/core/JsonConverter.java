@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.*;
+import org.apache.poi.ss.formula.functions.T;
 import org.nybatis.core.exception.unchecked.JsonIOException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
@@ -16,6 +17,7 @@ import java.util.*;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.ALWAYS;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static javafx.scene.input.KeyCode.Q;
 
 /**
  * @author nayasis@gmail.com
@@ -401,6 +403,16 @@ public class JsonConverter {
             return objectMapper.readValue( getArrayContent(jsonString), objectMapper.getTypeFactory().constructCollectionType(List.class, typeClass) );
         } catch( JsonParseException e ) {
             throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), jsonString );
+        } catch( IOException e ) {
+            throw new JsonIOException( e );
+        }
+    }
+
+    public <T> Collection<T> toCollectionFromJson( String json, Class<? extends Collection> collectionClass, Class<T> typeClass ) throws JsonIOException {
+        try {
+            return objectMapper.readValue( getArrayContent(json), objectMapper.getTypeFactory().constructCollectionType(collectionClass, typeClass) );
+        } catch( JsonParseException e ) {
+            throw new JsonIOException( "JsonParseException : {}\n\t-source :\n{}\n", e.getMessage(), json );
         } catch( IOException e ) {
             throw new JsonIOException( e );
         }
