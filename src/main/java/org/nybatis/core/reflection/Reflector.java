@@ -1,6 +1,7 @@
 package org.nybatis.core.reflection;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Collection;
 import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JsonIOException;
@@ -262,13 +263,17 @@ public class Reflector {
 	/**
 	 * convert json to list
 	 *
-	 * @param jsonString	json text
+	 * @param json			json text
 	 * @param typeClass   	list's generic type
 	 * @param <T> generic type
      * @return list
      */
-	public static <T> List<T> toListFromJson( String jsonString, Class<T> typeClass ) throws JsonIOException {
-		return jsonConverter.toListFromJson( jsonString, typeClass );
+	public static <T> List<T> toListFromJson( String json, Class<T> typeClass ) throws JsonIOException {
+		return jsonConverter.toListFromJson( json, typeClass );
+	}
+
+	public static <T> Collection<T> toCollectionFromJson( String json, Class<? extends Collection> collectionClass, Class<T> typeClass ) throws JsonIOException {
+		return jsonConverter.toCollectionFromJson( json, collectionClass, typeClass );
 	}
 
 	/**

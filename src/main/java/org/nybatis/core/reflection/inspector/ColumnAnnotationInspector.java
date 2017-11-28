@@ -1,5 +1,6 @@
 package org.nybatis.core.reflection.inspector;
 
+import com.fasterxml.jackson.databind.PropertyName;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.AnnotatedMethod;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
@@ -8,7 +9,9 @@ import org.nybatis.core.reflection.deserializer.ColumnBeanDeserializer;
 import org.nybatis.core.reflection.deserializer.ColumnBooleanDeserializer;
 import org.nybatis.core.reflection.serializer.column.ColumnBeanSerializer;
 import org.nybatis.core.reflection.serializer.column.ColumnBooleanSerializer;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
+import org.nybatis.core.validation.Validator;
 
 /**
  * Column Annotation Introspector
@@ -82,6 +85,27 @@ public class ColumnAnnotationInspector extends JacksonAnnotationIntrospector {
                 return true;
         }
         return false;
+    }
+
+    @Override
+    public PropertyName findNameForSerialization( Annotated annotated ) {
+        return getPropertyName( annotated );
+    }
+
+    @Override
+    public PropertyName findNameForDeserialization( Annotated annotated ) {
+        return getPropertyName( annotated );
+    }
+
+    private PropertyName getPropertyName( Annotated annotated ) {
+        Column annotation = getAnnotation( annotated );
+        if ( annotation != null && Validator.isNotEmpty(annotation.name()) ) {
+            String name = annotation.name();
+            name = StringUtil.toUncamel( name );
+            name = StringUtil.toCamel( name );
+            return new PropertyName( name );
+        }
+        return null;
     }
 
 }

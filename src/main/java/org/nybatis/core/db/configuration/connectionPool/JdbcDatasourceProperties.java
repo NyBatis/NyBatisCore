@@ -30,13 +30,9 @@ public class JdbcDatasourceProperties {
 	}
 
 	public void setPoolMin( String count ) {
-
 		try {
-
 			this.poolMin = Integer.parseInt( count );
-
 		} catch( NumberFormatException e ) {}
-
 	}
 
 	public int getPoolMax() {
@@ -48,13 +44,9 @@ public class JdbcDatasourceProperties {
 	}
 
 	public void setPoolMax( String count ) {
-
 		try {
-
 			this.poolMax = Integer.parseInt( count );
-
 		} catch( NumberFormatException e ) {}
-
 	}
 
 	public int getPoolStep() {
@@ -93,13 +85,9 @@ public class JdbcDatasourceProperties {
 	}
 
 	public void setPingCycle( String seconds ) {
-
 		try {
-
 			this.pingCycle = Integer.parseInt( seconds ) * 1_000;
-
 		} catch( NumberFormatException e ) {}
-
 	}
 
     public boolean isPingEnable() {

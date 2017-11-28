@@ -1,12 +1,12 @@
 package org.nybatis.core.db.orm.table.customAnnotationInsert.entity;
 
+import java.util.*;
 import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
 
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
+import org.nybatis.core.model.NMap;
 
 /**
  * @author nayasis@gmail.com
@@ -19,7 +19,9 @@ public class Person {
         @Column(length=100 )                 private String               name;
                                              private int                  age;
         @Column(type=Types.VARCHAR,length=1) private boolean              used;
-        @Column(type=Types.CLOB )            private List<PersonProperty> property = new ArrayList<>();
+        @Column(type=Types.CLOB )            private Set<PersonProperty>  property = new LinkedHashSet<>();
+        @Column(type=Types.CLOB )            private NMap                 nmap     = new NMap();
+        @Column(type=Types.CLOB )            private Map<String,PersonProperty> mixedProperty = new HashMap<>();
 
     public Person() {}
 
@@ -61,12 +63,32 @@ public class Person {
         this.used = used;
     }
 
-    public List<PersonProperty> getProperty() {
+    public Set<PersonProperty> getProperty() {
         return property;
     }
 
-    public void setProperty( List<PersonProperty> property ) {
+    public void setProperty( Set<PersonProperty> property ) {
         this.property = property;
+    }
+
+    public NMap getNmap() {
+        return nmap;
+    }
+
+    public void setNmap( NMap nmap ) {
+        this.nmap = nmap;
+    }
+
+    public Map<String, PersonProperty> getMixedProperty() {
+        return mixedProperty;
+    }
+
+    public void setMixedProperty( Map<String, PersonProperty> mixedProperty ) {
+        this.mixedProperty = mixedProperty;
+    }
+
+    public void addMixedProperty( String key, PersonProperty personProperty ) {
+        mixedProperty.put( key, personProperty );
     }
 
 }

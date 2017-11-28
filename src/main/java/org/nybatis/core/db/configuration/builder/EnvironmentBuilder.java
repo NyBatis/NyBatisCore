@@ -67,6 +67,13 @@ public class EnvironmentBuilder {
 		setRecreationDDL( recreation );
 	}
 
+	private void setStopOnFailConnecting( Node environment ) {
+		Node node = environment.getChildElement( "stopOnFailConnecting" );
+		if( node.isNull() ) return;
+		boolean enable = StringUtil.toBoolean( node.getValue() );
+		setStopOnFailConnecting( enable );
+	}
+
 	private void setJdbcDatasource( Node environment ) {
 
 		Node datasource = environment.getChildElement( "datasourceJdbc" );
@@ -154,19 +161,14 @@ public class EnvironmentBuilder {
 	}
 
 	private void setJndiDatasource( Node environment ) {
-
 		Node datasource = environment.getChildElement( "datasourceJndi" );
-
 		if( datasource.isNull() ) return;
-
 		JndiConnectionProperties jndiConnectionProperties = new JndiConnectionProperties(
-				prop.getValue( datasource, "initialContext" ),
-				prop.getValue( datasource, "providerUrl"    ),
-				prop.getValue( datasource, "name"           )
+			prop.getValue( datasource, "initialContext" ),
+			prop.getValue( datasource, "providerUrl"    ),
+			prop.getValue( datasource, "name"           )
 		);
-
 		setJndiDatasource( jndiConnectionProperties );
-
 	}
 
 	private void setJndiDatasource( JndiConnectionProperties jndiConnectionProperties ) {
@@ -192,6 +194,14 @@ public class EnvironmentBuilder {
 
 	public boolean isRecreationDDL() {
 		return TableLayoutRepository.isRecreationDDL( environmentId );
+	}
+
+	public boolean isStopOnFailConnecting() {
+		return DatasourceManager.isStopOnFailConnecting( environmentId );
+	}
+
+	public void setStopOnFailConnecting( boolean state ) {
+		DatasourceManager.setStopOnFailConnecting( environmentId, state );
 	}
 
 }
