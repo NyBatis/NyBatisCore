@@ -39,8 +39,25 @@ public class Reflector {
 	 */
     @SuppressWarnings( "unchecked" )
     public static <T> T clone( T object ) {
-		return new Cloner().deepClone( object );
+		return clone( object, true );
     }
+
+	/**
+	 * Creates and returnes a copy of object
+	 *
+	 * @param object 	object to clone
+	 * @param deepClone if true, clone all elements in object's Map or Collection
+	 * @param <T> object's generic type
+	 * @return a clone of object
+	 */
+	@SuppressWarnings( "unchecked" )
+	public static <T> T clone( T object, boolean deepClone ) {
+		if( deepClone ) {
+			return new Cloner().deepClone( object );
+		} else {
+			return new Cloner().shallowClone( object );
+		}
+	}
 
 	/**
 	 * Copy data in instance
