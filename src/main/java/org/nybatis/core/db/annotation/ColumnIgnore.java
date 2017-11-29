@@ -1,9 +1,6 @@
 package org.nybatis.core.db.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * ignorance indicator on table creation
@@ -11,6 +8,7 @@ import java.lang.annotation.Target;
  * @author nayasis@gmail.com
  *
  */
+@Inherited
 @Target({ ElementType.FIELD })
 @Retention( RetentionPolicy.RUNTIME )
 public @interface ColumnIgnore {}

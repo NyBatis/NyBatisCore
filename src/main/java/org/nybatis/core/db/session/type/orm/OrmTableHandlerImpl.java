@@ -151,12 +151,12 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     private void createTable() {
-        sqlSession.sql( tableSqlMaker.sqlCreateTable(entityLayout) ).execute();
+        executeSql( tableSqlMaker.sqlCreateTable(entityLayout) );
         if( isNotDatabase(SQLITE) ) {
-            sqlSession.sql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
         }
         for( TableIndex index : entityLayout.getIndices() ) {
-            sqlSession.sql( tableSqlMaker.sqlCreateIndex(index, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
     }
 
@@ -190,13 +190,13 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     private void addColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
             String sqlDefine = tableSqlMaker.sqlAddColumn( column, entityLayout );
-            if( StringUtil.isNotEmpty(sqlDefine) ) sqlSession.sql( sqlDefine ).execute();
+            executeSql( sqlDefine );
         }
     }
 
     private void modifyColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
-            sqlSession.sql( tableSqlMaker.sqlModifyColumn(column, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlModifyColumn(column, entityLayout) );
         }
     }
 
@@ -213,9 +213,9 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
             String sqlNotNullCurr = tableSqlMaker.sqlModifyColumn( column,     false, false, true, entityLayout );
             String sqlNotNullPrev = tableSqlMaker.sqlModifyColumn( prevColumn, false, false, true, entityLayout );
 
-            if( sqlTypeCurr    != null && ! sqlTypeCurr.equals(sqlTypePrev)       ) sqlSession.sql( sqlTypeCurr    ).execute();
-            if( sqlDefaultCurr != null && ! sqlDefaultCurr.equals(sqlDefaultPrev) ) sqlSession.sql( sqlDefaultCurr ).execute();
-            if( sqlNotNullCurr != null && ! sqlNotNullCurr.equals(sqlNotNullPrev) ) sqlSession.sql( sqlNotNullCurr ).execute();
+            if( sqlTypeCurr    != null && ! sqlTypeCurr.equals(sqlTypePrev)       ) executeSql( sqlTypeCurr    );
+            if( sqlDefaultCurr != null && ! sqlDefaultCurr.equals(sqlDefaultPrev) ) executeSql( sqlDefaultCurr );
+            if( sqlNotNullCurr != null && ! sqlNotNullCurr.equals(sqlNotNullPrev) ) executeSql( sqlNotNullCurr );
 
         }
 
@@ -224,26 +224,26 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
     private void dropColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
-            sqlSession.sql( tableSqlMaker.sqlDropColumn(column, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlDropColumn(column, entityLayout) );
         }
     }
 
     private void addIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
-            sqlSession.sql( tableSqlMaker.sqlCreateIndex(index, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
     }
 
     private void dropIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
-            sqlSession.sql( tableSqlMaker.sqlDropIndex(index, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlDropIndex(index, entityLayout) );
         }
     }
 
     private void modifyIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
-            sqlSession.sql( tableSqlMaker.sqlDropIndex(index, entityLayout) ).execute();
-            sqlSession.sql( tableSqlMaker.sqlCreateIndex(index, entityLayout) ).execute();
+            executeSql( tableSqlMaker.sqlDropIndex(index, entityLayout) );
+            executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
     }
 
@@ -251,9 +251,14 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         TableLayout prevLayout = getLayout();
         if( prevLayout != null && prevLayout.hasPk() ) {
             entityLayout.setPkName( prevLayout.getPkName() );
-            sqlSession.sql( tableSqlMaker.sqlDropPrimaryKey(prevLayout) ).execute();
+            executeSql( tableSqlMaker.sqlDropPrimaryKey(prevLayout) );
         }
-        sqlSession.sql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) ).execute();
+        executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
+    }
+
+    private void executeSql( String sql ) {
+        if( StringUtil.isEmpty(sql) ) return;
+        sqlSession.sql( sql ).execute();
     }
 
     private boolean isDatabase( DatabaseName... dbName ) {

@@ -1,6 +1,7 @@
 package org.nybatis.core.db.annotation;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -14,6 +15,7 @@ import org.nybatis.core.validation.Validator;
  * @author nayasis@gmail.com
  *
  */
+@Inherited
 @Target(ElementType.METHOD)
 public @interface Index {
 
