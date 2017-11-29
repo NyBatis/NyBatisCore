@@ -244,6 +244,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlAddPrimaryKey( TableLayout tableLayout ) {
+        if( tableLayout == null || tableLayout.getPkColumns().size() == 0 ) return null;
         String pkName = tableLayout.getPkName();
         if( StringUtil.isEmpty(pkName) ) {
             pkName = "PK_" + tableLayout.getName();
