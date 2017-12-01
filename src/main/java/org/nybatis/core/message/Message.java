@@ -158,17 +158,12 @@ public class Message {
      * @throws UncheckedIOException if I/O exception occurs.
      */
     public static void loadPool() throws UncheckedIOException {
-
         String configPath = Const.path.toResourceName( Const.path.getConfigMessage() );
-
         List<String> resourceNames = ClassUtil.findResources( configPath + "/**.prop" );
-
         Collections.sort( resourceNames );
-
         for( String name : resourceNames ) {
             loadPool( name );
         }
-
     }
 
     /**
