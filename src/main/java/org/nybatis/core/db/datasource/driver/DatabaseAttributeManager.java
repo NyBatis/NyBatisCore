@@ -95,7 +95,10 @@ public class DatabaseAttributeManager {
         add( new DatabaseAttribute( "mysql",      "com\\.mysql\\.jdbc"          ) );
         add( new DatabaseAttribute( "maria",      "org\\.mariadb\\.jdbc"        ) );
         add( new DatabaseAttribute( "sqlite",     "org\\.sqlite\\."             ) );
-        add( new DatabaseAttribute( "h2",         "org\\.h2\\.jdbc"             ) );
+
+        add( new DatabaseAttribute("h2", "org\\.h2\\.jdbc" )
+            .setPageSqlPost( "LIMIT (#{end} - #{start} + 1) OFFSET (#{start} - 1)" )
+        );
 
         //   Not Tested  !
         add( new DatabaseAttribute( "derby",      "org\\.apache\\.derby\\.jdbc" ) );
