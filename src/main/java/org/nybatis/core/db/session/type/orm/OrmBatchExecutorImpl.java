@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import java.util.Collection;
 import org.nybatis.core.db.session.type.sql.BatchExecutorImpl;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.model.NMap;
@@ -30,21 +31,21 @@ public class OrmBatchExecutorImpl<T> implements OrmBatchExecutor<T> {
     }
 
     @Override
-    public int insert( List<?> parameters ) {
+    public int insert( Collection<?> parameters ) {
         return executeBatch( properties.sqlIdInsertPk(), parameters );
     }
 
     @Override
-    public int update( List<?> parameters ) {
+    public int update( Collection<?> parameters ) {
         return executeBatch( properties.sqlIdUpdatePk(), parameters );
     }
 
     @Override
-    public int delete( List<?> parameters ) {
+    public int delete( Collection<?> parameters ) {
         return executeBatch( properties.sqlIdDeletePk(), parameters );
     }
 
-    private int executeBatch( String sqlId, List<?> params ) {
+    private int executeBatch( String sqlId, Collection<?> params ) {
 
         List<NMap> parameters = properties.getParameters( params );
 

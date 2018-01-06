@@ -1,6 +1,7 @@
 package org.nybatis.core.db.session.type.orm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.datasource.DatasourceManager;
@@ -157,7 +158,7 @@ public class OrmSessionProperties implements Cloneable {
         return result;
     }
 
-    public List<NMap> getParameters( List<?> parameters ) {
+    public List<NMap> getParameters( Collection<?> parameters ) {
         Assertion.isNotNull( parameters, "parameters is null" );
         List<NMap> list = new ArrayList<>();
         int index = 0;
