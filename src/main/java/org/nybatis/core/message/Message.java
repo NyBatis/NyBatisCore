@@ -110,17 +110,15 @@ public class Message {
      * @return message corresponding to code
      */
     private static String getMessage( Object code, Locale locale ) {
-
         if( code == null ) return "null";
-
     	if( ! messagePool.containsKey(code) ) return StringUtil.nvl( code );
-
     	Map<Locale, String> messages = messagePool.get( code );
-
         Locale pickedLocal = messages.containsKey( locale ) ? locale : NULL_LOCALE;
-
     	return messages.get( pickedLocal );
+    }
 
+    private static String getMessage( Object code ) {
+        return getMessage( code, Locale.getDefault() );
     }
 
     /**
@@ -131,21 +129,17 @@ public class Message {
      */
     public static String toJavaScript( String javascriptMessageObjectName ) {
 
-        StringBuffer contents = new StringBuffer();
-
+        StringBuilder contents = new StringBuilder();
         contents.append( javascriptMessageObjectName ).append( '=' );
 
         Map<String, String> map = new HashMap<>();
-
         for( String key : messagePool.keySet() ) {
-            map.put( key, get(key) );
+            map.put( key, getMessage(key) );
         }
 
         contents.append( Reflector.toJson( map ) );
         contents.append( "\n" );
-
         return contents.toString();
-
     }
 
     /**
