@@ -59,7 +59,8 @@ public class OrmTableInsertAnnotationTest {
     public void test() {
 
         OrmSession<Person> session = SessionManager.openOrmSession( Person.class );
-        session.table().drop().set();
+        session.table().drop();
+        session.table().set();
 
         Person sampleData = getSampleData();
         NLogger.debug( Reflector.toJson( sampleData ) );

@@ -122,7 +122,8 @@ public class OrmTableCreationTest {
         OrmSession<Employee> session = SessionManager.openOrmSession( Employee.class );
 
         session.setEnvironmentId( environmentId );
-        session.table().drop().set().set();
+        session.table().drop();
+        session.table().set();
 
         session.insert( getSampleTuple() );
         session.commit();
