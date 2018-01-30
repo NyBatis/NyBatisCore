@@ -66,29 +66,29 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     @Override
-    public OrmTableHandler<T> drop() {
+    public boolean drop() {
+        if( ! exists() ) return false;
         SqlLogHider.$.hideDebugLog( () -> {
-            if( exists() ) {
-                sqlSession.sql( tableSqlMaker.sqlDropTable( getLayout() ) ).execute();
-                commit();
-                refreshLayout();
-            }
+            sqlSession.sql( tableSqlMaker.sqlDropTable( getLayout() ) ).execute();
+            commit();
+            refreshLayout();
         });
-        return this;
+        return true;
     }
 
     @Override
-    public OrmTableHandler<T> set() {
-        if( ! isDDLExecutable() ) return this;
+    public boolean set() {
+        if( ! isDDLExecutable() ) return false;
+        Boolean[] result = { Boolean.FALSE };
         SqlLogHider.$.hideDebugLog( () -> {
             if( notExists() ) {
-                createTable();
+                result[0] = createTable();
             } else {
                 if( isChanged() ) {
                     NLogger.trace( ">> previous table layout\n{}", getLayout() );
                     NLogger.trace( ">> current  table layout\n{}", entityLayout );
                     try {
-                        modifiyTable();
+                        result[0] = modifiyTable();
                     } catch( SqlException e ) {
                         if( canRecreatTable() ) {
                             NLogger.error( e );
@@ -98,7 +98,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
                                 sqlSession.getDatabase().name
                             );
                             drop();
-                            createTable();
+                            result[0] = createTable();
                         } else {
                             throw new SqlConfigurationException( e,
                                 "table({}) can't be re-create because ORM option[environment(id:{}) > ddl > recreation] is [false]",
@@ -112,7 +112,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
             refreshLayout();
             commit();
         });
-        return this;
+        return result[0];
     }
 
     private boolean isDDLExecutable() {
@@ -150,57 +150,65 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         return ! prevLayout.isEqual( currLayout );
     }
 
-    private void createTable() {
-        executeSql( tableSqlMaker.sqlCreateTable(entityLayout) );
+    private boolean createTable() {
+        boolean result = false;
+        result |= executeSql( tableSqlMaker.sqlCreateTable(entityLayout) );
         if( isNotDatabase(SQLITE) ) {
-            executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
+            result |= executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
         }
         for( TableIndex index : entityLayout.getIndices() ) {
-            executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
+            result |= executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
+        return result;
     }
 
-    private void modifiyTable() {
+    private boolean modifiyTable() {
+
+        boolean result = false;
 
         TableLayout prevLayout = getLayout();
         TableLayout currLayout = entityLayout;
 
-        addColumns( currLayout.getColumnsToAdd(prevLayout) );
+        result |= addColumns( currLayout.getColumnsToAdd(prevLayout) );
 
         if( ! currLayout.isPkEqual(prevLayout) ) {
-            modifyPk();
+            result |= modifyPk();
         }
 
-        dropColumns( currLayout.getColumnsToDrop(prevLayout) );
+        result |= dropColumns( currLayout.getColumnsToDrop(prevLayout) );
 
         if( isDatabase(ORACLE) ) {
-            modifyColumns( currLayout.getColumnsToModify(prevLayout), prevLayout );
+            result |= modifyColumns( currLayout.getColumnsToModify(prevLayout), prevLayout );
         } else {
-            modifyColumns( currLayout.getColumnsToModify(prevLayout) );
+            result |= modifyColumns( currLayout.getColumnsToModify(prevLayout) );
         }
 
-        addIndices( currLayout.getIndicesToAdd(prevLayout) );
-        dropIndices( currLayout.getIndicesToDrop(prevLayout) );
-        modifyIndices( currLayout.getIndicesToModify(prevLayout) );
+        result |= addIndices( currLayout.getIndicesToAdd(prevLayout) );
+        result |= dropIndices( currLayout.getIndicesToDrop(prevLayout) );
+        result |= modifyIndices( currLayout.getIndicesToModify(prevLayout) );
 
-
+        return result;
 
     }
 
-    private void addColumns( List<TableColumn> columns ) {
+    private boolean addColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
             String sqlDefine = tableSqlMaker.sqlAddColumn( column, entityLayout );
             executeSql( sqlDefine );
         }
+        return columns.size() > 0;
     }
 
-    private void modifyColumns( List<TableColumn> columns ) {
+    private boolean modifyColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
             executeSql( tableSqlMaker.sqlModifyColumn(column, entityLayout) );
         }
+        return columns.size() > 0;
     }
 
-    private void modifyColumns( List<TableColumn> columns, TableLayout previousTable ) {
+    private boolean modifyColumns( List<TableColumn> columns, TableLayout previousTable ) {
+
+        boolean result = false;
 
         for( TableColumn column : columns ) {
 
@@ -213,52 +221,63 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
             String sqlNotNullCurr = tableSqlMaker.sqlModifyColumn( column,     false, false, true, entityLayout );
             String sqlNotNullPrev = tableSqlMaker.sqlModifyColumn( prevColumn, false, false, true, entityLayout );
 
-            if( sqlTypeCurr    != null && ! sqlTypeCurr.equals(sqlTypePrev)       ) executeSql( sqlTypeCurr    );
-            if( sqlDefaultCurr != null && ! sqlDefaultCurr.equals(sqlDefaultPrev) ) executeSql( sqlDefaultCurr );
-            if( sqlNotNullCurr != null && ! sqlNotNullCurr.equals(sqlNotNullPrev) ) executeSql( sqlNotNullCurr );
+            if( sqlTypeCurr    != null && ! sqlTypeCurr.equals(sqlTypePrev)       ) result |= executeSql( sqlTypeCurr    );
+            if( sqlDefaultCurr != null && ! sqlDefaultCurr.equals(sqlDefaultPrev) ) result |= executeSql( sqlDefaultCurr );
+            if( sqlNotNullCurr != null && ! sqlNotNullCurr.equals(sqlNotNullPrev) ) result |= executeSql( sqlNotNullCurr );
 
         }
+
+        return result;
 
     }
 
 
-    private void dropColumns( List<TableColumn> columns ) {
+    private boolean dropColumns( List<TableColumn> columns ) {
         for( TableColumn column : columns ) {
             executeSql( tableSqlMaker.sqlDropColumn(column, entityLayout) );
         }
+        return columns.size() > 0;
     }
 
-    private void addIndices( List<TableIndex> indices ) {
+    private boolean addIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
             executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
+        return indices.size() > 0;
     }
 
-    private void dropIndices( List<TableIndex> indices ) {
+    private boolean dropIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
             executeSql( tableSqlMaker.sqlDropIndex(index, entityLayout) );
         }
+        return indices.size() > 0;
     }
 
-    private void modifyIndices( List<TableIndex> indices ) {
+    private boolean modifyIndices( List<TableIndex> indices ) {
         for( TableIndex index : indices ) {
             executeSql( tableSqlMaker.sqlDropIndex(index, entityLayout) );
             executeSql( tableSqlMaker.sqlCreateIndex(index, entityLayout) );
         }
+        return indices.size() > 0;
     }
 
-    private void modifyPk() {
+    private boolean modifyPk() {
         TableLayout prevLayout = getLayout();
         if( prevLayout != null && prevLayout.hasPk() ) {
             entityLayout.setPkName( prevLayout.getPkName() );
             executeSql( tableSqlMaker.sqlDropPrimaryKey(prevLayout) );
         }
-        executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
+        return executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
     }
 
-    private void executeSql( String sql ) {
-        if( StringUtil.isEmpty(sql) ) return;
-        sqlSession.sql( sql ).execute();
+    private boolean executeSql( String sql ) {
+        if( StringUtil.isEmpty(sql) ) return false;
+        try {
+            sqlSession.sql( sql ).execute();
+            return true;
+        } catch( Exception e ) {
+            throw e;
+        }
     }
 
     private boolean isDatabase( DatabaseName... dbName ) {
