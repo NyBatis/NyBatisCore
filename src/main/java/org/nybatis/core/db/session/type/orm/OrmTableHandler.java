@@ -24,18 +24,23 @@ public interface OrmTableHandler<T> extends Cloneable {
 
     /**
      * is not table exists on database
-     * @return
+     *
+     * @return true if table does not exist
      */
     boolean notExists();
 
     /**
      * drop table layout on database
+     *
+     * @return true if entity changed success
      */
-    OrmTableHandler<T> drop();
+    boolean drop();
 
     /**
      * set table layout on database
+     *
+     * @return true if entity changed success
      */
-    OrmTableHandler<T> set();
+    boolean set();
 
 }
