@@ -26,17 +26,17 @@ public class TableLayoutRepository {
     /**
      * check enable to DDL with entity
      *
-     * @param enviornmentId environment id
+     * @param environmentId environment id
      * @return true if DDL is enable.
      */
-    public static boolean isEnableDDL( String enviornmentId ) {
-        return ddlEnable.getOrDefault( enviornmentId, false );
+    public static boolean isEnableDDL( String environmentId ) {
+        return ddlEnable.getOrDefault( environmentId, false );
     }
 
     /**
      * set enable to DDL with entity
      *
-     * @param enviornmentId environment id
+     * @param environmentId environment id
      * @param enable        flag
      */
     public static void setEnableDDL( String environmentId, boolean enable ) {
@@ -87,7 +87,7 @@ public class TableLayoutRepository {
      * @param environmentId environment id
      * @param tableName     table name
      * @return table layout
-     * @throws SqlConfigurationException
+     * @throws SqlConfigurationException occurs when configuration is not acceptable.
      */
     public static TableLayout getLayout( String environmentId, String tableName ) {
 
@@ -118,7 +118,7 @@ public class TableLayoutRepository {
      * @param environmentId environment id
      * @param domainClass   table entity class
      * @return table layout
-     * @throws SqlConfigurationException
+     * @throws SqlConfigurationException occurs when configuration is not acceptable
      */
     public static TableLayout getLayout( String environmentId, Class domainClass ) {
         return getLayout( environmentId, EntityLayoutReader.getTableName(domainClass) );

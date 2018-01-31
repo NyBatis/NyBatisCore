@@ -12,13 +12,13 @@ public interface OrmTableHandler<T> extends Cloneable {
 
     /**
      * get table layout on database
-     * @return
+     * @return table layout
      */
     TableLayout getLayout();
 
     /**
      * is table exists on database
-     * @return
+     * @return true if table exists
      */
     boolean exists();
 

@@ -32,7 +32,7 @@ public class DatabaseConfigurator {
 	 *
 	 * @param filePath 	given configuration path
 	 * @param reload  	reload configuration
-	 * @throws DatabaseConfigurationException
+	 * @throws DatabaseConfigurationException occurs when database configuration is not acceptable
 	 */
 	public static void build( String filePath, boolean reload ) {
 
