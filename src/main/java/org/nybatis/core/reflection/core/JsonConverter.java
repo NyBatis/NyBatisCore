@@ -383,10 +383,10 @@ public class JsonConverter {
     /**
      * convert json to collection
      *
-     * @param json              json text or collection
+     * @param object            json text or collection object
      * @param collectionClass   collection type
      * @param typeClass         data type
-     * @param <T>
+     * @param <T>               return class type
      * @return  collection
      * @throws JsonIOException  when json parsing error raised
      */
@@ -416,8 +416,8 @@ public class JsonConverter {
      * @param mapClass      return map type
      * @param keyType       key's type
      * @param valueType     value's type
-     * @param <K>
-     * @param <V>
+     * @param <K>           key type of return Map
+     * @param <V>           value type of return Map
      * @return converted map
      * @throws JsonIOException  when json parsing error raised
      */

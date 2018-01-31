@@ -95,9 +95,10 @@ public class TypeMapper {
 
 	/**
 	 * set mapper for unimplmented jdbc type
-	 * @param environmentId
-	 * @param sqlType
-	 * @throws SQLException
+	 * @param environmentId	db configuration environment id
+	 * @param sqlType column type
+	 * @param e       previous throable
+	 * @throws SQLException occurs when raise error in SQL handling.
      */
 	public static synchronized void setUnimplementedMapper( String environmentId, SqlType sqlType, Throwable e ) throws SQLException {
 		TypeMapperIF prevTypeMapper = get( environmentId, sqlType );
