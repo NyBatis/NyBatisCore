@@ -1,5 +1,7 @@
 package org.nybatis.core.db.session.type.sql;
 
+import java.util.Collection;
+import java.util.Set;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.orm.OrmSession;
@@ -73,14 +75,14 @@ public interface SqlSession {
 	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSqlId( String id, List<?> parameters );
+	BatchExecutor batchSqlId( String id, Collection<?> parameters );
 
 	/**
 	 * Set plain SQLs for batch execution.
 	 * @param  sqlList plain sqls
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSql( List<String> sqlList );
+	BatchExecutor batchSql( Collection<String> sqlList );
 
 	/**
 	 * Set SQL ID in mapper for batch execution.
@@ -88,7 +90,7 @@ public interface SqlSession {
 	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSql( String sql,  List<?> parameters );
+	BatchExecutor batchSql( String sql,  Collection<?> parameters );
 
 	/**
 	 * Commit and end transaction if it was activated

@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
+import java.util.Collection;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.SessionCreator;
@@ -93,17 +94,17 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     @Override
-    public BatchExecutor batchSqlId( String id, List<?> parameters ) {
+    public BatchExecutor batchSqlId( String id, Collection<?> parameters ) {
         return new BatchExecutorImpl( this ).batchSqlId( id, parameters );
     }
 
     @Override
-    public BatchExecutor batchSql( List<String> sqlList ) {
+    public BatchExecutor batchSql( Collection<String> sqlList ) {
         return new BatchExecutorImpl( this ).batchSql( sqlList );
     }
 
     @Override
-    public BatchExecutor batchSql( String sql, List<?> parameters ) {
+    public BatchExecutor batchSql( String sql, Collection<?> parameters ) {
         return new BatchExecutorImpl( this ).batchSql( sql, parameters );
     }
 
