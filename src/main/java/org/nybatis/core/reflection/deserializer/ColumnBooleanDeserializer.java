@@ -17,6 +17,7 @@ public class ColumnBooleanDeserializer extends JsonDeserializer<Boolean> {
     public Boolean deserialize( JsonParser jp, DeserializationContext ctxt ) throws IOException {
 		try {
 			String val = jp.getValueAsString();
+			if( val == null ) return null;
 			return StringUtil.toBoolean( val );
 		} catch( JsonParseException e ) {
 			return jp.getBooleanValue();
