@@ -19,6 +19,14 @@ public interface OrmListExecutor<T> {
     T selectOne();
 
     /**
+     * Retrieve single row
+     *
+     * @param parameter parameter
+     * @return first row in list
+     */
+    T selectOne( Object parameter );
+
+    /**
      * Retrieve list
      *
      * @return list
