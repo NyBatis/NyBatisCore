@@ -40,6 +40,11 @@ public class ListExecutorImpl implements ListExecutor {
     }
 
     @Override
+    public <T> T selectOne( Class<T> returnType ) {
+        return getExecutor().select( returnType );
+    }
+
+    @Override
     public void select( RowHandler rowHandler ) {
         getExecutor().selectList( rowHandler );
     }

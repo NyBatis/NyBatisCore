@@ -12,6 +12,13 @@ import java.util.Map;
 public interface OrmListExecutor<T> {
 
     /**
+     * Retrieve single row
+     *
+     * @return first row in list
+     */
+    T selectOne();
+
+    /**
      * Retrieve list
      *
      * @return list

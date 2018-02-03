@@ -22,6 +22,12 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     }
 
     @Override
+    public T selectOne() {
+        properties.setEntityParameter( null );
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().selectOne( domainClass );
+    }
+
+    @Override
     public List<T> select() {
         properties.setEntityParameter( null );
         return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().select( domainClass );
