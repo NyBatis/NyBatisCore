@@ -38,6 +38,15 @@ public interface ListExecutor {
     <T> List<T> select( Class<T> returnType );
 
     /**
+     * Retrieve first row in list
+     *
+     * @param returnType  Map or Bean (if you want to return row), Primitive (if you want to return value)
+     * @param <T> expected class of return
+     * @return first row in list
+     */
+    <T> T selectOne( Class<T> returnType );
+
+    /**
      * Retrieve list with RowHandler
      *
      * @param rowHandler  RowHandler to treat single row data
