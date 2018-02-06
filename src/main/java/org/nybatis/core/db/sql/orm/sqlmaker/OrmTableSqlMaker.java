@@ -126,6 +126,8 @@ public class OrmTableSqlMaker {
                 if( isDatabase(H2) ) {
                     if( ! column.isDefinedByAnnotation() ) {
                         sb.append( "TIMESTAMP" );
+                    } else {
+                        sb.append( toColumnType(dataType) );
                     }
                 } else {
                     sb.append( toColumnType(dataType) );
