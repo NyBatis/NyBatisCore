@@ -51,7 +51,7 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     private void createOrmSql() {
-        new OrmSqlMaker().readTable( properties.getEnvironmentId(), properties.getTableName() );
+        new OrmSqlMaker().readTable( properties.getEnvironmentId(), properties.getTableName(), false );
     }
 
     @Override
