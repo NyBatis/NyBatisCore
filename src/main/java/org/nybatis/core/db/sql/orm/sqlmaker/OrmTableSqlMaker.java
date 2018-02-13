@@ -41,7 +41,7 @@ public class OrmTableSqlMaker {
     public void refreshTableLayout( Class klass ) {
         TableLayoutRepository.clearLayout( environmentId, klass );
         String tableName = EntityLayoutReader.getTableName( klass );
-        new OrmSqlMaker().readTable( environmentId, tableName );
+        new OrmSqlMaker().readTable( environmentId, tableName, true );
     }
 
     public boolean exists( Class klass ) {

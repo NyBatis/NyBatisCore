@@ -35,12 +35,12 @@ public class OrmSqlMaker {
 
     private static Map<String,Lock> locks = new Hashtable<>();
 
-    public void readTable( String environmentId, String tableName ) {
+    public void readTable( String environmentId, String tableName, boolean forcedly ) {
 
         Assertion.isNotNull( environmentId, new SqlConfigurationException( "environmentId is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
         Assertion.isNotNull( tableName, new SqlConfigurationException( "tableName is null. (environmentId : {}, tableName:{})", environmentId, tableName ) );
 
-        if( TableLayoutRepository.isExist(environmentId, tableName) ) return;
+        if( ! forcedly && TableLayoutRepository.isExist(environmentId, tableName) ) return;
 
         Lock lock = getLock( environmentId, tableName );
 
