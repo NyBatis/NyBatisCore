@@ -11,22 +11,32 @@ import org.nybatis.core.worker.WorkerExecute;
  * @since 2017-11-22
  */
 public class SqlLogHider {
+
     public static SqlLogHider $ = new SqlLogHider();
+
     public void hideDebugLog( WorkerExecute worker ) {
 
-        NLoggerPrinter logger = NLogger.getLogger( Const.db.LOG_SQL );
-        Level prevLogLevel = logger.getLevel();
+        NLoggerPrinter sqlLogger         = NLogger.getLogger( Const.db.LOG_SQL   );
+        NLoggerPrinter batchLogger       = NLogger.getLogger( Const.db.LOG_BATCH );
+        Level          prevSqlLogLevel   = sqlLogger.getLevel();
+        Level          prevbatchLogLevel = batchLogger.getLevel();
 
-        if( prevLogLevel != null && prevLogLevel.levelInt >= Level.DEBUG.levelInt ) {
-            logger.setLevel( Level.INFO );
-        }
+        setLogLevel( sqlLogger, prevSqlLogLevel );
+        setLogLevel( batchLogger, prevbatchLogLevel );
 
         try {
             worker.execute();
         } finally {
-            logger.setLevel( prevLogLevel );
+            sqlLogger.setLevel( prevSqlLogLevel );
+            batchLogger.setLevel( prevbatchLogLevel );
         }
 
+    }
+
+    private void setLogLevel( NLoggerPrinter sqlLogger, Level prevSqlLogLevel ) {
+        if( prevSqlLogLevel != null && prevSqlLogLevel.levelInt >= Level.DEBUG.levelInt ) {
+            sqlLogger.setLevel( Level.INFO );
+        }
     }
 
 }
