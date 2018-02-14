@@ -34,7 +34,7 @@ public class OrmSqlMakerTest {
         String tableName     = "TEST_ORM_PROD";
 
         OrmSqlMaker ormSqlMaker = new OrmSqlMaker();
-        ormSqlMaker.readTable( environmentId, tableName );
+        ormSqlMaker.readTable( environmentId, tableName, true );
         printLoadedOrmSql( environmentId, tableName );
 
     }
