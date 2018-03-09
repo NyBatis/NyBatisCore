@@ -165,7 +165,7 @@ public class OrmSessionProperties implements Cloneable {
         for( Object parameter : parameters ) {
             setEntityParameter( parameter );
             if( ! isPkNotNull() ) {
-                throw new SqlException( "Parameters' PK has null.(index:{}, value:{})", index, getPkValues() );
+                throw new SqlException( "Parameters' PK has null.(table:{}, index:{}, value:{})", tableName, index, getPkValues() );
             }
             list.add( getParameter() );
             index++;
