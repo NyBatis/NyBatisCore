@@ -15,6 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.filechooser.FileSystemView;
 
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.file.FileUtil;
@@ -146,7 +147,7 @@ public class Link {
 
 			filePath = FileUtil.toRelativePath( Const.path.getBase(), filePath );
 
-		} catch( IllegalArgumentException | FileNotFoundException e ) {
+		} catch( IllegalArgumentException | UncheckedIOException e ) {
 			NLogger.error( e );
 		}
 
