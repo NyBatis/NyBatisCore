@@ -94,6 +94,8 @@ public class DatabaseConfigurator {
 
 		String dbConfDir = Const.path.toResourceName( Const.path.getConfigDatabase() );
 
+		NLogger.debug( "db conf dir : {}", dbConfDir );
+
 		List<String> resourceNames = ClassUtil.findResources( dbConfDir + "/*.xml" );
 
 		for( String resourceName : resourceNames ) {
