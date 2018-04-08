@@ -4,6 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
 import org.nybatis.core.validation.Validator;
 import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
@@ -66,7 +67,24 @@ public class ClassUtil {
 	 * @return get class loader in current thread.
 	 */
 	public static ClassLoader getClassLoader() {
-		return Thread.currentThread().getContextClassLoader();
+
+		try {
+			return Thread.currentThread().getContextClassLoader();
+		} catch( Throwable e ) {
+			// if current callstack is under Thread, cannot access Thread Context.
+		}
+
+		ClassLoader classLoader = ClassUtil.class.getClassLoader();
+
+		if( classLoader == null ) {
+			try {
+				classLoader = ClassLoader.getSystemClassLoader();
+			} catch( Throwable e ) {
+				// cannot access system ClassLoader.
+			}
+		}
+		return classLoader;
+
 	}
 
 	/**
@@ -177,7 +195,7 @@ public class ClassUtil {
 
 		Class<?> superclass = inspectClass.getSuperclass();
 		if( superclass != Object.class ) {
-			if( isExtendedBy( superclass, foundClass ) ) return true;
+			return isExtendedBy( superclass, foundClass );
 		}
 
 		return false;
@@ -282,12 +300,26 @@ public class ClassUtil {
 
 		}
 
+		NLogger.trace( "Const.path.base : {}", Const.path.getBase() );
+		NLogger.trace( "Const.path.root : {}", Const.path.getRoot() );
+		NLogger.trace( "pattern : {}", pattern );
+		NLogger.trace( "toFilePattern : {}", toFilePattern(pattern) );
+
 		List<Path> paths = FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) );
+
+		NLogger.trace( "paths count : {}\npaths : {}", paths.size(), paths );
+
 		for( Path path : paths ) {
 			String pathVal = FileUtil.nomalizeSeparator( path.toString() );
-			resourceNamesInFileSystem.add( pathVal.replace( Const.path.getBase(), "" ).replaceFirst( "^/", "" ) );
+			resourceNamesInFileSystem.add( pathVal.replace( Const.path.getRoot(), "" ).replaceFirst( "^/", "" ) );
 		}
+
+		NLogger.trace( ">> resource in jar : {}", resourceNamesInJar );
+		NLogger.trace( ">> resource in file system : {}", resourceNamesInFileSystem );
+
 		resourceNamesInJar.addAll( resourceNamesInFileSystem );
+
+		NLogger.trace( ">> all resource : {}", resourceNamesInJar );
 
 		return new ArrayList<>( resourceNamesInJar );
 
@@ -308,7 +340,7 @@ public class ClassUtil {
 	private static String[] toFilePattern( String[] pattern ) {
 		String[] result = new String[ pattern.length ];
 		for( int i = 0, iCnt = pattern.length; i < iCnt; i++ ) {
-			result[ i ] = ( Const.path.getBase() + "/" + pattern[ i ] ).replaceAll( "//", "/" );
+			result[ i ] = ( Const.path.getRoot() + "/" + pattern[ i ] ).replaceAll( "//", "/" );
         }
 		return result;
 	}

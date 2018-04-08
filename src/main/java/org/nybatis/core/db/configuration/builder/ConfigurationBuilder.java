@@ -24,9 +24,12 @@ public class ConfigurationBuilder {
 
 	public void readFrom( String file, boolean reload ) {
 
-		if( reload == false && isLoaded(file) ) return;
-
 		NLogger.debug( "load database configuration from [{}]", file );
+
+		if( reload == false && isLoaded(file) ) {
+			NLogger.debug( "cancel to load because already loaded. [{}]", file );
+			return;
+		}
 
 		try {
 
