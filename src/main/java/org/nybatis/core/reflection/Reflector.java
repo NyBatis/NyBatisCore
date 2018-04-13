@@ -140,7 +140,21 @@ public class Reflector {
 	 * @return json text
 	 */
 	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) throws JsonIOException {
-		return jsonConverter.toJson( fromBean, prettyPrint, sort, ignoreNull );
+		return jsonConverter.toJson( fromBean, prettyPrint, sort, ignoreNull, null );
+	}
+
+	/**
+	 * Get json text
+	 *
+	 * @param fromBean		instance to convert as json data
+	 * @param prettyPrint	whether or not to make json text pretty
+	 * @param sort			whether or not to sort key of json
+	 * @param ignoreNull	whether or not to ignore null value
+	 * @param view	        json view class
+	 * @return json text
+	 */
+	public static String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull, Class view ) throws JsonIOException {
+		return jsonConverter.toJson( fromBean, prettyPrint, sort, ignoreNull, view );
 	}
 
 	/**
@@ -152,7 +166,18 @@ public class Reflector {
 	 */
 	public static String toJson( Object fromBean, boolean prettyPrint ) throws JsonIOException {
 		return toJson( fromBean, prettyPrint, false, false );
+	}
 
+	/**
+	 * Get json text
+	 *
+	 * @param fromBean		instance to convert as json data
+	 * @param prettyPrint	whether or not to make json text pretty
+	 * @param view	        json view class
+	 * @return json text
+	 */
+	public static String toJson( Object fromBean, boolean prettyPrint, Class view ) throws JsonIOException {
+		return toJson( fromBean, prettyPrint, false, false, view );
 	}
 
 	/**
@@ -163,6 +188,17 @@ public class Reflector {
 	 */
 	public static String toJson( Object fromBean ) throws JsonIOException {
 		return toJson( fromBean, false );
+	}
+
+	/**
+	 * Get json text
+	 *
+	 * @param fromBean		instance to convert as json data
+	 * @param view	        json view class
+	 * @return json text
+	 */
+	public static String toJson( Object fromBean, Class view ) throws JsonIOException {
+		return toJson( fromBean, false, view );
 	}
 
 	/**

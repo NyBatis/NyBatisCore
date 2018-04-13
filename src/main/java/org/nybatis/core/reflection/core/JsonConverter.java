@@ -56,12 +56,30 @@ public class JsonConverter {
      * @return json text
      */
     public String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull ) throws JsonIOException {
+        return toJson( fromBean, prettyPrint, sort, ignoreNull, null );
+    }
+
+    /**
+     * Get json text
+     *
+     * @param fromBean		instance to convert as json data
+     * @param prettyPrint	whether or not to make json text pretty
+     * @param sort			whether or not to sort key of json
+     * @param ignoreNull	whether or not to ignore null value
+     * @param view	        json view class
+     * @return json text
+     */
+    public String toJson( Object fromBean, boolean prettyPrint, boolean sort, boolean ignoreNull, Class view ) throws JsonIOException {
 
         if( fromBean == null ) return null;
 
         ObjectWriter writer = prettyPrint ? objectMapper.writerWithDefaultPrettyPrinter() : objectMapper.writer();
         config( writer, SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, sort );
         config( writer, ignoreNull ? NON_NULL : ALWAYS );
+
+        if( view != null ) {
+            writer = writer.withView( view );
+        }
 
         try {
             return writer.writeValueAsString( fromBean );
@@ -91,8 +109,19 @@ public class JsonConverter {
      * @return json text
      */
     public String toJson( Object fromBean, boolean prettyPrint ) throws JsonIOException {
-        return toJson( fromBean, prettyPrint, false, false );
+        return toJson( fromBean, prettyPrint, false, false, null );
+    }
 
+    /**
+     * Get json text
+     *
+     * @param fromBean		instance to convert as json data
+     * @param prettyPrint	whether or not to make json text pretty
+     * @param view	        json view class
+     * @return json text
+     */
+    public String toJson( Object fromBean, boolean prettyPrint, Class view ) throws JsonIOException {
+        return toJson( fromBean, prettyPrint, false, false, view );
     }
 
     /**
@@ -103,6 +132,17 @@ public class JsonConverter {
      */
     public String toJson( Object fromBean ) throws JsonIOException {
         return toJson( fromBean, false );
+    }
+
+    /**
+     * Get json text
+     *
+     * @param fromBean		instance to convert as json data
+     * @param view	        json view class
+     * @return json text
+     */
+    public String toJson( Object fromBean, Class view ) throws JsonIOException {
+        return toJson( fromBean, false, view );
     }
 
     /**
