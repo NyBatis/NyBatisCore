@@ -1,14 +1,5 @@
 package org.nybatis.core.util;
 
-import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.ClassCastingException;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.validation.Validator;
-import org.objenesis.Objenesis;
-import org.objenesis.ObjenesisStd;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +14,14 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.nybatis.core.conf.Const;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Validator;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 
 /**
@@ -284,7 +283,20 @@ public class ClassUtil {
 			Set<PathMatcher> matchers = FileUtil.toPathMacher( toJarPattern( pattern ) );
 			boolean addAll = ( matchers.size() == 0 );
 
+			if( NLogger.isTraceEnabled() ) {
+				NLogger.trace( ">> Jar pathMatchers" );
+				for( String p : toJarPattern(pattern) ) {
+					NLogger.trace( p );
+				}
+			}
+
+			NLogger.trace( ">> entry in jar" );
 			for( JarEntry entry : Collections.list( jar.entries() ) ) {
+				if( NLogger.isTraceEnabled() ) {
+					if( entry.getName().startsWith( "WEB-INF/classes" ) && entry.getName().endsWith( ".xml" )) {
+						NLogger.trace( entry.getName() );
+					}
+				}
 				if( addAll ) {
 					resourceNamesInJar.add( entry.getName() );
 				} else {
@@ -302,10 +314,10 @@ public class ClassUtil {
 
 		NLogger.trace( "Const.path.base : {}", Const.path.getBase() );
 		NLogger.trace( "Const.path.root : {}", Const.path.getRoot() );
-		NLogger.trace( "pattern : {}", pattern );
-		NLogger.trace( "toFilePattern : {}", toFilePattern(pattern) );
+		NLogger.trace( "pattern         : {}", pattern );
+		NLogger.trace( "toFilePattern   : {}", toFilePattern(pattern) );
 
-		List<Path> paths = FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) );
+		List<Path> paths = FileUtil.search( Const.path.getRoot(), true, false, -1, toFilePattern( pattern ) );
 
 		NLogger.trace( "paths count : {}\npaths : {}", paths.size(), paths );
 
@@ -340,7 +352,7 @@ public class ClassUtil {
 	private static String[] toFilePattern( String[] pattern ) {
 		String[] result = new String[ pattern.length ];
 		for( int i = 0, iCnt = pattern.length; i < iCnt; i++ ) {
-			result[ i ] = ( Const.path.getRoot() + "/" + pattern[ i ] ).replaceAll( "//", "/" );
+			result[ i ] = ( Const.path.getRoot() + "/" + pattern[ i ] ).replaceAll( "//", "/" ).replaceAll( "(/WEB-INF/classes)+", "/WEB-INF/classes" );
         }
 		return result;
 	}
