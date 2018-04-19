@@ -155,7 +155,7 @@ public class DatabaseAttribute {
                 " - name : [%s]\n" +
                 " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
-                " - pre :\n%s" +
+                " - pre :\n%s\n" +
                 " - post:\n%s\n" +
                 "Ping Query:\n" +
                 " - %s"
