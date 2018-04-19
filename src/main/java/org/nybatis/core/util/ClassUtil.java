@@ -352,7 +352,9 @@ public class ClassUtil {
 	private static String[] toFilePattern( String[] pattern ) {
 		String[] result = new String[ pattern.length ];
 		for( int i = 0, iCnt = pattern.length; i < iCnt; i++ ) {
-			result[ i ] = ( Const.path.getRoot() + "/" + pattern[ i ] ).replaceAll( "//", "/" ).replaceAll( "(/WEB-INF/classes)+", "/WEB-INF/classes" );
+			result[ i ] = ( Const.path.getRoot() + "/" + pattern[ i ] )
+				.replaceAll( "//", "/" )
+				.replaceAll( "(/WEB-INF/classes)+", "/WEB-INF/classes" );
         }
 		return result;
 	}
@@ -366,22 +368,16 @@ public class ClassUtil {
 	}
 
 	private static JarFile getJarFile( URL url ) {
-
 		try {
-
 			String filePath = new File( url.toURI().getSchemeSpecificPart() ).getPath();
-
-			filePath = FileUtil.nomalizeSeparator( filePath );
-			filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
-
+			filePath = FileUtil.nomalizeSeparator( filePath )
+				.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" )
+				.replaceFirst( "!$", "" )
+				.replaceFirst( "file:", "" );
             return new JarFile( filePath );
-
-        } catch( IOException e ) {
+        } catch( IOException | URISyntaxException e ) {
             throw new UncheckedIOException( e );
-        } catch( URISyntaxException e ) {
-			throw new UncheckedIOException( e );
 		}
-
 	}
 
 }
