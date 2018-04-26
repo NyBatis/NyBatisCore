@@ -666,7 +666,7 @@ public class StringUtil {
 		while( matcher.find() ) {
 
 			if( caret != matcher.start() ) {
-				result.add( val.substring( caret, matcher.start() ) );
+				result.add( val.substring( caret, matcher.start() ).trim() );
 			}
 
 			if( returnDelimeter ) {
@@ -678,7 +678,7 @@ public class StringUtil {
 		}
 
 		if( caret != val.length() ) {
-			result.add( val.substring( caret ) );
+			result.add( val.substring( caret ).trim() );
 		}
 
 		return result;
