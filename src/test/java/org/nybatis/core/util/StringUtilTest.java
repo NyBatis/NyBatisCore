@@ -194,7 +194,7 @@ public class StringUtilTest {
 	@Test
 	public void split() {
 
-		String val = "DP01+DP02+^DP03|DP40";
+		String val = "DP01  +DP02+^DP03|DP40";
 
 		assertEquals( StringUtil.split( val, "(\\+(\\^)?|\\|)", true ).toString(), "[DP01, +, DP02, +^, DP03, |, DP40]"  );
 
