@@ -7,6 +7,7 @@ import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.ElseIfSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.ElseSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.IfSqlElement;
+import org.nybatis.core.db.sql.sqlNode.element.WhenFirstSqlElement;
 import org.nybatis.core.db.sql.sqlNode.element.WhenSqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 
@@ -69,30 +70,30 @@ public abstract class SqlElement {
 	}
 
 	private boolean isIf( SqlElement element ) {
-		return element.getClass() == IfSqlElement.class;
+		Class klass = element.getClass();
+		return klass == IfSqlElement.class || klass == WhenFirstSqlElement.class;
 	}
 
 	private boolean isElseIf( SqlElement element ) {
-		return element.getClass() == ElseIfSqlElement.class;
+		Class klass = element.getClass();
+		return klass == ElseIfSqlElement.class || klass == WhenSqlElement.class;
 	}
 
 	private boolean isElse( SqlElement element ) {
-		return element.getClass() == ElseSqlElement.class;
+		Class<? extends SqlElement> klass = element.getClass();
+		return klass == ElseSqlElement.class && klass != WhenFirstSqlElement.class;
 	}
 
 	private boolean getIfSeriesResult( SqlElement element, QueryParameter param ) {
-		if( ! isIf( element ) ) return false;
+		if( ! isIf(element) && ! isElseIf(element) ) return false;
 		return ((IfSqlElement) element).isTrue( param );
 	}
 
 	private boolean isElseSeries( SqlElement element ) {
-
 		Class klass = element.getClass();
-
 		if( klass == ElseIfSqlElement.class ) return true;
 		if( klass == WhenSqlElement.class   ) return true;
 		return klass == ElseSqlElement.class;
-
 	}
 
 }

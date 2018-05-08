@@ -220,6 +220,44 @@ WHERE rownum &lt;= 10
     </if>
   </sql>
 
+  <sql id="ifElse3Times">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <if test="#{name} == 'A' ">
+    AND     name = 'A'
+    </if>
+    <elseif test="#{name} == 'B' ">
+    AND     name = 'B'
+    </elseif>
+    <elseif test="#{name} == 'C' ">
+    AND     name = 'C'
+    </elseif>
+    <else>
+      AND     name = 'D'
+    </else>
+  </sql>
+
+  <sql id="caseWhen3Conditions">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <case>
+      <when test="#{name} == 'A' ">
+        AND     name = 'A'
+      </when>
+      <when test="#{name} == 'B' ">
+        AND     name = 'B'
+      </when>
+      <when test="#{name} == 'C' ">
+        AND     name = 'C'
+      </when>
+      <else>
+        AND     name = 'D'
+      </else>
+    </case>
+  </sql>
+
   <sql id="ifElseSwitch">
     SELECT  *
     FROM    TABLE_SAMPLE
