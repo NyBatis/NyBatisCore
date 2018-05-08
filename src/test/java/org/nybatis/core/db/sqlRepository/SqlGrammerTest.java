@@ -40,7 +40,7 @@ public class SqlGrammerTest {
 	}
 
     @Test
-	public void readTest() throws IOException, ParseException {
+	public void readTest() throws ParseException {
 
 		QueryParameter param = new QueryParameter();
 
@@ -185,7 +185,7 @@ public class SqlGrammerTest {
 
 		QueryParameter param = new QueryParameter();
 
-		String sql = null;
+		String sql;
 
 		sql = getSql( "Grammer.ifElseSwitch", param );
 		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'DANTE' AND age = 'DEFAULT' AND key = 'DEFAULT' AND val = 'DEFAULT'" );
@@ -226,6 +226,55 @@ public class SqlGrammerTest {
 		sql = getSql( "Grammer.ifElseSwitch", param );
 		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'DANTE' AND age = 'DEFAULT' AND key = '5' AND val = '4'" );
 
+	}
+
+	@Test
+	public void ifElse3Times() {
+
+		QueryParameter param = new QueryParameter();
+
+		String sql;
+
+		param.put( "name", "A" );
+		sql = getSql( "Grammer.ifElse3Times", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'A'" );
+
+		param.put( "name", "B" );
+		sql = getSql( "Grammer.ifElse3Times", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'B'" );
+
+		param.put( "name", "C" );
+		sql = getSql( "Grammer.ifElse3Times", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'C'" );
+
+		param.put( "name", "D" );
+		sql = getSql( "Grammer.ifElse3Times", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'D'" );
+
+	}
+
+	@Test
+	public void caseWhen3Conditions() {
+
+		QueryParameter param = new QueryParameter();
+
+		String sql;
+
+		param.put( "name", "A" );
+		sql = getSql( "Grammer.caseWhen3Conditions", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'A'" );
+
+		param.put( "name", "B" );
+		sql = getSql( "Grammer.caseWhen3Conditions", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'B'" );
+
+		param.put( "name", "C" );
+		sql = getSql( "Grammer.caseWhen3Conditions", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'C'" );
+
+		param.put( "name", "D" );
+		sql = getSql( "Grammer.caseWhen3Conditions", param );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND name = 'D'" );
 
 	}
 
