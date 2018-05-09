@@ -417,32 +417,30 @@ public class StringUtil {
     	return ( val == null ) ? nvl( nvlValue ) : val.toString();
     }
 
-
     /**
-     * 문자열을 Camel 형으로 변환한다.
+	 *
+	 * convert text to camel case
+	 *
      * <pre>
      * String text = DataConverter.getCamel( "unicode_text" );
-     * System.out.println( text ); → "unicodeText" 가 출력됨
+     * System.out.println( text ); → "unicodeText""
      * </pre>
-     * @param param     변환할 문자열
-     * @return CAMEL 형 문자열
+     * @param text   text to convert
+     * @return camel cased text
      */
-    public static String toCamel( String param ) {
+    public static String toCamel( String text ) {
 
-    	if( isEmpty(param) ) return "";
+    	if( isEmpty(text) ) return "";
 
-    	param = param.toLowerCase();
+    	text = text.toLowerCase();
         Pattern pattern = Pattern.compile( "(_[a-zA-Z0-9])" );
-        Matcher matcher = pattern.matcher( param );
+        Matcher matcher = pattern.matcher( text );
         StringBuffer sb = new StringBuffer();
 
         while( matcher.find() ) {
-
             String r = matcher.group().substring( 1 );
             if( matcher.start() != 0 ) r = r.toUpperCase();
-
             matcher.appendReplacement( sb, r );
-
         }
 
         matcher.appendTail( sb );
@@ -452,36 +450,31 @@ public class StringUtil {
     }
 
     /**
-     * CAMEL형 문자열을 _ 형 문자열로 변환한다.
+     * convert camel cased text to underscored text
+	 *
      * <pre>
      * String text = StringUtil.toUncamel( "unicodeText" );
-     * System.out.println( text ); → "unicode_text" 가 출력됨
+     * System.out.println( text ); → "unicode_text"
      * </pre>
-     * @param param     변환할 문자열
-     * @return UNDERLINE 형 문자열
+     * @param text     text to convert
+     * @return underscored text
      */
-    public static String toUncamel( String param ) {
+    public static String toUncamel( String text ) {
 
         Pattern pattern = Pattern.compile( "([A-Z])" );
-        Matcher matcher = pattern.matcher( param );
+        Matcher matcher = pattern.matcher( text );
         StringBuffer sb = new StringBuffer();
 
         while( matcher.find() ) {
-
             if( matcher.start() == 0 ) continue;
-
             String r = matcher.group();
             matcher.appendReplacement( sb, "_" + r.toLowerCase() );
-
         }
 
         matcher.appendTail( sb );
-
         return sb.toString();
 
     }
-
-
 
     /**
      * <pre>
@@ -513,7 +506,6 @@ public class StringUtil {
                 case '/':  sb.append("\\/");  break;
 
                 default:
-
                     if( ch >= '\u0000' && ch <= '\u001F' ) {
                     	sb.append("\\u").append( lpad(Integer.toHexString(ch), 4, '0').toUpperCase() );
                     } else {

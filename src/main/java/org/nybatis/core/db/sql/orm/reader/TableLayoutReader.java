@@ -15,6 +15,7 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
+import org.nybatis.core.validation.Validator;
 
 import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 
@@ -71,7 +72,7 @@ public class TableLayoutReader {
             for( NMap row : list ) {
                 int  seqPk  = row.getInt( "pk" );
                 int  seqCl  = row.getInt( "cid" );
-                String name = StringUtil.toCamel( row.getString("name") );
+                String name = getColumnName( row.getString("name") );
                 if( seqPk > 0 ) {
                     pkColumnNames.put( seqPk * 1000 + seqCl, name );
                 }
@@ -82,7 +83,7 @@ public class TableLayoutReader {
                     DatabaseMetaData metaData = connection.getMetaData();
                     int index = 1;
                     for( NMap pk : toList( metaData.getPrimaryKeys( null, table.scheme, table.name ), false ) ) {
-                        pkColumnNames.put( index++, StringUtil.toCamel(pk.getString("columnName")) );
+                        pkColumnNames.put( index++, getColumnName(pk.getString("columnName")) );
                     }
                 }
             });
@@ -90,6 +91,14 @@ public class TableLayoutReader {
 
         return new LinkedHashSet<>( pkColumnNames.values() );
 
+    }
+
+    private String getColumnName( String key ) {
+        if( key.contains("_") || Validator.isMatched(key, "^[A-Z].*$") ) {
+            return StringUtil.toCamel( key );
+        } else {
+            return key;
+        }
     }
 
     private TableLayout readColumns( SqlSession session, Table table ) {
@@ -110,7 +119,7 @@ public class TableLayoutReader {
                 for( NMap column : toList( metaData.getColumns( null, table.scheme, table.name, null ), false ) ) {
 
                     TableColumn c = new TableColumn( layout );
-                    c.setKey( StringUtil.toCamel( column.getString( "columnName" ) ) );
+                    c.setKey( column.getString( "columnName" ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
                     c.setNotNull( column.getInt( "nullable" ) <= 0 );
                     c.setPk( pkColumnNames.contains( c.getKey() ) );

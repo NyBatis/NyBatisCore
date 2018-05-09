@@ -45,4 +45,10 @@ END//
  { call test.procedure03() }
 </sql>
 
+<sql id="creatFunction">
+CREATE FUNCTION hello2 (s CHAR(20))
+  RETURNS CHAR(50) CHARACTER SET 'utf8' COLLATE 'utf8_bin' DETERMINISTIC
+  RETURN CONCAT('Hello, ',s,'!');
+</sql>
+
 </mapper>
