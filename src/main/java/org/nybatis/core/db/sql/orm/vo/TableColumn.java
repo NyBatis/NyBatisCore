@@ -16,6 +16,7 @@ import org.nybatis.core.validation.Validator;
 public class TableColumn {
 
     private String  key;
+    private String  name;
     private Integer dataType;
     private String  dataTypeName;
     private boolean notNull;
@@ -37,11 +38,18 @@ public class TableColumn {
     }
 
     public void setKey( String key ) {
-        this.key = key;
+        if( Validator.isEmpty(key) ) return;
+        if( key.contains("_") || Validator.isMatched(key, "^[A-Z].*$") ) {
+            this.key = StringUtil.toCamel( key );
+            this.name = key.toLowerCase();
+        } else {
+            this.key = key;
+            this.name = key;
+        }
     }
 
     public String getName() {
-        return StringUtil.toUncamel(key);
+        return name;
     }
 
     @JsonIgnore

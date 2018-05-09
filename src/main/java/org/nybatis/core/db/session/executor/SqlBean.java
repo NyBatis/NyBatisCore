@@ -229,6 +229,7 @@ public class SqlBean {
 	 * or ...
 	 * </pre>
 	 *
+	 * @see (@link org.nybatis.core.db.datasource.driver.DatabaseName}
 	 */
 	private void setDatabaseParameter() {
 		sqlParam.put( Const.db.PARAMETER_DATABASE, getDatabase() );
