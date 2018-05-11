@@ -94,7 +94,7 @@ public class OrmTableSqlMaker {
     }
 
     private String getColumnName( TableColumn column ) {
-        if( isDatabase(MY_SQL,MARIA,SQLITE) ) {
+        if( isDatabase( MYSQL,MARIA,SQLITE) ) {
             return column.getQuotedName();
         } else {
             return column.getName();
@@ -136,7 +136,7 @@ public class OrmTableSqlMaker {
             case Types.NUMERIC :
             case Types.DECIMAL :
             case Types.DOUBLE :
-                if( isDatabase(MY_SQL, MARIA) ) {
+                if( isDatabase( MYSQL, MARIA) ) {
                     sb.append( toColumnType(dataType) );
                 } else {
                     sb.append( "NUMBER" );
@@ -145,7 +145,7 @@ public class OrmTableSqlMaker {
                 break;
             case Types.VARBINARY :
             case Types.LONGVARBINARY :
-                if( isDatabase(MY_SQL,MARIA) ) {
+                if( isDatabase( MYSQL,MARIA) ) {
                     sb.append( "TEXT" );
                 } else {
                     sb.append( toColumnType(dataType) );
@@ -217,7 +217,7 @@ public class OrmTableSqlMaker {
             return String.format("ALTER TABLE %s MODIFY( %s %s )", table.getName(), getColumnName(column), sb );
         } else if( isDatabase(H2) ) {
             return String.format("ALTER TABLE %s ALTER COLUMN %s %s", table.getName(), getColumnName(column), sb );
-        } else if( isDatabase(MY_SQL,MARIA) ) {
+        } else if( isDatabase( MYSQL,MARIA) ) {
             return String.format("ALTER TABLE %s CHANGE %s %s %s", table.getName(), getColumnName(column), getColumnName(column), sb );
         } else {
             return String.format("ALTER TABLE %s MODIFY %s %s", table.getName(), getColumnName(column), sb );
@@ -238,7 +238,7 @@ public class OrmTableSqlMaker {
 
     public String sqlDropPrimaryKey( TableLayout tableLayout ) {
         if( tableLayout == null || ! tableLayout.hasPk() ) return null;
-        if( isDatabase(MY_SQL, MARIA) ) {
+        if( isDatabase( MYSQL, MARIA) ) {
             return String.format( "ALTER TABLE %s DROP PRIMARY KEY", tableLayout.getName() );
         } else {
             return String.format( "ALTER TABLE %s DROP CONSTRAINT %s", tableLayout.getName(), tableLayout.getPkName() );
@@ -257,7 +257,7 @@ public class OrmTableSqlMaker {
         } else if( isDatabase(SQLITE) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s KEY (%s)",
                 tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
-        } else if( isDatabase(MY_SQL, MARIA) ) {
+        } else if( isDatabase( MYSQL, MARIA) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (%s)",
                 tableLayout.getName(), serializeColumnNames( tableLayout.getPkColumnNames() ) );
         } else {
@@ -267,7 +267,7 @@ public class OrmTableSqlMaker {
     }
 
     private String serializeColumnNames( Collection<String> names ) {
-        boolean needsToPatch = isDatabase( MY_SQL, MARIA, SQLITE );
+        boolean needsToPatch = isDatabase( MYSQL, MARIA, SQLITE );
         Set<String> columnNames = new LinkedHashSet<>();
         for( String name : names ) {
             String[] words = name.split( " " );
@@ -284,7 +284,7 @@ public class OrmTableSqlMaker {
     }
 
     public String sqlDropIndex( TableIndex index, TableLayout table ) {
-        if( isDatabase(MY_SQL,MARIA) ) {
+        if( isDatabase( MYSQL,MARIA) ) {
             return String.format( "DROP INDEX %s ON %s", index.getName(), table.getName() );
         } else {
             return String.format( "DROP INDEX %s", index.getName() );

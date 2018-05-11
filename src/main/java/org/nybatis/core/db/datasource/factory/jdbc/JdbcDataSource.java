@@ -18,6 +18,7 @@ import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.validation.Validator;
 
 public class JdbcDataSource implements DataSource {
 
@@ -157,7 +158,13 @@ public class JdbcDataSource implements DataSource {
 			JdbcDriverManager.setLoginTimeout( connectionProperties.getTimeout() );
 		}
 
-		Connection connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		Connection connection;
+
+		if( Validator.isEmpty( username ) && Validator.isEmpty( password ) ) {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl() );
+		} else {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		}
 
 		try {
 	        connection.setAutoCommit( connectionProperties.isAutoCommit() );

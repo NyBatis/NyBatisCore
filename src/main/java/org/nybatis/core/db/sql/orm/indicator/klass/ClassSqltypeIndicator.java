@@ -63,7 +63,7 @@ public class ClassSqltypeIndicator {
         map.put( Calendar.class,      new ClassSqltypeDialect(SqlType.DATE)        );
         map.put( NDate.class,         new ClassSqltypeDialect(SqlType.DATE)        );
 
-        DatabaseName[] mysql = { MY_SQL, MARIA };
+        DatabaseName[] mysql = { MYSQL, MARIA };
         map.get( int.class        ).add( mysql, SqlType.INT           );
         map.get( Integer.class    ).add( mysql, SqlType.INT           );
         map.get( double.class     ).add( mysql, SqlType.DOUBLE        );

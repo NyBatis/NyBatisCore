@@ -9,19 +9,19 @@ import java.util.Map;
  */
 public enum DatabaseName {
 
-    NULL(    "",           ""                            ),
-    ORACLE(  "oracle",     "oracle\\.jdbc\\.driver"      ),
-    MY_SQL(  "mysql",      "com\\.mysql\\.jdbc"          ),
-    MARIA(   "maria",      "org\\.mariadb\\.jdbc"        ),
-    SQLITE(  "sqlite",     "org\\.sqlite\\."             ),
-    H2(      "h2",         "org\\.h2\\.jdbc"             ),
-    DERBY(   "derby",      "org\\.apache\\.derby\\.jdbc" ),
-    HSQL(    "hsqldb",     "org\\.hsqldb\\.jdbcDriver"   ),
-    MS_SQL(  "mssql",      "com\\.microsoft\\.jdbc"      ),
-    POSTGRE( "postgresql", "postgresql\\.driver"         ),
-    SYBASE(  "sybase",     "com\\.sybase\\."             ),
-    DB2(     "db2",        "ibm\\.db2\\."                ),
-    ODBC(    "postgresql", "sun\\.jdbc\\.odbc"           )
+    NULL(    "",           ""                                      ),
+    ORACLE(  "oracle",     "oracle\\.jdbc\\.driver"                ),
+    MYSQL(   "mysql",      "com\\.mysql\\.jdbc"                    ),
+    MARIA(   "maria",      "org\\.mariadb\\.jdbc"                  ),
+    SQLITE(  "sqlite",     "org\\.sqlite\\."                       ),
+    H2(      "h2",         "org\\.h2\\.jdbc"                       ),
+    DERBY(   "derby",      "org\\.apache\\.derby\\.jdbc"           ),
+    HSQL(    "hsql",       "org\\.hsqldb\\.jdbcDriver"             ),
+    MSSQL(   "mssql",      "com\\.microsoft\\.(sqlserver\\.)?jdbc" ),
+    POSTGRE( "postgre",    "postgresql\\.driver"                   ),
+    SYBASE(  "sybase",     "com\\.sybase\\."                       ),
+    DB2(     "db2",        "ibm\\.db2\\."                          ),
+    ODBC(    "odbc",       "sun\\.jdbc\\.odbc"                     )
     ;
 
     public final String name;

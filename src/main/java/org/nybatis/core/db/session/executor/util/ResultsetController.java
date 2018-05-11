@@ -96,7 +96,17 @@ public class ResultsetController {
 						TypeMapperIF mapper = TypeMapper.get( environmentId, type );
     					String mapperName = mapper == null ? null : mapper.getClass().getName();
     					throw new SQLException( String.format( "%s (colunmName:%s, type:%s, mapper:%s)", e.getMessage(), key, type, mapperName ), e );
-    				}
+					} catch( ClassCastException e ) {
+						// if sqlType in resultSet has error because of abnormal JDBC driver implements
+						SqlType alternativeType = SqlType.find( String.class );
+						try {
+							row.put( key, getResult( alternativeType, resultSet, i + 1 ) );
+						} catch( ClassCastException error ) {
+							TypeMapperIF mapper = TypeMapper.get( environmentId, type );
+							String mapperName = mapper == null ? null : mapper.getClass().getName();
+							throw new SQLException( String.format( "%s (colunmName:%s, type:%s, mapper:%s)", e.getMessage(), key, type, mapperName ), e );
+						}
+					}
 
     			}
 
