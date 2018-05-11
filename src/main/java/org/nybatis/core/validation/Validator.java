@@ -181,6 +181,27 @@ public class Validator {
     }
 
     /**
+     * check whether value is matched with regular expression pattern.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is matched with regular expression pattern.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isMatched( String value, Pattern pattern ) {
+        return value != null && pattern != null && pattern.matcher( value ).matches();
+    }
+
+    /**
      * check whether value is not matched with regular expression pattern.
      *
      * @param value   check value
@@ -198,6 +219,27 @@ public class Validator {
      * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotMatched( String value, String pattern ) {
+        return ! isMatched( value, pattern );
+    }
+
+    /**
+     * check whether value is not matched with regular expression pattern.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is not matched with regular expression pattern.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isNotMatched( String value, Pattern pattern ) {
         return ! isMatched( value, pattern );
     }
 
