@@ -65,17 +65,12 @@ public class SqlNode {
     		String sql = structuredSql.toString( param );
 
 			if( DatasourceManager.isExist( getEnvironmentId() ) ) {
-
 				DatabaseAttribute envAttr = DatasourceManager.getAttributes( getEnvironmentId() );
-
 				if( isPage ) {
 					sql = String.format( "%s%s%s", envAttr.getPageSqlPre(), sql, envAttr.getPageSqlPost() );
-
 				} else if( isCount ) {
 					sql = String.format( "%s%s%s", envAttr.getCountSqlPre(), sql, envAttr.getCountSqlPost() );
-
 				}
-
 			}
 
 			return StringUtil.compressEnter( sql );

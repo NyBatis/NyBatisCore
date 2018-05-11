@@ -87,14 +87,11 @@ public class ExpressionParser {
 		sb.append( message );
 		
 		for( int i = 0, iCnt = expression.size(); i < iCnt; i++ ) {
-			
 			if( i == errorPosition ) {
 				sb.append( " [" ).append( expression.get( i ) ).append( "] " );
-				
 			} else {
 				sb.append(' ' ).append( expression.get( i ) );
 			}
-			
 		}
 		
 		return sb.toString();
