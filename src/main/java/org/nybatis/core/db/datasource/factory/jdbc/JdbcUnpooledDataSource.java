@@ -12,6 +12,7 @@ import javax.sql.DataSource;
 import org.nybatis.core.db.datasource.factory.parameter.JdbcConnectionProperties;
 import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
+import org.nybatis.core.validation.Validator;
 
 public class JdbcUnpooledDataSource implements DataSource {
 
@@ -37,7 +38,13 @@ public class JdbcUnpooledDataSource implements DataSource {
 			JdbcDriverManager.setLoginTimeout( connectionProperties.getTimeout() );
 		}
 
-		Connection connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		Connection connection;
+
+		if( Validator.isEmpty( username ) && Validator.isEmpty( password ) ) {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl() );
+		} else {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		}
 
 		try {
 	        connection.setAutoCommit( connectionProperties.isAutoCommit() );

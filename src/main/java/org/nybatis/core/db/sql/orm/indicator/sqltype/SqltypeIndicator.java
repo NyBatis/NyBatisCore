@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.MY_SQL;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.MYSQL;
 import static org.nybatis.core.db.sql.mapper.SqlType.*;
 
 /**
@@ -36,7 +36,7 @@ public class SqltypeIndicator {
             map.put( sqlType.code, new SqltypeDialect(sqlType) );
         }
 
-        DatabaseName[] mysql = { MY_SQL, MARIA };
+        DatabaseName[] mysql = { MYSQL, MARIA };
         map.get( NUMERIC.code ).add( mysql, REAL          );
         map.get( DECIMAL.code ).add( mysql, REAL          );
         map.get( CLOB.code    ).add( mysql, LONGVARBINARY );

@@ -25,9 +25,9 @@ public class TableLayoutReaderTest {
 
         new EnvironmentBuilder( "oracle" ).setJdbcDatasource(
             "oracle.jdbc.driver.OracleDriver",
-            "jdbc:oracle:thin:@xxx.xxx.xxx.xxx:1521:STGSP",
-            "",
-            ""
+            "jdbc:oracle:thin:@172.21.196.34:1521:STGSP",
+            "ORAADMIN",
+            "QASP*34!"
         );
 
         TableLayoutReader tableLayoutReader = new TableLayoutReader();

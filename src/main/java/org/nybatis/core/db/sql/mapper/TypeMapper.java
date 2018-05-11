@@ -21,7 +21,7 @@ public class TypeMapper {
         put( SqlType.BOOLEAN,       new BooleanMapper()    );
     	put( SqlType.BIT,           new BooleanMapper()    );
     	put( SqlType.TINYINT,       new ByteMapper()       );
-    	put( SqlType.SMALLINT,      new ShortMapper()      );
+    	put( SqlType.SMALLINT,      new IntegerMapper()    );
     	put( SqlType.INTEGER,       new IntegerMapper()    );
     	put( SqlType.INT,           new IntegerMapper()    );
     	put( SqlType.BIGINT,        new LongMapper()       );

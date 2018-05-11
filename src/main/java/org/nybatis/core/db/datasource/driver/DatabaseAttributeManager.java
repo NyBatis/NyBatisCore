@@ -86,28 +86,28 @@ public class DatabaseAttributeManager {
 
     static {
 
-        add( new DatabaseAttribute("oracle", "oracle\\.jdbc\\.driver" )
+        add( new DatabaseAttribute( DatabaseName.ORACLE )
             .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
             .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
-        add( new DatabaseAttribute( "mysql",      "com\\.mysql\\.jdbc"          ) );
-        add( new DatabaseAttribute( "maria",      "org\\.mariadb\\.jdbc"        ) );
-        add( new DatabaseAttribute( "sqlite",     "org\\.sqlite\\."             ) );
+        add( new DatabaseAttribute( DatabaseName.MYSQL ) );
+        add( new DatabaseAttribute( DatabaseName.MARIA ) );
+        add( new DatabaseAttribute( DatabaseName.SQLITE ) );
 
-        add( new DatabaseAttribute("h2", "org\\.h2\\.jdbc" )
+        add( new DatabaseAttribute( DatabaseName.H2 )
             .setPageSqlPost( "LIMIT (#{end} - #{start} + 1) OFFSET (#{start} - 1)" )
         );
 
         //   Not Tested  !
-        add( new DatabaseAttribute( "derby",      "org\\.apache\\.derby\\.jdbc" ) );
-        add( new DatabaseAttribute( "hsqldb",     "org\\.hsqldb\\.jdbcDriver"   ) );
-        add( new DatabaseAttribute( "mssql",      "com\\.microsoft\\.jdbc"      ) );
-        add( new DatabaseAttribute( "postgresql", "postgresql\\.driver"         ) );
-        add( new DatabaseAttribute( "sybase",     "com\\.sybase\\."             ) );
-        add( new DatabaseAttribute( "db2",        "ibm\\.db2\\."                ) );
-        add( new DatabaseAttribute( "odbc",       "sun\\.jdbc\\.odbc"           ) );
+        add( new DatabaseAttribute( DatabaseName.DERBY ) );
+        add( new DatabaseAttribute( DatabaseName.HSQL ) );
+        add( new DatabaseAttribute( DatabaseName.MSSQL ) );
+        add( new DatabaseAttribute( DatabaseName.POSTGRE ) );
+        add( new DatabaseAttribute( DatabaseName.SYBASE ) );
+        add( new DatabaseAttribute( DatabaseName.DB2 ) );
+        add( new DatabaseAttribute( DatabaseName.ODBC ) );
 
     }
 
