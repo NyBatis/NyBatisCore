@@ -202,6 +202,7 @@ public class ProxyConnection {
 
 					case "createStatement":
 					case "prepareStatement":
+					case "prepareAutoCloseStatement":
 					case "prepareCall":
 						return invokeStatement( method.invoke( connection, arguments ) );
 
