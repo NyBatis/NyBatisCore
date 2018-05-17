@@ -1,19 +1,11 @@
 package org.nybatis.core.db.datasource.proxy;
 
-import java.lang.reflect.Method;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
-
+import org.nybatis.core.db.datasource.proxy.bci.ConnectionModifier;
+import org.nybatis.core.db.datasource.proxy.bci.ConnectionResource;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.reflection.Reflector;
-import org.nybatis.core.reflection.mapper.MethodInvocator;
 
 /**
  * Proxy connection
@@ -32,31 +24,30 @@ public class ProxyConnection {
 		}
 	};
 
-    private Connection      realConnection;
-    private Connection      proxyConnection;
-    private long            lastUsedTime; // nano time
-    private Runnable        runnable;
-	private int hashCode;
-
-    private Set<Statement> poolStatement = new HashSet<>();
-    private Set<ResultSet> poolResultset = new HashSet<>();
+    private Connection realConnection;
+	private int        hashCode;
 
     public ProxyConnection( Connection connection ) {
 
     	this.realConnection  = connection;
 		this.hashCode        = realConnection.hashCode();
-    	this.proxyConnection = invokeConnection( connection );
 
-		resetLastUsedTime();
+		ConnectionModifier.$.modify( connection );
+
+		NLogger.debug( "modified !!" );
 
     }
 
     public ProxyConnection setRunner( Runnable runner ) {
-    	this.runnable = runner;
+		getResource().setRunnable( runner );
 		return this;
     }
 
-    public int hashCode() {
+	private ConnectionResource getResource() {
+		return ConnectionModifier.$.getResource( realConnection );
+	}
+
+	public int hashCode() {
         return hashCode;
     }
 
@@ -73,11 +64,11 @@ public class ProxyConnection {
 	 * @return mili seconds
 	 */
     public int getElpasedTimeAfterLastUsed() {
-        return (int) ( ( System.nanoTime() - lastUsedTime ) / 1_000_000 );
+        return (int) ( ( System.nanoTime() - getResource().getLastUsedTime() ) / 1_000_000 );
     }
 
     private void resetLastUsedTime() {
-    	lastUsedTime = System.nanoTime();
+		getResource().resetLastUsedTime();
     }
 
     private void resetLastUsedTime( String methodName ) {
@@ -104,7 +95,7 @@ public class ProxyConnection {
     }
 
     public Connection getConnection() {
-        return proxyConnection;
+        return realConnection;
     }
 
     public boolean isAutoCommit() {
@@ -127,9 +118,9 @@ public class ProxyConnection {
     }
 
     public void destroy() {
-    	releaseResource();
     	if( realConnection == null ) return;
-		try { realConnection.close(); } catch( SQLException e ) {}
+//		try { realConnection.close(); } catch( SQLException e ) {}
+		ConnectionModifier.$.removeResource( realConnection );
 		realConnection = null;
     }
 
@@ -139,24 +130,6 @@ public class ProxyConnection {
 		} catch ( SQLException e ) {
 			NLogger.error( e );
 		}
-	}
-
-	public void releaseResource() {
-
-		for( ResultSet resultset : poolResultset ) {
-			if( resultset == null ) continue;
-			try { resultset.close(); } catch( SQLException e ) {}
-		}
-
-		poolResultset.clear();
-
-		for( Statement statement : poolStatement ) {
-			if( statement == null ) continue;
-			try { statement.close(); } catch( SQLException e ) {}
-		}
-
-		poolStatement.clear();
-
 	}
 
 	/**
@@ -184,106 +157,5 @@ public class ProxyConnection {
         return true;
 
 	}
-
-	private Connection invokeConnection( Connection connection ) {
-
-		return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
-			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
-
-				resetLastUsedTime( method.getName() );
-
-				switch( method.getName() ) {
-
-					case "close":
-
-						releaseResource();
-						if( runnable != null ) runnable.run();
-						return null;
-
-					case "createStatement":
-					case "prepareStatement":
-					case "prepareAutoCloseStatement":
-					case "prepareCall":
-						return invokeStatement( method.invoke( connection, arguments ) );
-
-					case "releaseSavepoint":
-						if( arguments != null && arguments[0] == RELEASE_RESOURCE ) {
-							releaseResource();
-							return null;
-						}
-
-						break;
-
-				}
-
-				return method.invoke( connection, arguments );
-
-			}
-
-		} );
-
-	}
-
-    private Object invokeStatement( Object statement ) {
-
-		poolStatement.add( (Statement) statement );
-
-        return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, ( proxy, method, arguments ) -> {
-
-            resetLastUsedTime( method.getName() );
-
-            switch( method.getName() ) {
-
-                case "getObject":
-
-                    Object returnValue = method.invoke( statement, arguments );
-
-                    if( returnValue instanceof ResultSet ) {
-                        poolResultset.add( (ResultSet) returnValue );
-                    }
-
-                    return returnValue;
-
-                case "executeQuery":
-                case "getGeneratedKeys":
-                case "getResultSet":
-                    ResultSet rs = (ResultSet) method.invoke( statement, arguments );
-                    return invokeResultSet( rs );
-
-            }
-
-            return method.invoke( statement, arguments );
-
-        });
-
-	}
-
-    private ResultSet invokeResultSet( ResultSet resultSet ) {
-
-    	poolResultset.add( resultSet );
-
-    	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, ( proxy, method, arguments ) -> {
-
-            resetLastUsedTime( method.getName() );
-
-            switch( method.getName() ) {
-
-                case "getObject":
-
-                    Object returnValue = method.invoke( resultSet, arguments );
-
-                    if( returnValue instanceof ResultSet ) {
-                        poolResultset.add( (ResultSet) returnValue );
-                    }
-
-                    return returnValue;
-
-            }
-
-            return method.invoke( resultSet, arguments );
-
-        });
-
-    }
 
 }

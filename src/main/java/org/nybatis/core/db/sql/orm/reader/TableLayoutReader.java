@@ -117,7 +117,6 @@ public class TableLayoutReader {
                 }
 
                 for( NMap column : toList( metaData.getColumns( null, table.scheme, table.name, null ), false ) ) {
-
                     TableColumn c = new TableColumn( layout );
                     c.setKey( column.getString( "columnName" ) );
                     c.setDataType( column.getInt( "dataType" ), column.getString( "typeName" ) );
@@ -129,9 +128,7 @@ public class TableLayoutReader {
                     if( precision > 0 ) {
                         c.setPrecison( precision );
                     }
-
                     layout.addColumn( c );
-
                 }
             }
         });

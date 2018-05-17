@@ -1,5 +1,6 @@
 package org.nybatis.core.db.datasource.driver;
 
+import org.nybatis.core.db.datasource.proxy.bci.ConnectionModifier;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
@@ -31,6 +32,10 @@ public class DatabaseAttributeManager {
         try {
 
             connection = datasource.getConnection();
+
+            ConnectionModifier.$.modify( connection );
+
+            NLogger.debug( "modified !!" );
 
             return get( connection );
 
