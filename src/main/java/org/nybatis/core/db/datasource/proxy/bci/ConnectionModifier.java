@@ -26,7 +26,7 @@ public class ConnectionModifier {
     private Set<String>                        modifiedChecker = new HashSet<>();
     private Map<Connection,ConnectionResource> resources       = new HashMap<>();
 
-    public static ConnectionModifier $ = new ConnectionModifier();
+    public static ConnectionModifier instance = new ConnectionModifier();
     private ConnectionModifier() {}
 
     public void modify( Connection connection ) {
@@ -52,16 +52,20 @@ public class ConnectionModifier {
         ClassPool classPool = ClassPool.getDefault();
         classPool.appendClassPath( new LoaderClassPath( getClass().getClassLoader() ) );
 
-        classPool.importPackage( "org.nybatis.core.db.datasource.proxy.bci" );
+        classPool.importPackage( "org.nybatis.core.db.datasource.proxy.bci.*" );
 
         CtClass klass = classPool.get( connection.getClass().getName() );
         klass.stopPruning( true );
+
+        if( klass.isFrozen() ) {
+            klass.defrost();
+        }
 
         for( CtMethod method : klass.getDeclaredMethods() ) {
 
             StringBuilder sb = new StringBuilder();
             sb.append( "{" );
-            sb.append( "ConnectionResource resource = ConnectionModifier.$.getResource($0);" );
+            sb.append( "ConnectionResource resource = ConnectionModifier.instance.getResource($r);" );
             sb.append( "resource.resetLastUsedTime();" );
 
             switch( method.getName() ) {

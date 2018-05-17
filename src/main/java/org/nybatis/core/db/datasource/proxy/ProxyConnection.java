@@ -1,8 +1,6 @@
 package org.nybatis.core.db.datasource.proxy;
 
 import java.sql.*;
-import java.util.HashSet;
-import java.util.Set;
 import org.nybatis.core.db.datasource.proxy.bci.ConnectionModifier;
 import org.nybatis.core.db.datasource.proxy.bci.ConnectionResource;
 import org.nybatis.core.log.NLogger;
@@ -32,7 +30,7 @@ public class ProxyConnection {
     	this.realConnection  = connection;
 		this.hashCode        = realConnection.hashCode();
 
-		ConnectionModifier.$.modify( connection );
+		ConnectionModifier.instance.modify( connection );
 
 		NLogger.debug( "modified !!" );
 
@@ -44,7 +42,7 @@ public class ProxyConnection {
     }
 
 	private ConnectionResource getResource() {
-		return ConnectionModifier.$.getResource( realConnection );
+		return ConnectionModifier.instance.getResource( realConnection );
 	}
 
 	public int hashCode() {
@@ -120,7 +118,7 @@ public class ProxyConnection {
     public void destroy() {
     	if( realConnection == null ) return;
 //		try { realConnection.close(); } catch( SQLException e ) {}
-		ConnectionModifier.$.removeResource( realConnection );
+		ConnectionModifier.instance.removeResource( realConnection );
 		realConnection = null;
     }
 

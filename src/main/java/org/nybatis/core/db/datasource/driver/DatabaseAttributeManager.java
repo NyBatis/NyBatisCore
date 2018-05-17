@@ -33,7 +33,7 @@ public class DatabaseAttributeManager {
 
             connection = datasource.getConnection();
 
-            ConnectionModifier.$.modify( connection );
+            ConnectionModifier.instance.modify( connection );
 
             NLogger.debug( "modified !!" );
 
