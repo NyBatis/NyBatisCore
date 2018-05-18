@@ -27,22 +27,30 @@ public class StatementController {
 	}
 
 	public ResultSet executeQuery( PreparedStatement statement ) throws SQLException {
+		logBefore();
 		StopWatcher watcher = new StopWatcher();
 		ResultSet resultSet = statement.executeQuery();
-		log( watcher );
+		logAfter( watcher );
 		return resultSet;
 	}
 
-	private void log( StopWatcher watcher ) {
+	private void logBefore() {
 		if( logger.isDebugEnabled() ) {
-			logger.debug( ">> {} elapsed : [{}]ms\n{}", sqlBean, watcher.elapsedMiliSeconds(), sqlBean.getDebugSql() );
+			logger.debug( ">> {}\n{}", sqlBean, sqlBean.getDebugSql() );
+		}
+	}
+
+	private void logAfter( StopWatcher watcher ) {
+		if( logger.isDebugEnabled() ) {
+			logger.debug( ">> {} elapsed : [{}]ms", sqlBean, watcher.elapsedMiliSeconds() );
 		}
 	}
 
 	public int executeUpdate( PreparedStatement statement ) throws SQLException {
+		logBefore();
 		StopWatcher watcher = new StopWatcher();
 		int affectedCount = statement.executeUpdate();
-		log( watcher );
+		logAfter( watcher );
 		return affectedCount;
 	}
 
@@ -54,24 +62,17 @@ public class StatementController {
 	 * @throws SQLException occurs when sql error is raised.
 	 */
 	public boolean execute( CallableStatement statement ) throws SQLException {
-
+		logBefore();
 		StopWatcher watcher = new StopWatcher();
-
 		boolean result = statement.execute();
-
-		log( watcher );
-
+		logAfter( watcher );
 		return result;
-
 	}
 
 	public void setParameter( CallableStatement statement ) throws SQLException, ClassCastingException {
-
 		for( int i = 0, iCnt = sqlBean.getBindParams().size(); i < iCnt; i++ ) {
-
 			BindStruct struct = sqlBean.getBindStructs().get( i );
 			BindParam  param  = sqlBean.getBindParams().get( i );
-
 			try {
     			if( struct.isOut() ) {
     				TypeMapper.get( sqlBean.getEnvironmentId(), struct.getType() ).setOutParameter( statement, i + 1 );
@@ -81,9 +82,7 @@ public class StatementController {
 			} catch( java.lang.ClassCastException e ) {
 				throw new ClassCastingException( e, "{}, index:{}, value:{}", e.getMessage(), i, param.getValue() );
 			}
-
 		}
-
 	}
 
 	public void setParameter( PreparedStatement statement ) throws SQLException {
@@ -224,7 +223,7 @@ public class StatementController {
 		}
 	}
 
-	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) throws SQLException {
+	private void setParameter( TypeMapperIF<Object> typeMapper, Statement statement, int paramIndex, BindParam value ) {
 		try {
 			if( statement instanceof PreparedStatement ) {
 				typeMapper.setParameter( (PreparedStatement) statement, paramIndex, value.getValue() );

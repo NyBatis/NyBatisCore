@@ -109,7 +109,7 @@ public class TypeMapper {
 			TypeMapper.put( environmentId, SqlType.CLOB, new StringMapper() );
 			return;
 		}
-		throw new SQLException( String.format("there is no mapper to handle sqlType(%s) in environment(id:%s)", sqlType, environmentId), e.getCause() );
+		throw new SQLException( String.format("there is no mapper to handle sqlType(%s) in environment(id:%s)", sqlType, environmentId), e );
 	}
 
 }
