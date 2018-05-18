@@ -52,11 +52,6 @@ public class TableColumn {
         return name;
     }
 
-    @JsonIgnore
-    public String getQuotedName() {
-        return String.format( "`%s`", getName() );
-    }
-
     /**
      * get data type of column
      *
