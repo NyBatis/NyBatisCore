@@ -23,8 +23,17 @@ import org.nybatis.core.reflection.core.RedefineClassAgent;
  */
 public class ConnectionModifier {
 
-    private Set<String>                        modifiedChecker = new HashSet<>();
-    private Map<Connection,ConnectionResource> resources       = new HashMap<>();
+    private Set<String>                        modifiedChecker    = new HashSet<>();
+    private Map<Connection,ConnectionResource> resources          = new HashMap<>();
+    private Set<String>                        modificationTarget = new HashSet<String>(){{
+        add( "close" );
+        add( "rollback" );
+        add( "createStatement" );
+        add( "prepareStatement" );
+        add( "prepareAutoCloseStatement" );
+        add( "prepareCall" );
+        add( "releaseSavepoint" );
+    }};
 
     public static ConnectionModifier $ = new ConnectionModifier();
     private ConnectionModifier() {}
@@ -63,12 +72,16 @@ public class ConnectionModifier {
 
         for( CtMethod method : klass.getDeclaredMethods() ) {
 
+            String methodName = method.getName();
+
+            if( ! modificationTarget.contains(methodName) ) continue;
+
             StringBuilder sb = new StringBuilder();
             sb.append( "{" );
-            sb.append( "org.nybatis.core.db.datasource.proxy.bci.ConnectionResource resource = org.nybatis.core.db.datasource.proxy.bci.ConnectionModifier.$.getResource(this);" );
+            sb.append( "org.nybatis.core.db.datasource.proxy.bci.ConnectionResource resource = org.nybatis.core.db.datasource.proxy.bci.ConnectionModifier.$.getResource($0);" );
             sb.append( "resource.resetLastUsedTime();" );
 
-            switch( method.getName() ) {
+            switch( methodName ) {
                 case "close" :
                     sb.append( "resource.releasePool();" );
                     sb.append( "resource.executeRunnable();" );
@@ -83,7 +96,7 @@ public class ConnectionModifier {
                     sb.append( "resource.invoke($_);" );
                     break;
                 case "releaseSavepoint":
-                    sb.append( "if( $args != null && $args[0] == ConnectionResource.RELEASE_RESOURCE )" );
+                    sb.append( "if( $args != null && $args[0] == org.nybatis.core.db.datasource.proxy.bci.ConnectionResource.RELEASE_RESOURCE )" );
                     sb.append( "resource.releasePool();" );
                     break;
             }
