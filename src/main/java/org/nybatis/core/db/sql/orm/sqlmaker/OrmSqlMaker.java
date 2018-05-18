@@ -16,6 +16,7 @@ import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 
 import java.util.concurrent.locks.Lock;
@@ -309,9 +310,9 @@ public class OrmSqlMaker {
     private String toColumnName( TableColumn column ) {
         StringBuilder sb = new StringBuilder();
         sb.append( "<if test=\"#{nybatis.database} =='mysql' || #{nybatis.database} =='maria' || #{nybatis.database} =='sqlite'\">" );
-        sb.append( column.getQuotedName() );
+        sb.append( String.format( "`%s`", StringUtil.toUncamel(column.getName())) );
         sb.append( "</if><else>" );
-        sb.append( column.getName() );
+        sb.append( StringUtil.toUncamel(column.getName()) );
         sb.append( "</else>" );
         return sb.toString();
     }

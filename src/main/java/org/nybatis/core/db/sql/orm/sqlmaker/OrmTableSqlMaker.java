@@ -95,9 +95,9 @@ public class OrmTableSqlMaker {
 
     private String getColumnName( TableColumn column ) {
         if( isDatabase( MYSQL,MARIA,SQLITE) ) {
-            return column.getQuotedName();
+            return String.format( "`%s`", StringUtil.toUncamel(column.getName()) );
         } else {
-            return column.getName();
+            return StringUtil.toUncamel( column.getName() );
         }
     }
 
