@@ -31,16 +31,7 @@ public class SqlSessionTest {
 
 	@BeforeClass
 	public void beforeTest() {
-
 	    DatabaseConfigurator.build();
-
-//	    new ConfigurationBuilder( Const.path.getConfigDatabase() + "/config.xml" );
-
-		// define specific mapper like this
-//		TypeMapper.put( "sqlite", SqlType.BLOB, new ByteArrayMapper() );
-
-//	    NLogger.debug( new SqlRepository().toString() );
-
 	}
 
 	@Test

@@ -33,7 +33,7 @@ public class DatabaseAttributeManager {
 
             connection = datasource.getConnection();
 
-            ConnectionModifier.instance.modify( connection );
+            ConnectionModifier.$.modify( connection );
 
             NLogger.debug( "modified !!" );
 
@@ -52,7 +52,7 @@ public class DatabaseAttributeManager {
     }
 
 
-    private static DatabaseAttribute get( Connection connection ) throws SQLException {
+    private static DatabaseAttribute get( Connection connection ) {
 
         Connection realConnection = Reflector.unwrapProxy( connection );
 

@@ -14,10 +14,10 @@ import org.nybatis.core.log.NLogger;
 public class ProxyConnection {
 
 	public static final Savepoint RELEASE_RESOURCE = new Savepoint() {
-		public String getSavepointName() throws SQLException {
+		public String getSavepointName() {
 			return ProxyConnection.class.getName() + ".CLEAR_RESOURCE";
 		}
-		public int getSavepointId() throws SQLException {
+		public int getSavepointId() {
 			return Integer.MIN_VALUE;
 		}
 	};
@@ -30,7 +30,7 @@ public class ProxyConnection {
     	this.realConnection  = connection;
 		this.hashCode        = realConnection.hashCode();
 
-		ConnectionModifier.instance.modify( connection );
+		ConnectionModifier.$.modify( connection );
 
 		NLogger.debug( "modified !!" );
 
@@ -42,7 +42,7 @@ public class ProxyConnection {
     }
 
 	private ConnectionResource getResource() {
-		return ConnectionModifier.instance.getResource( realConnection );
+		return ConnectionModifier.$.getResource( realConnection );
 	}
 
 	public int hashCode() {
@@ -118,7 +118,7 @@ public class ProxyConnection {
     public void destroy() {
     	if( realConnection == null ) return;
 //		try { realConnection.close(); } catch( SQLException e ) {}
-		ConnectionModifier.instance.removeResource( realConnection );
+		ConnectionModifier.$.removeResource( realConnection );
 		realConnection = null;
     }
 
