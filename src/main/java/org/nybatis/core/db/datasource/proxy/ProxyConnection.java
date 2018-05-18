@@ -1,19 +1,10 @@
 package org.nybatis.core.db.datasource.proxy;
 
-import java.lang.reflect.Method;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Savepoint;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
-import org.nybatis.core.reflection.mapper.MethodInvocator;
 
 /**
  * Proxy connection
@@ -81,9 +72,7 @@ public class ProxyConnection {
     }
 
     private void resetLastUsedTime( String methodName ) {
-
     	switch( methodName ) {
-
 			case "commit"           :
 			case "rollback"         :
 			case "executeQuery"     :
@@ -92,11 +81,8 @@ public class ProxyConnection {
 			case "execute"          :
 			case "executeUpdate"    :
 			case "next"             :
-
 				resetLastUsedTime();
-
     	}
-
     }
 
     public Connection getRealConnection() {
@@ -142,21 +128,16 @@ public class ProxyConnection {
 	}
 
 	public void releaseResource() {
-
 		for( ResultSet resultset : poolResultset ) {
 			if( resultset == null ) continue;
 			try { resultset.close(); } catch( SQLException e ) {}
 		}
-
 		poolResultset.clear();
-
 		for( Statement statement : poolStatement ) {
 			if( statement == null ) continue;
 			try { statement.close(); } catch( SQLException e ) {}
 		}
-
 		poolStatement.clear();
-
 	}
 
 	/**
@@ -186,42 +167,30 @@ public class ProxyConnection {
 	}
 
 	private Connection invokeConnection( Connection connection ) {
-
-		return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
-			public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
-
-				resetLastUsedTime( method.getName() );
-
-				switch( method.getName() ) {
-
-					case "close":
-
-						releaseResource();
-						if( runnable != null ) runnable.run();
-						return null;
-
-					case "createStatement":
-					case "prepareStatement":
-					case "prepareAutoCloseStatement":
-					case "prepareCall":
-						return invokeStatement( method.invoke( connection, arguments ) );
-
-					case "releaseSavepoint":
-						if( arguments != null && arguments[0] == RELEASE_RESOURCE ) {
-							releaseResource();
-							return null;
-						}
-
-						break;
-
-				}
-
-				return method.invoke( connection, arguments );
-
-			}
-
-		} );
-
+		return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, ( proxy, method, arguments ) -> {
+            resetLastUsedTime( method.getName() );
+            switch( method.getName() ) {
+                case "close":
+                    releaseResource();
+                    if( runnable != null ) runnable.run();
+                    return null;
+                case "rollback":
+                    releaseResource();
+                    break;
+                case "createStatement":
+                case "prepareStatement":
+                case "prepareAutoCloseStatement":
+                case "prepareCall":
+                    return invokeStatement( method.invoke( connection, arguments ) );
+                case "releaseSavepoint":
+                    if( arguments != null && arguments[0] == RELEASE_RESOURCE ) {
+                        releaseResource();
+                        return null;
+                    }
+                    break;
+            }
+            return method.invoke( connection, arguments );
+        });
 	}
 
     private Object invokeStatement( Object statement ) {
@@ -229,31 +198,21 @@ public class ProxyConnection {
 		poolStatement.add( (Statement) statement );
 
         return Reflector.wrapProxy( statement, new Class<?>[] {Statement.class, PreparedStatement.class, CallableStatement.class}, ( proxy, method, arguments ) -> {
-
             resetLastUsedTime( method.getName() );
-
             switch( method.getName() ) {
-
                 case "getObject":
-
                     Object returnValue = method.invoke( statement, arguments );
-
                     if( returnValue instanceof ResultSet ) {
                         poolResultset.add( (ResultSet) returnValue );
                     }
-
                     return returnValue;
-
                 case "executeQuery":
                 case "getGeneratedKeys":
                 case "getResultSet":
                     ResultSet rs = (ResultSet) method.invoke( statement, arguments );
                     return invokeResultSet( rs );
-
             }
-
             return method.invoke( statement, arguments );
-
         });
 
 	}
@@ -263,25 +222,16 @@ public class ProxyConnection {
     	poolResultset.add( resultSet );
 
     	return Reflector.wrapProxy( resultSet, new Class<?>[] {ResultSet.class}, ( proxy, method, arguments ) -> {
-
             resetLastUsedTime( method.getName() );
-
             switch( method.getName() ) {
-
                 case "getObject":
-
                     Object returnValue = method.invoke( resultSet, arguments );
-
                     if( returnValue instanceof ResultSet ) {
                         poolResultset.add( (ResultSet) returnValue );
                     }
-
                     return returnValue;
-
             }
-
             return method.invoke( resultSet, arguments );
-
         });
 
     }
