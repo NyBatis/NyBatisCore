@@ -1,7 +1,7 @@
 package org.nybatis.core.clone.vo;
 
 /**
- * @author nayasis@onestorecorp.com
+ * @author nayasis@gmail.com
  * @since 2017-03-24
  */
 public class AbstractProduct extends SuperAbstractProduct {
