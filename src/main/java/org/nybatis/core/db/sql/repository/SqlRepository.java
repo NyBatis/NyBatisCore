@@ -92,16 +92,16 @@ public class SqlRepository {
 
 	public void readFromDirectory( String directory, String environmentId ) {
 
-		if( FileUtil.exists( directory ) && ! directory.startsWith(Const.path.getBase())) {
+		if( FileUtil.exists( directory ) ) {
 			List<Path> pathList = FileUtil.search( directory, true, false, -1, "**.xml" );
 			for( Path path : pathList ) {
 				readFromFile( path.toString(), environmentId );
 			}
-		} else {
-			List<String> resourceNames = ClassUtil.findResources( directory + "/**.xml" );
-			for( String resourceName : resourceNames ) {
-				readFromFile( resourceName, environmentId );
-			}
+		}
+
+		List<String> resourceNames = ClassUtil.findResources( directory + "/**.xml" );
+		for( String resourceName : resourceNames ) {
+			readFromFile( resourceName, environmentId );
 		}
 
 	}
