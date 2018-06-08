@@ -69,6 +69,11 @@ public class StopWatch {
 			list.add( "%",    String.format("%3d", log.percent )          );
 			list.add( "Task", log.message                                 );
 		}
+
+		list.add( "ms",   String.format( "%6d", (long) total ) );
+		list.add( "%",    ""                                   );
+		list.add( "Task", "TOTAL"                              );
+
 		return list.toDebugString();
 
 	}
