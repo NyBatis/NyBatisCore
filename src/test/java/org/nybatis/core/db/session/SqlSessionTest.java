@@ -14,7 +14,7 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.nybatis.core.util.StringUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -61,7 +61,7 @@ public class SqlSessionTest {
 
 		try {
 
-			StopWatcher watcher = new StopWatcher();
+			StopWatch watcher = new StopWatch();
 
 			List<NMap> list = sqlSession.sqlId( "connectionTest.dynamic", param ).list().select();
 
@@ -78,7 +78,7 @@ public class SqlSessionTest {
 	@Test
 	public void envLocal() {
 
-	    StopWatcher watcher = new StopWatcher();
+	    StopWatch watcher = new StopWatch();
 
 	    SqlSession sqlSession = SessionManager.openSession();
 

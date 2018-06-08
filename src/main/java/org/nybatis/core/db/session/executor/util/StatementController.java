@@ -12,7 +12,7 @@ import org.nybatis.core.exception.unchecked.ClassCastingException;
 import org.nybatis.core.exception.unchecked.JdbcImplementException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +28,7 @@ public class StatementController {
 
 	public ResultSet executeQuery( PreparedStatement statement ) throws SQLException {
 		logBefore();
-		StopWatcher watcher = new StopWatcher();
+		StopWatch watcher = new StopWatch();
 		ResultSet resultSet = statement.executeQuery();
 		logAfter( watcher );
 		return resultSet;
@@ -40,7 +40,7 @@ public class StatementController {
 		}
 	}
 
-	private void logAfter( StopWatcher watcher ) {
+	private void logAfter( StopWatch watcher ) {
 		if( logger.isDebugEnabled() ) {
 			logger.debug( ">> {} elapsed : [{}]ms", sqlBean, watcher.elapsedMiliSeconds() );
 		}
@@ -48,7 +48,7 @@ public class StatementController {
 
 	public int executeUpdate( PreparedStatement statement ) throws SQLException {
 		logBefore();
-		StopWatcher watcher = new StopWatcher();
+		StopWatch watcher = new StopWatch();
 		int affectedCount = statement.executeUpdate();
 		logAfter( watcher );
 		return affectedCount;
@@ -63,7 +63,7 @@ public class StatementController {
 	 */
 	public boolean execute( CallableStatement statement ) throws SQLException {
 		logBefore();
-		StopWatcher watcher = new StopWatcher();
+		StopWatch watcher = new StopWatch();
 		boolean result = statement.execute();
 		logAfter( watcher );
 		return result;

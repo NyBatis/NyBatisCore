@@ -6,7 +6,7 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.NList;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -15,7 +15,7 @@ public class SqlSessionOracleTest {
 	@BeforeClass
 	public void beforeTest() {
 
-	    StopWatcher watcher = new StopWatcher();
+	    StopWatch watcher = new StopWatch();
 
 	    DatabaseConfigurator.build();
 

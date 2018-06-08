@@ -11,7 +11,7 @@ import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.nybatis.core.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,7 +127,7 @@ public abstract class AbstractBatchExecutor {
 
 		Map<Object, Long> elapsedTimes = new HashMap<>();
 
-		StopWatcher watcher = new StopWatcher();
+		StopWatch watcher = new StopWatch();
 
 		for( Object key : statements.keySet() ) {
 

@@ -17,7 +17,7 @@ import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.nybatis.core.validation.Validator;
 
 public class JdbcDataSource implements DataSource {
@@ -83,11 +83,11 @@ public class JdbcDataSource implements DataSource {
 
 				long waitTime = connectionProperties.getNanoTimeout();
 
-				StopWatcher stopWatcher = new StopWatcher();
+				StopWatch stopWatch = new StopWatch();
 
 				int tryCount = 0;
 
-				while( stopWatcher.elapsedNanoSeconds() < waitTime ) {
+				while( stopWatch.elapsedNanoSeconds() < waitTime ) {
 
 					try {
 						Thread.sleep( THREAD_WAIT_MILI_SECONDS );

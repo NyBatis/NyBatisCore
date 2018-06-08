@@ -5,12 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.nybatis.core.cache.Cache;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 
 public class LruCache implements Cache {
 
 	protected Map<Object, Object>      map            = null;
-	protected Map<Object, StopWatcher> mapAccess      = new HashMap<>();
+	protected Map<Object, StopWatch> mapAccess      = new HashMap<>();
 	private   int                      flushCycle     = Integer.MAX_VALUE;
 	private   boolean                  hasFlushCycle  = false;
 
@@ -46,9 +46,9 @@ public class LruCache implements Cache {
 		resetAccessTime( key );
 	}
 
-	public StopWatcher getWatcher( Object key ) {
+	public StopWatch getWatcher( Object key ) {
 		if( ! mapAccess.containsKey( key ) ) {
-			mapAccess.put( key, new StopWatcher() );
+			mapAccess.put( key, new StopWatch() );
 		}
 		return mapAccess.get( key );
 	}
