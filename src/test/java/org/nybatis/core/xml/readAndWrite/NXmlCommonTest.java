@@ -1,6 +1,5 @@
 package org.nybatis.core.xml.readAndWrite;
 
-import org.nybatis.core.conf.Const;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.xml.NXml;
 import org.testng.annotations.BeforeClass;
@@ -21,7 +20,7 @@ public class NXmlCommonTest {
     @Test
     public void read() {
 
-        NXml xml02 = new NXml( Paths.get( "C:\\TstoreIDE\\workspace\\NayasisCore\\NyBatisCore\\src\\test\\java\\org\\nybatis\\core\\xml\\readAndWrite\\common.xml" ) );
+        NXml xml02 = new NXml( Paths.get( "C:\\NIDE\\workspace\\NayasisCore\\NyBatisCore\\src\\test\\java\\org\\nybatis\\core\\xml\\readAndWrite\\common.xml" ) );
 
         NLogger.debug( xml02 );
 
