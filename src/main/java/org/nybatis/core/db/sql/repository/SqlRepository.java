@@ -38,7 +38,9 @@ public class SqlRepository {
 
 		if( sqlId == null || sqlNode == null ) return;
 
-		if( isExist( sqlId ) ) {
+		if( isExist(sqlId) ) {
+
+			if( get(sqlId).getSqlHash() == sqlNode.getSqlHash() ) return;
 
 			String environmentId = sqlNode.getEnvironmentId();
 
