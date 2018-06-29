@@ -24,15 +24,10 @@ public class SqlReader {
     }
 
     public SqlNode read( String environmentId, String sqlId, String xmlSql ) {
-
         xmlSql = getWellFormedXml( sqlId, xmlSql );
-
         NXml xmlReader = new NXmlDeformed( xmlSql );
-
         Node sqlNode = xmlReader.getRoot();
-
-        return new XmlSqlParser( environmentId ).parse( sqlId, sqlNode );
-
+        return new XmlSqlParser( environmentId ).parse( sqlId, sqlNode ).setSqlHash( xmlSql );
     }
 
     private String getWellFormedXml( String sqlId, String xmlSql ) {

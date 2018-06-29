@@ -3,9 +3,9 @@ package org.nybatis.core.db.sql.reader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
@@ -45,7 +45,7 @@ public class SqlFileReader {
 				SqlNode sql = xmlParser.parse( sqlId, node );
 
 				if( sql == null ) continue;
-
+				sql.setSqlHash( node.getValue() );
 				sql.setMainId( baseId );
 
 				SqlRepository.put( sqlId, sql, file );
