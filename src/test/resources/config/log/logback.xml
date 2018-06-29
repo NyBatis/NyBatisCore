@@ -25,20 +25,37 @@
     </encoder>
   </appender>
 
-  <logger name="org.nybatis" level="debug">
-    <appender-ref ref="console" />
-  </logger>
+  <!--<logger name="org.nybatis" level="debug">-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
 
-  <logger name="specific.test.log" level="debug">
-    <appender-ref ref="console" />
-  </logger>
+  <!--<logger name="org.nybatis.core.db.datasource"  level="warn" >-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
 
-  <logger name="nybatis.sql" level="debug">
-    <appender-ref ref="console" />
-  </logger>
+  <!--<logger name="specific.test.log" level="debug">-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
 
-  <logger name="nybatis.batch" level="debug">
-    <appender-ref ref="console" />
-  </logger>
+  <!--<logger name="nybatis.sql" level="debug">-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
+
+  <!--<logger name="nybatis.batch" level="debug">-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
+
+  <!--<logger name="org.nybatis.core.log" level="trace">-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
+
+  <!--&lt;!&ndash;<logger name="org.nybatis.core.log.SubClass" level="info" additive="false" >&ndash;&gt;-->
+  <!--<logger name="org.nybatis.core.log.SubClass" level="INFO"  additive="false" >-->
+    <!--<appender-ref ref="console" />-->
+  <!--</logger>-->
+
+  <root level="trace">
+    <appender-ref ref="console"/>
+  </root>
 
 </configuration>
