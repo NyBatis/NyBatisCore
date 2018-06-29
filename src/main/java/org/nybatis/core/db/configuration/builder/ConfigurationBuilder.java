@@ -1,8 +1,9 @@
 package org.nybatis.core.db.configuration.builder;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.ParseException;
-import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
@@ -10,9 +11,6 @@ import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ConfigurationBuilder {
 
@@ -48,7 +46,9 @@ public class ConfigurationBuilder {
 
 				for( Node environment : root.getChildElements("environment") ) {
 					new EnvironmentBuilder( environment, propertyResolver );
+					NLogger.trace( "start environment building : {}", environment.getName() );
 					new SqlBuilder( propertyResolver, getDirectory(file) ).setSql( environment );
+					NLogger.trace( "end environment building : {}", environment.getName() );
 				}
 
 				loadedFiles.add( file.toString() );
