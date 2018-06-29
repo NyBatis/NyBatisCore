@@ -40,29 +40,24 @@ public class SqlRepository {
 
 		if( isExist(sqlId) ) {
 
-			if( get(sqlId).getSqlHash() == sqlNode.getSqlHash() ) return;
-
 			String environmentId = sqlNode.getEnvironmentId();
 
 			// if sql id is duplicated, skip later one.
 			if( get(sqlId).containsEnvironmentId( environmentId ) ) {
-
-				if( xmlFile == null ) {
-					NLogger.warn( "Sql(id:{}) is duplicated. later sql will be ignored.\n\t\t>> {}", sqlId, sqlNode.getSqlSkeleton() );
-				} else {
-					NLogger.warn( "Sql(id:{}, file:{}) is duplicated.\n{}", sqlId, xmlFile, sqlNode.getSqlSkeleton() );
+				if( get(sqlId).getSqlHash() != sqlNode.getSqlHash() ) {
+					if( xmlFile == null ) {
+						NLogger.warn( "Sql(id:{}) is duplicated. later sql will be ignored.\n\t\t>> {}", sqlId, sqlNode.getSqlSkeleton() );
+					} else {
+						NLogger.warn( "Sql(id:{}, file:{}) is duplicated.\n{}", sqlId, xmlFile, sqlNode.getSqlSkeleton() );
+					}
 				}
-
 			} else {
-
 				get( sqlId ).addEnvironmentId( environmentId );
-
 				if( xmlFile == null ) {
 					NLogger.trace( "Sql({}) has multiple environment({})", sqlId, environmentId );
 				} else {
 					NLogger.trace( "Sql({}) has multiple environment({}) because of sql mapper file({}).", sqlId, environmentId, xmlFile );
 				}
-
 			}
 
 
