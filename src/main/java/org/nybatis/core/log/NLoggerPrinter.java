@@ -333,4 +333,8 @@ public class NLoggerPrinter {
 
 	}
 
+	public Logger getNativeLogger() {
+		return this.logger;
+	}
+
 }
