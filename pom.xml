@@ -42,6 +42,7 @@
     <jdk.version>1.8</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>github</github.global.server>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <skipTests>true</skipTests>
   </properties>
 
