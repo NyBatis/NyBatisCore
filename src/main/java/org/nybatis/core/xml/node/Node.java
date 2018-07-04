@@ -51,8 +51,9 @@ public class Node {
     }
 
 	//@Override
-    public void setValue( String value ) throws DOMException {
+    public Node setValue( String value ) throws DOMException {
 		node.setNodeValue( value );
+		return this;
     }
 
 	//@Override
@@ -268,11 +269,12 @@ public class Node {
     	return newNode( node.removeChild(oldNode) );
     }
 
-    public void removeChild() {
+    public Node removeChild() {
     	NodeList childNodes = node.getChildNodes();
     	for( int i = 0, iCnt = childNodes.getLength(); i < iCnt; i++ ) {
     		node.removeChild( childNodes.item(i) );
     	}
+		return this;
     }
 
 	//@Override
@@ -322,8 +324,9 @@ public class Node {
     }
 
 	//@Override
-    public void normalize() {
+    public Node normalize() {
     	node.normalize();
+    	return this;
     }
 
 	//@Override
@@ -342,8 +345,9 @@ public class Node {
     }
 
 	//@Override
-    public void setPrefix( String prefix ) throws DOMException {
+    public Node setPrefix( String prefix ) throws DOMException {
     	node.setPrefix( prefix );
+		return this;
 
     }
 
@@ -373,8 +377,9 @@ public class Node {
     }
 
 	//@Override
-    public void setText( String textContent ) throws DOMException {
+    public Node setText( String textContent ) throws DOMException {
     	node.setTextContent( textContent );
+		return this;
     }
 
 	//@Override
@@ -450,13 +455,15 @@ public class Node {
     }
 
 	//@Override
-    public void setAttr( String key, String value ) throws DOMException {
+    public Node setAttr( String key, String value ) throws DOMException {
     	rawElement().setAttribute( key, value );
+    	return this;
     }
 
 	//@Override
-    public void removeAttr( String key ) throws DOMException {
+    public Node removeAttr( String key ) throws DOMException {
     	rawElement().removeAttribute( key );
+		return this;
     }
 
 	//@Override
@@ -474,13 +481,15 @@ public class Node {
     }
 
 	//@Override
-    public void setAttrNS( String namespaceURI, String qualifiedName, String value ) throws DOMException {
+    public Node setAttrNS( String namespaceURI, String qualifiedName, String value ) throws DOMException {
     	rawElement().setAttributeNS( namespaceURI, qualifiedName, value );
+		return this;
     }
 
 	//@Override
-    public void removeAttrNS( String namespaceURI, String localName ) throws DOMException {
+    public Node removeAttrNS( String namespaceURI, String localName ) throws DOMException {
     	rawElement().removeAttributeNS( namespaceURI, localName );
+		return this;
     }
 
 	//@Override
