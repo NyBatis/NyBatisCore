@@ -18,15 +18,13 @@ public class ClassUtilTest {
 	@Test( expectedExceptions = InvalidActivityException.class )
 	public void makeInstance() throws ClassNotFoundException, InvalidActivityException {
 
-		ClassUtil classUtil = new ClassUtil();
-
 		NLogger.debug( ClassUtil.getClass( "java.util.ArrayList<java.lang.String>" ) );
 		NLogger.debug( ClassUtil.getClass( "java.util.ArrayList <java.lang.String" ) );
 		NLogger.debug( ClassUtil.getClass( "java. util.ArrayList" ) );
+		NLogger.debug( ClassUtil.getClass( "java.util.ArrayList" ) );
 
 		try {
 			NLogger.debug( ClassUtil.getClass( "java.util.ArrayLis" ) );
-
 		} catch( ClassNotFoundException e ) {
 			throw new InvalidActivityException( e );
 		}
@@ -35,14 +33,10 @@ public class ClassUtilTest {
 
 	@Test
 	public void hasClassTest() {
-
-		ClassUtil classUtil = new ClassUtil();
-
 		assertEquals( true,   ClassUtil.isExtendedBy( Integer.class, Integer.class ) );
 		assertEquals( true,   ClassUtil.isExtendedBy( ArrayList.class, List.class ) );
 		assertEquals( true,   ClassUtil.isExtendedBy( NMap.class, Map.class ) );
 		assertEquals( false,  ClassUtil.isExtendedBy( NMap.class, List.class ) );
-
 	}
 
 }
