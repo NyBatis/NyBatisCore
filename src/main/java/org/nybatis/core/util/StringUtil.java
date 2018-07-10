@@ -1082,45 +1082,60 @@ public class StringUtil {
 	}
 
 	/**
-	 * 정규식 패턴에 해당하는 문자열을 추출한다.
+	 * extract words matched by regular expression.
 	 *
 	 * <pre>
 	 *
 	 *  String pattern = "#\\{(.+?)}";
-	 *
 	 *  List&lt;String&gt; finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
-	 *
-	 *  System.out.println( finded ); → ['AAAA','BBBB', 'AAAA']
+	 *  System.out.println( finded ); -> ['AAAA','BBBB', 'AAAA']
 	 *
 	 *  ----------------------------------------------------------------
 	 *
-	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   → []
-	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) → ['.', '.', '.']
+	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   -> []
+	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) -> ['.', '.', '.']
 	 *
 	 * </pre>
 	 *
-	 * @param value 검사할 문자열
-	 * @param pattern 정규식 (capture 될 문자열을 반드시 ( ) 로 감싸주어야 함)
-	 * @return 패턴에 해당하는 문자열
+	 * @param value   target value to inspect
+	 * @param pattern regular expression (only captured pattern (wrapped by (...)) can be extracted)
+	 * @return captured words
 	 */
 	public static List<String> capturePatterns( Object value, String pattern ) {
+		Pattern p = ( pattern == null ) ? null : Pattern.compile( pattern );
+		return capturePatterns( value, p );
+	}
 
+	/**
+	 * extract words matched by regular expression.
+	 *
+	 * <pre>
+	 *
+	 *  String pattern = "#\\{(.+?)}";
+	 *  List&lt;String&gt; finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
+	 *  System.out.println( finded ); -> ['AAAA','BBBB', 'AAAA']
+	 *
+	 *  ----------------------------------------------------------------
+	 *
+	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   -> []
+	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) -> ['.', '.', '.']
+	 *
+	 * </pre>
+	 *
+	 * @param value   target value to inspect
+	 * @param pattern regular expression (only captured pattern (wrapped by (...)) can be extracted)
+	 * @return captured words
+	 */
+	public static List<String> capturePatterns( Object value, Pattern pattern ) {
 		List<String> result = new ArrayList<>();
-
 		if( isEmpty(value) || isEmpty(pattern) ) return result;
-
-	    Pattern p = Pattern.compile( pattern );
-
-	    Matcher matcher = p.matcher( value.toString() );
-
-	    while( matcher.find() ) {
-	        for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
-	            result.add( matcher.group(i) );
-	        }
-	    }
-
-	    return result;
-
+		Matcher matcher = pattern.matcher( value.toString() );
+		while( matcher.find() ) {
+			for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
+				result.add( matcher.group(i) );
+			}
+		}
+		return result;
 	}
 
 	/**
