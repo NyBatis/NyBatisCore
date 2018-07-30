@@ -29,10 +29,10 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
     private SqlSessionImpl       sqlSession;
     private OrmSessionProperties properties  = new OrmSessionProperties();
-    private Class<T>             domainClass = null;
+    private Class<T>             domainClass;
     private OrmTableSqlMaker     tableSqlMaker;
 
-    private TableLayout          entityLayout = null;
+    private TableLayout          entityLayout;
 
     public OrmTableHandlerImpl( SqlSessionImpl sqlSession, OrmSessionProperties properties, Class<T> domainClass ) {
         this.sqlSession    = sqlSession;
@@ -47,7 +47,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     @Override
-    public TableLayout getLayout() {
+    public synchronized TableLayout getLayout() {
         try {
             return tableSqlMaker.getTableLayout( domainClass );
         } catch( SqlConfigurationException e ) {
@@ -66,7 +66,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     @Override
-    public boolean drop() {
+    public synchronized boolean drop() {
         if( ! exists() ) return false;
         SqlLogHider.$.hideDebugLog( () -> {
             sqlSession.sql( tableSqlMaker.sqlDropTable( getLayout() ) ).execute();
@@ -77,18 +77,19 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     @Override
-    public boolean set() {
+    public synchronized boolean set() {
         if( ! isDDLExecutable() ) return false;
         Boolean[] result = { Boolean.FALSE };
         SqlLogHider.$.hideDebugLog( () -> {
+            boolean modified = false;
             if( notExists() ) {
-                result[0] = createTable();
+                modified = createTable();
             } else {
                 if( isChanged() ) {
                     NLogger.trace( ">> previous table layout\n{}", getLayout() );
                     NLogger.trace( ">> current  table layout\n{}", entityLayout );
                     try {
-                        result[0] = modifiyTable();
+                        modified = modifiyTable();
                     } catch( SqlException e ) {
                         if( canRecreatTable() ) {
                             NLogger.error( e );
@@ -98,7 +99,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
                                 sqlSession.getDatabase().name
                             );
                             drop();
-                            result[0] = createTable();
+                            modified = createTable();
                         } else {
                             throw new SqlConfigurationException( e,
                                 "table({}) can't be re-create because ORM option[environment(id:{}) > ddl > recreation] is [false]",
@@ -109,8 +110,11 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
                     }
                 }
             }
-            refreshLayout();
-            commit();
+            if( modified ) {
+                commit();
+                refreshLayout();
+            }
+            result[0] = modified;
         });
         return result[0];
     }
@@ -144,7 +148,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         tableSqlMaker.refreshTableLayout( domainClass );
     }
 
-    private boolean isChanged() {
+    private synchronized boolean isChanged() {
         TableLayout prevLayout = getLayout();
         TableLayout currLayout = entityLayout;
         return ! prevLayout.isEqual( currLayout );
