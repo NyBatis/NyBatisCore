@@ -24,7 +24,7 @@ import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
  * @author nayasis@gmail.com
  * @since 2017-11-16
  */
-public class OrmTableCreationTest {
+public class OrmTableModificationTest {
 
     public static final String envirionmentId = "h2";
 
@@ -161,35 +161,9 @@ public class OrmTableCreationTest {
             Assert.assertEquals( (int) tableLayout.getColumn( "income" ).getSize(), 21 );
         }
 
-        insertDataToModifiedTable( anotherSession );
-
         // revert table layout
-        session.table().drop();
         session.table().set();
 
-
-    }
-
-    private void insertDataToModifiedTable( OrmSession<EmployeeModification> anotherSession ) {
-
-        EmployeeModification param01 = new EmployeeModification();
-        param01.setKey( "1" );
-        param01.setSubKey( "2" );
-        param01.setLastName( "merong" );
-
-        EmployeeModification param02 = new EmployeeModification();
-        param02.setKey( "1" );
-        param02.setSubKey( "1" );
-        param02.setLastName( "merong" );
-
-        anotherSession.insert( param01 );
-        anotherSession.insert( param02 );
-
-        EmployeeModification row = anotherSession.select( param01 );
-
-        Assert.assertEquals( row.getSubKey(), param01.getSubKey() );
-
-        NLogger.debug( row );
 
     }
 
