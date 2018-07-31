@@ -57,12 +57,19 @@ public class OrmSqlMaker {
 
             String sqlIdPrefix = Const.db.getOrmSqlIdPrefix( environmentId, tableName );
 
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ) );
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ) );
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout )   );
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ) );
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ) );
-            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )   );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_INSERT_PK );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_SELECT_PK );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_SELECT );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_UPDATE_PK );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_DELETE_PK );
+            SqlRepository.remove( sqlIdPrefix + Const.db.ORM_SQL_DELETE );
+
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_INSERT_PK, insertPkSql( layout ), forcedly );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT_PK, selectPkSql( layout ), forcedly );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_SELECT,    selectSql( layout )  , forcedly );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_UPDATE_PK, updatePkSql( layout ), forcedly );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE_PK, deletePkSql( layout ), forcedly );
+            readTable( environmentId, sqlIdPrefix, Const.db.ORM_SQL_DELETE,    deleteSql( layout )  , forcedly );
 
         } finally {
             lock.unlock();
@@ -79,11 +86,11 @@ public class OrmSqlMaker {
     }
 
 
-    private void readTable( String environmentId, String mainId, String subId, String xmlSql ) {
+    private void readTable( String environmentId, String mainId, String subId, String xmlSql, boolean forcedly ) {
 
         String sqlId = mainId + subId;
 
-        if( SqlRepository.isExist( sqlId ) ) return;
+        if( ! forcedly && SqlRepository.isExist( sqlId ) ) return;
 
         SqlReader reader = new SqlReader();
 

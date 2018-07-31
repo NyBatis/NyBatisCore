@@ -17,9 +17,9 @@ import org.nybatis.core.util.StringUtil;
  */
 public class TableLayoutRepository {
 
-    private static Map<String, TableLayout> tableLayoutRepository  = new HashMap<>();
-    private static Map<String, Boolean>     ddlEnable              = new HashMap<>();
-    private static Map<String, Boolean>     ddlRecreation          = new HashMap<>();
+    private static Map<String,TableLayout> tableLayoutRepository  = new HashMap<>();
+    private static Map<String,Boolean>     ddlEnable              = new HashMap<>();
+    private static Map<String,Boolean>     ddlRecreation          = new HashMap<>();
 
     private static Object lock = new Object();
 

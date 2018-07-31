@@ -18,8 +18,8 @@ import org.nybatis.core.validation.Validator;
  */
 public class SqlRepository {
 
-	public static final SqlProperties      EMPTY_PROPERTIES   = new SqlProperties();
-	public static Map<String, SqlNode>     sqlRepository      = new Hashtable<>();
+	public static final SqlProperties EMPTY_PROPERTIES = new SqlProperties();
+	public static Map<String,SqlNode> sqlRepository    = new Hashtable<>();
 
 	public static boolean isExist( String sqlId ) {
 		return sqlId != null && sqlRepository.containsKey( sqlId );
@@ -28,6 +28,10 @@ public class SqlRepository {
 	public static SqlNode get( String sqlId ) {
 		if( sqlId == null ) return null;
 		return sqlRepository.get( sqlId );
+	}
+
+	public static void remove( String sqlId ) {
+		sqlRepository.remove( sqlId );
 	}
 
 	public static void put( String sqlId, SqlNode sqlNode ) {

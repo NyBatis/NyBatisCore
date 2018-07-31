@@ -3,6 +3,7 @@ package org.nybatis.core.db.orm.table.create.entity;
 import java.sql.Types;
 import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Pk;
+import org.nybatis.core.reflection.Reflector;
 
 /**
  * Table Modification
@@ -27,6 +28,10 @@ public class EmployeeModification extends Employee {
     @Column( length = 21, precision = 4, notNull = true, type = Types.VARCHAR )
     public double getIncome() {
         return super.getIncome();
+    }
+
+    public String toString() {
+        return Reflector.toJson( this );
     }
 
 }
