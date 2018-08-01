@@ -29,14 +29,13 @@ public class StopWatch {
 
 	public StopWatch tick( String message ) {
 
-		Log log = new Log( message);
+		Log log = new Log( message );
 
 		if( logs.size() == 0 ) {
-			log.lastNonoSec = initTime;
 			log.durationMiliSec = elapsedMiliSeconds();
 		} else {
-			log.lastNonoSec = System.nanoTime();
-			log.durationMiliSec = ( log.lastNonoSec - logs.get(logs.size() - 1).lastNonoSec ) / 1_000_000;
+			Log prevLog = logs.get( logs.size() - 1 );
+			log.durationMiliSec = ( log.lastNonoSec - prevLog.lastNonoSec ) / 1_000_000;
 		}
 
 		logs.add( log );
@@ -85,6 +84,7 @@ public class StopWatch {
 		public int    percent;
 		public Log( String message ) {
 			this.message = message;
+			this.lastNonoSec = System.nanoTime();
 		}
 	}
 
