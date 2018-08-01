@@ -16,8 +16,7 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 
-import static org.nybatis.core.db.datasource.driver.DatabaseName.ORACLE;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 
 /**
  * ORM entity table handler implements
@@ -157,6 +156,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     private boolean createTable() {
         boolean result = false;
         result |= executeSql( tableSqlMaker.sqlCreateTable(entityLayout) );
+
         if( isNotDatabase(SQLITE) ) {
             result |= executeSql( tableSqlMaker.sqlAddPrimaryKey(entityLayout) );
         }
@@ -279,8 +279,14 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         try {
             sqlSession.sql( sql ).execute();
             return true;
-        } catch( Exception e ) {
-            throw e;
+        } catch( SqlException e ) {
+            // InnoDB 엔진 key-size 제약이 발생했을 경우
+            if( isDatabase( MARIA, MYSQL ) && "1071".equals(e.getErrorCode()) ) {
+                executeSql( tableSqlMaker.sqlMariaTableRowFormatDynamic(entityLayout) );
+                sqlSession.sql( sql ).execute();
+                return true;
+            }
+            return false;
         }
     }
 
