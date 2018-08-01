@@ -257,13 +257,19 @@ public class OrmTableSqlMaker {
         } else if( isDatabase(SQLITE) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s KEY (%s)",
                 tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
-        } else if( isDatabase( MYSQL, MARIA) ) {
+        } else if( isDatabase(MYSQL, MARIA) ) {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT PRIMARY KEY (%s)",
                 tableLayout.getName(), serializeColumnNames( tableLayout.getPkColumnNames() ) );
         } else {
             return String.format( "ALTER TABLE %s ADD CONSTRAINT %s PRIMARY KEY (%s)",
                 tableLayout.getName(), pkName, serializeColumnNames( tableLayout.getPkColumnNames() ) );
         }
+    }
+
+    public String sqlMariaTableRowFormatDynamic( TableLayout tableLayout ) {
+        if( tableLayout == null ) return null;
+        if( ! isDatabase(MYSQL, MARIA) ) return null;
+        return String.format( "ALTER TABLE %s ROW_FORMAT=DYNAMIC", tableLayout.getName() );
     }
 
     private String serializeColumnNames( Collection<String> names ) {
