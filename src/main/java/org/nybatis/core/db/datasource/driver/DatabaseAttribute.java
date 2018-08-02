@@ -11,9 +11,11 @@ import org.nybatis.core.validation.Validator;
  */
 public class DatabaseAttribute {
 
-    public static final String PAGE_PARAM_START = "NybatisPagebuilder.START";
-    public static final String PAGE_PARAM_END   = "NybatisPagebuilder.END";
-    public static final String DATABASE_UNKOWN  = "unknown";
+    public static final String PAGE_PARAM_START   = "NybatisPagebuilder.START";
+    public static final String PAGE_PARAM_END     = "NybatisPagebuilder.END";
+    public static final String PAGE_PARAM_OFFSET  = "NybatisPagebuilder.OFFSET";
+    public static final String PAGE_PARAM_COUNT   = "NybatisPagebuilder.COUNT";
+    public static final String DATABASE_UNKOWN    = "unknown";
 
     private String  database                   = DATABASE_UNKOWN;
     private String  patternToMatchClassName    = "";
@@ -113,7 +115,12 @@ public class DatabaseAttribute {
     }
     public DatabaseAttribute setPageSqlPre( String sql ) {
         pageSqlPre = StringUtil.compressSpaceOrEnter( sql ) + " ";
-        pageSqlPre = pageSqlPre.replaceAll( "(?i)#\\{start\\}", "#{" + PAGE_PARAM_START + "}" ).replaceAll( "(?i)#\\{end\\}", "#{" + PAGE_PARAM_END + "}" );
+        pageSqlPre = pageSqlPre
+            .replaceAll( "(?i)#\\{start\\}",  "#{" + PAGE_PARAM_START  + "}" )
+            .replaceAll( "(?i)#\\{end\\}",    "#{" + PAGE_PARAM_END    + "}" )
+            .replaceAll( "(?i)#\\{offset\\}", "#{" + PAGE_PARAM_OFFSET + "}" )
+            .replaceAll( "(?i)#\\{count\\}",  "#{" + PAGE_PARAM_COUNT  + "}" )
+        ;
         return this;
     }
     public String getPageSqlPost() {
@@ -121,7 +128,12 @@ public class DatabaseAttribute {
     }
     public DatabaseAttribute setPageSqlPost( String sql ) {
         pageSqlPost = StringUtil.compressSpaceOrEnter( sql ) + " ";
-        pageSqlPost = pageSqlPost.replaceAll( "(?i)#\\{start\\}", "#{" + PAGE_PARAM_START + "}" ).replaceAll( "(?i)#\\{end\\}", "#{" + PAGE_PARAM_END + "}" );
+        pageSqlPost = pageSqlPost
+            .replaceAll( "(?i)#\\{start\\}",  "#{" + PAGE_PARAM_START  + "}" )
+            .replaceAll( "(?i)#\\{end\\}",    "#{" + PAGE_PARAM_END    + "}" )
+            .replaceAll( "(?i)#\\{offset\\}", "#{" + PAGE_PARAM_OFFSET + "}" )
+            .replaceAll( "(?i)#\\{count\\}",  "#{" + PAGE_PARAM_COUNT  + "}" )
+        ;
         return this;
     }
 

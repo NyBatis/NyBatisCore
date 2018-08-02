@@ -92,21 +92,43 @@ public class DatabaseAttributeManager {
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
-        add( new DatabaseAttribute( DatabaseName.MYSQL ) );
-        add( new DatabaseAttribute( DatabaseName.MARIA ) );
-        add( new DatabaseAttribute( DatabaseName.SQLITE ) );
+        add( new DatabaseAttribute( DatabaseName.MYSQL )
+            .setPageSqlPost( "LIMIT #{offset}, #{count}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.MARIA )
+            .setPageSqlPost( "LIMIT #{offset}, #{count}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.SQLITE )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
 
         add( new DatabaseAttribute( DatabaseName.H2 )
-            .setPageSqlPost( "LIMIT (#{end} - #{start} + 1) OFFSET (#{start} - 1)" )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
         );
 
         //   Not Tested  !
-        add( new DatabaseAttribute( DatabaseName.DERBY ) );
-        add( new DatabaseAttribute( DatabaseName.HSQL ) );
-        add( new DatabaseAttribute( DatabaseName.MSSQL ) );
-        add( new DatabaseAttribute( DatabaseName.POSTGRE ) );
-        add( new DatabaseAttribute( DatabaseName.SYBASE ) );
-        add( new DatabaseAttribute( DatabaseName.DB2 ) );
+        add( new DatabaseAttribute( DatabaseName.DERBY )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.HSQL )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.MSSQL )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.POSTGRE )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.SYBASE )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROW_NUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.DB2 )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
         add( new DatabaseAttribute( DatabaseName.ODBC ) );
 
     }

@@ -94,8 +94,23 @@ public class SqlBean {
 		this.sqlParam   = new QueryParameter( inputParam ).addGlobalParameters();
 
 		if( properties.isPageSql() ) {
-			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );
-			sqlParam.put( DatabaseAttribute.PAGE_PARAM_END,   this.properties.getPageSqlEnd()   );
+
+			Integer pageStart = this.properties.getPageSqlStart();
+			Integer pageEnd   = this.properties.getPageSqlEnd();
+
+			if( pageStart != null && pageEnd != null ) {
+
+				int tmp   = pageStart;
+				pageStart = Math.min( pageStart, pageEnd );
+				pageEnd   = Math.max( tmp,       pageEnd );
+
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, pageStart );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_END,   pageEnd );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_OFFSET, Math.max( pageStart - 1, 0) );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_COUNT,  Math.abs( pageEnd - pageStart ) + 1 );
+
+			}
+
 		}
 
 		if( properties.hasOrmDynamicSql() ) {
