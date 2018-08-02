@@ -132,12 +132,24 @@ public class DatasourceManager {
 
 	}
 
+	public static boolean isDatabase( DatabaseName... dbName ) {
+		String database = getAttributes( getDefaultEnvironmentId() ).getDatabase();
+		for( DatabaseName name : dbName ) {
+			if( database.equalsIgnoreCase(name.name) ) return true;
+		}
+		return false;
+	}
+
 	public static boolean isDatabase( String environmentId, DatabaseName... dbName ) {
 		String database = getAttributes( environmentId ).getDatabase();
 		for( DatabaseName name : dbName ) {
 			if( database.equalsIgnoreCase(name.name) ) return true;
 		}
 		return false;
+	}
+
+	public static DatabaseName getDatabaseName() {
+		return getDatabaseName( getDefaultEnvironmentId() );
 	}
 
 	public static DatabaseName getDatabaseName( String environmentId ) {
