@@ -55,11 +55,15 @@ public class JdbcDataSource implements DataSource {
 		return getProxyConnection( username, password ).getConnection();
     }
 
+	public JdbcConnectionProperties getConnectionProperties() {
+		return connectionProperties;
+	}
+
 	public ProxyConnection getProxyConnection() throws SQLException {
 		return getProxyConnection( connectionProperties.getUserName(), connectionProperties.getUserPassword() );
 	}
 
-	public synchronized ProxyConnection getProxyConnection( String username, String password ) throws SQLException {
+	public synchronized ProxyConnection getProxyConnection( String username, String password ) {
 
 		if( connectionPoolIdle.isEmpty() ) {
 
@@ -205,27 +209,27 @@ public class JdbcDataSource implements DataSource {
     }
 
 	@Override
-    public PrintWriter getLogWriter() throws SQLException {
+    public PrintWriter getLogWriter() {
 		return DriverManager.getLogWriter();
     }
 
 	@Override
-    public void setLogWriter( PrintWriter out ) throws SQLException {
+    public void setLogWriter( PrintWriter out ) {
 		DriverManager.setLogWriter( out );
     }
 
 	@Override
-    public void setLoginTimeout( int seconds ) throws SQLException {
+    public void setLoginTimeout( int seconds ) {
 		DriverManager.setLoginTimeout( seconds );
     }
 
 	@Override
-    public int getLoginTimeout() throws SQLException {
+    public int getLoginTimeout() {
 		return DriverManager.getLoginTimeout();
     }
 
 	@Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public Logger getParentLogger() {
 		return Logger.getLogger( Logger.GLOBAL_LOGGER_NAME );
     }
 
@@ -235,7 +239,7 @@ public class JdbcDataSource implements DataSource {
     }
 
 	@Override
-    public boolean isWrapperFor( Class<?> iface ) throws SQLException {
+    public boolean isWrapperFor( Class<?> iface ) {
 	    return false;
     }
 

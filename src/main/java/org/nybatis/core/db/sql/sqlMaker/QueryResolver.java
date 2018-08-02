@@ -1,14 +1,17 @@
 package org.nybatis.core.db.sql.sqlMaker;
 
 import com.jayway.jsonpath.InvalidPathException;
-import java.util.*;
 import org.nybatis.core.conf.Const;
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.exception.unchecked.JsonPathNotFoundException;
 import org.nybatis.core.exception.unchecked.SqlParseException;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
+
+import java.util.*;
 
 public class QueryResolver {
 
@@ -77,20 +80,24 @@ public class QueryResolver {
     }
 
     public String getDebugSql() {
+        return getDebugSql( null );
+    }
+
+    public String getDebugSql( String environmentId ) {
 
     	StringBuilder sql = new StringBuilder();
 
-    	int index = 0;
+        DatabaseName dbName = DatasourceManager.getDatabaseName( environmentId );
+
+        int index = 0;
 
     	for( String line : binarySql ) {
-
     		if( line == null ) {
                 String key = binaryKeys.get( index++ );
-    			sql.append( bindStructs.get( key ).toDebugParam( bindParams.get( key ) ) );
+    			sql.append( bindStructs.get( key ).toDebugParam( bindParams.get(key), dbName ) );
     		} else {
     			sql.append( line );
     		}
-
     	}
 
     	return sql.toString();
