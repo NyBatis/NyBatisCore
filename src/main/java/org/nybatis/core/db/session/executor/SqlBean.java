@@ -185,7 +185,7 @@ public class SqlBean {
 	}
 
 	public String getDebugSql() {
-		return queryResolver.getDebugSql();
+		return queryResolver.getDebugSql( getEnvironmentId() );
 	}
 
 	public String getOrignalSql() {

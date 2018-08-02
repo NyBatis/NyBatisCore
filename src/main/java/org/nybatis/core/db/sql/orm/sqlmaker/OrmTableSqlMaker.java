@@ -123,11 +123,11 @@ public class OrmTableSqlMaker {
                 sb.append( toColumnSize(column) );
                 break;
             case Types.DATE :
-                if( isDatabase(H2) ) {
-                    if( ! column.isDefinedByAnnotation() ) {
+                if( ! column.isDefinedByAnnotation() ) {
+                    if( isDatabase(MYSQL,MARIA) ) {
+                        sb.append( "DATETIME" );
+                    } else if( isDatabase(H2) ) {
                         sb.append( "TIMESTAMP" );
-                    } else {
-                        sb.append( toColumnType(dataType) );
                     }
                 } else {
                     sb.append( toColumnType(dataType) );
@@ -136,7 +136,7 @@ public class OrmTableSqlMaker {
             case Types.NUMERIC :
             case Types.DECIMAL :
             case Types.DOUBLE :
-                if( isDatabase( MYSQL, MARIA) ) {
+                if( isDatabase(MYSQL, MARIA) ) {
                     sb.append( toColumnType(dataType) );
                 } else {
                     sb.append( "NUMBER" );
@@ -147,6 +147,24 @@ public class OrmTableSqlMaker {
             case Types.LONGVARBINARY :
                 if( isDatabase( MYSQL,MARIA) ) {
                     sb.append( "TEXT" );
+                } else {
+                    sb.append( toColumnType(dataType) );
+                }
+                break;
+            case Types.CLOB :
+                if( isDatabase(MYSQL,MARIA) ) {
+                    sb.append( "LONGTEXT" );
+                } else if( isDatabase(MSSQL) ) {
+                    sb.append( "TEXT" );
+                } else {
+                    sb.append( toColumnType(dataType) );
+                }
+                break;
+            case Types.BLOB :
+                if( isDatabase(MYSQL,MARIA) ) {
+                    sb.append( "LONGBLOB" );
+                } else if( isDatabase(MSSQL) ) {
+                    sb.append( "IMAGE" );
                 } else {
                     sb.append( toColumnType(dataType) );
                 }

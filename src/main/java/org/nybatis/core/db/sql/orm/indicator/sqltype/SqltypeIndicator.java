@@ -37,9 +37,8 @@ public class SqltypeIndicator {
         }
 
         DatabaseName[] mysql = { MYSQL, MARIA };
-        map.get( NUMERIC.code ).add( mysql, REAL          );
-        map.get( DECIMAL.code ).add( mysql, REAL          );
-        map.get( CLOB.code    ).add( mysql, LONGVARBINARY );
+        map.get( NUMERIC.code ).add( mysql, REAL );
+        map.get( DECIMAL.code ).add( mysql, REAL );
 
         initialized = true;
     }

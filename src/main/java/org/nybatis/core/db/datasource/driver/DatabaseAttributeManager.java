@@ -1,5 +1,6 @@
 package org.nybatis.core.db.datasource.driver;
 
+import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
@@ -18,7 +19,7 @@ import java.util.Map;
  */
 public class DatabaseAttributeManager {
 
-    private static Map<String, DatabaseAttribute> driverRepository = new Hashtable<>();
+    private static Map<String,DatabaseAttribute> driverRepository = new Hashtable<>();
 
     public static void add( DatabaseAttribute databaseAttribute ) {
         driverRepository.put( databaseAttribute.getDatabase(), databaseAttribute );
@@ -26,14 +27,14 @@ public class DatabaseAttributeManager {
 
     public static DatabaseAttribute get( DataSource datasource ) throws DatabaseConfigurationException {
 
+        if( datasource instanceof JdbcDataSource ) {
+            return getDatabaseAttribute( ( (JdbcDataSource) datasource ).getConnectionProperties().getDriverName() );
+        }
+
         Connection  connection = null;
-
         try {
-
             connection = datasource.getConnection();
-
             return get( connection );
-
         } catch( SQLException e ) {
             throw new DatabaseConfigurationException( e );
         } finally {
@@ -43,35 +44,33 @@ public class DatabaseAttributeManager {
                 } catch( SQLException e ) {}
             }
         }
-
     }
 
-
-    private static DatabaseAttribute get( Connection connection ) throws SQLException {
-
+    private static DatabaseAttribute get( Connection connection ) {
         Connection realConnection = Reflector.unwrapProxy( connection );
-
         String className = realConnection.getClass().getName();
+        return getDatabaseAttribute( className );
+    }
+
+    private static DatabaseAttribute getDatabaseAttribute( String classOrDriverName ) {
 
         NLogger.trace( "---------------------------------------------------------------------" );
-        NLogger.trace( "Connection class name : {}", className );
+        NLogger.trace( "Connection class (or driver) name : {}", classOrDriverName );
         NLogger.trace( "---------------------------------------------------------------------" );
 
         for( DatabaseAttribute attribute : driverRepository.values() ) {
-            if( attribute.isMatched( className ) ) {
+            if( attribute.isMatched( classOrDriverName ) ) {
                 NLogger.trace( attribute );
                 return attribute.clone();
             }
         }
 
-        if( ! driverRepository.containsKey( className ) ) {
-            add( new DatabaseAttribute( className, className ) );
+        if( ! driverRepository.containsKey( classOrDriverName ) ) {
+            add( new DatabaseAttribute( classOrDriverName, classOrDriverName ) );
         }
 
-        DatabaseAttribute databaseAttribute = driverRepository.get( className );
-
+        DatabaseAttribute databaseAttribute = driverRepository.get( classOrDriverName );
         NLogger.trace( databaseAttribute );
-
         return databaseAttribute.clone();
 
     }

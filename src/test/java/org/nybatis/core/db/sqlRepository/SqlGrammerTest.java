@@ -106,8 +106,10 @@ public class SqlGrammerTest {
 
 		String sql = getSql( "Grammer.forEach", param );
 
-		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND age > #{age} AND ( names LIKE '%' || #{names[0]} || '%' || #{names[0].index} -- #{index} OR names LIKE '%' || #{names[1]} || '%' || #{names[1].index} -- #{index} ) ORDER BY title" );
-		assertEquals( param.toString(), "{age=39, names=[hwasu, hwajong], names[0]=hwasu, names[0].index=0, names[1]=hwajong, names[1].index=1}" );
+		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND age > #{age} AND ( names LIKE '%' || #{names[0]} || '%' || #{names[0].index} -- #{names[0].index} OR names LIKE '%' || #{names[1]} || '%' || #{names[1].index} -- #{names[1].index} ) ORDER BY title" );
+		assertEquals( param.get("names").toString(), "[hwasu, hwajong]" );
+		assertEquals( param.get("names[0]").toString(), "hwasu" );
+		assertEquals( param.get("names[1]").toString(), "hwajong" );
 
 	}
 
@@ -121,7 +123,9 @@ public class SqlGrammerTest {
 		String sql = getSql( "Grammer.forEachPrimitiveParam", param );
 
 		assertEquals( sql, "SELECT * FROM TABLE_SAMPLE WHERE 1=1 AND ( SELECT #{names[0].index} AS index, #{names[0]} AS name FROM DUAL UNION ALL SELECT #{names[1].index} AS index, #{names[1]} AS name FROM DUAL ) ORDER BY title" );
-		assertEquals( param.toString(), "{names=[hwasu, hwajong], names[0]=hwasu, names[0].index=0, names[1]=hwajong, names[1].index=1}" );
+		assertEquals( param.get("names").toString(), "[hwasu, hwajong]" );
+		assertEquals( param.get("names[0]").toString(), "hwasu" );
+		assertEquals( param.get("names[1]").toString(), "hwajong" );
 
 	}
 
