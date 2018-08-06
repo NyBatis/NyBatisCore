@@ -19,28 +19,24 @@ import static org.nybatis.core.db.sql.mapper.SqlType.*;
  * @author nayasis@gmail.com
  * @since 2017-11-22
  */
-public class SqltypeIndicator {
+public class SqltypeDialector {
 
     private Map<Integer,SqltypeDialect> map = new HashMap<>();
 
-    private boolean initialized = false;
+    public final static SqltypeDialector $ = new SqltypeDialector();
 
-    public final static SqltypeIndicator $ = new SqltypeIndicator();
-
-    private SqltypeIndicator() {}
+    private SqltypeDialector() {
+        init();
+    }
 
     private synchronized void init() {
-        if( initialized ) return;
-
         for( SqlType sqlType : SqlType.values() ) {
             map.put( sqlType.code, new SqltypeDialect(sqlType) );
         }
-
         DatabaseName[] mysql = { MYSQL, MARIA };
         map.get( NUMERIC.code ).add( mysql, REAL );
         map.get( DECIMAL.code ).add( mysql, REAL );
-
-        initialized = true;
+        map.get( CLOB.code ).add( mysql, LONGVARCHAR );
     }
 
     public SqlType getSqlType( int sqlType, DatabaseName dbName ) {

@@ -1,10 +1,10 @@
 package org.nybatis.core.db.session.type.orm;
 
-import java.util.List;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.etc.SqlLogHider;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
+import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.orm.sqlmaker.OrmTableSqlMaker;
 import org.nybatis.core.db.sql.orm.vo.TableColumn;
@@ -15,6 +15,8 @@ import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
+
+import java.util.List;
 
 import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 
@@ -148,9 +150,45 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
     }
 
     private synchronized boolean isChanged() {
-        TableLayout prevLayout = getLayout();
+        TableLayout prevLayout = getPrevLayout();
         TableLayout currLayout = entityLayout;
         return ! prevLayout.isEqual( currLayout );
+    }
+
+    private TableLayout getPrevLayout() {
+
+        TableLayout prevLayout = getLayout();
+        TableLayout currLayout = this.entityLayout;
+
+        for( String currColumnName : currLayout.getColumnMap().keySet() ) {
+
+            TableColumn currCol = currLayout.getColumnMap().get( currColumnName );
+            TableColumn prevCol = prevLayout.getColumnMap().get( currColumnName );
+
+            // if default value is defined by DBMS and JavaModel has no definition
+            // DO NOT check differences.
+            if( prevCol != null ) {
+                if( currCol.getDefaultValue() == null )
+                    prevCol.setDefaultValue( null );
+                if( currCol.getSize() == null )
+                    prevCol.setSize( null );
+                if( currCol.getPrecison() == null )
+                    prevCol.setPrecison( null );
+            }
+
+            // if DBMS is MySQL, TIMESTAMP column is not null so DO NOT check NotNull difference.
+            if( isDatabase(MARIA, MYSQL) ) {
+                if( currCol.getDataType() == SqlType.TIMESTAMP.code || currCol.getDataType() == SqlType.DATE.code ) {
+                    if( prevCol.getDataType() == SqlType.TIMESTAMP.code || prevCol.getDataType() == SqlType.DATE.code ) {
+                        prevCol.setNotNull( currCol.isNotNull() );
+                    }
+                }
+            }
+
+        }
+
+        return prevLayout;
+
     }
 
     private boolean createTable() {
@@ -170,7 +208,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
 
         boolean result = false;
 
-        TableLayout prevLayout = getLayout();
+        TableLayout prevLayout = getPrevLayout();
         TableLayout currLayout = entityLayout;
 
         result |= addColumns( currLayout.getColumnsToAdd(prevLayout) );
@@ -281,7 +319,7 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
             return true;
         } catch( SqlException e ) {
             // InnoDB 엔진 key-size 제약이 발생했을 경우
-            if( isDatabase( MARIA, MYSQL ) && "1071".equals(e.getErrorCode()) ) {
+            if( isDatabase( MARIA, MYSQL ) && ("1071".equals(e.getErrorCode()) || "1709".equals(e.getErrorCode()) ) ) {
                 executeSql( tableSqlMaker.sqlMariaTableRowFormatDynamic(entityLayout) );
                 sqlSession.sql( sql ).execute();
                 return true;

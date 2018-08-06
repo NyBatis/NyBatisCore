@@ -61,6 +61,10 @@ public class TableLayout {
         return new ArrayList<>( columns.values() );
     }
 
+    public Map<String,TableColumn> getColumnMap() {
+        return columns;
+    }
+
     public TableColumn getColumn( String name ) {
         if( StringUtil.isNotEmpty(name) ) {
             name = name.replaceFirst( " .*$", "" );

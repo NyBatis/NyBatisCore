@@ -3,7 +3,8 @@ package org.nybatis.core.db.sql.orm.reader;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.nybatis.core.db.annotation.*;
 import org.nybatis.core.db.sql.mapper.SqlType;
-import org.nybatis.core.db.sql.orm.indicator.sqltype.SqltypeIndicator;
+import org.nybatis.core.db.sql.orm.indicator.sqltype.ClassDialector;
+import org.nybatis.core.db.sql.orm.indicator.sqltype.SqltypeDialector;
 import org.nybatis.core.db.sql.orm.vo.TableColumn;
 import org.nybatis.core.db.sql.orm.vo.TableIndex;
 import org.nybatis.core.db.sql.orm.vo.TableLayout;
@@ -121,7 +122,7 @@ public class EntityLayoutReader {
         if( field.isAnnotationPresent(ColumnIgnore.class) ) return null;
 
         TableColumn column = new TableColumn( table );
-        column.setDataType( field.getType() );
+        column.setDataType( ClassDialector.$.getSqlType(field.getType(), environmentId).code );
         column.setKey( field.getName() );
 
         if( field.isAnnotationPresent(Column.class) )
@@ -157,7 +158,7 @@ public class EntityLayoutReader {
 
     private void setColumn( TableColumn column, Column annotation ) {
         if( annotation.type() != Integer.MIN_VALUE ) {
-            SqlType sqlType = SqltypeIndicator.$.getSqlType( annotation.type(), environmentId );
+            SqlType sqlType = SqltypeDialector.$.getSqlType( annotation.type(), environmentId );
             column.setDataType( sqlType.code );
         }
         if( StringUtil.isNotEmpty(annotation.name()) ) {
