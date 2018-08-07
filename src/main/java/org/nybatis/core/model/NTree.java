@@ -377,6 +377,17 @@ public class NTree<T> implements Serializable {
     }
 
     /**
+     * get parent
+     *
+     * @param parent
+     * @return self
+     */
+    public NTree<T> setParent( NTree<T> parent ) {
+        this.parent = parent;
+        return this;
+    }
+
+    /**
      * check if parent branch exists.
      * @return true if parent branch exists.
      */
