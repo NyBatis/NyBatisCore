@@ -233,7 +233,7 @@ public class NLoggerPrinter {
 				} else if( Types.isArray(format) ) {
 					printLog( marker, level, logger, Arrays.deepToString( (Object[]) format ) );
 				} else if( format instanceof Throwable ) {
-					printLog( marker, level, logger, getThrowableString( (Throwable) format ) );
+					printLog( marker, level, logger, toString( (Throwable) format ) );
 				} else {
 					printLog( marker, level, logger, format.toString() );
 				}
@@ -242,7 +242,7 @@ public class NLoggerPrinter {
 
 				for( int i = 0, iCnt = param.length; i < iCnt; i++ ) {
 					if( param[i] instanceof Throwable ) {
-						param[i] = getThrowableString( (Throwable) param[i] );
+						param[i] = toString( (Throwable) param[i] );
 					} else if( Types.isArray(param[i]) ) {
 						param[i] = Arrays.deepToString( (Object[]) param[i] );
 					}
@@ -323,7 +323,7 @@ public class NLoggerPrinter {
 
 	}
 
-	protected String getThrowableString( Throwable throwable ) {
+	protected String toString( Throwable throwable ) {
 
 		if( throwable == null ) return null;
 
