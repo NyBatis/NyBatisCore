@@ -63,7 +63,12 @@ public enum SqlType {
 	NCLOB                   ( java.sql.Types.NCLOB                   , "NCLOB"                   )  ,
 	SQLXML                  ( java.sql.Types.SQLXML                  , "SQLXML"                  )  ,
 	TIME_WITH_TIMEZONE      ( java.sql.Types.TIME_WITH_TIMEZONE      , "TIME_WITH_TIMEZONE"      )  ,
-	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ;
+	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" ),
+
+	TEXT                    ( java.sql.Types.CLOB                    , "TEXT"                    )  ,
+	LONGTEXT                ( java.sql.Types.CLOB                    , "LONGTEXT"                )  ,
+
+	;
 
 	public final int     code;
 	public final String  name;
