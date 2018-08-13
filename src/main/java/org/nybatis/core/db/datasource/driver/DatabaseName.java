@@ -11,7 +11,7 @@ public enum DatabaseName {
 
     NULL(    "",           ""                                      ),
     ORACLE(  "oracle",     "oracle\\.jdbc\\.driver"                ),
-    MYSQL(   "mysql",      "com\\.mysql\\.jdbc"                    ),
+    MYSQL(   "mysql",      "com\\.mysql\\.(cj\\.)?jdbc"            ),
     MARIA(   "maria",      "org\\.mariadb\\.jdbc"                  ),
     SQLITE(  "sqlite",     "org\\.sqlite\\."                       ),
     H2(      "h2",         "org\\.h2\\.jdbc"                       ),
