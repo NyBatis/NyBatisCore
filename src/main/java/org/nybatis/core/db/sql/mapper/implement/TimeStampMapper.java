@@ -2,6 +2,7 @@ package org.nybatis.core.db.sql.mapper.implement;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
+import org.nybatis.core.model.NDate;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -20,6 +21,9 @@ public class TimeStampMapper implements TypeMapperIF<Date> {
 
 	@Override
     public void setParameter( PreparedStatement statement, int index, Date param ) throws SQLException {
+		if( param != null ) {
+			param = new NDate( param ).setMillisecond( 0 ).toDate();
+		}
 		statement.setTimestamp( index, new Timestamp(param.getTime()) );
     }
 

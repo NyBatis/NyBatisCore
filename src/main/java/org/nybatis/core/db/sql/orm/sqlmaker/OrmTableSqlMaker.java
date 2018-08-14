@@ -96,8 +96,6 @@ public class OrmTableSqlMaker {
     private String getColumnName( TableColumn column ) {
         if( isDatabase(MYSQL,MARIA,SQLITE) ) {
             return String.format( "`%s`", StringUtil.toUncamel( column.getName() ) );
-        } else if( isDatabase(ORACLE) ) {
-            return String.format( "\"%s\"", StringUtil.toUncamel( column.getName() ).toUpperCase() );
         } else {
             return StringUtil.toUncamel( column.getName() );
         }

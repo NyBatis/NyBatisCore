@@ -46,8 +46,10 @@ public class TypeMapper {
 		 * java.sql.Date handle data as Date only and miss time information(HH:MI:SS).<br>
 		 * So It is necessary to handle data as TimeStamp
 		 */
-
+		// TODO 1 : TimeStamp는 mili-sec까지 세팅이 가능하다. mili-sec까지 세팅하지 않는 DATE 또는 DATETIME 형식의 Mapper가 필요하다.
+		// TODO 2 : JDBC 타입은 DBMS에 지나치게 의존적이다. 이를 해결하기 위한 고유 SqlType을 만들자.
 		put( SqlType.DATE,          new TimeStampMapper()  );
+
     	put( SqlType.TIME,          new TimeStampMapper()  );
     	put( SqlType.TIMESTAMP,     new TimeStampMapper()  );
 
