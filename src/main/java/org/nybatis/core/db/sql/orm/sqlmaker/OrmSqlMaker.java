@@ -318,7 +318,9 @@ public class OrmSqlMaker {
         StringBuilder sb = new StringBuilder();
         sb.append( "<if test=\"#{nybatis.database} =='mysql' || #{nybatis.database} =='maria' || #{nybatis.database} =='sqlite'\">" );
         sb.append( String.format("`%s`", StringUtil.toUncamel(column.getName())) );
-        sb.append( "</if><else>" );
+        sb.append( "</if><elseif test=\"#{nybatis.database} =='oracle'\">" );
+        sb.append( String.format("\"%s\"", StringUtil.toUncamel(column.getName()).toUpperCase() ) );
+        sb.append( "</elseif><else>" );
         sb.append( StringUtil.toUncamel(column.getName()) );
         sb.append( "</else>" );
         return sb.toString();
