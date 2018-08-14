@@ -95,7 +95,9 @@ public class OrmTableSqlMaker {
 
     private String getColumnName( TableColumn column ) {
         if( isDatabase(MYSQL,MARIA,SQLITE) ) {
-            return String.format( "`%s`", StringUtil.toUncamel(column.getName()) );
+            return String.format( "`%s`", StringUtil.toUncamel( column.getName() ) );
+        } else if( isDatabase(ORACLE) ) {
+            return String.format( "\"%s\"", StringUtil.toUncamel( column.getName() ).toUpperCase() );
         } else {
             return StringUtil.toUncamel( column.getName() );
         }
@@ -126,18 +128,31 @@ public class OrmTableSqlMaker {
                 if( ! column.isDefinedByAnnotation() ) {
                     if( isDatabase(MYSQL,MARIA) ) {
                         sb.append( "DATETIME" );
+                    } else if( isDatabase(MYSQL) ) {
+                        sb.append( "TIMESTAMP" );
                     } else if( isDatabase(H2) ) {
                         sb.append( "TIMESTAMP" );
+                    } else {
+                        sb.append( "DATE" );
                     }
                 } else {
                     sb.append( toColumnType(dataType) );
                 }
                 break;
+            case Types.INTEGER :
+            case Types.TINYINT :
+            case Types.SMALLINT :
+            case Types.BIGINT :
             case Types.NUMERIC :
             case Types.DECIMAL :
             case Types.DOUBLE :
+            case Types.FLOAT :
                 if( isDatabase(MYSQL, MARIA) ) {
-                    sb.append( toColumnType(dataType) );
+                    if( dataType == Types.NUMERIC || dataType == Types.DECIMAL ) {
+                        sb.append( "REAL" );
+                    } else {
+                        sb.append( toColumnType(dataType) );
+                    }
                 } else {
                     sb.append( "NUMBER" );
                 }

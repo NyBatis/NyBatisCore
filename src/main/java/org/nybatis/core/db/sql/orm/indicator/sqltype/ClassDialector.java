@@ -7,9 +7,7 @@ import org.nybatis.core.db.sql.mapper.SqlType;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.nybatis.core.db.datasource.driver.DatabaseName.H2;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.MARIA;
-import static org.nybatis.core.db.datasource.driver.DatabaseName.MYSQL;
+import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 import static org.nybatis.core.db.sql.mapper.SqlType.*;
 
 /**
@@ -37,7 +35,6 @@ public class ClassDialector {
         }
 
         DatabaseName[] mysql = { MYSQL, MARIA };
-        map.get( DATE ).add( mysql, TIMESTAMP );
         map.get( NUMERIC ).add( mysql, REAL );
         map.get( DECIMAL ).add( mysql, REAL );
 
