@@ -65,8 +65,8 @@ public enum SqlType {
 	TIME_WITH_TIMEZONE      ( java.sql.Types.TIME_WITH_TIMEZONE      , "TIME_WITH_TIMEZONE"      )  ,
 	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ,
 
-	TEXT                    ( java.sql.Types.CLOB                    , "TEXT"                    )  ,
-	LONGTEXT                ( java.sql.Types.CLOB                    , "LONGTEXT"                )
+	TEXT                    ( 9003                                   , "TEXT"                    )  ,
+	LONGTEXT                ( 9004                                   , "LONGTEXT"                )
 
 	;
 

@@ -320,9 +320,15 @@ public class OrmTableHandlerImpl<T> implements OrmTableHandler<T> {
         } catch( SqlException e ) {
             // InnoDB 엔진 key-size 제약이 발생했을 경우
             if( isDatabase( MARIA, MYSQL ) && ("1071".equals(e.getErrorCode()) || "1709".equals(e.getErrorCode()) ) ) {
-                executeSql( tableSqlMaker.sqlMariaTableRowFormatDynamic(entityLayout) );
-                sqlSession.sql( sql ).execute();
-                return true;
+                try {
+                    sqlSession.sql( tableSqlMaker.sqlMariaTableRowFormatDynamic(entityLayout) ).execute();
+                } catch( Exception s1 ) {}
+                try {
+                    sqlSession.sql( sql ).execute();
+                    return true;
+                } catch( Exception s2 ) {
+                    return false;
+                }
             }
             return false;
         }
