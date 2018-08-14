@@ -10,6 +10,7 @@ import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.db.sql.mapper.TypeMapper;
 import org.nybatis.core.db.sql.mapper.TypeMapperIF;
 import org.nybatis.core.exception.unchecked.JdbcImplementException;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.PrimitiveConverter;
@@ -174,6 +175,10 @@ public class ResultsetController {
 		} catch( JdbcImplementException | SQLException e ) {
 			TypeMapper.setUnimplementedMapper( environmentId, sqlType, e );
 			return getResult( sqlType, resultSet, columnIndex );
+		} catch( NullPointerException e ) {
+			throw new SqlConfigurationException( "type mapper is not valid. (SqlType:{}, environmentId:{}, column:{}, rsValue:{}",
+				sqlType, environmentId, columnIndex, resultSet.getString(columnIndex)
+			);
 		}
 	}
 
