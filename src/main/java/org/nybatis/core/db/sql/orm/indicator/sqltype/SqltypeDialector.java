@@ -36,8 +36,6 @@ public class SqltypeDialector {
         DatabaseName[] mysql = { MYSQL, MARIA };
         map.get( NUMERIC.code ).add( mysql, REAL );
         map.get( DECIMAL.code ).add( mysql, REAL );
-        map.get( CLOB.code    ).add( MARIA, LONGVARBINARY );
-        map.get( CLOB.code    ).add( MYSQL, LONGTEXT  );
     }
 
     public SqlType getSqlType( int sqlType, DatabaseName dbName ) {
