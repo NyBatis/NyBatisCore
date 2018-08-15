@@ -159,7 +159,7 @@ public class OrmTableSqlMaker {
             case Types.VARBINARY :
             case Types.LONGVARBINARY :
                 if( isDatabase( MYSQL,MARIA) ) {
-                    sb.append( "TEXT" );
+                    sb.append( "LONGTEXT" );
                 } else {
                     sb.append( toColumnType(dataType) );
                 }
