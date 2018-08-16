@@ -184,12 +184,16 @@ public abstract class AbstractBatchExecutor {
 
 		}
 
+
 		if( logger.isDebugEnabled() ) {
 			DbUtils.logCaller();
 			for( Object key : statements.keySet() ) {
-				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms\n{}", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key), logs.getLog(key) );
+				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key) );
+				if( logger.isTraceEnabled() ) {
+				    logger.trace( logs.getLog(key) );
+                }
 			}
-		}
+        }
 
 		statements.clear();
 		logs.clear();
