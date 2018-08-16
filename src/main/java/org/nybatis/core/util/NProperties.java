@@ -80,6 +80,10 @@ public class NProperties {
 		return properties.getProperty( key );
 	}
 
+	public Boolean toBoolean( String key ) {
+		return StringUtil.toBoolean( get( key ) );
+	}
+
 	public NProperties set( String key, String value ) {
 		properties.put( key, value );
 		return this;
