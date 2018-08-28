@@ -37,6 +37,14 @@ public class ClassDialector {
         DatabaseName[] mysql = { MYSQL, MARIA };
         map.get( NUMERIC ).add( mysql, REAL );
         map.get( DECIMAL ).add( mysql, REAL );
+        map.get( DATE ).add( mysql, TIMESTAMP );
+
+        map.get( INT ).add( ORACLE, DECIMAL );
+        map.get( INTEGER ).add( ORACLE, DECIMAL );
+        map.get( DOUBLE ).add( ORACLE, DECIMAL );
+        map.get( BIGINT ).add( ORACLE, DECIMAL );
+        map.get( FLOAT ).add( ORACLE, DECIMAL );
+        map.get( REAL ).add( ORACLE, DECIMAL );
 
         map.get( DATE ).add( H2, TIMESTAMP );
 

@@ -199,18 +199,39 @@ public class TableColumn {
     }
 
     public boolean isEqual( TableColumn column ) {
-        return isEqual( column, true );
+        return isEqual( column, true, false );
     }
 
-    public boolean isEqual( TableColumn column, boolean checkPkDifference ) {
+    public boolean isEqual( TableColumn column, boolean checkPkDifference, boolean checkDefaultValueDifference ) {
         if( column == null ) return false;
         if( StringUtil.isNotEqual(key, column.key) ) return false;
-        if( StringUtil.isNotEqual(defaultValue, column.defaultValue) ) return false;
-        if( dataType != null && column.dataType != null && ! dataType.equals(column.dataType) ) return false;
+        if( ! isClob(this) && ! isClob(column) ) {
+            if( ! isBlob(this) && !isBlob(column) ) {
+                if( dataType != null && column.dataType != null && ! dataType.equals(column.dataType) ) {
+                    if( dataTypeName != null && column.dataTypeName != null && ! dataTypeName.equals( column.dataTypeName ) )
+                        return false;
+                }
+            }
+        }
         if( notNull  != column.notNull  ) return false;
+        if( checkDefaultValueDifference && StringUtil.isNotEqual(defaultValue, column.defaultValue) ) return false;
         if( checkPkDifference && pk != column.pk ) return false;
         if( size != null && column.size != null && ! size.equals(column.size) ) return false;
         return !( precison != null && column.precison != null && !precison.equals( column.precison ) );
+    }
+
+    private boolean isClob( TableColumn column ) {
+        if( column == null || column.dataType == null ) return false;
+        if( column.dataType == SqlType.CLOB.code     ) return true;
+        if( column.dataType == SqlType.LONGTEXT.code ) return true;
+        return false;
+    }
+
+    private boolean isBlob( TableColumn column ) {
+        if( column == null || column.dataType == null ) return false;
+        if( column.dataType == SqlType.BLOB.code          ) return true;
+        if( column.dataType == SqlType.LONGVARBINARY.code ) return true;
+        return false;
     }
 
     private boolean canAssignLength() {

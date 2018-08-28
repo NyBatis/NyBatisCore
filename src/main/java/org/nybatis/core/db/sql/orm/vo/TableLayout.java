@@ -178,7 +178,7 @@ public class TableLayout {
         for( String key : this.columns.keySet() ) {
             if( another.columns.containsKey(key) ) {
                 // do not check PK dirrefence
-                if( ! this.columns.get(key).isEqual( another.columns.get(key), false ) ) {
+                if( ! this.columns.get(key).isEqual( another.columns.get(key), false, false ) ) {
                     columns.add( this.columns.get(key) );
                 }
             }
