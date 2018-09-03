@@ -37,11 +37,26 @@ public interface OrmSession<T> extends Cloneable {
     int update( Object entity );
 
     /**
+     * Update entity.
+     *
+     * @param entity entity parameter to update.
+     * @return affected count
+     */
+    int updateAll( Object entity );
+
+    /**
      * Update entities.
      *
      * @return affected count
      */
     int update();
+
+    /**
+     * Update entities.
+     *
+     * @return affected count
+     */
+    int updateAll();
 
     /**
      * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
@@ -52,11 +67,27 @@ public interface OrmSession<T> extends Cloneable {
     int delete( Object entity );
 
     /**
+     * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
+     *
+     * @param entity entity parameter to delete.
+     * @return affected count
+     */
+    int deleteAll( Object entity );
+
+    /**
      * Delete entities.
      *
      * @return affected count
      */
     int delete();
+
+    /**
+     * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
+     *
+     * @param entity entity parameter to delete.
+     * @return affected count
+     */
+    int deleteAll();
 
     /**
      * Select entity.

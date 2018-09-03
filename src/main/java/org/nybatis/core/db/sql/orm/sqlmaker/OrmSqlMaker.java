@@ -169,7 +169,7 @@ public class OrmSqlMaker {
         StringBuilder sb = new StringBuilder();
 
         sb.append( String.format("UPDATE /*+ %s.%s.%s */ %s SET\n", Const.db.ORM_SQL_PREFIX + Const.db.ORM_SQL_UPDATE_PK, layout.getEnvironmentId(), layout.getName(), layout.getName()) );
-        sb.append( "<group delimeter=\",\">\n" );
+        sb.append( "<group concater=\",\">\n" );
 
         for( TableColumn column : layout.getColumns() ) {
 

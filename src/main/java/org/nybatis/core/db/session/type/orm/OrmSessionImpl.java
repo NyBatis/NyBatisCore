@@ -89,12 +89,24 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
+    public int updateAll( Object entity ) {
+        properties.allowNonPkParameter( true );
+        return update( entity );
+    }
+
+    @Override
     public int update() {
         try {
             return getSessionExecutor( properties.sqlIdUpdatePk() ).execute();
         } finally {
             properties.clear();
         }
+    }
+
+    @Override
+    public int updateAll() {
+        properties.allowNonPkParameter( true );
+        return update();
     }
 
     @Override
@@ -105,11 +117,23 @@ public class OrmSessionImpl<T> implements OrmSession<T> {
     }
 
     @Override
+    public int deleteAll( Object entity ) {
+        properties.allowNonPkParameter( true );
+        return delete( entity );
+    }
+
+    @Override
     public int delete() {
         String sqlId = isPkSql() ? properties.sqlIdDeletePk() : properties.sqlIdDelete();
         int cnt = getSessionExecutor( sqlId ).execute();
         properties.clear();
         return cnt;
+    }
+
+    @Override
+    public int deleteAll() {
+        properties.allowNonPkParameter( true );
+        return delete();
     }
 
     private boolean isPkSql() {
