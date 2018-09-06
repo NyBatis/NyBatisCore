@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import java.io.IOException;
 import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.reflection.Reflector;
@@ -20,6 +21,15 @@ public class ColumnBeanSerializer extends JsonSerializer<Object> {
             generator.writeString( NullValue.STRING );
         } else {
             generator.writeString( Reflector.toJson(value) );
+        }
+    }
+
+    @Override
+    public void serializeWithType( Object value, JsonGenerator generator, SerializerProvider serializers, TypeSerializer typeSerializer ) throws IOException {
+        if( NullValue.isNull(value) ) {
+            generator.writeString( NullValue.STRING );
+        } else {
+            serialize( value, generator, serializers );
         }
     }
 
