@@ -114,6 +114,10 @@ public class EnvironmentBuilder {
 	}
 
 	public void setJdbcDatasource( String driverName, String url, String username, String password, String passwordSecretKey ) {
+		setJdbcDatasource( driverName, url, username, password, passwordSecretKey, null );
+	}
+
+	public void setJdbcDatasource( String driverName, String url, String username, String password, String passwordSecretKey, Integer timeout ) {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
@@ -122,6 +126,10 @@ public class EnvironmentBuilder {
 		connectionProperties.setUserName( username );
 		connectionProperties.setUserPassword( password );
 		connectionProperties.setPasswordSecretKey( passwordSecretKey );
+
+		if( timeout != null && timeout > 0 ) {
+			connectionProperties.setTimeout( timeout );
+		}
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
