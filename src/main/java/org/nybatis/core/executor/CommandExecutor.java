@@ -122,9 +122,9 @@ public class CommandExecutor {
 	}
 
 	/**
-	 * 실행중인지 여부를 확인한다.
+	 * check whether process is executing or not.
 	 *
-	 * @return 실행중인지 여부
+	 * @return true if process is executing.
 	 */
 	public boolean isAlive() {
 
@@ -159,7 +159,7 @@ public class CommandExecutor {
 	 * @param timeout	max wait time (mili-seconds)
 	 * @return	process termination code ( 0 : success )
 	 */
-	public int waitFor( Long timeout ) {
+	public int waitFor( Integer timeout ) {
 
 		if( ! isAlive() ) return 0;
 
@@ -184,7 +184,7 @@ public class CommandExecutor {
 
 	}
 
-	private void waitThread( ProcessOutputThread thread, Long timeOut ) {
+	private void waitThread( ProcessOutputThread thread, Integer timeOut ) {
 
 		if( thread == null || ! thread.isAlive() ) return;
 
