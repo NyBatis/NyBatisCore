@@ -26,7 +26,7 @@ import static org.nybatis.core.db.datasource.driver.DatabaseName.SQLITE;
  */
 public class OrmTableCreationTest {
 
-    public static final String envirionmentId = "h2";
+    public static final String environmentId = "maria";
 
     @BeforeClass
     public void init() {
@@ -36,10 +36,10 @@ public class OrmTableCreationTest {
     @Test
     public void checkXmlConfiguration() {
 
-        DatabaseAttribute attribute = DatasourceManager.getAttributes( "h2" );
-        Assert.assertEquals( attribute.getDatabase(), envirionmentId );
+        DatabaseAttribute attribute = DatasourceManager.getAttributes( environmentId );
+        Assert.assertEquals( attribute.getDatabase(), environmentId );
 
-        boolean enableToCreateTable = TableLayoutRepository.isEnableDDL( envirionmentId );
+        boolean enableToCreateTable = TableLayoutRepository.isEnableDDL( environmentId );
         Assert.assertEquals( enableToCreateTable, true );
 
     }
@@ -66,9 +66,9 @@ public class OrmTableCreationTest {
 
 //        printTableLayout( "oracle", "TB_DEV_SQL" );
 //        printTableLayout( "oracle", "TB_TABLE" );
-        printTableLayout( "h2",     "TB_TABLE" );
+//        printTableLayout( "h2",     "TB_TABLE" );
 //        printTableLayout( "sqlite", "TB_TABLE" );
-//        printTableLayout( "maria", "TB_TABLE" );
+        printTableLayout( "maria", "TB_TABLE" );
     }
 
     private void printTableLayout( String envirionmentId, String tableName ) {
@@ -87,18 +87,18 @@ public class OrmTableCreationTest {
     @Test
     public void creatSql() {
 
-        TableLayout layout = getSampleTableLayout( envirionmentId );
+        TableLayout layout = getSampleTableLayout( environmentId );
 
-        OrmTableSqlMaker sqlMaker = new OrmTableSqlMaker( envirionmentId );
+        OrmTableSqlMaker sqlMaker = new OrmTableSqlMaker( environmentId );
         System.out.println( sqlMaker.sqlCreateTable(layout) );
 
     }
 
     @Test
     public void tableModificationTest() {
-        tableModificationTest( "h2" );
-        tableModificationTest( "sqlite" );
-        tableModificationTest( "oracle" );
+//        tableModificationTest( "h2" );
+//        tableModificationTest( "sqlite" );
+//        tableModificationTest( "oracle" );
         tableModificationTest( "maria" );
     }
 
@@ -110,6 +110,23 @@ public class OrmTableCreationTest {
         employee.setAge( 40 );
         employee.setIncome( 1000.674 );
         return employee;
+    }
+
+    @Test
+    public void tableRecreationTest() {
+
+        if( ! DatasourceManager.isExist( environmentId ) ) {
+            NLogger.info( "environmentId({}) is not exist", environmentId );
+            return;
+        }
+
+        OrmSession<Employee> session = SessionManager.openOrmSession( Employee.class );
+
+        session.setEnvironmentId( environmentId );
+
+        session.table().set();
+        session.table().set();
+
     }
 
     private void tableModificationTest( String environmentId ) {

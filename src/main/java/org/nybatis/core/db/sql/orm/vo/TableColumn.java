@@ -274,11 +274,11 @@ public class TableColumn {
      * @param klass	matched class
      * @return SqlType
      */
-    private SqlType findColumnType( Class<?> klass ) {
+    public SqlType findColumnType( Class<?> klass ) {
         return ClassSqltypeIndicator.$.getSqlType( klass, table.getEnvironmentId() );
     }
 
-    private Integer findColumnLength( Class klass ) {
+    public Integer findColumnLength( Class klass ) {
         return ClassSqltypeIndicator.$.getLength( klass, table.getEnvironmentId() );
     }
 

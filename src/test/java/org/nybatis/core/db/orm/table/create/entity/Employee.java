@@ -7,7 +7,7 @@ import org.nybatis.core.db.annotation.Column;
  * @author nayasis@gmail.com
  * @since 2017-11-16
  */
-public class Employee extends Persion {
+public class Employee extends Person {
 
     public Employee() {}
 

@@ -27,6 +27,7 @@ public enum SqlType {
 	VARCHAR                 ( java.sql.Types.VARCHAR                 , "VARCHAR"                 )  ,
 	LONGVARCHAR             ( java.sql.Types.LONGVARCHAR             , "LONGVARCHAR"             )  ,
 	DATE                    ( java.sql.Types.DATE                    , "DATE"                    )  ,
+	DATETIME                ( java.sql.Types.TIMESTAMP               , "DATETIME"                )  ,
 	TIME                    ( java.sql.Types.TIME                    , "TIME"                    )  ,
 	TIMESTAMP               ( java.sql.Types.TIMESTAMP               , "TIMESTAMP"               )  ,
 	BINARY                  ( java.sql.Types.BINARY                  , "BINARY"                  )  ,

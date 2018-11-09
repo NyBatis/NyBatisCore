@@ -123,11 +123,10 @@ public class OrmTableSqlMaker {
                 sb.append( toColumnSize(column) );
                 break;
             case Types.DATE :
+            case Types.TIMESTAMP :
                 if( ! column.isDefinedByAnnotation() ) {
                     if( isDatabase(MYSQL,MARIA) ) {
                         sb.append( "DATETIME" );
-                    } else if( isDatabase(MYSQL) ) {
-                        sb.append( "TIMESTAMP" );
                     } else if( isDatabase(H2) ) {
                         sb.append( "TIMESTAMP" );
                     } else {

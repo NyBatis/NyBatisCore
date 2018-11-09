@@ -13,10 +13,10 @@ import org.nybatis.core.model.NDate;
  * @since 2017-11-16
  */
 @Table( value = "Tb_tAbLe", indices = {
-    @Index( name = "test1", columns = {"age","lastName desc"} ),
+    @Index( name = "test1", columns = {"age","lastName"} ),
     @Index( name = "test2", columns = {"age","income","key"} )
 })
-public class Persion {
+public class Person {
 
     @Pk
     private String key;
@@ -34,9 +34,9 @@ public class Persion {
         return key;
     }
 
-    public Persion() {}
+    public Person() {}
 
-    public Persion( String key, String lastName, int age, double income, String id, String dummy ) {
+    public Person( String key, String lastName, int age, double income, String id, String dummy ) {
         this.key    = key;
         this.lastName = lastName;
         this.age    = age;

@@ -122,7 +122,9 @@ public class EntityLayoutReader {
         if( field.isAnnotationPresent(ColumnIgnore.class) ) return null;
 
         TableColumn column = new TableColumn( table );
-        column.setDataType( ClassDialector.$.getSqlType(field.getType(), environmentId).code );
+        SqlType sqlType = ClassDialector.$.getSqlType( field.getType(), environmentId );
+        column.setDataType( sqlType.code, sqlType.name );
+        column.setSize( column.findColumnLength( field.getType() ) );
         column.setKey( field.getName() );
 
         if( field.isAnnotationPresent(Column.class) )
