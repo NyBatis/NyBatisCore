@@ -53,7 +53,6 @@ public abstract class AbstractBatchExecutor {
 		String environmentId = properties.getRepresentativeEnvironmentId();
 
 		Statements  statements  = getStatements().init( token, environmentId );
-		Logs        logs        = getLogs();
 		SqlBean     sqlBean     = null;
 
 		int executeCount = 0;
@@ -74,21 +73,19 @@ public abstract class AbstractBatchExecutor {
 
 				Object key = statements.getKey( sqlBean );
 
-				logs.set( key, sqlBean );
-
 				statements.addBatch( key, sqlBean );
 
 				if( commitCount != null ) {
 					executeCount++;
 					if( executeCount % commitCount == 0 ) {
-						executeBatch( statements, logs );
+						executeBatch( statements );
 						statements.commit();
 					}
 				}
 
 			}
 
-			executeBatch( statements, logs );
+			executeBatch( statements );
 
 			if( commitCount != null ) {
 				statements.commit();
@@ -118,12 +115,11 @@ public abstract class AbstractBatchExecutor {
 
 		} finally {
 			statements.clear();
-			logs.clear();
 		}
 
 	}
 
-	private void executeBatch( Statements statements, Logs logs  ) throws SQLException {
+	private void executeBatch( Statements statements ) throws SQLException {
 
 		Map<Object, Long> elapsedTimes = new HashMap<>();
 
@@ -164,16 +160,9 @@ public abstract class AbstractBatchExecutor {
 				SqlException exception;
 
 				try {
-					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error\n{}",
-							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage(), logs.getLog( key ) );
-
-				} catch( OutOfMemoryError error ) {
-
-					NLogger.warn( "fail on logging error detail due to OutOfMemoryError\n\n{} Error (code:{}) {}", statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
-
-					exception = new SqlException( e, "{} Error (code:{}) {}\n\n>> Parameters in error",
-							statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
-
+					exception = new SqlException( e, "{} Error (code:{}) {}", statements.getKeyInfo( key ), e.getErrorCode(), e.getMessage() );
+				} catch( Exception error ) {
+					exception = new SqlException( e );
 				}
 
 				exception.setErrorCode( e.getErrorCode() );
@@ -188,15 +177,11 @@ public abstract class AbstractBatchExecutor {
 		if( logger.isDebugEnabled() ) {
 			DbUtils.logCaller();
 			for( Object key : statements.keySet() ) {
-				logger.debug( ">> {} executed:[{}]count(s), elapsed:[{}]ms", statements.getKeyInfo( key ), logs.getParamSize( key ), elapsedTimes.get(key) );
-				if( logger.isTraceEnabled() ) {
-				    logger.trace( logs.getLog(key) );
-                }
+				logger.debug( ">> {} executed, elapsed:[{}]ms", statements.getKeyInfo( key ), elapsedTimes.get(key) );
 			}
         }
 
 		statements.clear();
-		logs.clear();
 
 	}
 
