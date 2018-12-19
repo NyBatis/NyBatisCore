@@ -84,7 +84,6 @@ public interface OrmSession<T> extends Cloneable {
     /**
      * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
      *
-     * @param entity entity parameter to delete.
      * @return affected count
      */
     int deleteAll();
