@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.model.NMap;
 
@@ -36,12 +37,56 @@ public interface OrmSession<T> extends Cloneable {
     int update( Object entity );
 
     /**
+     * Update entity.
+     *
+     * @param entity entity parameter to update.
+     * @return affected count
+     */
+    int updateAll( Object entity );
+
+    /**
+     * Update entities.
+     *
+     * @return affected count
+     */
+    int update();
+
+    /**
+     * Update entities.
+     *
+     * @return affected count
+     */
+    int updateAll();
+
+    /**
      * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
      *
      * @param entity entity parameter to delete.
      * @return affected count
      */
     int delete( Object entity );
+
+    /**
+     * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
+     *
+     * @param entity entity parameter to delete.
+     * @return affected count
+     */
+    int deleteAll( Object entity );
+
+    /**
+     * Delete entities.
+     *
+     * @return affected count
+     */
+    int delete();
+
+    /**
+     * Delete entity or entities. If entity's class equals to domain class, only PK records affected.
+     *
+     * @return affected count
+     */
+    int deleteAll();
 
     /**
      * Select entity.
@@ -66,6 +111,14 @@ public interface OrmSession<T> extends Cloneable {
      * @return ListExecutor
      */
     OrmListExecutor<T> list();
+
+
+    /**
+     * get ORM table handler
+     *
+     * @return OrmTableHandler
+     */
+    OrmTableHandler<T> table();
 
     /**
      * Get batch executor
@@ -139,35 +192,11 @@ public interface OrmSession<T> extends Cloneable {
     OrmSession<T> setEnvironmentId( String id );
 
     /**
-     * Cache statements should not be cached at once when has been executed.
+     * get representative environment id
      *
-     * @return self instance
+     * @return environment id
      */
-    OrmSession<T> disableCache();
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    OrmSession<T> clearCache();
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId   cache id
-     * @return self instance
-     */
-    OrmSession<T> enableCache( String cacheId );
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId       cache id
-     * @param flushSeconds  cache flush cycle (unit:seconds)
-     * @return self instance
-     */
-    OrmSession<T> enableCache( String cacheId, Integer flushSeconds );
+    String getEnvironmentId();
 
     /**
      * Get native sql sqlSession
@@ -201,5 +230,21 @@ public interface OrmSession<T> extends Cloneable {
      * @return cloned sql session
      */
     OrmSession<T> clone();
+
+    /**
+     * check if session environment's database type is included
+     *
+     * @param dbName database type name
+     * @return true if type is matched
+     */
+    boolean isDatabase( DatabaseName... dbName );
+
+    /**
+     * check not if session environment's database type is included
+     *
+     * @param dbName database type name
+     * @return false if type is matched
+     */
+    boolean isNotDatabase( DatabaseName... dbName );
 
 }

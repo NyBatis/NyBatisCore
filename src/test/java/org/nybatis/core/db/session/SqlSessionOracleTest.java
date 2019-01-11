@@ -6,7 +6,7 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.model.NList;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -15,7 +15,7 @@ public class SqlSessionOracleTest {
 	@BeforeClass
 	public void beforeTest() {
 
-	    StopWatcher watcher = new StopWatcher();
+	    StopWatch watcher = new StopWatch();
 
 	    DatabaseConfigurator.build();
 
@@ -23,7 +23,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void select() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -33,7 +33,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void selectCursor() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -43,7 +43,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure01() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -60,7 +60,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure02() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -71,7 +71,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void function01() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -93,7 +93,7 @@ public class SqlSessionOracleTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void pageSql() {
 
 		SqlSession sqlSession = SessionManager.openSession();

@@ -95,6 +95,10 @@ public class StringUtilTest {
 		assertEquals( 2, capturedList.size() );
 		assertEquals( Arrays.asList( "Merong", "Nayasis" ), capturedList );
 
+		value = "< Ref id=\"refOrigin2\" />";
+		List<String> refIds = StringUtil.capturePatterns( value, "(?i)< *?ref +?id *?= *?['\"](.*?)['\"] *?\\/>" );
+		assertEquals( "[refOrigin2]", refIds.toString() );
+
 	}
 
 	@Test
@@ -190,7 +194,7 @@ public class StringUtilTest {
 	@Test
 	public void split() {
 
-		String val = "DP01+DP02+^DP03|DP40";
+		String val = "DP01  +DP02+^DP03|DP40";
 
 		assertEquals( StringUtil.split( val, "(\\+(\\^)?|\\|)", true ).toString(), "[DP01, +, DP02, +^, DP03, |, DP40]"  );
 
@@ -205,5 +209,35 @@ public class StringUtilTest {
 		assertEquals( "lnd_plus19_yn", StringUtil.toUncamel( "lndPlus19Yn" ) );
 
 	}
+
+	@Test
+	public void xss() {
+
+		String word01 = "<script>";
+		String word02 = "&lt;script&gt;";
+		String word03 = "<script>aaa(\"aaa\",'b'){}</script>";
+		String word04 = "066&";
+
+		assertEquals( word02, StringUtil.clearXss( word01 ) );
+		assertEquals( word01, StringUtil.unclearXss( word02 ) );
+		assertEquals( word03, StringUtil.unclearXss( word03 ) );
+		assertEquals( word04, StringUtil.unclearXss( word04 ) );
+
+	}
+
+	@Test
+	public void mask() {
+
+		String word = "01031155023";
+
+		assertEquals( "", StringUtil.mask( "", word ) );
+		assertEquals( "010_3115_5023", StringUtil.mask( "***_****_****", word ) );
+		assertEquals( "010_3115_502", StringUtil.mask( "***_****_***", word ) );
+		assertEquals( "*010_3115_502", StringUtil.mask( "\\****_****_***", word ) );
+		assertEquals( "010_3115_502*", StringUtil.mask( "***_****_***\\*", word ) );
+		assertEquals( "010_3115_502", StringUtil.mask( "***_****_***\\", word ) );
+
+	}
+
 
 }

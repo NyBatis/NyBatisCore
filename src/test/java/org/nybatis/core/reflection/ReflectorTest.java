@@ -1,32 +1,25 @@
 package org.nybatis.core.reflection;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
+import org.adrianwalker.multilinestring.Multiline;
+import org.nybatis.core.clone.Cloner;
 import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.vo.FromVo;
-import org.nybatis.core.reflection.vo.Person;
-import org.nybatis.core.reflection.vo.PersonAnother;
-import org.nybatis.core.reflection.vo.PhoneNumber;
-import org.nybatis.core.reflection.vo.TestRes;
-import org.nybatis.core.reflection.vo.TestVo;
-import org.nybatis.core.reflection.vo.ToVo;
+import org.nybatis.core.reflection.vo.*;
 import org.nybatis.core.testModel.Link;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 public class ReflectorTest {
 
@@ -39,7 +32,7 @@ public class ReflectorTest {
 
 		assertEquals( "{\"firstName\":\"Hwasu\",\"lastName\":\"Jung\",\"phone\":{\"code\":2,\"number\":\"322-3493\"},\"fax\":{\"code\":9999,\"number\":\"00100\"},\"phoneList\":[]}", json );
 
-        Map map1 = Reflector.toMapFromJson( json );
+        Map map1 = Reflector.toMapFrom( json );
 
 		NLogger.debug( map1 );
 
@@ -98,7 +91,7 @@ public class ReflectorTest {
 
 		NLogger.debug( jsonText );
 
-		Map<String, Object> map = Reflector.toMapFromJson( jsonText );
+		Map<String, Object> map = Reflector.toMapFrom( jsonText );
 
 		NLogger.debug( map      );
 
@@ -181,6 +174,10 @@ public class ReflectorTest {
 
 		person.phone = new PhoneNumber( 0, "Phone-111-222-333" );
 		person.fax   = new PhoneNumber( 0, "Fax-77948-22328" );
+		person.phoneList.add( person.phone );
+		person.phoneList.add( person.fax );
+
+		System.out.println( person );
 
 		Person clone = new Person();
 		Reflector.copy( person, clone );
@@ -243,6 +240,16 @@ public class ReflectorTest {
 		assertEquals( testVo.toString(), json );
 	}
 
+	@Test
+	public void nullValueTest() {
+
+		int a = 0;
+		assertTrue( a == NullValue.INTEGER );
+
+		Integer b = 0;
+		assertFalse( b == NullValue.INTEGER );
+
+	}
 
 	@Test
 	public void setNybatisDbNullValueTest() {
@@ -251,13 +258,15 @@ public class ReflectorTest {
 
 		person.firstName = "HWASU";
 		person.lastName  = "JUNG";
-		person.age       = 12;
+		person.age       = 0;
 		person.weight    = 25L;
 		person.birthDate = new Date();
 		person.birthNDate = new NDate();
 
 		person.profileNList.add( "key1", "val1" );
 		person.profileNList.add( "key2", "val2" );
+
+		assertTrue( person.age != NullValue.INTEGER, "age must be defined as Integer class." );
 
 		NLogger.debug( Reflector.toJson( person ) );
 
@@ -287,8 +296,6 @@ public class ReflectorTest {
 		assertEquals( map.get( "weight" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "phoneList" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "previousAddresses" ).toString(), NullValue.STRING );
-		assertEquals( map.get( "profileNMap" ).toString(), NullValue.STRING );
-		assertEquals( map.get( "profileMap" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "profileNList" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "profileSet" ).toString(), NullValue.STRING );
 		assertEquals( map.get( "birthDate" ).toString(), NullValue.STRING );
@@ -299,12 +306,12 @@ public class ReflectorTest {
 	@Test
 	public void parseJson() throws IOException {
 
-		TestRes res = Reflector.toBeanFrom( getValidTestJson(), TestRes.class );
+		TestRes res = Reflector.toBeanFrom( validJson, TestRes.class );
 		NLogger.debug( Reflector.toJson( res, true ) );
 
 		try {
 
-			Reflector.toBeanFrom( getInvalidTestJson(), TestRes.class );
+			Reflector.toBeanFrom( invalidJson, TestRes.class );
 			assertFalse( true );
 
 		} catch( Exception e ) {
@@ -313,39 +320,80 @@ public class ReflectorTest {
 
 	}
 
-	private String getInvalidTestJson() {
-		return "{\n" +
-				"\t\"name\": \"test\",\n" +
-				"\t\"count\": 5,\n" +
-				"\t\"date\": {\n" +
-				"\t\t\"type\": \"date/reg\",\n" +
-				"\t\t\"text\": \"20140101T000000+0900\"\n" +
-				"\t},\n" +
-				"\t\"etcProp\": {},\n" +
-				"\t\"subList\": [{\n" +
-				"\t\t\"name\": \"sub-1\",\n" +
-				"\t\t\"value\": \"sub-value-1\"\n" +
-				"\t}, {\n" +
-				"\t\t\"name\": \"sub-2\",\n" +
-				"\t\t\"value\": \"sub-value-2\"\n" +
-				"\t}]\n" +
-				"}";
+	@Test
+	public void populate() throws InvocationTargetException, IllegalAccessException {
+
+		System.out.println( invalidJson );
+
+		TestRes res = Reflector.toBeanFrom( validJson, TestRes.class );
+
+		System.out.println( Reflector.toJson(  res, true ) );
+
+		Map<String, Object> map = Reflector.toMapFrom( populationJson );
+
+//		BeanUtils.populate( res, map );
+
+		Cloner cloner = new Cloner();
+//		cloner.shallowClone(  )
+
+		Reflector.copy( map, res );
+
+		System.out.println( Reflector.toJson( res, true ) );
+
 	}
 
-	private String getValidTestJson() {
-		return "{\n" +
-				"\t\"name\": \"test\",\n" +
-				"\t\"count\": 5,\n" +
-				"\t\"date\": \"20140101T000000+0900\",\n" +
-				"\t\"etcProp\": {},\n" +
-				"\t\"subList\": [{\n" +
-				"\t\t\"name\": \"sub-1\",\n" +
-				"\t\t\"value\": \"sub-value-1\"\n" +
-				"\t}, {\n" +
-				"\t\t\"name\": \"sub-2\",\n" +
-				"\t\t\"value\": \"sub-value-2\"\n" +
-				"\t}]\n" +
-				"}";
+	/**
+	{
+		"name": "test",
+		"count": 5,
+		"date": "20140101T000000+0900",
+		"etcProp": {},
+		"subList": [{
+			"name": "sub-1",
+			"value": "sub-value-1"
+		}, {
+			"name": "sub-2",
+			"value": "sub-value-2"
+		}],
+	    "sub" : {
+		 "name": "sub-3",
+		 "value": "sub-value-3"
+	    }
 	}
+	 */
+	@Multiline
+	private String validJson;
+
+	/**
+	{
+		"count": 7,
+		"sub": {
+			"value": "populated-3"
+		}
+	}
+	 */
+	@Multiline
+	private String populationJson;
+
+	/**
+	{
+		"name": "test",
+		"count": 5,
+		"date": {
+			"type": "date/reg",
+			"text": "20140101T000000+0900"
+		},
+		"etcProp": {},
+		"subList": [{
+			"name": "sub-1",
+			"value": "sub-value-1"
+		}, {
+			"name": "sub-2",
+			"value": "sub-value-2"
+		}]
+	}
+	 */
+	@Multiline
+	private String invalidJson;
 
 }

@@ -1,42 +1,47 @@
 package org.nybatis.core.db.datasource;
 
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import javax.sql.DataSource;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.datasource.driver.DatabaseAttributeManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Validator;
 
-import javax.sql.DataSource;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 public class DatasourceManager {
 
 	private static Map<String, DataSource>        datasourceRepository = new Hashtable<>();
 	private static Map<String, DatabaseAttribute> attributeRepository  = new Hashtable<>();
+	private static Map<String, Boolean>           stopOnFailConnecting = new Hashtable<>();
 
 	private static String defaultEnvironmentId;
 
-	public void set( String environmentId, DataSource datasource ) {
+	public void set( String environmentId, DataSource datasource ) throws DatabaseConfigurationException {
 
 		if( StringUtil.isEmpty( defaultEnvironmentId ) && datasourceRepository.size() == 0 ) {
 			defaultEnvironmentId = environmentId;
 		}
 
-		DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
-
-		setPingQuery( datasource, databaseAttribute.getPingQuery() );
-
-		datasourceRepository.put( environmentId, datasource );
-		attributeRepository.put( environmentId, databaseAttribute );
-
-		DatabaseAttributeManager.get( datasource );
+		try {
+			DatabaseAttribute databaseAttribute = DatabaseAttributeManager.get( datasource );
+			setPingQuery( datasource, databaseAttribute.getPingQuery() );
+			datasourceRepository.put( environmentId, datasource );
+			attributeRepository.put( environmentId, databaseAttribute );
+		} catch( DatabaseConfigurationException e ) {
+			if( isStopOnFailConnecting(environmentId) ) {
+				throw new DatabaseConfigurationException( e, "Error on initializing datasoure environment(id:{})", environmentId );
+			} else {
+				NLogger.error( "Error on initializing datasoure environment(id:{})", environmentId );
+				NLogger.error( e );
+			}
+		}
 
 	}
 
@@ -87,6 +92,22 @@ public class DatasourceManager {
 		return datasourceRepository.keySet();
 	}
 
+	public static void runHealthChecker() {
+		for( DataSource dataSource : datasourceRepository.values() ) {
+			if( dataSource instanceof JdbcDataSource ) {
+				((JdbcDataSource) dataSource).runHealthChecker();
+			}
+		}
+	}
+
+	public static void stopHealthChecker() {
+		for( DataSource dataSource : datasourceRepository.values() ) {
+			if( dataSource instanceof JdbcDataSource ) {
+				((JdbcDataSource) dataSource).stopHealthChecker();
+			}
+		}
+	}
+
 	public static void printStatus() {
 
 		if( ! NLogger.isTraceEnabled() ) return;
@@ -109,6 +130,40 @@ public class DatasourceManager {
 
 		NLogger.trace( sb );
 
+	}
+
+	public static boolean isDatabase( DatabaseName... dbName ) {
+		String database = getAttributes( getDefaultEnvironmentId() ).getDatabase();
+		for( DatabaseName name : dbName ) {
+			if( database.equalsIgnoreCase(name.name) ) return true;
+		}
+		return false;
+	}
+
+	public static boolean isDatabase( String environmentId, DatabaseName... dbName ) {
+		String database = getAttributes( environmentId ).getDatabase();
+		for( DatabaseName name : dbName ) {
+			if( database.equalsIgnoreCase(name.name) ) return true;
+		}
+		return false;
+	}
+
+	public static DatabaseName getDatabaseName() {
+		return getDatabaseName( getDefaultEnvironmentId() );
+	}
+
+	public static DatabaseName getDatabaseName( String environmentId ) {
+		DatabaseAttribute attributes = getAttributes( environmentId );
+		if( attributes == null ) return DatabaseName.NULL;
+		return DatabaseName.get( attributes.getDatabase() );
+	}
+
+	public static boolean isStopOnFailConnecting( String environmentId ) {
+		return stopOnFailConnecting.getOrDefault( environmentId, true );
+	}
+
+	public static void setStopOnFailConnecting( String environmentId, boolean state ) {
+		stopOnFailConnecting.put( environmentId, state );
 	}
 
 }

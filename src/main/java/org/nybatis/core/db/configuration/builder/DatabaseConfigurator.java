@@ -1,7 +1,9 @@
 package org.nybatis.core.db.configuration.builder;
 
+import java.util.ArrayList;
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.context.NThreadLocal;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.ClassUtil;
@@ -9,6 +11,10 @@ import org.nybatis.core.util.ClassUtil;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Paths;
 import java.util.List;
+import org.nybatis.core.util.StringUtil;
+
+import static com.sun.tools.doclint.Entity.exist;
+import static com.sun.tools.doclint.Entity.not;
 
 /**
  * Database Configuration Builder
@@ -26,36 +32,55 @@ public class DatabaseConfigurator {
 	 *
 	 * @param filePath 	given configuration path
 	 * @param reload  	reload configuration
+	 * @throws DatabaseConfigurationException occurs when database configuration is not acceptable
 	 */
 	public static void build( String filePath, boolean reload ) {
 
-		filePath = FileUtil.nomalizeSeparator( filePath );
-
-		if( FileUtil.notExists( filePath ) ) {
-
-			try {
-
-				String modifiedPath = Paths.get( Const.path.getConfigDatabase(), filePath ).toString();
-
-				if( FileUtil.notExists( modifiedPath ) ) {
-					NLogger.error( "Database configuration file is not exist.\n\t - in [{}]\n\t - in [{}]", filePath, modifiedPath );
-					filePath = null;
-				}
-
-				filePath = modifiedPath;
-
-			} catch( InvalidPathException e ) {
-				NLogger.error( e, "Database configuration file is not exist.\n\t - in [{}]", filePath );
-				filePath = null;
-			}
-
+		try {
+			new ConfigurationBuilder().readFrom( getFilePath(filePath), reload );
+		} catch( InvalidPathException e ) {
+			throw new DatabaseConfigurationException( e );
+		} catch( DatabaseConfigurationException e ) {
+			throw e;
 		}
-
-		new ConfigurationBuilder().readFrom( filePath, reload );
 
 		// Delete temporary thread local key
 		NThreadLocal.clear();
 
+	}
+
+	private static String getFilePath( String filePath ) {
+
+		List<String> checkList = new ArrayList<>();
+
+		filePath = FileUtil.nomalizeSeparator( filePath );
+		String checkPath = filePath;
+		checkList.add( checkPath );
+
+		if( FileUtil.exists(checkPath) ) return checkPath;
+
+		checkPath = resolvePath( Const.path.getConfigDatabase(), filePath );
+		checkList.add( checkPath );
+
+		if( FileUtil.exists(checkPath) ) return checkPath;
+
+		checkPath = resolvePath( Const.path.getBase(), filePath );
+		checkList.add( checkPath );
+
+		if( FileUtil.exists(checkPath) ) return checkPath;
+
+		StringBuilder errorMessage = new StringBuilder( "Database configuration file is not exist." );
+		for( String path : checkList ) {
+			errorMessage.append( "\n\tin [" ).append( path ).append( "]" );
+		}
+
+		throw new DatabaseConfigurationException( errorMessage.toString() );
+
+	}
+
+	private static String resolvePath( String root, String path ) {
+		path = Paths.get( root, path ).toString();
+		return FileUtil.nomalizeSeparator( path );
 	}
 
 	/**
@@ -68,6 +93,8 @@ public class DatabaseConfigurator {
 	public static void build( boolean reload ) {
 
 		String dbConfDir = Const.path.toResourceName( Const.path.getConfigDatabase() );
+
+		NLogger.debug( "db conf dir : {}", dbConfDir );
 
 		List<String> resourceNames = ClassUtil.findResources( dbConfDir + "/*.xml" );
 

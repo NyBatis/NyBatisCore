@@ -1,11 +1,7 @@
 package org.nybatis.core.db.annotation;
 
+import java.lang.annotation.*;
 import org.nybatis.core.conf.Const;
-
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 
 /**
  * Mapping attrubutes with domain class and database table
@@ -13,6 +9,7 @@ import java.lang.annotation.Target;
  * @author nayasis@gmail.com
  *
  */
+@Inherited
 @Target( ElementType.TYPE ) // Allow to class and interface
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Table {
@@ -32,10 +29,24 @@ public @interface Table {
     String name()  default Const.db.DEFAULT_TABLE_NAME;
 
     /**
+     * schema name
+     *
+     * @return schema name
+     */
+    String schema() default "";
+
+    /**
      * environment id
      *
      * @return environment id
      */
     String environmentId() default Const.db.DEFAULT_ENVIRONMENT_ID;
+
+    /**
+     * index attribute
+     *
+     * @return additional index when create table
+     */
+    Index[] indices() default {};
 
 }

@@ -1,6 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.cache.CacheManager;
+import org.apache.poi.ss.formula.functions.T;
 import org.nybatis.core.db.session.executor.SqlBean;
 import org.nybatis.core.db.session.executor.SqlExecutor;
 import org.nybatis.core.db.sql.reader.SqlReader;
@@ -30,13 +30,9 @@ public class SessionExecutorImpl implements SessionExecutor {
     }
 
     public SessionExecutor sqlId( String id, Object parameter ) {
-
         SqlNode sqlNode = SqlRepository.get( id );
-
         Assertion.isNotNull( sqlNode, new SqlConfigurationException( "There is no sql id({}) in repository.", id ) );
-
         sqlBean = new SqlBean( sqlNode, parameter );
-
         return this;
     }
 
@@ -117,29 +113,6 @@ public class SessionExecutorImpl implements SessionExecutor {
     @Override
     public NMap getParameters() {
         return sqlBean.getInputParams();
-    }
-
-    @Override
-    public SessionExecutor disableCache() {
-        CacheManager.disableCache( sqlBean.getSqlId() );
-        return this;
-    }
-
-    @Override
-    public SessionExecutor enableCache( String cacheId ) {
-        return enableCache( cacheId, null );
-    }
-
-    @Override
-    public SessionExecutor enableCache( String cacheId, Integer flushCycle ) {
-        CacheManager.enableCache( sqlBean.getSqlId(), cacheId, flushCycle );
-        return this;
-    }
-
-    @Override
-    public SessionExecutor clearCache() {
-        sqlSession.getProperties().isCacheClear( true );
-        return this;
     }
 
     @Override

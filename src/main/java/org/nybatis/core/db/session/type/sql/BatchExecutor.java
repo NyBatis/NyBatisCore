@@ -1,6 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.annotation.NotSupportCache;
+import org.nybatis.core.exception.unchecked.SqlException;
 
 /**
  * The primary Java interface for SQL management in Nybatis.
@@ -33,8 +33,7 @@ public interface BatchExecutor {
 	 *
 	 * @return affected count by execute (insert, update, delete ... )
 	 */
-	@NotSupportCache
-	int execute();
+	int execute() throws SqlException;
 
 	/**
 	 * Set transaction size. if it is defined, batch excution is committed automatically.

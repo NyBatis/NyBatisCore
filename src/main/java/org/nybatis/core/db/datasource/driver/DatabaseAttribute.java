@@ -11,21 +11,22 @@ import org.nybatis.core.validation.Validator;
  */
 public class DatabaseAttribute {
 
-    public static final String PAGE_PARAM_START = "NybatisPagebuilder.START";
-    public static final String PAGE_PARAM_END   = "NybatisPagebuilder.END";
-    public static final String DATABASE_UNKOWN  = "unknown";
+    public static final String PAGE_PARAM_START   = "NybatisPagebuilder.START";
+    public static final String PAGE_PARAM_END     = "NybatisPagebuilder.END";
+    public static final String PAGE_PARAM_OFFSET  = "NybatisPagebuilder.OFFSET";
+    public static final String PAGE_PARAM_COUNT   = "NybatisPagebuilder.COUNT";
+    public static final String DATABASE_UNKOWN    = "unknown";
 
     private String  database                   = DATABASE_UNKOWN;
     private String  patternToMatchClassName    = "";
 
     private boolean enableToGetParameterType   = true;
-    private boolean enableToGetBLob            = true;
     private boolean enableToDoLobPrefetch      = true;
 
     private String  pageSqlPre                 = "";
     private String  pageSqlPost                = String.format( "\nLIMIT #{%s}, #{%s}", PAGE_PARAM_START, PAGE_PARAM_END );
     private String  countSqlPre                = "SELECT COUNT(1) AS CNT FROM (\n";
-    private String  countSqlPost               = "\n)";
+    private String  countSqlPost               = "\n) NybatisCountQuery";
 
     private String  pingQuery                  = "SELECT 1";
 
@@ -37,7 +38,8 @@ public class DatabaseAttribute {
     /**
      * Driver Attributes
      *
-     * @param database Driver name (oracle, mysql, etc...)
+     * @see DatabaseName
+     * @param database Driver name (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
      * @param patternToMatchClassName Driver name pattern to match with Database name. It must be regular expression.
      */
     public DatabaseAttribute( String database, String patternToMatchClassName ) {
@@ -45,6 +47,24 @@ public class DatabaseAttribute {
         setPatternToMatchClassName( patternToMatchClassName );
     }
 
+    /**
+     * Driver Attributes
+     *
+     * @see DatabaseName
+     * @param database Driver name (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
+     */
+    public DatabaseAttribute( DatabaseName database ) {
+        setDatabase( database.name );
+        setPatternToMatchClassName( database.driverNamePattern );
+    }
+
+
+    /**
+     * get database type
+     *
+     * @see DatabaseName
+     * @return database type (oracle, mysql, maria, sqlite, h2, hsqldb, mssql, postgresql, sybase, db2, odbc ...)
+     */
     public String getDatabase() {
         return database;
     }
@@ -80,12 +100,6 @@ public class DatabaseAttribute {
         this.enableToGetParameterType = enable;
         return this;
     }
-    public boolean enableToGetBlob() {
-        return enableToGetBLob;
-    }
-    public DatabaseAttribute enableToGetBlob( boolean enable ) {
-        this.enableToGetBLob = enable;return this;
-    }
 
     public boolean enableToDoLobPrefetch() {
         return enableToDoLobPrefetch;
@@ -101,7 +115,12 @@ public class DatabaseAttribute {
     }
     public DatabaseAttribute setPageSqlPre( String sql ) {
         pageSqlPre = StringUtil.compressSpaceOrEnter( sql ) + " ";
-        pageSqlPre = pageSqlPre.replaceAll( "(?i)#\\{start\\}", "#{" + PAGE_PARAM_START + "}" ).replaceAll( "(?i)#\\{end\\}", "#{" + PAGE_PARAM_END + "}" );
+        pageSqlPre = pageSqlPre
+            .replaceAll( "(?i)#\\{start\\}",  "#{" + PAGE_PARAM_START  + "}" )
+            .replaceAll( "(?i)#\\{end\\}",    "#{" + PAGE_PARAM_END    + "}" )
+            .replaceAll( "(?i)#\\{offset\\}", "#{" + PAGE_PARAM_OFFSET + "}" )
+            .replaceAll( "(?i)#\\{count\\}",  "#{" + PAGE_PARAM_COUNT  + "}" )
+        ;
         return this;
     }
     public String getPageSqlPost() {
@@ -109,7 +128,12 @@ public class DatabaseAttribute {
     }
     public DatabaseAttribute setPageSqlPost( String sql ) {
         pageSqlPost = StringUtil.compressSpaceOrEnter( sql ) + " ";
-        pageSqlPost = pageSqlPost.replaceAll( "(?i)#\\{start\\}", "#{" + PAGE_PARAM_START + "}" ).replaceAll( "(?i)#\\{end\\}", "#{" + PAGE_PARAM_END + "}" );
+        pageSqlPost = pageSqlPost
+            .replaceAll( "(?i)#\\{start\\}",  "#{" + PAGE_PARAM_START  + "}" )
+            .replaceAll( "(?i)#\\{end\\}",    "#{" + PAGE_PARAM_END    + "}" )
+            .replaceAll( "(?i)#\\{offset\\}", "#{" + PAGE_PARAM_OFFSET + "}" )
+            .replaceAll( "(?i)#\\{count\\}",  "#{" + PAGE_PARAM_COUNT  + "}" )
+        ;
         return this;
     }
 
@@ -143,7 +167,7 @@ public class DatabaseAttribute {
                 " - name : [%s]\n" +
                 " - Pattern to match with class name: [%s]\n" +
                 "Page Sql\n" +
-                " - pre :\n%s" +
+                " - pre :\n%s\n" +
                 " - post:\n%s\n" +
                 "Ping Query:\n" +
                 " - %s"
@@ -164,7 +188,6 @@ public class DatabaseAttribute {
         attribute.database                 = database;
         attribute.patternToMatchClassName  = patternToMatchClassName;
         attribute.enableToGetParameterType = enableToGetParameterType;
-        attribute.enableToGetBLob          = enableToGetBLob;
         attribute.enableToDoLobPrefetch    = enableToDoLobPrefetch;
         attribute.pageSqlPre               = pageSqlPre;
         attribute.pageSqlPost              = pageSqlPost;

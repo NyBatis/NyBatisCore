@@ -1,5 +1,8 @@
 package org.nybatis.core.db.session.type.sql;
 
+import java.util.Collection;
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.SessionCreator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
@@ -33,11 +36,9 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     private void init( String token, SqlProperties properties ) {
-
         this.token              = token;
         this.originalProperties = Validator.nvl( properties, new SqlProperties() );
         this.properties         = originalProperties.clone();
-
     }
 
     public SqlSessionImpl initProperties() {
@@ -47,6 +48,21 @@ public class SqlSessionImpl implements SqlSession {
 
     public SqlSession clone() {
         return new SqlSessionImpl( token, properties );
+    }
+
+    @Override
+    public boolean isDatabase( DatabaseName... dbName ) {
+        return DatasourceManager.isDatabase( getEnvironmentId(), dbName );
+    }
+
+    @Override
+    public boolean isNotDatabase( DatabaseName... dbName ) {
+        return ! isDatabase( dbName );
+    }
+
+    public DatabaseName getDatabase() {
+        String database = DatasourceManager.getAttributes( getEnvironmentId() ).getDatabase();
+        return DatabaseName.get( database );
     }
 
     public SqlProperties getProperties() {
@@ -78,17 +94,17 @@ public class SqlSessionImpl implements SqlSession {
     }
 
     @Override
-    public BatchExecutor batchSqlId( String id, List<?> parameters ) {
+    public BatchExecutor batchSqlId( String id, Collection<?> parameters ) {
         return new BatchExecutorImpl( this ).batchSqlId( id, parameters );
     }
 
     @Override
-    public BatchExecutor batchSql( List<String> sqlList ) {
+    public BatchExecutor batchSql( Collection<String> sqlList ) {
         return new BatchExecutorImpl( this ).batchSql( sqlList );
     }
 
     @Override
-    public BatchExecutor batchSql( String sql, List<?> parameters ) {
+    public BatchExecutor batchSql( String sql, Collection<?> parameters ) {
         return new BatchExecutorImpl( this ).batchSql( sql, parameters );
     }
 
@@ -129,44 +145,30 @@ public class SqlSessionImpl implements SqlSession {
         Connection connection = null;
 
         try {
-
             connection = TransactionManager.getConnection( token, properties.getRepresentativeEnvironmentId() );
-
             Connection protectedConnection = getProtectedConnection( connection );
-
             worker.setProperties( properties );
             worker.setConnection( protectedConnection );
-
             worker.execute( protectedConnection );
-
             return this;
-
         } catch( Throwable e ) {
             throw new BaseRuntimeException( e );
-
         } finally {
             TransactionManager.releaseConnection( token, connection );
             initProperties();
-
         }
 
     }
 
     private Connection getProtectedConnection( Connection connection ) {
-
         return Reflector.wrapProxy( connection, new Class<?>[] {Connection.class}, new MethodInvocator() {
             public Object invoke( Object proxy, Method method, Object[] arguments ) throws Throwable {
-
                 if( "close".equals(method.getName()) ) {
                     throw new DatabaseException( "connection's close method is not supprted in useConnection feature." );
                 }
-
                 return method.invoke( connection, arguments );
-
             }
-
-        } );
-
+        });
     }
 
     @Override
@@ -174,6 +176,11 @@ public class SqlSessionImpl implements SqlSession {
         originalProperties.setEnvironmentId( id );
         properties.setEnvironmentId( id );
         return this;
+    }
+
+    @Override
+    public String getEnvironmentId() {
+        return properties.getRepresentativeEnvironmentId();
     }
 
     @Override

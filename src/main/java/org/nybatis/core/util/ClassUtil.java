@@ -1,26 +1,27 @@
 package org.nybatis.core.util;
 
-import org.nybatis.core.conf.Const;
-import org.nybatis.core.exception.unchecked.ClassCastingException;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-import org.nybatis.core.file.FileUtil;
-import org.nybatis.core.validation.Validator;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import org.nybatis.core.conf.Const;
+import org.nybatis.core.exception.unchecked.ClassCastingException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
+import org.nybatis.core.file.FileUtil;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.validation.Validator;
+import org.objenesis.Objenesis;
+import org.objenesis.ObjenesisStd;
 
 
 /**
@@ -29,6 +30,8 @@ import java.util.jar.JarFile;
  * @author nayasis@gmail.com
  */
 public class ClassUtil {
+
+	private static Objenesis classCreator = new ObjenesisStd();
 
 	/**
 	 * Get class for name
@@ -44,13 +47,11 @@ public class ClassUtil {
 		className = className.replaceAll( " ", "" );
 
 		int invalidCharacterIndex = className.indexOf( '<' );
-
 		if( invalidCharacterIndex >= 0 ) {
 			className = className.substring( 0, invalidCharacterIndex );
 		}
 
 		ClassLoader classLoader = getClassLoader();
-
 		try {
 	        return classLoader.loadClass( className );
         } catch( ClassNotFoundException e ) {
@@ -65,7 +66,24 @@ public class ClassUtil {
 	 * @return get class loader in current thread.
 	 */
 	public static ClassLoader getClassLoader() {
-		return Thread.currentThread().getContextClassLoader();
+
+		try {
+			return Thread.currentThread().getContextClassLoader();
+		} catch( Throwable e ) {
+			// if current callstack is under Thread, cannot access Thread Context.
+		}
+
+		ClassLoader classLoader = ClassUtil.class.getClassLoader();
+
+		if( classLoader == null ) {
+			try {
+				classLoader = ClassLoader.getSystemClassLoader();
+			} catch( Throwable e ) {
+				// cannot access system ClassLoader.
+			}
+		}
+		return classLoader;
+
 	}
 
 	/**
@@ -75,7 +93,7 @@ public class ClassUtil {
 	 *
 	 * Type type = this.getClass().getGenericSuperclass();
 	 *
-	 * Class&lt;?&gt; klass = new ClassUtil().getClass( type );
+	 * Class&lt;?&gt; klass = ClassUtil.getClass( type );
 	 * </pre>
 	 *
 	 * @param type class type
@@ -83,23 +101,49 @@ public class ClassUtil {
 	 * @throws ClassNotFoundException if class is not founded in class loader.
 	 */
 	public static Class<?> getClass( Type type ) throws ClassNotFoundException {
-
 		if( type == null ) return Object.class;
 
 		String typeInfo = type.toString();
-
 		int startIndex = typeInfo.indexOf( '<' );
-
 		if( startIndex < 0 ) return Object.class;
 
 		String typeClassName = typeInfo.substring( startIndex + 1, typeInfo.length() - 1 );
-
 		startIndex = typeClassName.indexOf( '<' );
-
 		if( startIndex >= 0 ) typeClassName = typeClassName.substring( 0, startIndex );
 
 		return getClass( typeClassName );
+	}
 
+	/**
+	 * get generic class from another class.
+	 *
+	 * it only works when used in class itself.
+	 *
+	 * <pre>
+	 * public class Test&lt;T&gt; {
+	 *     public Test() {
+	 *         Class genericClass = ClassUtil.getGenericClass( this.getClass() );
+	 *         -&gt; it returns type of <b>T</b> exactly.
+	 *     }
+	 * }
+	 *
+	 * Test&lt;HashMap&gt; test = new Test&lt;&gt;();
+	 * Class genericClass = ClassUtil.getGenericClass( test.getClass() );
+	 * -&gt; it returns <b>Object.class</b> only because instance has no information about Generic.
+	 * </pre>
+	 *
+	 * @param klass class to inspect
+	 * @return generic class of klass
+     */
+	public static Class getGenericClass( Class klass ) {
+		if( klass == null ) return null;
+		try {
+			Type genericSuperclass = klass.getGenericSuperclass();
+			Type[] types = ( (ParameterizedType) genericSuperclass ).getActualTypeArguments();
+			return (Class) types[ 0 ];
+		} catch( Exception e ) {
+			return Object.class;
+		}
 	}
 
 	public static Class<?> getClass( Object object ) {
@@ -116,17 +160,21 @@ public class ClassUtil {
 	    return ( object == null ) ? null : getTopSuperClass( object.getClass() );
 	}
 
-	public static <T> T getInstance( Class<T> klass ) {
+	public static <T> T createInstance( Class<T> klass ) throws ClassCastingException {
 		try {
 			return klass.newInstance();
-		} catch( InstantiationException | IllegalAccessException e ) {
-        	throw new ClassCastingException( e );
+		} catch( Exception e ) {
+			try {
+				return classCreator.newInstance( klass );
+			} catch( Exception finalException ) {
+				throw new ClassCastingException( finalException );
+			}
         }
 	}
 
 	@SuppressWarnings( "unchecked" )
-    public static <T> T getInstance( Type type ) throws ClassNotFoundException {
-		return (T) getInstance( getClass( type ) );
+    public static <T> T createInstance( Type type ) throws ClassNotFoundException {
+		return (T) createInstance( getClass(type) );
 	}
 
 	/**
@@ -139,17 +187,14 @@ public class ClassUtil {
 	public static boolean isExtendedBy( Class<?> inspectClass, Class<?> foundClass ) {
 
 		if( inspectClass == null || foundClass == null ) return false;
-
 		if( inspectClass == foundClass ) return true;
-
 		for( Class<?> klass : inspectClass.getInterfaces() ) {
 			if( klass == foundClass ) return true;
 		}
 
 		Class<?> superclass = inspectClass.getSuperclass();
-
 		if( superclass != Object.class ) {
-			if( isExtendedBy( superclass, foundClass ) ) return true;
+			return isExtendedBy( superclass, foundClass );
 		}
 
 		return false;
@@ -164,7 +209,7 @@ public class ClassUtil {
 	 * @return true if inspect instance is extended of implemented by found class
 	 */
 	public static boolean isExtendedBy( Object inspectInstance, Class<?> foundClass ) {
-		return ( inspectInstance == null ) ? false : isExtendedBy( inspectInstance.getClass(), foundClass );
+		return inspectInstance != null && isExtendedBy( inspectInstance.getClass(), foundClass );
 	}
 
 	/**
@@ -193,8 +238,7 @@ public class ClassUtil {
 	 * @return refined resource name
 	 */
 	private static String refineResourceName( String name ) {
-		name = StringUtil.nvl( name ).replaceFirst( "^/", "" );
-		return name;
+		return StringUtil.nvl( name ).replaceFirst( "^/", "" );
 	}
 
 	/**
@@ -239,13 +283,24 @@ public class ClassUtil {
 			Set<PathMatcher> matchers = FileUtil.toPathMacher( toJarPattern( pattern ) );
 			boolean addAll = ( matchers.size() == 0 );
 
+			if( NLogger.isTraceEnabled() ) {
+				NLogger.trace( ">> Jar pathMatchers" );
+				for( String p : toJarPattern(pattern) ) {
+					NLogger.trace( p );
+				}
+			}
+
+			NLogger.trace( ">> entry in jar" );
 			for( JarEntry entry : Collections.list( jar.entries() ) ) {
+				if( NLogger.isTraceEnabled() ) {
+					if( entry.getName().startsWith( "WEB-INF/classes" ) && entry.getName().endsWith( ".xml" )) {
+						NLogger.trace( entry.getName() );
+					}
+				}
 				if( addAll ) {
 					resourceNamesInJar.add( entry.getName() );
 				} else {
-
 					Path targetPath = Paths.get( entry.getName() );
-
 					for( PathMatcher matcher : matchers ) {
 						if( matcher.matches( targetPath )) {
 							resourceNamesInJar.add( entry.getName() );
@@ -257,14 +312,26 @@ public class ClassUtil {
 
 		}
 
+		NLogger.trace( "Const.path.base : {}", Const.path.getBase() );
+		NLogger.trace( "Const.path.root : {}", Const.path.getRoot() );
+		NLogger.trace( "pattern         : {}", pattern );
+		NLogger.trace( "toFilePattern   : {}", toFilePattern(pattern) );
+
 		List<Path> paths = FileUtil.search( Const.path.getBase(), true, false, -1, toFilePattern( pattern ) );
+
+		NLogger.trace( "paths count : {}\npaths : {}", paths.size(), paths );
 
 		for( Path path : paths ) {
 			String pathVal = FileUtil.nomalizeSeparator( path.toString() );
 			resourceNamesInFileSystem.add( pathVal.replace( Const.path.getBase(), "" ).replaceFirst( "^/", "" ) );
 		}
 
+		NLogger.trace( ">> resource in jar : {}", resourceNamesInJar );
+		NLogger.trace( ">> resource in file system : {}", resourceNamesInFileSystem );
+
 		resourceNamesInJar.addAll( resourceNamesInFileSystem );
+
+		NLogger.trace( ">> all resource : {}", resourceNamesInJar );
 
 		return new ArrayList<>( resourceNamesInJar );
 
@@ -276,21 +343,18 @@ public class ClassUtil {
 	 * @return true if it is running in jar.
 	 */
 	public static boolean isRunningInJar() {
-
 		URL root = getClassLoader().getResource( "" );
-
 		if( root == null ) return true;
-
 		String file = root.getFile();
-
 		return Validator.isMatched( file, "(?i).*\\.(jar|war)$" );
-
 	}
 
 	private static String[] toFilePattern( String[] pattern ) {
 		String[] result = new String[ pattern.length ];
 		for( int i = 0, iCnt = pattern.length; i < iCnt; i++ ) {
-			result[ i ] = ( Const.path.getBase() + "/" + pattern[ i ] ).replaceAll( "//", "/" );
+			result[ i ] = ( Const.path.getBase() + "/" + pattern[ i ] )
+				.replaceAll( "//", "/" )
+				.replaceAll( "(/WEB-INF/classes)+", "/WEB-INF/classes" );
         }
 		return result;
 	}
@@ -304,16 +368,16 @@ public class ClassUtil {
 	}
 
 	private static JarFile getJarFile( URL url ) {
-
-		String filePath = FileUtil.nomalizeSeparator( url.getFile() );
-		filePath = filePath.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" ).replaceFirst( "!$", "" ).replaceFirst( "file:", "" );
-
 		try {
+			String filePath = new File( url.toURI().getSchemeSpecificPart() ).getPath();
+			filePath = FileUtil.nomalizeSeparator( filePath )
+				.replaceFirst( "\\/WEB-INF\\/classes(!)?(\\/)?", "" )
+				.replaceFirst( "!$", "" )
+				.replaceFirst( "file:", "" );
             return new JarFile( filePath );
-        } catch( IOException e ) {
+        } catch( IOException | URISyntaxException e ) {
             throw new UncheckedIOException( e );
-        }
-
+		}
 	}
 
 }

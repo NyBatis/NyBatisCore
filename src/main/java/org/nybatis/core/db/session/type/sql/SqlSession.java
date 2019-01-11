@@ -1,5 +1,8 @@
 package org.nybatis.core.db.session.type.sql;
 
+import java.util.Collection;
+import java.util.Set;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.exception.unchecked.BaseRuntimeException;
@@ -72,14 +75,14 @@ public interface SqlSession {
 	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSqlId( String id, List<?> parameters );
+	BatchExecutor batchSqlId( String id, Collection<?> parameters );
 
 	/**
 	 * Set plain SQLs for batch execution.
 	 * @param  sqlList plain sqls
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSql( List<String> sqlList );
+	BatchExecutor batchSql( Collection<String> sqlList );
 
 	/**
 	 * Set SQL ID in mapper for batch execution.
@@ -87,7 +90,7 @@ public interface SqlSession {
 	 * @param  parameters Parameters to bind with sql. Parameter consists with Map, Bean or Primitive (int, Integer, Date... )
 	 * @return batch mode executor to run sql
 	 */
-	BatchExecutor batchSql( String sql,  List<?> parameters );
+	BatchExecutor batchSql( String sql,  Collection<?> parameters );
 
 	/**
 	 * Commit and end transaction if it was activated
@@ -144,6 +147,13 @@ public interface SqlSession {
 	SqlSession setEnvironmentId( String id );
 
 	/**
+	 * get representative environment id
+	 *
+	 * @return environment id
+     */
+	String getEnvironmentId();
+
+	/**
 	 * Open ORM Session.
 	 * environment id is determined by <b>environmentId</b>'s value of {@link org.nybatis.core.db.annotation.Table} annotation in domain class.
 	 *
@@ -179,5 +189,21 @@ public interface SqlSession {
 	 * @return cloned sql session
 	 */
 	SqlSession clone();
+
+	/**
+	 * check if session environment's database type is included
+	 *
+	 * @param dbName database type name
+	 * @return true if type is matched
+	 */
+	boolean isDatabase( DatabaseName... dbName );
+
+	/**
+	 * check not if session environment's database type is included
+	 *
+	 * @param dbName database type name
+	 * @return false if type is matched
+	 */
+	boolean isNotDatabase( DatabaseName... dbName );
 
 }

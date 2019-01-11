@@ -17,7 +17,8 @@ import org.nybatis.core.db.datasource.proxy.ProxyConnection;
 import org.nybatis.core.exception.unchecked.DatabaseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
+import org.nybatis.core.validation.Validator;
 
 public class JdbcDataSource implements DataSource {
 
@@ -27,6 +28,8 @@ public class JdbcDataSource implements DataSource {
 	protected final Stack<ProxyConnection> connectionPoolIdle   = new Stack<>();
 	protected final Stack<ProxyConnection> connectionPoolActive = new Stack<>();
 
+	private ConnectionHealthChecker healthChecker;
+
 	private static final long THREAD_WAIT_MILI_SECONDS = 200;
 
 	public JdbcDataSource( JdbcDatasourceProperties datasourceProperties, JdbcConnectionProperties connectionProperties ) {
@@ -34,9 +37,7 @@ public class JdbcDataSource implements DataSource {
 		this.datasourceProperties = datasourceProperties;
 		this.connectionProperties = connectionProperties;
 
-		if( datasourceProperties.isPingEnable() ) {
-			new ConnectionHealthChecker( this ).run();
-		}
+		runHealthChecker();
 
 	}
 
@@ -54,11 +55,15 @@ public class JdbcDataSource implements DataSource {
 		return getProxyConnection( username, password ).getConnection();
     }
 
+	public JdbcConnectionProperties getConnectionProperties() {
+		return connectionProperties;
+	}
+
 	public ProxyConnection getProxyConnection() throws SQLException {
 		return getProxyConnection( connectionProperties.getUserName(), connectionProperties.getUserPassword() );
 	}
 
-	public synchronized ProxyConnection getProxyConnection( String username, String password ) throws SQLException {
+	public synchronized ProxyConnection getProxyConnection( String username, String password ) {
 
 		if( connectionPoolIdle.isEmpty() ) {
 
@@ -82,11 +87,11 @@ public class JdbcDataSource implements DataSource {
 
 				long waitTime = connectionProperties.getNanoTimeout();
 
-				StopWatcher stopWatcher = new StopWatcher();
+				StopWatch stopWatch = new StopWatch();
 
 				int tryCount = 0;
 
-				while( stopWatcher.elapsedNanoSeconds() < waitTime ) {
+				while( stopWatch.elapsedNanoSeconds() < waitTime ) {
 
 					try {
 						Thread.sleep( THREAD_WAIT_MILI_SECONDS );
@@ -94,7 +99,7 @@ public class JdbcDataSource implements DataSource {
 						break;
 					}
 
-					if( !connectionPoolIdle.isEmpty() ) break;
+					if( ! connectionPoolIdle.isEmpty() ) break;
 
 					tryCount++;
 
@@ -157,7 +162,13 @@ public class JdbcDataSource implements DataSource {
 			JdbcDriverManager.setLoginTimeout( connectionProperties.getTimeout() );
 		}
 
-		Connection connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		Connection connection;
+
+		if( Validator.isEmpty( username ) && Validator.isEmpty( password ) ) {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl() );
+		} else {
+			connection = JdbcDriverManager.getConnection( connectionProperties.getUrl(), username, password );
+		}
 
 		try {
 	        connection.setAutoCommit( connectionProperties.isAutoCommit() );
@@ -198,27 +209,27 @@ public class JdbcDataSource implements DataSource {
     }
 
 	@Override
-    public PrintWriter getLogWriter() throws SQLException {
+    public PrintWriter getLogWriter() {
 		return DriverManager.getLogWriter();
     }
 
 	@Override
-    public void setLogWriter( PrintWriter out ) throws SQLException {
+    public void setLogWriter( PrintWriter out ) {
 		DriverManager.setLogWriter( out );
     }
 
 	@Override
-    public void setLoginTimeout( int seconds ) throws SQLException {
+    public void setLoginTimeout( int seconds ) {
 		DriverManager.setLoginTimeout( seconds );
     }
 
 	@Override
-    public int getLoginTimeout() throws SQLException {
+    public int getLoginTimeout() {
 		return DriverManager.getLoginTimeout();
     }
 
 	@Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public Logger getParentLogger() {
 		return Logger.getLogger( Logger.GLOBAL_LOGGER_NAME );
     }
 
@@ -228,8 +239,24 @@ public class JdbcDataSource implements DataSource {
     }
 
 	@Override
-    public boolean isWrapperFor( Class<?> iface ) throws SQLException {
+    public boolean isWrapperFor( Class<?> iface ) {
 	    return false;
     }
+
+	public boolean runHealthChecker() {
+		if( healthChecker == null && datasourceProperties.isPingEnable() ) {
+			healthChecker = new ConnectionHealthChecker( this );
+			healthChecker.run();
+			return true;
+		}
+		return true;
+	}
+
+	public boolean stopHealthChecker() {
+		if( healthChecker == null ) return false;
+		healthChecker.interrupt();
+		healthChecker = null;
+		return true;
+	}
 
 }

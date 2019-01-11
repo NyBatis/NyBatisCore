@@ -1,14 +1,14 @@
 package org.nybatis.core.db.sql.mapper;
 
+import org.nybatis.core.model.NDate;
+import org.nybatis.core.util.Types;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import org.nybatis.core.model.NDate;
-import org.nybatis.core.util.Types;
 
 public enum SqlType {
 
@@ -27,6 +27,7 @@ public enum SqlType {
 	VARCHAR                 ( java.sql.Types.VARCHAR                 , "VARCHAR"                 )  ,
 	LONGVARCHAR             ( java.sql.Types.LONGVARCHAR             , "LONGVARCHAR"             )  ,
 	DATE                    ( java.sql.Types.DATE                    , "DATE"                    )  ,
+	DATETIME                ( java.sql.Types.TIMESTAMP               , "DATETIME"                )  ,
 	TIME                    ( java.sql.Types.TIME                    , "TIME"                    )  ,
 	TIMESTAMP               ( java.sql.Types.TIMESTAMP               , "TIMESTAMP"               )  ,
 	BINARY                  ( java.sql.Types.BINARY                  , "BINARY"                  )  ,
@@ -63,13 +64,18 @@ public enum SqlType {
 	NCLOB                   ( java.sql.Types.NCLOB                   , "NCLOB"                   )  ,
 	SQLXML                  ( java.sql.Types.SQLXML                  , "SQLXML"                  )  ,
 	TIME_WITH_TIMEZONE      ( java.sql.Types.TIME_WITH_TIMEZONE      , "TIME_WITH_TIMEZONE"      )  ,
-	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ;
+	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ,
 
-	private final int    code;
-	private final String name;
+	TEXT                    ( 9003                                   , "TEXT"                    )  ,
+	LONGTEXT                ( 9004                                   , "LONGTEXT"                )
 
-	private static Map<Integer, SqlType> codes = new LinkedHashMap<Integer, SqlType>();
-	private static Map<String,  SqlType> names = new LinkedHashMap<String,  SqlType>();
+	;
+
+	public final int     code;
+	public final String  name;
+
+	private static Map<Integer,SqlType> codes = new LinkedHashMap<>();
+	private static Map<String,SqlType>  names = new LinkedHashMap<>();
 
 	static {
 		for( SqlType type : SqlType.values() ) {
@@ -79,8 +85,8 @@ public enum SqlType {
 	}
 
 	SqlType( int code, String string ) {
-		this.code = code;
-		this.name = string;
+		this.code   = code;
+		this.name   = string;
 	}
 
 	public static SqlType find( int code )  {
@@ -100,11 +106,6 @@ public enum SqlType {
 		return name;
 	}
 
-	public static SqlType findByValue( Object value ) {
-		if( value == null ) return SqlType.NULL;
-        return find( value.getClass() );
-	}
-
 	public static SqlType find( Class<?> klass ) {
 
 		if( klass == null ) return SqlType.NULL;
@@ -114,14 +115,15 @@ public enum SqlType {
 		if( klass == StringBuffer.class  ) return SqlType.VARCHAR;
 		if( klass == char.class          ) return SqlType.CHAR;
 		if( klass == Character.class     ) return SqlType.CHAR;
+		if( klass == boolean.class       ) return SqlType.BOOLEAN;
+		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
+
 		if( klass == int.class           ) return SqlType.INTEGER;
 		if( klass == Integer.class       ) return SqlType.INTEGER;
 		if( klass == double.class        ) return SqlType.DOUBLE;
 		if( klass == Double.class        ) return SqlType.DOUBLE;
 		if( klass == float.class         ) return SqlType.FLOAT;
 		if( klass == Float.class         ) return SqlType.FLOAT;
-		if( klass == boolean.class       ) return SqlType.BOOLEAN;
-		if( klass == Boolean.class       ) return SqlType.BOOLEAN;
 		if( klass == byte.class          ) return SqlType.TINYINT;
 		if( klass == Byte.class          ) return SqlType.TINYINT;
 		if( klass == short.class         ) return SqlType.SMALLINT;
@@ -130,6 +132,7 @@ public enum SqlType {
 		if( klass == Long.class          ) return SqlType.BIGINT;
 		if( klass == BigInteger.class    ) return SqlType.BIGINT;
 		if( klass == BigDecimal.class    ) return SqlType.NUMERIC;
+
 		if( klass == byte[].class        ) return SqlType.BLOB;
 		if( klass == Byte[].class        ) return SqlType.BLOB_BOXED;
 		if( klass == Date.class          ) return SqlType.DATE;

@@ -4,9 +4,9 @@ import org.nybatis.core.message.Message;
 import org.nybatis.core.util.StringUtil;
 
 /**
- * 표준 RuntimeException
+ * Base RuntimeException
  *
- * @author 정화수
+ * @author nayasis@gmail.com
  *
  */
 public class BaseRuntimeException extends RuntimeException {
@@ -14,60 +14,57 @@ public class BaseRuntimeException extends RuntimeException {
     private static final long serialVersionUID = 5185435566147737597L;
 
     /**
-     * Exception Code 정보
+     * Exception Code
      */
     private String errorCode = "";
 
-    /**
-     * BaseRuntimeException 생성자
-     */
     public BaseRuntimeException() {
         super();
     }
 
     /**
-     * BaseRuntimeException 생성자
+     * Constructor
      *
-     * @param rootCause 원인이 되는 예외
+     * @param rootCause root cause
      */
     public BaseRuntimeException( Throwable rootCause ) {
         super( rootCause );
     }
 
     /**
-     * BaseRuntimeException 생성자
+     * Constructor
      *
-     * @param message   에러메세지(또는 메세지코드)
-     * @param messageParam '@' 문자를 치환할 파라미터
+     * @param message       error message ( or message code )
+     * @param messageParam  parameters binding with '{}' phrase
      */
     public BaseRuntimeException( String message, Object... messageParam ) {
         super( Message.get(message, messageParam) );
     }
 
     /**
-     * BaseRuntimeException 생성자
+     * Constructor
      *
-     * @param rootCause 원인이 되는 예외
-     * @param message 에러메세지(또는 메세지코드)
-     * @param messageParam '@' 문자를 치환할 파라미터
+     * @param rootCause     root cause
+     * @param message       error message ( or message code )
+     * @param messageParam  parameters binding with '{}' phrase
      */
     public BaseRuntimeException( Throwable rootCause, String message, Object... messageParam ) {
         super( Message.get(message, messageParam), rootCause );
     }
 
     /**
-     * 에러코드를 구한다.
+     * get error code
      *
-     * @return String 에러코드
+     * @return String error code
      */
     public String getErrorCode() {
     	return errorCode;
     }
 
     /**
-     * 에러코드를 세팅한다.
+     * set error code
      *
-     * @param errorCode 에러코드
+     * @param errorCode error code
      */
     public void setErrorCode( Object errorCode ) {
         this.errorCode = StringUtil.nvl( errorCode );
@@ -77,17 +74,12 @@ public class BaseRuntimeException extends RuntimeException {
      * @see java.lang.Throwable#toString()
      */
     public String toString() {
-
         StringBuffer sb = new StringBuffer();
-
         if( ! StringUtil.isEmpty(errorCode) ) {
             sb.append( '[' ).append( errorCode ).append( ']' );
         }
-
         sb.append( super.getMessage() );
-
         return sb.toString();
-
     }
 
 }

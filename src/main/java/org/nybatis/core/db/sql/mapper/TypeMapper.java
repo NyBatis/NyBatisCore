@@ -1,27 +1,12 @@
 package org.nybatis.core.db.sql.mapper;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.nybatis.core.db.sql.mapper.implement.ArrayMapper;
-import org.nybatis.core.db.sql.mapper.implement.BigDecimalMapper;
-import org.nybatis.core.db.sql.mapper.implement.BlobBoxedMapper;
-import org.nybatis.core.db.sql.mapper.implement.BlobMapper;
-import org.nybatis.core.db.sql.mapper.implement.BooleanMapper;
-import org.nybatis.core.db.sql.mapper.implement.ByteMapper;
-import org.nybatis.core.db.sql.mapper.implement.ClobMapper;
-import org.nybatis.core.db.sql.mapper.implement.DateMapper;
-import org.nybatis.core.db.sql.mapper.implement.DoubleMapper;
-import org.nybatis.core.db.sql.mapper.implement.FloatMapper;
-import org.nybatis.core.db.sql.mapper.implement.IntegerMapper;
-import org.nybatis.core.db.sql.mapper.implement.LongMapper;
-import org.nybatis.core.db.sql.mapper.implement.NullMapper;
-import org.nybatis.core.db.sql.mapper.implement.ObjectMapper;
-import org.nybatis.core.db.sql.mapper.implement.ResultsetMapper;
-import org.nybatis.core.db.sql.mapper.implement.ShortMapper;
-import org.nybatis.core.db.sql.mapper.implement.StringMapper;
-import org.nybatis.core.db.sql.mapper.implement.TimeMapper;
-import org.nybatis.core.db.sql.mapper.implement.TimeStampMapper;
+import org.nybatis.core.db.sql.mapper.implement.*;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.exception.unchecked.SqlException;
 
 public class TypeMapper {
 
@@ -36,7 +21,7 @@ public class TypeMapper {
         put( SqlType.BOOLEAN,       new BooleanMapper()    );
     	put( SqlType.BIT,           new BooleanMapper()    );
     	put( SqlType.TINYINT,       new ByteMapper()       );
-    	put( SqlType.SMALLINT,      new ShortMapper()      );
+    	put( SqlType.SMALLINT,      new IntegerMapper()    );
     	put( SqlType.INTEGER,       new IntegerMapper()    );
     	put( SqlType.INT,           new IntegerMapper()    );
     	put( SqlType.BIGINT,        new LongMapper()       );
@@ -61,8 +46,10 @@ public class TypeMapper {
 		 * java.sql.Date handle data as Date only and miss time information(HH:MI:SS).<br>
 		 * So It is necessary to handle data as TimeStamp
 		 */
-
+		// TODO 1 : TimeStamp는 mili-sec까지 세팅이 가능하다. mili-sec까지 세팅하지 않는 DATE 또는 DATETIME 형식의 Mapper가 필요하다.
+		// TODO 2 : JDBC 타입은 DBMS에 지나치게 의존적이다. 이를 해결하기 위한 고유 SqlType을 만들자.
 		put( SqlType.DATE,          new TimeStampMapper()  );
+
     	put( SqlType.TIME,          new TimeStampMapper()  );
     	put( SqlType.TIMESTAMP,     new TimeStampMapper()  );
 
@@ -78,7 +65,6 @@ public class TypeMapper {
     	put( SqlType.REF,           new ObjectMapper()     );
     	put( SqlType.STRUCT,        new ObjectMapper()     );
 
-
     }
 
     private static void put( SqlType sqlType, TypeMapperIF<?> typeMapper ) {
@@ -86,13 +72,10 @@ public class TypeMapper {
     }
 
 	public static synchronized void put( String environmentId, SqlType sqlType, TypeMapperIF<?> typeMapper ) {
-
 		if( ! mapper.containsKey(environmentId) ) {
 			mapper.put( environmentId, new HashMap<>() );
 		}
-
 		mapper.get( environmentId ).put( sqlType, typeMapper );
-
 	}
 
 	@SuppressWarnings( "rawtypes" )
@@ -102,18 +85,33 @@ public class TypeMapper {
 
 	@SuppressWarnings( "rawtypes" )
     public static synchronized TypeMapperIF get( String environmentId, SqlType sqlType ) {
-
 		if( ! mapper.containsKey(environmentId) ) environmentId = DEFAULT;
-
 		TypeMapperIF<?> typeMapper = mapper.get( environmentId ).get( sqlType );
-
 		return ( typeMapper == null ) ? get( sqlType ) : typeMapper;
-
 	}
 
 	@SuppressWarnings( "rawtypes" )
 	public static TypeMapperIF get( int sqlType ) {
 		return mapper.get( DEFAULT ).get( SqlType.find( sqlType ) );
+	}
+
+	/**
+	 * set mapper for unimplmented jdbc type
+	 * @param environmentId	db configuration environment id
+	 * @param sqlType column type
+	 * @param e       previous throable
+	 * @throws SQLException occurs when raise error in SQL handling.
+     */
+	public static synchronized void setUnimplementedMapper( String environmentId, SqlType sqlType, Throwable e ) throws SQLException {
+		TypeMapperIF prevTypeMapper = get( environmentId, sqlType );
+		if( sqlType == SqlType.BLOB && ! (prevTypeMapper instanceof ByteArrayMapper) ) {
+			TypeMapper.put( environmentId, SqlType.BLOB, new ByteArrayMapper() );
+			return;
+		} else if( sqlType == SqlType.CLOB && ! (prevTypeMapper instanceof StringMapper) ) {
+			TypeMapper.put( environmentId, SqlType.CLOB, new StringMapper() );
+			return;
+		}
+		throw new SQLException( String.format("there is no mapper to handle sqlType(%s) in environment(id:%s)", sqlType, environmentId), e );
 	}
 
 }

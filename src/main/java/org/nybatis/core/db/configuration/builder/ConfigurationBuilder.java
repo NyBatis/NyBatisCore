@@ -1,15 +1,16 @@
 package org.nybatis.core.db.configuration.builder;
 
+import java.util.HashSet;
+import java.util.Set;
+import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.exception.unchecked.UncheckedIOException;
 import org.nybatis.core.file.FileUtil;
 import org.nybatis.core.log.NLogger;
+import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.NXml;
 import org.nybatis.core.xml.NXmlDeformed;
 import org.nybatis.core.xml.node.Node;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class ConfigurationBuilder {
 
@@ -21,39 +22,38 @@ public class ConfigurationBuilder {
 
 	public void readFrom( String file, boolean reload ) {
 
-		if( reload == false && isLoaded(file) ) return;
-
 		NLogger.debug( "load database configuration from [{}]", file );
+
+		if( reload == false && isLoaded(file) ) {
+			NLogger.debug( "cancel to load because already loaded. [{}]", file );
+			return;
+		}
 
 		try {
 
 			synchronized( loadedFiles ) {
 
-				NXml xmlReader = new NXmlDeformed( FileUtil.readResourceFrom( file ) );
+				String xml = FileUtil.readResourceFrom( file );
 
-				Node root = xmlReader.getRoot();
-
-				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
-
-				CacheBuilder cacheBuilder = new CacheBuilder( propertyResolver );
-
-				for( Node cache : root.getChildElements("cache") ) {
-					cacheBuilder.setCache( cache );
+				if( StringUtil.isEmpty(xml) ) {
+					throw new DatabaseConfigurationException( "there is no contents in file path({})", file );
 				}
 
-				cacheBuilder.setDefaultCache();
+				NXml xmlReader = new NXmlDeformed( xml );
+
+				Node root = xmlReader.getRoot();
+				PropertyResolver propertyResolver = new PropertyResolver( root.getChildElement("properties") );
 
 				for( Node environment : root.getChildElements("environment") ) {
 					new EnvironmentBuilder( environment, propertyResolver );
+					NLogger.trace( "start environment building : {}", environment.getName() );
 					new SqlBuilder( propertyResolver, getDirectory(file) ).setSql( environment );
+					NLogger.trace( "end environment building : {}", environment.getName() );
 				}
-
-				cacheBuilder.checkEachSqlCache();
 
 				loadedFiles.add( file.toString() );
 
             }
-
 
 		} catch( ParseException | UncheckedIOException e ) {
 	        throw new ParseException( e, "Error on reading Database configuration file({})\n\t{}", file, e.getMessage() );

@@ -4,24 +4,22 @@ import org.nybatis.core.db.session.executor.util.QueryParameter;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.ElementText;
 import org.nybatis.core.db.sql.sqlNode.element.abstracts.SqlElement;
 import org.nybatis.core.exception.unchecked.SqlParseException;
-import org.nybatis.core.model.NMap;
 import org.nybatis.core.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class GroupSqlElement extends SqlElement {
 
 	private String open;
 	private String close;
-	private String delimeter;
+	private String concater;
 
-	public GroupSqlElement( String open, String close, String delimeter ) {
+	public GroupSqlElement( String open, String close, String concater ) {
 
 		this.open        = StringUtil.trim( open );
 		this.close       = StringUtil.trim( close );
-		this.delimeter   = StringUtil.trim( delimeter );
+		this.concater = StringUtil.trim( concater );
 
 	}
 
@@ -33,7 +31,7 @@ public class GroupSqlElement extends SqlElement {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append( open );
-		sb.append( StringUtil.join( paragraph, delimeter ) );
+		sb.append( StringUtil.join( paragraph, concater ) );
 		sb.append( close );
 
 		return sb.toString();
@@ -42,7 +40,7 @@ public class GroupSqlElement extends SqlElement {
 
 	private List<StringBuilder> getParagraph( QueryParameter param ) {
 
-		boolean delimiterOff = StringUtil.isEmpty( delimeter );
+		boolean delimiterOff = StringUtil.isEmpty( concater );
 
 		List<StringBuilder> paragraph = new ArrayList<>();
 
@@ -80,7 +78,7 @@ public class GroupSqlElement extends SqlElement {
 
 		StringBuilder sb = new StringBuilder();
 
-		sb.append( String.format("[GROUP open='%s' close='%s' delimeter='%s']\n", open, close, delimeter) );
+		sb.append( String.format("[GROUP open='%s' close='%s' concater='%s']\n", open, close, concater ) );
 
 		for( SqlElement node : children ) {
 			toString( sb, node, 0 );

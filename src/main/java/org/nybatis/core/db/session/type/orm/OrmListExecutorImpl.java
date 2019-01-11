@@ -1,6 +1,5 @@
 package org.nybatis.core.db.session.type.orm;
 
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
 import org.nybatis.core.exception.unchecked.InvalidArgumentException;
 
@@ -20,6 +19,19 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
         this.domainClass = domainClass;
         this.sqlSession  = sqlSession;
         this.properties  = properties.clone();
+    }
+
+    @Override
+    public T selectOne() {
+        properties.setEntityParameter( null );
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().selectOne( domainClass );
+    }
+
+    @Override
+    public T selectOne( Object parameter ) {
+        properties.setEntityParameter( null );
+        properties.setEntityParameter( parameter );
+        return sqlSession.sqlId( properties.sqlIdSelect(), properties.getParameter() ).list().selectOne( domainClass );
     }
 
     @Override
@@ -55,7 +67,8 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
 
     @Override
     public OrmListExecutor<T> where( String sqlExpression ) {
-        return where( sqlExpression );
+        properties.addWhere( sqlExpression, null );
+        return this;
     }
 
     @Override
@@ -79,29 +92,6 @@ public class OrmListExecutorImpl<T> implements OrmListExecutor<T> {
     @Override
     public OrmListExecutor<T> setLobPrefetchSize( int size ) {
         sqlSession.getProperties().setLobPrefetchSize( size );
-        return this;
-    }
-
-    @Override
-    public OrmListExecutor<T> disableCache() {
-        CacheManager.disableCache( properties.sqlIdSelectPk() );
-        return this;
-    }
-
-    @Override
-    public OrmListExecutor<T> enableCache( String cacheId ) {
-        return enableCache( cacheId, null );
-    }
-
-    @Override
-    public OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds ) {
-        CacheManager.enableCache( properties.sqlIdSelectPk(), cacheId, flushSeconds );
-        return this;
-    }
-
-    @Override
-    public OrmListExecutor<T> clearCache() {
-        sqlSession.getProperties().isCacheClear( true );
         return this;
     }
 

@@ -1,5 +1,6 @@
 package org.nybatis.core.db.datasource.driver;
 
+import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSource;
 import org.nybatis.core.exception.unchecked.DatabaseConfigurationException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.Reflector;
@@ -18,22 +19,22 @@ import java.util.Map;
  */
 public class DatabaseAttributeManager {
 
-    private static Map<String, DatabaseAttribute> driverRepository = new Hashtable<>();
+    private static Map<String,DatabaseAttribute> driverRepository = new Hashtable<>();
 
     public static void add( DatabaseAttribute databaseAttribute ) {
         driverRepository.put( databaseAttribute.getDatabase(), databaseAttribute );
     }
 
-    public static DatabaseAttribute get( DataSource datasource ) {
+    public static DatabaseAttribute get( DataSource datasource ) throws DatabaseConfigurationException {
+
+        if( datasource instanceof JdbcDataSource ) {
+            return getDatabaseAttribute( ( (JdbcDataSource) datasource ).getConnectionProperties().getDriverName() );
+        }
 
         Connection  connection = null;
-
         try {
-
             connection = datasource.getConnection();
-
             return get( connection );
-
         } catch( SQLException e ) {
             throw new DatabaseConfigurationException( e );
         } finally {
@@ -43,35 +44,33 @@ public class DatabaseAttributeManager {
                 } catch( SQLException e ) {}
             }
         }
-
     }
 
-
-    private static DatabaseAttribute get( Connection connection ) throws SQLException {
-
+    private static DatabaseAttribute get( Connection connection ) {
         Connection realConnection = Reflector.unwrapProxy( connection );
-
         String className = realConnection.getClass().getName();
+        return getDatabaseAttribute( className );
+    }
+
+    private static DatabaseAttribute getDatabaseAttribute( String classOrDriverName ) {
 
         NLogger.trace( "---------------------------------------------------------------------" );
-        NLogger.trace( "Connection class name : {}", className );
+        NLogger.trace( "Connection class (or driver) name : {}", classOrDriverName );
         NLogger.trace( "---------------------------------------------------------------------" );
 
         for( DatabaseAttribute attribute : driverRepository.values() ) {
-            if( attribute.isMatched( className ) ) {
+            if( attribute.isMatched( classOrDriverName ) ) {
                 NLogger.trace( attribute );
                 return attribute.clone();
             }
         }
 
-        if( ! driverRepository.containsKey( className ) ) {
-            add( new DatabaseAttribute( className, className ) );
+        if( ! driverRepository.containsKey( classOrDriverName ) ) {
+            add( new DatabaseAttribute( classOrDriverName, classOrDriverName ) );
         }
 
-        DatabaseAttribute databaseAttribute = driverRepository.get( className );
-
+        DatabaseAttribute databaseAttribute = driverRepository.get( classOrDriverName );
         NLogger.trace( databaseAttribute );
-
         return databaseAttribute.clone();
 
     }
@@ -86,25 +85,50 @@ public class DatabaseAttributeManager {
 
     static {
 
-        add( new DatabaseAttribute("oracle", "oracle\\.jdbc\\.driver" )
+        add( new DatabaseAttribute( DatabaseName.ORACLE )
             .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
             .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
             .setPingQuery( "SELECT 1 FROM DUAL" )
         );
 
-        add( new DatabaseAttribute( "mysql",      "com\\.mysql\\.jdbc"          ) );
-        add( new DatabaseAttribute( "maria",      "org\\.mariadb\\.jdbc"        ) );
-        add( new DatabaseAttribute( "sqlite",     "org\\.sqlite\\."             ) );
-        add( new DatabaseAttribute( "h2",         "org\\.h2\\.jdbc"             ) );
+        add( new DatabaseAttribute( DatabaseName.MYSQL )
+            .setPageSqlPost( "LIMIT #{offset}, #{count}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.MARIA )
+            .setPageSqlPost( "LIMIT #{offset}, #{count}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.SQLITE )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
+
+        add( new DatabaseAttribute( DatabaseName.H2 )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
 
         //   Not Tested  !
-        add( new DatabaseAttribute( "derby",      "org\\.apache\\.derby\\.jdbc" ) );
-        add( new DatabaseAttribute( "hsqldb",     "org\\.hsqldb\\.jdbcDriver"   ) );
-        add( new DatabaseAttribute( "mssql",      "com\\.microsoft\\.jdbc"      ) );
-        add( new DatabaseAttribute( "postgresql", "postgresql\\.driver"         ) );
-        add( new DatabaseAttribute( "sybase",     "com\\.sybase\\."             ) );
-        add( new DatabaseAttribute( "db2",        "ibm\\.db2\\."                ) );
-        add( new DatabaseAttribute( "odbc",       "sun\\.jdbc\\.odbc"           ) );
+        add( new DatabaseAttribute( DatabaseName.DERBY )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.HSQL )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.MSSQL )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUM AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.POSTGRE )
+            .setPageSqlPost( "LIMIT #{count} OFFSET #{offset}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.SYBASE )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROW_NUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.DB2 )
+            .setPageSqlPre( "SELECT * FROM ( SELECT ROWNUMBER() OVER() AS nybatis_page_rownum, NYBATIS_PAGE_VIEW.* FROM (\n" )
+            .setPageSqlPost( "\n) NYBATIS_PAGE_VIEW WHERE rownum <= #{end} ) WHERE nybatis_page_rownum >= #{start}" )
+        );
+        add( new DatabaseAttribute( DatabaseName.ODBC ) );
 
     }
 

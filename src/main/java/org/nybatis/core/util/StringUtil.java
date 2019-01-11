@@ -1,37 +1,27 @@
 package org.nybatis.core.util;
 
-import org.nybatis.core.exception.unchecked.ClassNotExistException;
-import org.nybatis.core.exception.unchecked.EncodingException;
-import org.nybatis.core.exception.unchecked.UncheckedIOException;
-
-import javax.xml.bind.DatatypeConverter;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import javax.xml.bind.DatatypeConverter;
+import org.nybatis.core.exception.unchecked.ClassNotExistException;
+import org.nybatis.core.exception.unchecked.EncodingException;
+import org.nybatis.core.exception.unchecked.UncheckedIOException;
 
 
 /**
- * 문자열 처리용 유틸리티 클래스
+ * String Hadling Utility
  *
- * @author 	nayasis
+ * @author nayasis@gmail.com
  */
 public class StringUtil {
 
@@ -96,12 +86,10 @@ public class StringUtil {
      * @return String Padding 된 문자열
 	 */
 	public static String rpadCJK( Object value, int length, char padChar ) {
-
 		int adjustLength = ( CharacterUtil.getFullwidthCharacterWidth() == 1 || value == null )	? length
 				: value.toString().length() + ( length - getCjkLength( value ) );
 
 		return rpad( value, adjustLength, padChar );
-
 	}
 
 	/**
@@ -127,6 +115,28 @@ public class StringUtil {
 
 	public static String trim( Object string ) {
 		return nvl( string ).trim();
+	}
+
+	/**
+	 * check if there are equal without null difference
+	 *
+	 * @param value		value to check differenc
+	 * @param another	another value to check difference
+	 * @return true if equals
+	 */
+	public static boolean isEqual( Object value, Object another ) {
+		return StringUtil.nvl(value).equals( StringUtil.nvl(another) );
+	}
+
+	/**
+	 * check if there are not equal without null difference
+	 *
+	 * @param value		value to check differenc
+	 * @param another	another value to check difference
+	 * @return true if not equals
+	 */
+	public static boolean isNotEqual( Object value, Object another ) {
+		return ! isEqual( value, another );
 	}
 
 	/**
@@ -407,32 +417,30 @@ public class StringUtil {
     	return ( val == null ) ? nvl( nvlValue ) : val.toString();
     }
 
-
     /**
-     * 문자열을 Camel 형으로 변환한다.
+	 *
+	 * convert text to camel case
+	 *
      * <pre>
      * String text = DataConverter.getCamel( "unicode_text" );
-     * System.out.println( text ); → "unicodeText" 가 출력됨
+     * System.out.println( text ); → "unicodeText""
      * </pre>
-     * @param param     변환할 문자열
-     * @return CAMEL 형 문자열
+     * @param text   text to convert
+     * @return camel cased text
      */
-    public static String toCamel( String param ) {
+    public static String toCamel( String text ) {
 
-    	if( isEmpty(param) ) return "";
+    	if( isEmpty(text) ) return "";
 
-    	param = param.toLowerCase();
+    	text = text.toLowerCase();
         Pattern pattern = Pattern.compile( "(_[a-zA-Z0-9])" );
-        Matcher matcher = pattern.matcher( param );
+        Matcher matcher = pattern.matcher( text );
         StringBuffer sb = new StringBuffer();
 
         while( matcher.find() ) {
-
             String r = matcher.group().substring( 1 );
             if( matcher.start() != 0 ) r = r.toUpperCase();
-
             matcher.appendReplacement( sb, r );
-
         }
 
         matcher.appendTail( sb );
@@ -442,36 +450,31 @@ public class StringUtil {
     }
 
     /**
-     * CAMEL형 문자열을 _ 형 문자열로 변환한다.
+     * convert camel cased text to underscored text
+	 *
      * <pre>
      * String text = StringUtil.toUncamel( "unicodeText" );
-     * System.out.println( text ); → "unicode_text" 가 출력됨
+     * System.out.println( text ); → "unicode_text"
      * </pre>
-     * @param param     변환할 문자열
-     * @return UNDERLINE 형 문자열
+     * @param text     text to convert
+     * @return underscored text
      */
-    public static String toUncamel( String param ) {
+    public static String toUncamel( String text ) {
 
         Pattern pattern = Pattern.compile( "([A-Z])" );
-        Matcher matcher = pattern.matcher( param );
+        Matcher matcher = pattern.matcher( text );
         StringBuffer sb = new StringBuffer();
 
         while( matcher.find() ) {
-
             if( matcher.start() == 0 ) continue;
-
             String r = matcher.group();
             matcher.appendReplacement( sb, "_" + r.toLowerCase() );
-
         }
 
         matcher.appendTail( sb );
-
         return sb.toString();
 
     }
-
-
 
     /**
      * <pre>
@@ -503,7 +506,6 @@ public class StringUtil {
                 case '/':  sb.append("\\/");  break;
 
                 default:
-
                     if( ch >= '\u0000' && ch <= '\u001F' ) {
                     	sb.append("\\u").append( lpad(Integer.toHexString(ch), 4, '0').toUpperCase() );
                     } else {
@@ -565,23 +567,16 @@ public class StringUtil {
     }
 
     private static String getUnescapedUnicodeChar( String escapedString ) {
-
     	try {
-
     		String hex = escapedString.substring( 2 );
-
     		int hexNumber = Integer.parseInt( hex, 16 );
-
     		return Character.toString( (char) hexNumber );
-
     	} catch( StringIndexOutOfBoundsException e ) {
     		throw new StringIndexOutOfBoundsException( String.format( "Char to unescape unicode : [%s]", escapedString ) );
     	}
-
     }
 
     private static String getUnescapedSequence( String escapedString ) {
-
     	switch( escapedString.charAt(0) ) {
     		case 'b' : return "\b";
     		case 't' : return "\t";
@@ -589,9 +584,7 @@ public class StringUtil {
     		case 'f' : return "\f";
     		case 'r' : return "\r";
     	}
-
     	return escapedString;
-
     }
 
     /**
@@ -609,7 +602,7 @@ public class StringUtil {
      * @param concator 엘리먼트 사이를 연결시킬 구분 문자열
      * @return joined text
      */
-    public static String join( List<?> list, String concator ) {
+    public static String join( Collection<?> list, String concator ) {
 
     	if( list == null || list.size() == 0 ) return "";
 
@@ -617,39 +610,13 @@ public class StringUtil {
     	int           index = list.size();
 
     	for( Object e : list ) {
-
     		index--; if( e == null ) continue;
-
     		sb.append( e.toString() );
-
     		if( index > 0 ) sb.append( concator );
-
     	}
-
     	return sb.toString();
 
     }
-
-	/**
-	 * concat set values
-	 *
-	 * @param set		values to concat
-	 * @param concator  concator
-	 * @return joined text
-	 */
-	public static String join( Set<?> set, String concator ) {
-		if( set == null || set.size() == 0 ) return "";
-		return join( new ArrayList(set), concator );
-	}
-
-	public static String join( Stack<?> stack, String delimeter ) {
-
-		List list = new ArrayList<>();
-		list.addAll( stack );
-
-		return join( list, delimeter );
-
-	}
 
 	/**
 	 * Split string around matches of the given <a href="../util/regex/Pattern.html#sum">regular expression</a>.
@@ -691,7 +658,7 @@ public class StringUtil {
 		while( matcher.find() ) {
 
 			if( caret != matcher.start() ) {
-				result.add( val.substring( caret, matcher.start() ) );
+				result.add( val.substring( caret, matcher.start() ).trim() );
 			}
 
 			if( returnDelimeter ) {
@@ -703,7 +670,7 @@ public class StringUtil {
 		}
 
 		if( caret != val.length() ) {
-			result.add( val.substring( caret ) );
+			result.add( val.substring( caret ).trim() );
 		}
 
 		return result;
@@ -712,11 +679,11 @@ public class StringUtil {
 
 
 	/**
-     * 문자열을 구분자로 끊어 목록으로 변환한다.
+     * tokenize text by seperator
      *
-     * @param value     값
-     * @param separator 구분자
-     * @return 구분자로 끊어진 문자열 목록
+     * @param value     value to tokenize
+     * @param separator sepertator to tokenize
+     * @return tokenized word list
      */
     public static List<String> tokenize( Object value, String separator ) {
 
@@ -726,27 +693,24 @@ public class StringUtil {
 
     	String workVal = value.toString();
 
-    	if( isEmpty(separator) ) return Arrays.asList( workVal );
+    	if( isEmpty(separator) ) {
+			result.add( workVal );
+			return result;
+		}
 
     	int fromIndex = 0, toIndex = 0, separatorLength = separator.length();
 
     	List<int[]> indexes = new ArrayList<>();
 
     	while( true ) {
-
     		toIndex = workVal.indexOf( separator, fromIndex );
-
     		if( toIndex < 0 ) {
     			indexes.add( new int[] {fromIndex, workVal.length()} );
     			break;
     		}
-
     		indexes.add( new int[] {fromIndex, toIndex} );
-
     		fromIndex = toIndex + separatorLength;
-
     	}
-
 
     	for( int[] index : indexes ) {
     		result.add( workVal.substring( index[0], index[1] ) );
@@ -762,45 +726,35 @@ public class StringUtil {
      * @param phoneNumber phone number
 	 * @return phone number delimeted with '-'
      */
-    public static String getPhoneNumber( Object phoneNumber ) {
+	public static String getPhoneNumber( Object phoneNumber ) {
     	if( isEmpty(phoneNumber) ) return "";
     	return nvl(phoneNumber).replaceAll( "\\D*(02|\\d{3})\\D*(\\d{3,4})\\D*(\\d{4})", "$1-$2-$3" );
     }
 
     /**
-     * 문자열의 첫글자를 소문자로 바꾼다.
+     * change word's first character to upper case
      *
-     * @param text 처리할 문자열
-     * @return 변환된 문자열
+     * @param text text to change
+     * @return uncapitalized text
      */
     public static String uncapitalize( Object text ) {
-
     	if( isEmpty(text) ) return "";
-
     	char[] array = nvl( text ).toCharArray();
-
     	array[ 0 ] = Character.toLowerCase( array[0] );
-
     	return new String( array );
-
     }
 
     /**
-     * 문자열의 첫글자를 대문자로 바꾼다.
+     * change word's first character to lower case
      *
-     * @param text 처리할 문자열
-     * @return 변환된 문자열
+     * @param text text to change
+     * @return capitalized text
      */
     public static String capitalize( Object text ) {
-
     	if( isEmpty(text) ) return "";
-
     	char[] array = nvl( text ).toCharArray();
-
     	array[ 0 ] = Character.toUpperCase( array[0] );
-
     	return new String( array );
-
     }
 
     /**
@@ -855,10 +809,10 @@ public class StringUtil {
 	}
 
     /**
-     * 객체를 텍스트로 encode 한다.
+     * encode object to text
      *
-     * @param value 텍스트로 만들 객체
-     * @return encode된 텍스트
+     * @param value object to encode
+     * @return encoded text
      * @throws UncheckedIOException if I/O exception occurs.
      */
     public static String encode( Object value ) {
@@ -868,7 +822,6 @@ public class StringUtil {
     	try (
     		ByteArrayOutputStream bos = new ByteArrayOutputStream();
     		ObjectOutputStream    oos = new ObjectOutputStream( bos )
-
 		) {
     		oos.writeObject( value );
     		oos.close();
@@ -883,10 +836,10 @@ public class StringUtil {
     }
 
     /**
-     * 텍스트를 객체로 decode 한다.
+     * decode text to object
      *
-     * @param value 객체로 만들 text
-     * @return decode된 객체
+     * @param value text to decode as object
+     * @return decoded object
      * @throws UncheckedIOException if I/O exception occurs.
      * @throws ClassNotExistException if class is not found in class loader.
      */
@@ -899,7 +852,6 @@ public class StringUtil {
     	try (
     		ByteArrayInputStream bis = new ByteArrayInputStream( o );
     		ObjectInputStream    ois = new ObjectInputStream( bis )
-
 		) {
     		vo = ois.readObject();
 
@@ -920,13 +872,11 @@ public class StringUtil {
 	 * @throws EncodingException	if an encoding error occurs.
 	 */
     public static String encodeUrl( Object url ) throws EncodingException {
-
     	try {
 			return URLEncoder.encode( nvl(url), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
-
     }
 
 	/**
@@ -936,20 +886,18 @@ public class StringUtil {
 	 * @throws EncodingException	if an decoding error occurs.
 	 */
     public static String decodeUrl( Object url ) throws EncodingException {
-
     	try {
     		return URLDecoder.decode( nvl( url ), "UTF-8" );
     	} catch( UnsupportedEncodingException e ) {
         	throw new EncodingException( e );
         }
-
     }
 
     /**
-	 * 문자열에서 숫자만 추출한다.
+	 * extract number characters from word
 	 *
-	 * @param string 작업할 대상 문자열
-	 * @return 숫자만 추출된 문자열
+	 * @param string word
+	 * @return number characters
 	 */
 	public static String extractNumber( String string ) {
 		if( isEmpty( string ) ) return "";
@@ -957,10 +905,10 @@ public class StringUtil {
 	}
 
 	/**
-	 * 문자열에서 대문자만 추출한다.
+	 * extracter upper characters from word
 	 *
-	 * @param string 작업할 대상 문자열
-	 * @return 대문자만 추출된 문자열
+	 * @param string word
+	 * @return upper characters
 	 */
 	public static String extractUpperCharacters( String string ) {
 		if( isEmpty( string ) ) return "";
@@ -979,62 +927,47 @@ public class StringUtil {
 	}
 
 	/**
-	 * 문자열을 압축한다.
+	 * compress text
 	 *
-	 * @param value 압축할 문자열
-	 * @return 압축한 문자열
+	 * @param value text value
+	 * @return compressed text
 	 */
 	public static String compress( String value ) {
-
 		if( isEmpty(value) ) return "";
-
         try(
         	ByteArrayOutputStream out  = new ByteArrayOutputStream();
         	GZIPOutputStream      gzip = new GZIPOutputStream( out )
 		) {
-
         	gzip.write( value.getBytes() );
         	gzip.close();
-
         	return out.toString( StandardCharsets.ISO_8859_1.toString() );
-
         } catch( IOException e ) {
         	throw new UncheckedIOException( e );
         }
-
 	}
 
 	/**
-	 * 압축된 문자열을 해제한다.
+	 *  decompress text
 	 *
-	 * @param value 압축을 해제할 문자열
-	 * @return 압축이 해제된 문자열
+	 * @param value text value
+	 * @return decompressed text
 	 */
 	public static String decompress( String value ) {
-
 		if( isEmpty(value) ) return "";
-
         try(
         	ByteArrayInputStream input        = new ByteArrayInputStream( value.getBytes( StandardCharsets.ISO_8859_1 ));
         	GZIPInputStream      gzip         = new GZIPInputStream( input );
         	BufferedReader       bufferReader = new BufferedReader( new InputStreamReader( gzip ) )
-
 		) {
-
         	StringBuilder sb = new StringBuilder();
-
         	String line;
-
         	while( (line = bufferReader.readLine()) != null ) {
         		sb.append( line );
         	}
-
         	return sb.toString();
-
         } catch( IOException e ) {
         	throw new UncheckedIOException( e );
         }
-
 	}
 
 	/**
@@ -1149,45 +1082,60 @@ public class StringUtil {
 	}
 
 	/**
-	 * 정규식 패턴에 해당하는 문자열을 추출한다.
+	 * extract words matched by regular expression.
 	 *
 	 * <pre>
 	 *
 	 *  String pattern = "#\\{(.+?)}";
-	 *
 	 *  List&lt;String&gt; finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
-	 *
-	 *  System.out.println( finded ); → ['AAAA','BBBB', 'AAAA']
+	 *  System.out.println( finded ); -> ['AAAA','BBBB', 'AAAA']
 	 *
 	 *  ----------------------------------------------------------------
 	 *
-	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   → []
-	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) → ['.', '.', '.']
+	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   -> []
+	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) -> ['.', '.', '.']
 	 *
 	 * </pre>
 	 *
-	 * @param value 검사할 문자열
-	 * @param pattern 정규식 (capture 될 문자열을 반드시 ( ) 로 감싸주어야 함)
-	 * @return 패턴에 해당하는 문자열
+	 * @param value   target value to inspect
+	 * @param pattern regular expression (only captured pattern (wrapped by (...)) can be extracted)
+	 * @return captured words
 	 */
 	public static List<String> capturePatterns( Object value, String pattern ) {
+		Pattern p = ( pattern == null ) ? null : Pattern.compile( pattern );
+		return capturePatterns( value, p );
+	}
 
+	/**
+	 * extract words matched by regular expression.
+	 *
+	 * <pre>
+	 *
+	 *  String pattern = "#\\{(.+?)}";
+	 *  List&lt;String&gt; finded = StringUtil.capturePatterns( "/admkr#{AAAA}note#{BBBB}ananan#{AAAA}sss", pattern );
+	 *  System.out.println( finded ); -> ['AAAA','BBBB', 'AAAA']
+	 *
+	 *  ----------------------------------------------------------------
+	 *
+	 *  StringUtil.capturePatterns( "1.2.3.4", "\\." )   -> []
+	 *  StringUtil.capturePatterns( "1.2.3.4", "(\\.)" ) -> ['.', '.', '.']
+	 *
+	 * </pre>
+	 *
+	 * @param value   target value to inspect
+	 * @param pattern regular expression (only captured pattern (wrapped by (...)) can be extracted)
+	 * @return captured words
+	 */
+	public static List<String> capturePatterns( Object value, Pattern pattern ) {
 		List<String> result = new ArrayList<>();
-
 		if( isEmpty(value) || isEmpty(pattern) ) return result;
-
-	    Pattern p = Pattern.compile( pattern );
-
-	    Matcher matcher = p.matcher( value.toString() );
-
-	    while( matcher.find() ) {
-	        for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
-	            result.add( matcher.group(i) );
-	        }
-	    }
-
-	    return result;
-
+		Matcher matcher = pattern.matcher( value.toString() );
+		while( matcher.find() ) {
+			for( int i = 1, iCnt = matcher.groupCount(); i <= iCnt; i++ ) {
+				result.add( matcher.group(i) );
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -1360,5 +1308,209 @@ public class StringUtil {
 		return false;
 
 	}
+
+	/**
+	 * clear XSS in text
+	 *
+	 * @param value target value
+	 * @return escaped string
+	 */
+	public static String clearXss( Object value ) {
+
+		if( isEmpty(value) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		for( char ch : value.toString().toCharArray() ) {
+
+			switch( ch ) {
+				case '<' :  sb.append("&lt;");   break;
+				case '>' :  sb.append("&gt;");   break;
+				case '"' :  sb.append("&#34;");  break;
+				case '\'':  sb.append("&#39;");  break;
+				case '(' :  sb.append("&#40;");  break;
+				case ')' :  sb.append("&#41;");  break;
+				case '{' :  sb.append("&#123;"); break;
+				case '}' :  sb.append("&#125;"); break;
+				default:
+					sb.append( ch );
+			}
+
+		}
+
+		return sb.toString();
+
+	}
+
+	/**
+	 * unclear XSS in text
+	 *
+	 * @param value target value
+	 * @return unescaped string
+	 */
+	public static String unclearXss( Object value ) {
+
+		if( isEmpty(value) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		char[] chars = value.toString().toCharArray();
+
+		for( int i = 0, limit = chars.length - 1; i <= limit; i++ ) {
+
+			if( chars[i] != '&' ) {
+				sb.append( chars[i] );
+				continue;
+			}
+
+			String code = String.format( "&%c%c%c%c%c"
+				,chars[ Math.min(i + 1,limit) ]
+				,chars[ Math.min(i + 2,limit) ]
+				,chars[ Math.min(i + 3,limit) ]
+				,chars[ Math.min(i + 4,limit) ]
+				,chars[ Math.min(i + 5,limit) ]
+			);
+
+			if( code.startsWith( "&lt;" ) ) {
+				sb.append( '<' ); i+=3;
+			} else if ( code.startsWith( "&gt;" ) ) {
+				sb.append( '>' ); i+=3;
+			} else if ( code.startsWith( "&#34;" ) ) {
+				sb.append( '"' ); i+=4;
+			} else if ( code.startsWith( "&#39;" ) ) {
+				sb.append( '\'' ); i+=4;
+			} else if ( code.startsWith( "&#40;" ) ) {
+				sb.append( '(' ); i+=4;
+			} else if ( code.startsWith( "&#41;" ) ) {
+				sb.append( ')' ); i+=4;
+			} else if ( code.startsWith( "&#123;" ) ) {
+				sb.append( '{' ); i+=5;
+			} else if ( code.startsWith( "&#125;" ) ) {
+				sb.append( '}' ); i+=5;
+			} else {
+				sb.append( chars[i] );
+			}
+
+		}
+
+		return sb.toString();
+
+	}
+
+	/**
+	 * apply mask pattern to word
+	 *
+	 * <pre>
+	 * String word = "01031155023";
+	 *
+	 * StringUtil.mask( "",                word ) ); -&gt; ""
+	 * StringUtil.mask( "***_****_****",   word ) ); -&gt; "010_3115_5023"
+	 * StringUtil.mask( "***_****_***",    word ) ); -&gt; "010_3115_502"
+	 * StringUtil.mask( "\\****_****_***", word ) ); -&gt; "*010_3115_502"
+	 * StringUtil.mask( "***_****_***\\*", word ) ); -&gt; "010_3115_502*"
+	 * StringUtil.mask( "***_****_***\\",  word ) ); -&gt; "010_3115_502"
+	 * </pre>
+	 *
+	 * @param maskPattern	mask pattern to apply. only '*' character is substitute with word.
+	 *                     if you want to print '*' character itself, set pattern as '\\*'
+	 * @param word  word to mask
+	 * @return masked text
+	 */
+	public static String mask( String maskPattern, String word ) {
+
+		if( isEmpty(maskPattern) || isEmpty(word) ) return "";
+
+		StringBuilder sb = new StringBuilder();
+
+		int k = 0;
+
+		int lastIdxMask = maskPattern.length() - 1;
+		int lastIdxWord = word.length() - 1;
+
+		for( int i = 0; i <= lastIdxMask; i++ ) {
+
+			char curr = maskPattern.charAt( i );
+			char next = ( i == lastIdxMask ) ? '\n' : maskPattern.charAt( i + 1 );
+
+			if( curr == '\\' ) {
+				if( i != lastIdxMask ) sb.append( next );
+				i++;
+				continue;
+			}
+
+			if( curr == '*' ) {
+				sb.append( word.charAt( k ) );
+				k++;
+				if( k > lastIdxWord ) break;
+			} else {
+				sb.append( curr );
+			}
+
+		}
+
+		return sb.toString();
+	}
+
+
+	/**
+	 * get similarity between 0 and 1.
+	 *
+	 * 0 is non-matched and 1 is perfect-matched.
+	 *
+	 * @param source
+	 * @param target
+     * @return
+     */
+	public static double similarity( String source, String target ) {
+
+		String longer = nvl(source), shorter = nvl(target);
+		if( longer.length() < shorter.length() ) {
+			String temp = longer;
+			longer = shorter; shorter = temp;
+		}
+		int longerLength = longer.length();
+		if (longerLength == 0) return 1.0;
+
+		return (longerLength - getLavenshteinDistance(longer, shorter)) / (double) longerLength;
+
+	}
+
+	/**
+	 * get Levenshtein distance
+	 *
+	 * @param source
+	 * @param target
+     * @return
+	 * @see http://rosettacode.org/wiki/Levenshtein_distance#Java
+	 * @see https://en.wikipedia.org/wiki/Levenshtein_distance
+     */
+	private static int getLavenshteinDistance( String source, String target ) {
+
+		source = toLowerCase( source );
+		target = toLowerCase( target );
+
+		int[] costs = new int[ target.length() + 1 ];
+
+		for (int i = 0; i <= source.length(); i++) {
+			int lastValue = i;
+			for (int j = 0; j <= target.length(); j++) {
+				if (i == 0) {
+					costs[j] = j;
+				} else {
+					if (j > 0) {
+						int newValue = costs[j-1];
+						if (source.charAt(i - 1) != target.charAt(j - 1))
+							newValue = Math.min( Math.min(newValue, lastValue), costs[j]) + 1;
+						costs[j-1] = lastValue;
+						lastValue = newValue;
+					}
+				}
+			}
+			if ( i > 0 )
+				costs[target.length()] = lastValue;
+		}
+		return costs[target.length()];
+	}
+
 
 }

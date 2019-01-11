@@ -5,16 +5,14 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.classic.spi.ThrowableProxyUtil;
-import org.nybatis.core.exception.unchecked.JsonIOException;
+import java.util.Arrays;
+import java.util.List;
 import org.nybatis.core.log.converter.StackTracer;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.util.Types;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Marker;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Common Logger Printer
@@ -39,6 +37,18 @@ public class NLoggerPrinter {
 
 	public NLoggerPrinter( String loggerName ) {
 		logger = (Logger) LoggerFactory.getLogger( loggerName );
+	}
+
+	public Level getLevel() {
+		return logger.getLevel();
+	}
+
+	public void setLevel( Level newLevel ) {
+		logger.setLevel( newLevel );
+	}
+
+	public void setAdditive( boolean additive ) {
+		logger.setAdditive( additive );
 	}
 
 	public void trace( Object message ) {
@@ -216,14 +226,14 @@ public class NLoggerPrinter {
 
 					try {
 						printLog( marker, level, logger, new NList( (List) format ).toString() );
-					} catch( JsonIOException e ) {
+					} catch( Exception e ) {
 						printLog( marker, level, logger, format.toString() );
 					}
 
 				} else if( Types.isArray(format) ) {
 					printLog( marker, level, logger, Arrays.deepToString( (Object[]) format ) );
 				} else if( format instanceof Throwable ) {
-					printLog( marker, level, logger, getThrowableString( (Throwable) format ) );
+					printLog( marker, level, logger, toString( (Throwable) format ) );
 				} else {
 					printLog( marker, level, logger, format.toString() );
 				}
@@ -232,7 +242,7 @@ public class NLoggerPrinter {
 
 				for( int i = 0, iCnt = param.length; i < iCnt; i++ ) {
 					if( param[i] instanceof Throwable ) {
-						param[i] = getThrowableString( (Throwable) param[i] );
+						param[i] = toString( (Throwable) param[i] );
 					} else if( Types.isArray(param[i]) ) {
 						param[i] = Arrays.deepToString( (Object[]) param[i] );
 					}
@@ -313,7 +323,7 @@ public class NLoggerPrinter {
 
 	}
 
-	protected String getThrowableString( Throwable throwable ) {
+	protected String toString( Throwable throwable ) {
 
 		if( throwable == null ) return null;
 
@@ -321,6 +331,10 @@ public class NLoggerPrinter {
 		throwableProxy.calculatePackagingData();
 		return ThrowableProxyUtil.asString( throwableProxy );
 
+	}
+
+	public Logger getNativeLogger() {
+		return this.logger;
 	}
 
 }

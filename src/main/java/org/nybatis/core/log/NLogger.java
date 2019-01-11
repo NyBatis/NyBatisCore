@@ -1,9 +1,8 @@
 package org.nybatis.core.log;
 
 
-import org.nybatis.core.conf.Const;
-
 import ch.qos.logback.classic.Level;
+import org.nybatis.core.conf.Const;
 import org.slf4j.Marker;
 
 /**
@@ -50,9 +49,9 @@ public class NLogger {
 	 * @param callDepth	caller depth (default : 4)
 	 * @return logger
 	 */
-	public static NLoggerPrinter getLogger( int callDepth ) {
+	private static NLoggerPrinter getLogger( int callDepth ) {
 		loadDefaultConfiguration();
-		return new NLoggerPrinter( new Caller( 4 + callDepth) );
+		return new NLoggerPrinter( new Caller(5 + callDepth) );
 	}
 
 	private static NLoggerPrinter getLogger() {
@@ -75,6 +74,7 @@ public class NLogger {
 	 */
 	public static void loadConfiguration( String filePath ) {
 		new NLoggerConfigLoader().loadConfiguration( filePath );
+		isConfigurationIinitialized = true;
 	}
 
 	public static void trace( Object message ) {
@@ -245,6 +245,14 @@ public class NLogger {
 	 */
 	public static NLoggerPrinter setCallderDepth( int depth ) {
 		return getLogger().setCallerDepth( depth );
+	}
+
+	public static void setLevel( Level newLevel ) {
+		getLogger().setLevel( newLevel );
+	}
+
+	public static void setAdditive( boolean additive ) {
+		getLogger().setAdditive( additive );
 	}
 
 	public static boolean isTraceEnabled() {

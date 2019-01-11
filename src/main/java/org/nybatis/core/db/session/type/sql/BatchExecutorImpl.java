@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.sql;
 
+import java.util.*;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
@@ -9,12 +10,10 @@ import org.nybatis.core.db.sql.reader.SqlReader;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.sql.sqlNode.SqlNode;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
+import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Batch Executor Implements
@@ -24,26 +23,30 @@ import java.util.List;
  */
 public class BatchExecutorImpl implements BatchExecutor {
 
-    private SqlSessionImpl sqlSession;
-    private SqlNode        sqlNode;
-    private List<Object>   parameters;
-    private Integer        transactionSize = null;
+    private SqlSessionImpl     sqlSession;
+    private SqlNode            sqlNode;
+    private List<Object>       parameters;
+    private Integer            transactionSize = null;
 
     public BatchExecutorImpl( SqlSessionImpl sqlSession ) {
         this.sqlSession = sqlSession;
     }
 
-    public BatchExecutorImpl batchSqlId( String id, List<?> parameters ) {
+    public BatchExecutorImpl batchSqlId( String id, Collection<?> parameters ) {
 
         Assertion.isTrue( SqlRepository.isExist( id ), "There is no sql id({}) in repository.", id );
 
         this.sqlNode    = SqlRepository.get( id );
-        this.parameters = Validator.nvl( parameters, new ArrayList() );
+
+        this.parameters = new ArrayList<>();
+        if( Validator.isNotEmpty( parameters ) ) {
+            this.parameters.addAll( parameters );
+        }
 
         return this;
     }
 
-    public BatchExecutorImpl batchSql( List<String> sqlList ) {
+    public BatchExecutorImpl batchSql( Collection<String> sqlList ) {
 
         if( sqlList == null ) sqlList = new ArrayList<>();
 
@@ -59,18 +62,21 @@ public class BatchExecutorImpl implements BatchExecutor {
         return this;
     }
 
-    public BatchExecutorImpl batchSql( String sql, List<?> parameters ) {
+    public BatchExecutorImpl batchSql( String sql, Collection<?> parameters ) {
 
         Assertion.isNotEmpty( sql, "Query must not be empty." );
 
         this.sqlNode    = new SqlReader().read( sql );
-        this.parameters = Validator.nvl( parameters, new ArrayList() );
+        this.parameters = new ArrayList<>();
+        if( Validator.isNotEmpty( parameters ) ) {
+            this.parameters.addAll( parameters );
+        }
 
         return this;
     }
 
     @Override
-    public int execute() {
+    public int execute() throws SqlException {
 
         try {
             if( sqlNode == null ) {

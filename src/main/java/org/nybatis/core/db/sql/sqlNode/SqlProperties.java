@@ -1,7 +1,5 @@
 package org.nybatis.core.db.sql.sqlNode;
 
-import org.nybatis.core.conf.Const;
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.reflection.Reflector;
@@ -17,14 +15,10 @@ public class SqlProperties {
 	private String  environmentId    = null;
 	private Integer fetchSize        = null;
 	private Integer lobPrefetchSize  = null;
-	private Boolean cacheEnable      = null;
-	private String  cacheId          = null;
-	private Integer cacheFlushCycle  = null;
 
 	/**
 	 * Dynamic Properties
 	 */
-	private Boolean cacheClear       = null;
 	private Boolean countSql         = null;
 	private Integer pageSqlStart     = null;
 	private Integer pageSqlEnd       = null;
@@ -36,19 +30,16 @@ public class SqlProperties {
 	public SqlProperties( String environmentId, Node element ) {
 
 		// ** xml sample
-		// <sql id="selectKey" fetch="50" cache="cacheId" flush="60" lobPrefetch="1000" >
+		// <sql id="selectKey" fetch="50" lobPrefetch="1000" >
 
 		this.environmentId = environmentId;
 
 		setFetchSize( element.getAttrIgnoreCase( "fetch" ) );
 		setLobPrefetchSize( element.getAttrIgnoreCase( "lobPrefetch" ) );
-		setCacheId( element.getAttrIgnoreCase( "cache" ) );
-		setCacheFlushCycle( element.getAttrIgnoreCase( "flush" ) );
 
 	}
 
 	public void clear() {
-		cacheClear         = null;
 		countSql           = null;
 		pageSqlStart       = null;
 		pageSqlEnd         = null;
@@ -63,10 +54,6 @@ public class SqlProperties {
 		if( environmentId   != null ) newProperties.environmentId   = environmentId;
 		if( fetchSize       != null ) newProperties.fetchSize       = fetchSize;
 		if( lobPrefetchSize != null ) newProperties.lobPrefetchSize = lobPrefetchSize;
-		if( cacheEnable     != null ) newProperties.cacheEnable     = cacheEnable;
-		if( cacheId         != null ) newProperties.cacheId         = cacheId;
-		if( cacheFlushCycle != null ) newProperties.cacheFlushCycle = cacheFlushCycle;
-		if( cacheClear      != null ) newProperties.cacheClear      = cacheClear;
 		if( countSql        != null ) newProperties.countSql        = countSql;
 		if( pageSqlStart    != null ) newProperties.pageSqlStart    = pageSqlStart;
 		if( pageSqlEnd      != null ) newProperties.pageSqlEnd      = pageSqlEnd;
@@ -141,65 +128,6 @@ public class SqlProperties {
 		} catch( NumberFormatException e ) {}
 	}
 
-	public boolean isCacheEnable() {
-		return isTrue( cacheEnable );
-	}
-
-	public void isCacheEnable( Boolean yn ) {
-		this.cacheEnable = yn;
-	}
-
-	public String getCacheId() {
-		return cacheId;
-	}
-
-	public void setCacheId( String cacheId ) {
-		if( ! CacheManager.hasCacheModel( cacheId ) ) return;
-		this.cacheId     = cacheId;
-		this.cacheEnable = true;
-	}
-
-	/**
-	 * Get cache flush cycle
-	 *
-	 * @return cache flush cycle (unit:seconds)
-	 */
-	public int getCacheFlushCycle() {
-		return Validator.nvl( cacheFlushCycle, Const.db.DEFAULT_CACHE_FLUSH_CYCLE_SECONDS );
-	}
-
-	public boolean hasSpecificCacheCycle() {
-		return cacheFlushCycle != null;
-	}
-
-	/**
-	 * Set cache flush cycle
-	 *
-	 * @param seconds flush cycle (unit:seconds)
-	 */
-	public void setCacheFlushCycle( Integer seconds ) {
-		this.cacheFlushCycle = seconds;
-	}
-
-	public void clearCacheFlushCycle() {
-		cacheFlushCycle = null;
-	}
-
-	public void setCacheFlushCycle( String seconds ) {
-		if( StringUtil.isEmpty(seconds) ) return;
-		try {
-			this.cacheFlushCycle = Integer.parseInt( seconds );
-		} catch( NumberFormatException e ) {}
-	}
-
-	public boolean isCacheClear() {
-		return cacheClear != null && cacheClear == true;
-	}
-
-	public void isCacheClear( Boolean yn ) {
-		this.cacheClear = yn;
-	}
-
 	public Integer getPageSqlStart() {
 		return pageSqlStart;
 	}
@@ -248,11 +176,6 @@ public class SqlProperties {
 
 		if( hasSpecificFetchSize() ) {
 			sb.append( String.format(", fetch:[%d]", getFetchSize()) );
-		}
-
-		if( isCacheEnable() ) {
-			sb.append( String.format(", cache:[%s]", getCacheId()) );
-			sb.append( String.format(", cacheFlushCycle:[%d]", getCacheFlushCycle()) );
 		}
 
 		return sb.toString();

@@ -3,42 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.NyBatis</groupId>
   <artifactId>NyBatisCore</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <name>NyBatisCore</name>
-  <description><![CDATA[
+  <description>
     Nybatis Data Mapper Framework
-
-1. Logging
-    based on logback but further simple
-2. Configuration
-3. Message
-4. Database
-    It can substitute iBasit or MyBatis.
-    It is very simple but powerful to use
-5. Util
-   It provides following utility class
-   - FileUtil
-   - StringUtil
-   - ClassUtil
-   - Reflector
-   - Validator
-   - StopWatcher
-   - ExcelFileUtil
-     this module will run when including following optinal dependency
-
-    <dependency>
-      <groupId>org.apache.poi</groupId>
-      <artifactId>poi-ooxml</artifactId>
-      <version>3.11</version>
-    </dependency>
-OR
-    <dependency>
-      <groupId>net.sourceforge.jexcelapi</groupId>
-      <artifactId>jxl</artifactId>
-      <version>2.6.12</version>
-    </dependency>
-
-]]></description>
+  </description>
   <url>http://nybatis.github.io</url>
   <licenses>
     <license>
@@ -47,6 +16,16 @@ OR
       <distribution>repo</distribution>
     </license>
   </licenses>
+  <developers>
+    <developer>
+      <name>Hwasu Jung</name>
+      <email>nayasis@gmail.com</email>
+      <roles>
+        <role>author</role>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <scm>
     <url>github.com/NyBatis/NyBatisCore</url>
     <connection>scm:git:ssh://github.com/NyBatis/NyBatisCore.git</connection>
@@ -57,31 +36,27 @@ OR
     <url>https://github.com/NyBatis/NyBatisCore/issues</url>
   </issueManagement>
 
-
   <properties>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <jdk.version>1.8</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <github.global.server>github</github.global.server>
+    <maven.javadoc.skip>true</maven.javadoc.skip>
     <skipTests>true</skipTests>
   </properties>
-
-  <developers>
-    <developer>
-      <name>Jung Hwasu</name>
-      <email>nayasis@gmail.com</email>
-      <id>nayasis</id>
-      <roles>
-        <role>developer</role>
-      </roles>
-    </developer>
-  </developers>
 
   <repositories>
     <repository>
       <id>codelds</id>
       <url>https://code.lds.org/nexus/content/groups/main-repo</url>
+    </repository>
+    <repository>
+      <id>bintray</id>
+      <url>http://jcenter.bintray.com</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
 
@@ -91,29 +66,46 @@ OR
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.1.3</version>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
-      <version>2.8.3</version>
+      <version>2.8.11.3</version>
     </dependency>
     <dependency>
-      <groupId>uk.com.robust-it</groupId>
-      <artifactId>cloning</artifactId>
-      <version>1.9.2</version>
+      <groupId>org.objenesis</groupId>
+      <artifactId>objenesis</artifactId>
+      <version>2.5.1</version>
     </dependency>
     <dependency>
       <groupId>com.jayway.jsonpath</groupId>
       <artifactId>json-path</artifactId>
       <version>2.2.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.javassist</groupId>
+      <artifactId>javassist</artifactId>
+      <version>3.22.0-GA</version>
+    </dependency>
+    <dependency>
+      <groupId>sun.jdk</groupId>
+      <artifactId>tools</artifactId>
+      <version>RELEASE</version>
+      <scope>system</scope>
+      <systemPath>${java.home}/../lib/tools.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <version>1.10</version>
+    </dependency>
 
     <!-- Zip Handler -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
-      <version>1.8</version>
+      <version>1.18</version>
       <optional>true</optional>
     </dependency>
 
@@ -135,7 +127,13 @@ OR
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.8.5</version>
+      <version>6.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.adrianwalker</groupId>
+      <artifactId>multiline-string</artifactId>
+      <version>0.1.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -147,7 +145,7 @@ OR
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
-      <version>1.1.7</version>
+      <version>2.2.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -156,30 +154,16 @@ OR
       <version>3.7.15-M1</version>
       <scope>test</scope>
     </dependency>
-
-    <!-- deploy -->
     <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-gpg-plugin</artifactId>
-      <version>1.6</version>
+      <groupId>org.apache.derby</groupId>
+      <artifactId>derby</artifactId>
+      <version>10.13.1.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-javadoc-plugin</artifactId>
-      <version>2.10.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-source-plugin</artifactId>
-      <version>3.0.1</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plugins</groupId>
-      <artifactId>nexus-staging-maven-plugin</artifactId>
-      <version>1.6.7</version>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.196</version>
       <scope>test</scope>
     </dependency>
 
@@ -289,23 +273,6 @@ OR
                 <goals>
                   <goal>jar</goal>
                 </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.4</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-                <configuration>
-                  <additionalparam>-Xdoclint:none</additionalparam>
-                </configuration>
               </execution>
             </executions>
           </plugin>

@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.nybatis.core.db.datasource.DatasourceManager;
+import org.nybatis.core.db.datasource.driver.DatabaseName;
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.util.StringUtil;
+
+import static org.nybatis.core.db.datasource.driver.DatabaseName.*;
 
 public class BindStruct {
 
@@ -96,29 +100,25 @@ public class BindStruct {
 
     }
 
-    protected String toDebugParam( BindParam bindValue ) {
+    protected String toDebugParam( BindParam bindValue, DatabaseName dbName ) {
 
     	if( out ) return String.format( "#{%s:%s}", getKey(), getType() );
 
     	Object value = bindValue.getValue();
 
         if( bindValue.getType() == SqlType.LIST ) {
-
         	List<String> temp = new ArrayList<>();
-
         	for( Object e : (List) value ) {
-        		temp.add( toDebugParam(e) );
+        		temp.add( toDebugParam(e, dbName) );
         	}
-
         	return StringUtil.join( temp, "," );
-
         }
 
-        return toDebugParam( value );
+        return toDebugParam( value, dbName );
 
     }
 
-    private String toDebugParam( Object value ) {
+    private String toDebugParam( Object value, DatabaseName dbName ) {
 
     	if( value == null ) return "NULL";
 
@@ -132,7 +132,11 @@ public class BindStruct {
 
         } else if( value instanceof Date ) {
 			String dateString = new NDate( (Date) value ).toString( "YYYY-MM-DD HH:MI:SS" );
-			return String.format( "TO_DATE( '%s','%s')", dateString, "YYYY-MM-DD HH24:MI:SS" );
+			if( dbName == MYSQL || dbName == MARIA ) {
+				return String.format( "STR_TO_DATE( '%s','%s')", dateString, "%Y-%m-%d %H:%i:%s" );
+			} else {
+				return String.format( "TO_DATE( '%s','%s')", dateString, "YYYY-MM-DD HH24:MI:SS" );
+			}
 		}
 
         return value.toString();

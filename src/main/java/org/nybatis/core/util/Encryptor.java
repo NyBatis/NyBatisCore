@@ -151,15 +151,12 @@ public class Encryptor {
     }
 
     private String toHex( byte byteArray[] ) {
-
         if( Validator.isEmpty( byteArray ) ) return "";
-
         StringBuilder sb = new StringBuilder( byteArray.length * 2 );
         for( byte b : byteArray ) {
             sb.append( String.format("%02x", b & 0XFF) );
         }
         return sb.toString();
-
     }
 
     private boolean isHex( String value ) {

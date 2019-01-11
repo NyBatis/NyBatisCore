@@ -81,9 +81,9 @@ public class Const {
 	 */
 	public abstract static class path {
 
-		private static final String  root     = new ConstHelper().getRoot();
-		private static       String  base     = root;
-		private static       boolean runInWar = new ConstHelper().isRunInWar();
+		private static final String  root          = new ConstHelper().getRoot();
+		private static       boolean isWebinfExist = new ConstHelper().isWebInfExist();
+		private static       String  base          = root;
 
 		/**
 		 * Get NayasisCore's base path. <br><br>
@@ -108,7 +108,7 @@ public class Const {
 				NLogger.warn( "base path({}) does not exists in file system.", path );
 			}
 
-			base = path;
+			base = FileUtil.nomalizeSeparator( path );
 
 		}
 
@@ -137,11 +137,18 @@ public class Const {
 		 * @return Configuration directory
 		 */
 		public static String getConfig() {
-	        return getBase() + getWarRoot() + "/config";
+			if( isWebInfExist() && ! getBase().endsWith( "/WEB-INF/classes" ) ) {
+				return getBase() + "/WEB-INF/classes/config";
+			}
+			return getBase() + "/config";
         }
 
-		private static String getWarRoot() {
-			return runInWar ? "/WEB-INF/classes" : "";
+		/**
+		 * check whether '/WEB-INF' directory resource exists.
+		 * @return true if 'WEB-INF' directory exists.
+         */
+		public static boolean isWebInfExist() {
+			return isWebinfExist;
 		}
 
 		/**
@@ -172,24 +179,15 @@ public class Const {
         }
 
 		/**
-		 * Get local DB directory
-		 *
-		 * @return local DB directory
-		 */
-		public static String getLocalDatabase() {
-	        return getBase() + getWarRoot() + "/localDb";
-        }
-
-		/**
 		 * Convert file path to resource path. <br>
 		 *
-		 * (remove base path from file path.)
+		 * (remove root path from file path.)
 		 *
 		 * @param filePath file path
 		 * @return resource path
 		 */
 		public static String toResourceName( String filePath ) {
-			return StringUtil.nvl( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/", "" );
+			return FileUtil.nomalizeSeparator( filePath ).replaceFirst( "^" + base, "" ).replaceFirst( "^/+", "" );
 		}
 	}
 
@@ -236,10 +234,6 @@ public class Const {
 		public static final String ORM_SQL_INSERT_PK             = ".insert.record";
 		public static final String ORM_SQL_DELETE                = ".delete";
 		public static final String ORM_SQL_DELETE_PK             = ".delete.record";
-
-
-		public static final int DEFAULT_CACHE_FLUSH_CYCLE_SECONDS = Integer.MAX_VALUE;
-		public static final int    DEFAULT_CACHE_CAPACITY        = 5120;
 
 		public static final String DEFAULT_TABLE_NAME            = ORM_SQL_PREFIX + "-DEFAULT_TABLE_NAME";
 		public static final String DEFAULT_ENVIRONMENT_ID        = ORM_SQL_PREFIX + "-DEFAULT_ENVIRONMENT_ID";

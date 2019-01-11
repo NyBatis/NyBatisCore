@@ -1,31 +1,22 @@
 package org.nybatis.core.db.session;
 
-import org.nybatis.core.db.annotation.Table;
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.constant.NullValue;
 import org.nybatis.core.db.session.type.orm.OrmSession;
-import org.nybatis.core.db.session.type.sql.ListExecutor;
 import org.nybatis.core.db.session.type.sql.SqlSession;
-import org.nybatis.core.db.session.type.vo.ResultVo;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -222,11 +213,11 @@ public class SqlSessionSqliteTest {
 
 			NLogger.debug( "loop : {}", i );
 
-			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) != null );
 
 			sqlSession.sql( SQL_DELETE, param ).execute();
 
-			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+			assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 			sqlSession.rollback();
 
@@ -249,11 +240,11 @@ public class SqlSessionSqliteTest {
 		String SQL_SELECT = "SELECT * FROM ${tableName} WHERE prod_id = #{prodId}";
 		String SQL_DELETE = "DELETE   FROM ${tableName} WHERE prod_id = #{prodId}";
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() != 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) != null );
 
 		sqlSession.sql( SQL_DELETE, param ).execute();
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 		sqlSession.commit();
 
@@ -273,33 +264,7 @@ public class SqlSessionSqliteTest {
 
 		NLogger.debug( ">>> [{}]", sqlSession.sql( SQL_SELECT, param ).select( Map.class ) );
 
-		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ).size() == 0 );
-
-	}
-
-	@Test( sequential = true )
-	public void case11_cache() {
-
-		NLogger.debug( new CacheManager() );
-
-		SqlSession sqlSession = SessionManager.openSession();
-
-		ListExecutor listExecutor = sqlSession.sqlId( "Sqlite.selectForList", "RNK00001" ).list();
-
-		for( int i = 0; i < 10; i++ ) {
-
-			if( i == 3 ) {
-				listExecutor.clearCache();
-			}
-
-			if( i == 8 ) {
-				listExecutor.disableCache();
-			}
-
-			List<ResultVo> list = listExecutor.select( ResultVo.class );
-			NLogger.debug( "index : {}, count : {}", i, list.size() );
-
-		}
+		assertTrue( sqlSession.sql( SQL_SELECT, param ).select( Map.class ) == null );
 
 	}
 
@@ -383,6 +348,73 @@ public class SqlSessionSqliteTest {
 		entity.prodName = NullValue.STRING;
 		session.update( entity );
 		NLogger.debug( session.select( entity ) );
+
+	}
+
+	@Test
+	public void case13_OrmInsert() {
+
+		case10_initTable();
+
+		OrmSession<OrmEntity> session = getSession().openOrmSession( OrmEntity.class );
+
+		OrmEntity entity = new OrmEntity();
+
+		entity.listId = "A";
+		entity.prodId = "1";
+		entity.prodName = "INPUTED DATA";
+
+		session.insert( entity );
+
+		OrmEntity selectParam = new OrmEntity();
+		selectParam.listId = "A";
+		selectParam.prodId = "1";
+
+		NLogger.debug( session.select( selectParam ) );
+
+	}
+
+	@Test
+	public void case14_arrayParameterBind() {
+
+		case10_initDummyDataByStatementBatch();
+
+		SqlSession sqlSession = getSession();
+
+		String sql = "SELECT * FROM ${tableName} WHERE prod_id IN ( #{prodId} )";
+
+		Map param = new HashMap();
+
+		param.put( "tableName", TABLE_NAME );
+		param.put( "prodId", Arrays.asList( 0,1,2,3,4,5 ) );
+
+		List<OrmEntity> list = sqlSession.sql( sql, param ).list().select( OrmEntity.class );
+
+		NLogger.debug( list );
+
+		assertEquals( 6, list.size() );
+
+	}
+
+	@Test
+	public void case15_selectKey() {
+
+		case10_initTable();
+
+		String selectKey = String.format( "<key id=\"prodId\">SELECT IFNULL(MAX(prod_id),0) + 1 FROM %s WHERE list_id = #{listId}</key>", TABLE_NAME );
+		String sql = String.format( "%s\nINSERT INTO %s ( list_id, prod_id, prod_name ) VALUES ( #{listId}, #{prodId}, #{prodName} )", selectKey, TABLE_NAME );
+
+		SqlSession session = getSession();
+
+		OrmEntity param = new OrmEntity();
+		param.listId = "A";
+		param.prodName = "UNKNOWN";
+
+		session.sql( sql, param ).execute();
+
+		NLogger.debug( param );
+
+		assertEquals( param.prodId, "1" );
 
 	}
 

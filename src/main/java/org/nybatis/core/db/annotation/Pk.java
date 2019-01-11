@@ -1,9 +1,6 @@
 package org.nybatis.core.db.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Primary key on database
@@ -11,7 +8,8 @@ import java.lang.annotation.Target;
  * @author nayasis@gmail.com
  *
  */
-@Target( ElementType.FIELD ) // Allow to class and interface
+@Inherited
+@Target({ ElementType.FIELD, ElementType.METHOD })
 @Retention( RetentionPolicy.RUNTIME )
 public @interface Pk {
 }

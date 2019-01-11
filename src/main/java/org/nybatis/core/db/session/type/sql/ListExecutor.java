@@ -1,6 +1,5 @@
 package org.nybatis.core.db.session.type.sql;
 
-import org.nybatis.core.db.annotation.SupportCache;
 import org.nybatis.core.db.session.handler.RowHandler;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
@@ -20,7 +19,6 @@ public interface ListExecutor {
      *
      * @return list NList
      */
-    @SupportCache
     NList selectNList();
 
     /**
@@ -28,7 +26,6 @@ public interface ListExecutor {
      *
      * @return list consist with Map
      */
-    @SupportCache
     List<NMap> select();
 
     /**
@@ -38,15 +35,22 @@ public interface ListExecutor {
      * @param <T> expected class of return
      * @return list consist with row or value
      */
-    @SupportCache
     <T> List<T> select( Class<T> returnType );
+
+    /**
+     * Retrieve first row in list
+     *
+     * @param returnType  Map or Bean (if you want to return row), Primitive (if you want to return value)
+     * @param <T> expected class of return
+     * @return first row in list
+     */
+    <T> T selectOne( Class<T> returnType );
 
     /**
      * Retrieve list with RowHandler
      *
      * @param rowHandler  RowHandler to treat single row data
      */
-    @SupportCache
     void select( RowHandler rowHandler );
 
     /**
@@ -81,37 +85,6 @@ public interface ListExecutor {
      * @return self instance
      */
     ListExecutor setLobPrefetchSize( int size );
-
-    /**
-     * Disable statements cache functionality.
-     *
-     * @return self instance
-     */
-    ListExecutor disableCache();
-
-    /**
-     * Enable statements cache functionality.
-     *
-     * @param cacheId	cache id
-     * @return self instance
-     */
-    ListExecutor enableCache( String cacheId );
-
-    /**
-     * Enable statements cache functionality.
-     *
-     * @param cacheId		cache id
-     * @param flushCycle	cache flush cycle (seconds)
-     * @return self instance
-     */
-    ListExecutor enableCache( String cacheId, Integer flushCycle );
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    ListExecutor clearCache();
 
     /**
      * Set sql exeution mode to page and it's limit.

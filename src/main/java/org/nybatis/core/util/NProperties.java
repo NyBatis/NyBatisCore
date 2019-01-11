@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -40,6 +41,14 @@ public class NProperties {
 
 	public NProperties( File file, String charset ) throws UncheckedIOException {
 	    readFrom( file, charset );
+	}
+
+	public NProperties( Path file ) throws UncheckedIOException {
+		this( file, StandardCharsets.UTF_8.toString() );
+	}
+
+	public NProperties( Path file, String charset ) throws UncheckedIOException {
+		readFrom( file.toFile(), charset );
 	}
 
 	public NProperties( NProperties properties ) {
@@ -78,6 +87,10 @@ public class NProperties {
 
 	public String get( String key ) {
 		return properties.getProperty( key );
+	}
+
+	public Boolean toBoolean( String key ) {
+		return StringUtil.toBoolean( get( key ) );
 	}
 
 	public NProperties set( String key, String value ) {

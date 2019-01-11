@@ -1,23 +1,12 @@
 package org.nybatis.core.db.session;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.nybatis.core.conf.Const;
-import org.nybatis.core.db.cache.CacheManager;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.db.session.handler.ConnectionHandler;
-import org.nybatis.core.db.session.type.vo.Param;
-import org.nybatis.core.db.session.type.sql.SqlSession;
-import org.nybatis.core.db.session.type.sql.ListExecutor;
 import org.nybatis.core.db.session.type.sql.SessionExecutor;
+import org.nybatis.core.db.session.type.sql.SqlSession;
+import org.nybatis.core.db.session.type.vo.Param;
 import org.nybatis.core.db.session.type.vo.ResultVo;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
@@ -25,10 +14,15 @@ import org.nybatis.core.exception.unchecked.SqlException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.nybatis.core.util.StringUtil;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
@@ -67,7 +61,7 @@ public class SqlSessionTest {
 
 		try {
 
-			StopWatcher watcher = new StopWatcher();
+			StopWatch watcher = new StopWatch();
 
 			List<NMap> list = sqlSession.sqlId( "connectionTest.dynamic", param ).list().select();
 
@@ -84,7 +78,7 @@ public class SqlSessionTest {
 	@Test
 	public void envLocal() {
 
-	    StopWatcher watcher = new StopWatcher();
+	    StopWatch watcher = new StopWatch();
 
 	    SqlSession sqlSession = SessionManager.openSession();
 
@@ -212,34 +206,6 @@ public class SqlSessionTest {
 		}
 
 		fail( "No Exception raised" );
-
-	}
-
-	@Test
-	public void cacheTest() {
-
-		NLogger.debug( new CacheManager() );
-
-		SqlSession sqlSession = SessionManager.openSession();
-
-		ListExecutor listExecutor = sqlSession.sqlId( "Sqlite.selectForList", "RNK00001" ).list();
-
-		for( int i = 0; i < 10; i++ ) {
-
-			Param param = new Param( "A001" );
-
-			if( i == 3 ) {
-				listExecutor.clearCache();
-			}
-
-			if( i == 8 ) {
-				listExecutor.disableCache();
-			}
-
-			List<ResultVo> list = listExecutor.select( ResultVo.class );
-			NLogger.debug( "index : {} ************************************\n{}", i, list.size() );
-
-		}
 
 	}
 

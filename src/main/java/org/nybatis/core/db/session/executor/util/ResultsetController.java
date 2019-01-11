@@ -1,23 +1,20 @@
 package org.nybatis.core.db.session.executor.util;
 
-import org.nybatis.core.db.datasource.DatasourceManager;
-import org.nybatis.core.db.datasource.driver.DatabaseAttribute;
-import org.nybatis.core.db.session.handler.RowHandler;
-import org.nybatis.core.db.sql.mapper.SqlType;
-import org.nybatis.core.db.sql.mapper.TypeMapper;
-import org.nybatis.core.db.sql.mapper.TypeMapperIF;
-import org.nybatis.core.db.sql.mapper.implement.ByteArrayMapper;
-import org.nybatis.core.exception.unchecked.JdbcImplementException;
-import org.nybatis.core.log.NLogger;
-import org.nybatis.core.model.NMap;
-import org.nybatis.core.model.PrimitiveConverter;
-import org.nybatis.core.util.StringUtil;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import org.nybatis.core.db.session.handler.RowHandler;
+import org.nybatis.core.db.sql.mapper.SqlType;
+import org.nybatis.core.db.sql.mapper.TypeMapper;
+import org.nybatis.core.db.sql.mapper.TypeMapperIF;
+import org.nybatis.core.exception.unchecked.JdbcImplementException;
+import org.nybatis.core.exception.unchecked.SqlConfigurationException;
+import org.nybatis.core.log.NLogger;
+import org.nybatis.core.model.NMap;
+import org.nybatis.core.model.PrimitiveConverter;
+import org.nybatis.core.util.StringUtil;
 
 public class ResultsetController {
 
@@ -47,13 +44,11 @@ public class ResultsetController {
 			}, raiseErrorOnKeyDuplication );
 
 		} else {
-
 			toList( resultSet, new RowHandler() {
 				public void handle( NMap row ) {
 					list.add( row.toBean(returnType) );
 				}
 			}, raiseErrorOnKeyDuplication );
-
 		}
 
 		return list;
@@ -61,14 +56,11 @@ public class ResultsetController {
 	}
 
     public void toList( List<NMap> cacheResult, RowHandler rowHandler ) {
-
     	if( cacheResult == null ) return;
-
     	for( NMap row : cacheResult ) {
     		rowHandler.handle( row );
     		if( rowHandler.isBreak() ) break;
     	}
-
     }
 
     public void toList( ResultSet resultSet, RowHandler rowHandler, boolean raiseErrorOnKeyDuplication ) throws SQLException {
@@ -77,12 +69,11 @@ public class ResultsetController {
 
 	public void toList( ResultSet resultSet, RowHandler rowHandler, Integer rowFetchSize, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
+		if( resultSet == null ) return;
+
 		try {
 
-			if( resultSet == null ) return;
-
 			Header header= getHaeder( resultSet, raiseErrorOnKeyDuplication );
-
 			rowHandler.setHeader( header.keySet() );
 
     		if( rowFetchSize != null ) {
@@ -98,28 +89,29 @@ public class ResultsetController {
 
     				String  key   = header.getName( i );
     				SqlType type  = header.getType( i );
-
 					if( key == null ) continue;
 
     				try {
-
     					row.put( key, getResult(type, resultSet, i + 1)  );
-
     				} catch( SQLException e ) {
-
-    					@SuppressWarnings( "rawtypes" )
-						TypeMapperIF mapper = TypeMapper.get( type );
-
+						TypeMapperIF mapper = TypeMapper.get( environmentId, type );
     					String mapperName = mapper == null ? null : mapper.getClass().getName();
-
     					throw new SQLException( String.format( "%s (colunmName:%s, type:%s, mapper:%s)", e.getMessage(), key, type, mapperName ), e );
-
-    				}
+					} catch( ClassCastException e ) {
+						// if sqlType in resultSet has error because of abnormal JDBC driver implements
+						SqlType alternativeType = SqlType.find( String.class );
+						try {
+							row.put( key, getResult( alternativeType, resultSet, i + 1 ) );
+						} catch( ClassCastException error ) {
+							TypeMapperIF mapper = TypeMapper.get( environmentId, type );
+							String mapperName = mapper == null ? null : mapper.getClass().getName();
+							throw new SQLException( String.format( "%s (colunmName:%s, type:%s, mapper:%s)", e.getMessage(), key, type, mapperName ), e );
+						}
+					}
 
     			}
 
     			rowHandler.handle( row );
-
     			if( rowHandler.isBreak() ) break;
 
     		}
@@ -135,23 +127,16 @@ public class ResultsetController {
 	public Header getHaeder( ResultSet resultSet, boolean raiseErrorOnKeyDuplication ) throws SQLException {
 
 		Header header = new Header();
-
 		if( resultSet == null ) return header;
 
 		ResultSetMetaData metaData = resultSet.getMetaData();
-
 		int columnCount = metaData.getColumnCount();
-
 		List<String>  duplicatedKeys = new ArrayList<>();
 
 		for( int i = 1; i <= columnCount; i++ ) {
-
-			String name = StringUtil.toCamel( metaData.getColumnName( i ) );
-
+			String name = StringUtil.toCamel( metaData.getColumnLabel(i) );
 			if( header.contains( name ) ) duplicatedKeys.add( name );
-
 			header.add( name, metaData.getColumnType( i ) );
-
 		}
 
 		if( duplicatedKeys.size() > 0 ) {
@@ -181,38 +166,20 @@ public class ResultsetController {
 	}
 
 	private Object getResult( SqlType sqlType, ResultSet resultSet, int columnIndex ) throws SQLException {
-
 		try {
-
 			Object result = TypeMapper.get( environmentId, sqlType ).getResult( resultSet, columnIndex );
-
 			if( result instanceof ResultSet ) {
 				result = toList( (ResultSet) result, true );
 			}
-
 			return result;
-
-		} catch( JdbcImplementException e ) {
-
-			if( sqlType == SqlType.BLOB ) {
-
-				DatabaseAttribute attributes = DatasourceManager.getAttributes( environmentId );
-
-				if( attributes.enableToGetBlob() ) {
-
-					attributes.enableToGetBlob( false );
-					TypeMapper.put( environmentId, SqlType.BLOB, new ByteArrayMapper() );
-
-					return getResult( sqlType, resultSet, columnIndex );
-
-				}
-
-			}
-
-			throw (SQLException) e.getCause();
-
+		} catch( JdbcImplementException | SQLException e ) {
+			TypeMapper.setUnimplementedMapper( environmentId, sqlType, e );
+			return getResult( sqlType, resultSet, columnIndex );
+		} catch( NullPointerException e ) {
+			throw new SqlConfigurationException( "type mapper is not valid. (SqlType:{}, environmentId:{}, column:{}, rsValue:{}",
+				sqlType, environmentId, columnIndex, resultSet.getString(columnIndex)
+			);
 		}
-
 	}
 
 }

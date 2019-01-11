@@ -31,7 +31,6 @@ public class PropertyResolver {
 		String path = getPropValue( properties.getAttrIgnoreCase( "path" ) );
 
 		if( Validator.isNotEmpty(path) ) {
-
 			try {
 	            this.properties.readFrom( Const.path.getConfigDatabase() + "/" + path );
             } catch( UncheckedIOException e ) {
@@ -53,12 +52,9 @@ public class PropertyResolver {
 
 		// prepare properties
 		for( Node element : properties.getChildElements("property") ) {
-
 			String key   = element.getAttrIgnoreCase( "key"   );
 			String value = element.getAttrIgnoreCase( "value" );
-
 			this.properties.set( key, getPropValue(value) );
-
 		}
 
 	}
@@ -68,16 +64,12 @@ public class PropertyResolver {
 	}
 
 	private String getPropValue( String value, NProperties properties ) {
-
 		value = StringUtil.nvl( value );
-
 		for( String key : StringUtil.capturePatterns( value, "[#|$]\\{(.+?)\\}" ) ) {
 			if( ! properties.hasKey( key ) ) continue;
 			value = value.replaceAll( String.format("[#|$]\\{%s\\}", key), properties.get(key) );
 		}
-
 		return value;
-
 	}
 
 	public String getChildValue( Node node, String childName ) {
@@ -94,12 +86,8 @@ public class PropertyResolver {
 	}
 
 	public String getValue( Node node, String key ) {
-
 		String val = getChildValue( node, key );
-
 		if( StringUtil.isBlank(val) ) val = getAttrVal( node, key );
-
 		return StringUtil.isBlank(val) ? null : val;
-
 	}
 }

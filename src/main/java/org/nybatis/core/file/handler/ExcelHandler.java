@@ -32,7 +32,7 @@ import java.util.Map;
 public abstract class ExcelHandler {
 
 	private static final String DEFAULT_SHEET_NAME = "Sheet1";
-	private static NObjectExcelMapper excelMapper  = new NObjectExcelMapper( false );
+	private static NObjectExcelMapper excelMapper  = new NObjectExcelMapper();
 
 	/**
 	 * Write excel data to output stream

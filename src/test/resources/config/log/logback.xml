@@ -5,6 +5,7 @@
     <!-- Console을 붙이던, File을 붙이던 아래 endoder만 넣어주면 된다. -->
     <encoder class="org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder">
       <pattern>%d{HH:mm:ss.SSS} %-5level %35(\(%F:%L\))</pattern>
+      <!--<pattern>%d{HH:mm:ss.SSS} %yellow(%-5level) %cyan(%35(\(%F:%L\)))</pattern>-->
     </encoder>
   </appender>
 
@@ -20,6 +21,7 @@
     </rollingPolicy>
     <encoder class="org.nybatis.core.log.layout.NLoggerPatternLayoutEncoder">
       <pattern>%d{HH:mm:ss.SSS} %-5level \(%F:%L\)</pattern>
+      <!--<pattern>%d{HH:mm:ss.SSS} %yellow(%-5level) \(%F:%L\)</pattern>-->
     </encoder>
   </appender>
 
@@ -27,9 +29,11 @@
     <appender-ref ref="console" />
   </logger>
 
-  <!--<logger name="com.jayway.jsonpath.internal.path.CompiledPath" level="off" />-->
+  <logger name="org.nybatis.core.db.datasource"  level="warn" >
+    <appender-ref ref="console" />
+  </logger>
 
-  <logger name="specific.test.log" level="trace">
+  <logger name="specific.test.log" level="debug">
     <appender-ref ref="console" />
   </logger>
 
@@ -40,5 +44,13 @@
   <logger name="nybatis.batch" level="debug">
     <appender-ref ref="console" />
   </logger>
+
+  <logger name="org.nybatis.core.log" level="trace">
+    <appender-ref ref="console" />
+  </logger>
+
+  <!--<root level="trace">-->
+    <!--<appender-ref ref="console"/>-->
+  <!--</root>-->
 
 </configuration>

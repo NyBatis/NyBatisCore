@@ -12,6 +12,10 @@ public class SqlBuilder {
 	private PropertyResolver prop = new PropertyResolver();
 	private String           basePath;
 
+	public SqlBuilder( String basePath ) {
+		this.basePath = basePath;
+	}
+
 	public SqlBuilder( PropertyResolver propertyResolver, String basePath ) {
 		this.prop     = propertyResolver;
 		this.basePath = basePath;

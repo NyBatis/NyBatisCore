@@ -2,6 +2,7 @@ package org.nybatis.core.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.time.*;
 import org.nybatis.core.exception.unchecked.ParseException;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.reflection.deserializer.NDateDeserializer;
@@ -52,6 +53,14 @@ public class NDate implements Serializable {
      */
     public NDate( Date date ) {
         setDate( (Date) date.clone() );
+    }
+
+    public NDate( LocalDate date ) {
+        setDate( Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()) );
+    }
+
+    public NDate( LocalDateTime date ) {
+        setDate( Date.from(date.atZone(ZoneId.systemDefault()).toInstant()) );
     }
 
     /**
@@ -273,6 +282,38 @@ public class NDate implements Serializable {
         return this.currentTime;
     }
 
+    public LocalTime toLocalTime( ZoneId zoneId ) {
+        return toZonedDateTime( zoneId ).toLocalTime();
+    }
+
+    public LocalTime toLocalTime() {
+        return toLocalTime( ZoneId.systemDefault() );
+    }
+
+    public LocalDateTime toLocalDateTime( ZoneId zoneId ) {
+        return toZonedDateTime( zoneId ).toLocalDateTime();
+    }
+
+    public LocalDateTime toLocalDateTime() {
+        return toLocalDateTime( ZoneId.systemDefault() );
+    }
+
+    public LocalDate toLocalDate( ZoneId zone ) {
+        return toZonedDateTime( zone ).toLocalDate();
+    }
+
+    public LocalDate toLocalDate() {
+        return toLocalDate( ZoneId.systemDefault() );
+    }
+
+    public ZonedDateTime toZonedDateTime( ZoneId zone ) {
+        return toDate().toInstant().atZone( zone );
+    }
+
+    public ZonedDateTime toZonedDateTime() {
+        return toZonedDateTime( ZoneId.systemDefault() );
+    }
+
     /**
      * get time in milli-seconds
      *
@@ -327,6 +368,15 @@ public class NDate implements Serializable {
 
         return format;
 
+    }
+
+    /**
+     * truncate date's hour/minute/second/millisecond and remain it's date related properties only
+     *
+     * @return truncated date ( 00:00:00 )
+     */
+    public NDate truncate() {
+        return setHour( 0 ).setMinute( 0 ).setSecond( 0 ).setMillisecond( 0 );
     }
 
     /**

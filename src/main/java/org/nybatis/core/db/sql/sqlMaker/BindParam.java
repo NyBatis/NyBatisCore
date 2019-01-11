@@ -1,15 +1,14 @@
 package org.nybatis.core.db.sql.sqlMaker;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
 
 import org.nybatis.core.db.sql.mapper.SqlType;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
 import org.nybatis.core.model.NDate;
 import org.nybatis.core.reflection.Reflector;
+import org.nybatis.core.reflection.core.JsonConverter;
+import org.nybatis.core.util.Types;
 
 /**
  * Parameter Value to bind in SQL
@@ -74,7 +73,10 @@ public class BindParam {
 		sb.append( "{" ).append( "key:" ).append( key );
 
 		if( type  != null ) sb.append( ", " ).append( "type:" ).append( type );
-		if( value != null ) sb.append( ", " ).append( "value:" ).append( value );
+		if( value != null ) {
+			sb.append( ", " ).append( "value:" ).append( value );
+			sb.append( ", " ).append( "valueClass:" ).append( value.getClass() );
+		}
 		if( out == true   ) sb.append( ", " ).append( "out:y" );
 
 		sb.append( "}" );
@@ -94,7 +96,7 @@ public class BindParam {
         	return;
         }
 
-		if( Reflector.isJsonDate(value) ) {
+		if( JsonConverter.isJsonDate(value) ) {
 			this.value = value = new NDate( value.toString(), NDate.ISO_8601_24H_FULL_FORMAT ).toDate();
 		}
 
@@ -154,7 +156,7 @@ public class BindParam {
 			type = SqlType.DATE;
 
 		} else if( klass == NDate.class ) {
-			this.value = ((NDate) this.value).toDate();
+			this.value = ( (NDate) this.value ).toDate();
 			if( type == SqlType.TIME || type == SqlType.TIMESTAMP ) return;
 			type = SqlType.DATE;
 
@@ -162,8 +164,16 @@ public class BindParam {
 		} else if( type == SqlType.ARRAY ) {
 			this.value = value;
 
-		} else if( type == SqlType.VARCHAR || type == SqlType.CHAR ) {
-			this.value = value.toString();
+		} else if( type == SqlType.VARCHAR || type == SqlType.CHAR || type == SqlType.CLOB || type == SqlType.LONGVARBINARY || type == SqlType.LONGNVARCHAR ) {
+			if( Types.isPrimitive(value) ) {
+				this.value = value;
+			} else {
+				try {
+					this.value = Reflector.toJson( value );
+				} catch( Exception e ) {
+					this.value = value.toString();
+				}
+			}
 		}
 
     }

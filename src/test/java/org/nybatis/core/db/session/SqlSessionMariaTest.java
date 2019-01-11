@@ -10,7 +10,7 @@ import org.nybatis.core.db.session.type.vo.ResultVo;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.NList;
 import org.nybatis.core.model.NMap;
-import org.nybatis.core.util.StopWatcher;
+import org.nybatis.core.util.StopWatch;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public class SqlSessionMariaTest {
 	@BeforeClass
 	public void beforeTest() {
 
-	    StopWatcher watcher = new StopWatcher();
+	    StopWatch watcher = new StopWatch();
 
 	    new ConfigurationBuilder().readFrom( Const.path.getConfigDatabase() + "/config.xml" );
 
@@ -28,7 +28,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void mariaSelect() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -53,7 +53,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure01() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -64,7 +64,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure02() {
 
 		SqlSession sqlSession = SessionManager.openSession();
@@ -75,7 +75,7 @@ public class SqlSessionMariaTest {
 
 	}
 
-	@Test
+	@Test ( enabled = false )
 	public void procedure03() {
 
 		SqlSession sqlSession = SessionManager.openSession();

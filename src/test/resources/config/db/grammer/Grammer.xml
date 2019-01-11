@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.2" xsi:schemaLocation="urn:nybatis.mapper:1.2 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
-<sql id="select" fetch="50" cache="fifo" >
+<sql id="select" fetch="50" >
   SELECT  *
   FROM    PROD
   WHERE   list_id  = #{listId}
@@ -10,7 +10,7 @@
   LIMIT 0, #{rowNum:int}
 </sql>
 
-<sql id="selectKey" fetch="50" cache="lru" flush="60" lobPrefetch="1000" >
+<sql id="selectKey" fetch="50" lobPrefetch="1000" >
   <key id="listId" >
     SELECT 'A001' FROM PROD
   </key>
@@ -62,7 +62,7 @@ WHERE rownum &lt;= 10
   WHERE   tenant_id = 'S02'
   <if test="#{id} is empty ">
     <!-- You can use '<' character in xml query instead of '&lt;' or '<![CDATA[-]]>' -->
-  AND     dataset_id < A.test
+  AND     dataset_id &lt; A.test
     <if test="#{id} > 3">
     AND   dataset_id > 1.2
     </if>
@@ -76,7 +76,7 @@ WHERE rownum &lt;= 10
   ORDER BY title
 </sql>
 
-<sql id="test" fetch="50" cache="true" flush="60" >
+<sql id="test" fetch="50" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   rownum &lt;= 10
@@ -135,7 +135,7 @@ WHERE rownum &lt;= 10
     SELECT  *
     FROM    TABLE_SAMPLE
     WHERE   1=1
-    <foreach key="#{names}" open="AND (" close=")" delimeter="UNION ALL" indexKey="#{index}">
+    <foreach key="#{names}" open="AND (" close=")" concater="UNION ALL" indexKey="index">
       SELECT #{index} AS index, #{names} AS name FROM DUAL
     </foreach>
     ORDER BY title
@@ -145,7 +145,7 @@ WHERE rownum &lt;= 10
     SELECT  *
     FROM    TABLE_SAMPLE
     WHERE   1=1
-    <foreach key="#{names}" open="#{AND} (" close="#{CLOSE} )" delimeter="#{DELIMETER} - " indexKey="#{index}">
+    <foreach key="#{names}" open="#{AND} (" close="#{CLOSE} )" concater="#{DELIMETER} - " indexKey="index">
       SELECT #{index} AS index, #{names} AS name FROM DUAL
     </foreach>
     ORDER BY title
@@ -158,7 +158,7 @@ WHERE rownum &lt;= 10
     <if test="#{age} is not empty ">
       AND     age > #{age}
     </if>
-    <foreach key="#{names}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+    <foreach key="#{names}" open="AND (" close=")" concater="OR" indexKey="index">
       names LIKE '%' || #{names} || '%' || #{index} -- #{index}
     </foreach>
     ORDER BY title
@@ -171,12 +171,12 @@ WHERE rownum &lt;= 10
     <if test="#{age} is not empty">
       AND     age > #{age}
     </if>
-    <foreach key="#{children}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+    <foreach key="#{children}" open="AND (" close=")" concater="OR" indexKey="#{index}">
       <if test="#{index} == 1" >
       names LIKE '%' || #{children.name} || '%' || #{index} -- #{index}
       </if>
     </foreach>
-    <foreach key="#{children}" open="AND (" close=")" delimeter="OR" indexKey="#{index}">
+    <foreach key="#{children}" open="AND (" close=")" concater="OR" indexKey="#{index}">
         <if test="#{children.age} > 10">
           names LIKE '%' || #{children.name} || '%' || #{index} OR age > #{children.age} -- #{index}
         </if>
@@ -209,7 +209,7 @@ WHERE rownum &lt;= 10
 
   <sql id="group">
     UPDATE TABLE_SAMPLE
-    <group open="SET /* OPEN */" close=" /* CLOSE */" delimeter=",">
+    <group open="SET /* OPEN */" close=" /* CLOSE */" concater=",">
       <if test="#{name} != empty">name = #{name}</if>
       <if test="#{age} != empty">age = #{age}</if>
       <if test="#{job} != empty">job = #{job}</if>
@@ -218,6 +218,44 @@ WHERE rownum &lt;= 10
     <if test="#{name} != empty">
     AND    name = #{name}
     </if>
+  </sql>
+
+  <sql id="ifElse3Times">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <if test="#{name} == 'A' ">
+    AND     name = 'A'
+    </if>
+    <elseif test="#{name} == 'B' ">
+    AND     name = 'B'
+    </elseif>
+    <elseif test="#{name} == 'C' ">
+    AND     name = 'C'
+    </elseif>
+    <else>
+      AND     name = 'D'
+    </else>
+  </sql>
+
+  <sql id="caseWhen3Conditions">
+    SELECT  *
+    FROM    TABLE_SAMPLE
+    WHERE   1=1
+    <case>
+      <when test="#{name} == 'A' ">
+        AND     name = 'A'
+      </when>
+      <when test="#{name} == 'B' ">
+        AND     name = 'B'
+      </when>
+      <when test="#{name} == 'C' ">
+        AND     name = 'C'
+      </when>
+      <else>
+        AND     name = 'D'
+      </else>
+    </case>
   </sql>
 
   <sql id="ifElseSwitch">
@@ -317,5 +355,5 @@ WHERE rownum &lt;= 10
   WHERE   1=1
   AND     age >= #{condition.limit.age}
   </sql>
-
+  
 </mapper>

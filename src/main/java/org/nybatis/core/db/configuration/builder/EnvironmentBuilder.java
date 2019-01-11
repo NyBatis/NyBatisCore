@@ -7,9 +7,12 @@ import org.nybatis.core.db.datasource.DatasourceFactory;
 import org.nybatis.core.db.datasource.DatasourceManager;
 import org.nybatis.core.db.datasource.factory.jdbc.JdbcDataSourceFactory;
 import org.nybatis.core.db.datasource.factory.jndi.JndiDatasourceFactory;
+import org.nybatis.core.db.sql.repository.TableLayoutRepository;
 import org.nybatis.core.log.NLogger;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.xml.node.Node;
+
+import static com.sun.tools.javac.jvm.ByteCodes.pop;
 
 /**
  * Database connection Environment builder
@@ -39,9 +42,11 @@ public class EnvironmentBuilder {
 
 		NLogger.trace( "configurate datasource (id:{})", environmentId );
 
+		setStopOnFailConnecting( environment );
 		setJdbcDatasource( environment );
 		setUnpooledJdbcDatasource( environment );
 		setJndiDatasource( environment );
+		setEnableDDL( environment );
 
 	}
 
@@ -53,10 +58,25 @@ public class EnvironmentBuilder {
 		return StringUtil.isTrue( environment.getAttrIgnoreCase( "default" ) );
 	}
 
+	private void setEnableDDL( Node environment ) {
+		Node node = environment.getChildElement( "ddl" );
+		if( node.isNull() ) return;
+		boolean enable = StringUtil.toBoolean( prop.getAttrVal( node, "enable" ) );
+		boolean recreation = StringUtil.toBoolean( prop.getAttrVal( node, "recreation" ) );
+		setEnableDDL( enable );
+		setRecreationDDL( recreation );
+	}
+
+	private void setStopOnFailConnecting( Node environment ) {
+		Node node = environment.getChildElement( "stopOnFailConnecting" );
+		if( node.isNull() ) return;
+		boolean enable = StringUtil.toBoolean( node.getValue() );
+		setStopOnFailConnecting( enable );
+	}
+
 	private void setJdbcDatasource( Node environment ) {
 
 		Node datasource = environment.getChildElement( "datasourceJdbc" );
-
 		if( datasource.isNull() ) return;
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
@@ -94,6 +114,10 @@ public class EnvironmentBuilder {
 	}
 
 	public void setJdbcDatasource( String driverName, String url, String username, String password, String passwordSecretKey ) {
+		setJdbcDatasource( driverName, url, username, password, passwordSecretKey, null );
+	}
+
+	public void setJdbcDatasource( String driverName, String url, String username, String password, String passwordSecretKey, Integer timeout ) {
 
 		JdbcConnectionProperties connectionProperties = new JdbcConnectionProperties();
 
@@ -102,6 +126,10 @@ public class EnvironmentBuilder {
 		connectionProperties.setUserName( username );
 		connectionProperties.setUserPassword( password );
 		connectionProperties.setPasswordSecretKey( passwordSecretKey );
+
+		if( timeout != null && timeout > 0 ) {
+			connectionProperties.setTimeout( timeout );
+		}
 
 		JdbcDatasourceProperties datasourceProperties = new JdbcDatasourceProperties( environmentId );
 
@@ -141,19 +169,14 @@ public class EnvironmentBuilder {
 	}
 
 	private void setJndiDatasource( Node environment ) {
-
 		Node datasource = environment.getChildElement( "datasourceJndi" );
-
 		if( datasource.isNull() ) return;
-
 		JndiConnectionProperties jndiConnectionProperties = new JndiConnectionProperties(
-				prop.getValue( datasource, "initialContext" ),
-				prop.getValue( datasource, "providerUrl"    ),
-				prop.getValue( datasource, "name"           )
+			prop.getValue( datasource, "initialContext" ),
+			prop.getValue( datasource, "providerUrl"    ),
+			prop.getValue( datasource, "name"           )
 		);
-
 		setJndiDatasource( jndiConnectionProperties );
-
 	}
 
 	private void setJndiDatasource( JndiConnectionProperties jndiConnectionProperties ) {
@@ -163,6 +186,30 @@ public class EnvironmentBuilder {
 
 	public void setJndiDatasource( String jndiName ) {
 		setJndiDatasource( new JndiConnectionProperties( jndiName ) );
+	}
+
+	public void setEnableDDL( boolean enable ) {
+		TableLayoutRepository.setEnableDDL( environmentId, enable );
+	}
+
+	public boolean isEnableDDL() {
+		return TableLayoutRepository.isEnableDDL( environmentId );
+	}
+
+	public void setRecreationDDL( boolean enable ) {
+		TableLayoutRepository.setRecreationDDL( environmentId, enable );
+	}
+
+	public boolean isRecreationDDL() {
+		return TableLayoutRepository.isRecreationDDL( environmentId );
+	}
+
+	public boolean isStopOnFailConnecting() {
+		return DatasourceManager.isStopOnFailConnecting( environmentId );
+	}
+
+	public void setStopOnFailConnecting( boolean state ) {
+		DatasourceManager.setStopOnFailConnecting( environmentId, state );
 	}
 
 }

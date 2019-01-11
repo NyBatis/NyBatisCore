@@ -2,20 +2,17 @@ package org.nybatis.core.db.session;
 
 import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.annotation.Table;
-import org.nybatis.core.db.session.executor.GlobalSqlParameter;
 import org.nybatis.core.db.session.type.orm.OrmSession;
 import org.nybatis.core.db.session.type.orm.OrmSessionImpl;
 import org.nybatis.core.db.session.type.sql.SqlSession;
 import org.nybatis.core.db.session.type.sql.SqlSessionImpl;
+import org.nybatis.core.db.sql.orm.reader.EntityLayoutReader;
 import org.nybatis.core.db.sql.sqlNode.SqlProperties;
 import org.nybatis.core.db.transaction.TransactionToken;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
-import org.nybatis.core.util.ClassUtil;
 import org.nybatis.core.util.StringUtil;
 import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
-
-import java.lang.annotation.Annotation;
 
 /**
  * Session Creator
@@ -50,7 +47,7 @@ public class SessionCreator {
 
 		String domainTableName, domainEnvironmentId = null;
 
-		Table tableAnnotation = getTableAnnotaion( domainClass );
+		Table tableAnnotation = getTableAnnotation( domainClass );
 
 		if( tableAnnotation != null ) {
 			domainEnvironmentId = tableAnnotation.environmentId();
@@ -72,22 +69,8 @@ public class SessionCreator {
 
 	}
 
-	private Table getTableAnnotaion( Class domainClass ) {
-
-		if( domainClass == null ) return null;
-
-		Class klass = domainClass;
-
-		while( true ) {
-
-			if( klass.isAnnotationPresent( Table.class ) )
-				return (Table) klass.getAnnotation( Table.class );
-
-			klass = klass.getSuperclass();
-			if( klass == Object.class ) return null;
-
-		}
-
+	private Table getTableAnnotation( Class domainClass ) {
+		return EntityLayoutReader.getTableAnnotation( domainClass );
 	}
 
 	public <T> OrmSession<T> createDefaultOrmSession( String environmentId, String tableName, Class<T> domainClass ) {

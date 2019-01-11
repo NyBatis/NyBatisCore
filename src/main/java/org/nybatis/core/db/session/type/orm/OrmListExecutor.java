@@ -12,6 +12,21 @@ import java.util.Map;
 public interface OrmListExecutor<T> {
 
     /**
+     * Retrieve single row
+     *
+     * @return first row in list
+     */
+    T selectOne();
+
+    /**
+     * Retrieve single row
+     *
+     * @param parameter parameter
+     * @return first row in list
+     */
+    T selectOne( Object parameter );
+
+    /**
      * Retrieve list
      *
      * @return list
@@ -83,37 +98,6 @@ public interface OrmListExecutor<T> {
      * @return self instance
      */
     OrmListExecutor<T> setLobPrefetchSize( int size );
-
-    /**
-     * Cache statements should not be cached at once when has been executed.
-     *
-     * @return self instance
-     */
-    OrmListExecutor<T> disableCache();
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId   cache id
-     * @return self instance
-     */
-    OrmListExecutor<T> enableCache( String cacheId );
-
-    /**
-     * Enable cache
-     *
-     * @param cacheId cache id
-     * @param flushSeconds cache flush cycle (unit:seconds)
-     * @return self instance
-     */
-    OrmListExecutor<T> enableCache( String cacheId, Integer flushSeconds );
-
-    /**
-     * Clear cache
-     *
-     * @return self instance
-     */
-    OrmListExecutor<T> clearCache();
 
     /**
      * Set sql exeution mode to page and it's limit.

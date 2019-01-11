@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.0" xsi:schemaLocation="urn:nybatis.mapper:1.0 http://nybatis.github.io/schema/nybatis-mapper.xsd">
+<mapper xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:nybatis.mapper:1.2" xsi:schemaLocation="urn:nybatis.mapper:1.2 http://nybatis.github.io/schema/nybatis-mapper.xsd">
 
-<sql id="test" fetch="50" cache="true" flush="60" >
+<sql id="test" fetch="50">
   SELECT  *
   FROM    TB_DP_LIST_PROD
-  WHERE   rownum <= 10
+  WHERE   rownum &lt;= 10
 </sql>
 
 <sql id="dynamic" >
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   tenant_id = #{tenantId}
-  AND     rownum    <= #{rowNum}
+  AND     rownum    = #{rowNum}
   ORDER BY ${orderKey}
 </sql>
 
@@ -19,7 +19,7 @@
   SELECT  *
   FROM    TB_DP_LIST_PROD
   WHERE   tenant_id = #{tenantId}
-  AND     rownum    <= #{rowNum}
+  AND     rownum    &lt;= #{rowNum}
   ORDER BY ${orderKey}
 </sql>
 

@@ -18,17 +18,20 @@ import org.nybatis.core.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SqlBean {
 
 	private static final Logger logger = LoggerFactory.getLogger( Const.db.LOG_SQL );
 
-	private SqlNode        sqlNode       = null;
-	private SqlProperties  properties    = null;
-	private QueryParameter sqlParam      = null;
-	private NMap           inputParam    = new NMap();
+	private SqlNode        sqlNode        = null;
+	private SqlProperties  properties     = null;
+	private QueryParameter sqlParam       = null;
+	private NMap           inputParam     = new NMap();
+	private Set            originalParams = new HashSet<>();
 
 	private QueryResolver queryResolver = null;
 
@@ -50,40 +53,38 @@ public class SqlBean {
 	 * @return self instance
 	 */
 	public SqlBean setParameter( Object parameter ) {
-
 		if( parameter != null ) {
-
 			inputParam.clear();
-
+			originalParams.clear();
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				inputParam.bind( parameter );
+				Map<String, Object> newParam = DbUtils.jsonConverter.toMapFrom( parameter );
+				inputParam.bind( newParam );
+				originalParams.add( parameter );
 			}
-
 		}
-
 		return this;
-
 	}
 
 	public SqlBean addParameter( Object parameter ) {
-
 		if( parameter != null ) {
 			if( DbUtils.isPrimitive(parameter) ) {
 				inputParam.put( Const.db.PARAMETER_SINGLE, parameter );
 			} else {
-				NMap newParam = new NMap().bind( parameter );
-				Reflector.merge( newParam, inputParam );
+				Map<String, Object> newParam = DbUtils.jsonConverter.toMapFrom( parameter );
+				Reflector.merge( newParam, inputParam, false );
+				originalParams.add( parameter );
 			}
 		}
-
 		return this;
-
 	}
 
 	public SqlBean addParameter( String key, Object parameter ) {
 		inputParam.put( key, parameter );
+		if( ! DbUtils.isPrimitive(parameter) ) {
+			originalParams.add( parameter );
+		}
 		return this;
 	}
 
@@ -93,8 +94,23 @@ public class SqlBean {
 		this.sqlParam   = new QueryParameter( inputParam ).addGlobalParameters();
 
 		if( properties.isPageSql() ) {
-			sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, this.properties.getPageSqlStart() );
-			sqlParam.put( DatabaseAttribute.PAGE_PARAM_END,   this.properties.getPageSqlEnd()   );
+
+			Integer pageStart = this.properties.getPageSqlStart();
+			Integer pageEnd   = this.properties.getPageSqlEnd();
+
+			if( pageStart != null && pageEnd != null ) {
+
+				int tmp   = pageStart;
+				pageStart = Math.min( pageStart, pageEnd );
+				pageEnd   = Math.max( tmp,       pageEnd );
+
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_START, pageStart );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_END,   pageEnd );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_OFFSET, Math.max( pageStart - 1, 0) );
+				sqlParam.put( DatabaseAttribute.PAGE_PARAM_COUNT,  Math.abs( pageEnd - pageStart ) + 1 );
+
+			}
+
 		}
 
 		if( properties.hasOrmDynamicSql() ) {
@@ -121,8 +137,8 @@ public class SqlBean {
 			queryResolver = new QueryResolver( query, sqlParam );
 			return this;
 
-		} catch( StringIndexOutOfBoundsException e ) {
-			throw new SqlParseException( e, "{} Error on parameter binding because of invalid sql parameter syntax.({})\n>> Error SQL :\n{}", toString(), e.getMessage(), query );
+		} catch( StringIndexOutOfBoundsException | SqlParseException e ) {
+			throw new SqlParseException( e, "{} Error on parameter binding because of invalid sql parameter syntax.\n>> Error Message :\n{}\n>> Error SQL :\n{}", toString(), e.getMessage(), query );
 
 		} catch( IllegalArgumentException | SqlConfigurationException e ) {
 			throw new SqlConfigurationException( e, "{} {}", toString(), e.getMessage() );
@@ -161,7 +177,7 @@ public class SqlBean {
 	}
 
 	public String getSqlId() {
-		return sqlNode.getSqlId();
+		return sqlNode == null ? null : sqlNode.getSqlId();
 	}
 
 	public String getSql() {
@@ -169,7 +185,7 @@ public class SqlBean {
 	}
 
 	public String getDebugSql() {
-		return queryResolver.getDebugSql();
+		return queryResolver.getDebugSql( getEnvironmentId() );
 	}
 
 	public String getOrignalSql() {
@@ -196,36 +212,22 @@ public class SqlBean {
 		return inputParam;
 	}
 
+	public SqlBean mergeSelectKeys( NMap result ) {
+		if( result != null && ! result.isEmpty() ) {
+			Reflector.merge( result, inputParam );
+			for( Object originalParam : originalParams ) {
+				Reflector.merge( result, originalParam );
+			}
+		}
+		return this;
+	}
+
 	public NMap getParams() {
 		return sqlParam;
 	}
 
 	public int getUniqueKeyQuery() {
 		return String.format( "%s::%s::%s", getSqlId(), getEnvironmentId(), getSql() ).hashCode();
-	}
-
-	private int getUniqueKeyParameter() {
-
-		NMap map = new NMap();
-
-		for( BindParam bindParam : getBindParams() ) {
-			map.put( bindParam.getKey(), bindParam.getValue() );
-		}
-
-		return map.getValueHash();
-
-	}
-
-	private Integer baseCacheKey = null;
-
-	public Integer getCacheKey( String methodName ) {
-
-		if( baseCacheKey == null ) {
-			baseCacheKey = String.format( "%s::%d::%d", getEnvironmentId(), getUniqueKeyQuery(), getUniqueKeyParameter() ).hashCode();
-		}
-
-		return String.format( "%s::%s", baseCacheKey, methodName ).hashCode();
-
 	}
 
 	/**
@@ -242,6 +244,7 @@ public class SqlBean {
 	 * or ...
 	 * </pre>
 	 *
+	 * @see (@link org.nybatis.core.db.datasource.driver.DatabaseName}
 	 */
 	private void setDatabaseParameter() {
 		sqlParam.put( Const.db.PARAMETER_DATABASE, getDatabase() );

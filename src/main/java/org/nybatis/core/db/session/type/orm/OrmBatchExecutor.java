@@ -1,5 +1,6 @@
 package org.nybatis.core.db.session.type.orm;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,14 +25,14 @@ public interface OrmBatchExecutor<T> {
      * @param parameters    data to insert
      * @return affected counts
      */
-    int insert( List<?> parameters );
+    int insert( Collection<?> parameters );
 
     /**
      * update data on add-batch mode
      * @param parameters    data to update
      * @return  affected counts
      */
-    int update( List<?> parameters );
+    int update( Collection<?> parameters );
 
     /**
      * delete data on add-batch mode
@@ -39,7 +40,7 @@ public interface OrmBatchExecutor<T> {
      * @param parameters    data to delete
      * @return  affected counts
      */
-    int delete( List<?> parameters );
+    int delete( Collection<?> parameters );
 
     /**
      * Get name of database connected with session.

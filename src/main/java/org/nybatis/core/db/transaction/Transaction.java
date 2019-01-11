@@ -2,9 +2,7 @@ package org.nybatis.core.db.transaction;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -48,6 +46,7 @@ public class Transaction {
 	}
 
 	public void commit( String token ) {
+		if( ! TransactionManager.canExecuteCommit() ) return;
 		for( Connection conn : getStoredConnections(token).values() ) {
 			try {
                 conn.commit();
@@ -58,7 +57,9 @@ public class Transaction {
 	}
 
 	public void commit() {
-		for( String token : transactionPool.keySet() ) {
+		if( ! TransactionManager.canExecuteCommit() ) return;
+		Set<String> keys = new HashSet<>( transactionPool.keySet() );
+		for( String token : keys ) {
 			commit( token );
 		}
 	}

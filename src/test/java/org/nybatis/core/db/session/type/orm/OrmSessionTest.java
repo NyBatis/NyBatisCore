@@ -4,7 +4,7 @@ import org.nybatis.core.conf.Const;
 import org.nybatis.core.db.configuration.builder.DatabaseConfigurator;
 import org.nybatis.core.db.session.SessionManager;
 import org.nybatis.core.db.session.SqlSessionSqliteTest;
-import org.nybatis.core.db.sql.reader.DbTableReaderTest;
+import org.nybatis.core.db.sql.reader.OrmSqlMakerTest;
 import org.nybatis.core.db.sql.repository.SqlRepository;
 import org.nybatis.core.db.transaction.TransactionManager;
 import org.nybatis.core.exception.unchecked.SqlConfigurationException;
@@ -228,51 +228,6 @@ public class OrmSessionTest {
 
     }
 
-    @Test
-    public void z_cacheTest() {
-
-        OrmSession ormSession = SessionManager.openOrmSession( NybatisTest.class );
-
-        ormSession.enableCache( "lru" );
-
-        NybatisTest domain = new NybatisTest();
-        domain.setListId( "RNK00000" );
-        domain.setProdId( "70" );
-
-        for( int i = 0; i < 50; i++ ) {
-            NLogger.debug( ormSession.select( domain ) );
-        }
-
-    }
-
-    @Test
-    public void z_cacheTest_refresh() {
-
-        OrmSession<NybatisTest> ormSession = SessionManager.openOrmSession( NybatisTest.class );
-
-        ormSession.enableCache( "lru" );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( "PROD-70", getData( "RNK00000", "70" ).getProdName() );
-
-        NybatisTest domain = new NybatisTest();
-        domain.setListId( "RNK00000" );
-        domain.setProdId( "70" );
-        domain.setProdName( "2" );
-
-        ormSession.update( domain );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( "2", getData( "RNK00000", "70" ).getProdName() );
-
-        ormSession.delete( domain );
-
-        NLogger.debug( getData( "RNK00000", "70" ) );
-        assertEquals( null, getData( "RNK00000", "70" ).getProdName() );
-
-
-    }
-
     private NybatisTest getData( String listId, String prodId ) {
 
         OrmSession<NybatisTest> ormSession = SessionManager.openOrmSession( NybatisTest.class );
@@ -286,7 +241,7 @@ public class OrmSessionTest {
     }
 
     private void printLoadedOrmSql() {
-        new DbTableReaderTest().printLoadedOrmSql( ENVIRONMENT_ID, TABLE_NAME );
+        new OrmSqlMakerTest().printLoadedOrmSql( ENVIRONMENT_ID, TABLE_NAME );
     }
 
     public String sqlIdPrefix() {

@@ -30,6 +30,17 @@ public class DatabaseCodeConfigurationTest {
 
         new EnvironmentBuilder( environmentId ).setJdbcDatasource( JDBC.class, url, "username", "password" );
 
+//        new EnvironmentBuilder( "" ).setJndiDatasource( "" );
+
+    }
+
+    @Test
+    public void setEnvironmentWithSql() {
+        String url = String.format( "jdbc:sqlite:%s/localDb/TestDb01", Const.path.getBase() );
+        System.out.println( url );
+        new EnvironmentBuilder( environmentId ).setJdbcDatasource( JDBC.class, url, "username", "password" );
+        new SqlRepository().readFromDirectory( Const.path.getConfigDatabase() + "/sqlite", environmentId );
+        new SqlRepository().readFromFile( Const.path.getConfigDatabase() + "/sqlite/sample.xml", environmentId );
     }
 
     @Test

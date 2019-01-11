@@ -11,16 +11,7 @@ import org.nybatis.core.validation.Assertion;
 import org.nybatis.core.validation.Validator;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -48,7 +39,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param json json text
      */
     public NList( String json ) {
-        _addRow( json, false );
+        _addRow( null, json, false );
         refreshKey();
     }
 
@@ -69,7 +60,7 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      *
      * @param list   list
      */
-    public NList( List list ) {
+    public NList( Collection list ) {
     	this( list, null );
     }
 
@@ -79,11 +70,11 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param list      list
      * @param header    specific header
      */
-    public NList( List list, Set<?> header ) {
+    public NList( Collection list, Set<?> header ) {
 
         boolean headerExist = Validator.isNotEmpty( header );
 
-        _addRows( list, !headerExist );
+        _addRows( null, list, !headerExist );
 
         if( headerExist ) {
             for( Object key : header )
@@ -263,28 +254,46 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @return self instance
      */
     public NList addRow( Object value ) {
-        _addRow( value, true );
+        _addRow( null, value, true );
         return this;
     }
 
-    private void _addRow( Object value, boolean syncronizeHeaderData ) {
+    /**
+     * add row
+     *
+     * <pre>
+     * {@link NList} data = new {@link NList};
+     *
+     * data.add( 0, "{key:'1', val:'AAA'}" );
+     * </pre>
+     *
+     * @param index index at which to insert the first element from collection
+     * @param value row data (Bean, Map, JSON text)
+     * @return self instance
+     */
+    public NList addRow( int index, Object value ) {
+        _addRow( index, value, true );
+        return this;
+    }
+
+    private void _addRow( Integer index, Object value, boolean syncronizeHeaderData ) {
 
         if( value == null ) return;
 
         if( value instanceof NMap ) {
-            _addRowFromNMap( (NMap) value, syncronizeHeaderData );
+            _addRowFromNMap( index, (NMap) value, syncronizeHeaderData );
 
         } else if( value instanceof Map ) {
-            _addRowFromNMap( new NMap( value ), syncronizeHeaderData );
+            _addRowFromNMap( index, new NMap( value ), syncronizeHeaderData );
 
-        } else if( value instanceof List ) {
-            _addRows( (List) value, syncronizeHeaderData );
+        } else if( value instanceof Collection ) {
+            _addRows( index, (Collection) value, syncronizeHeaderData );
 
         } else if( value instanceof NList ) {
-            addRows( (NList) value );
+            addRows( index, (NList) value );
 
         } else if( Types.isArray(value) ) {
-            _addRows( Types.toList( value ), syncronizeHeaderData );
+            _addRows( index, Types.toList( value ), syncronizeHeaderData );
 
         } else if( Types.isString( value ) ) {
 
@@ -292,24 +301,28 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
 
             try {
                 List list = Reflector.toListFromJson( json );
-                _addRows( list, false );
+                _addRows( index, list, false );
                 if( syncronizeHeaderData ) {
                     refreshKey();
                 }
             } catch( JsonIOException e ) {
                 Map<String, Object> map = Reflector.toMapFrom( json );
-                _addRow( map, syncronizeHeaderData );
+                _addRow( index, map, syncronizeHeaderData );
             }
 
         } else {
-            _addRow( new NMap( value ), syncronizeHeaderData );
+            _addRow( index, new NMap( value ), syncronizeHeaderData );
         }
 
     }
 
-    private void _addRowFromNMap( NMap data, boolean syncronizeHeaderData ) {
+    private void _addRowFromNMap( Integer index, NMap data, boolean syncronizeHeaderData ) {
 
-        dataBody.add( Validator.nvl(data, new NMap()) );
+        if( index == null ) {
+            dataBody.add( Validator.nvl(data, new NMap()) );
+        } else {
+            dataBody.add( index, Validator.nvl(data, new NMap()) );
+        }
 
         if( syncronizeHeaderData ) {
             int size = dataBody.size();
@@ -327,15 +340,31 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @return self instance
      */
     public NList addRows( NList nlist ) {
-        _addRows( nlist, true );
+        _addRows( null, nlist, true );
         return this;
     }
 
-    public void _addRows( NList nlist, boolean syncronizeHeaderData ) {
+    /**
+     * add rows from another NList data
+     *
+     * @param index index at which to insert the first element from collection
+     * @param nlist NList data
+     * @return self instance
+     */
+    public NList addRows( int index, NList nlist ) {
+        _addRows( index, nlist, true );
+        return this;
+    }
+
+    private void _addRows( Integer index, NList nlist, boolean syncronizeHeaderData ) {
 
         if( nlist == null ) return;
 
-        dataBody.addAll( nlist.dataBody );
+        if( index == null ) {
+            dataBody.addAll( nlist.dataBody );
+        } else {
+            dataBody.addAll( index, nlist.dataBody );
+        }
 
         if( ! syncronizeHeaderData ) return;
 
@@ -355,15 +384,27 @@ public class NList implements Serializable, Cloneable, Iterable<NMap> {
      * @param list List data
      * @return self instance
      */
-    public NList addRows( List list ) {
-        _addRows( list, true );
+    public NList addRows( Collection list ) {
+        _addRows( null, list, true );
         return this;
 	}
 
-    private void _addRows( List list, boolean syncronizeHeaderData ) {
+    /**
+     * add rows from another List contains Map or Bean or JSON text.
+     *
+     * @param index index at which to insert the first element from collection
+     * @param list List data
+     * @return self instance
+     */
+    public NList addRows( int index, Collection list ) {
+        _addRows( index, list, true );
+        return this;
+    }
+
+    private void _addRows( Integer index, Collection list, boolean syncronizeHeaderData ) {
         if( list != null ) {
             for( Object e : list ) {
-                _addRow( e, syncronizeHeaderData );
+                _addRow( index, e, syncronizeHeaderData );
             }
         }
     }

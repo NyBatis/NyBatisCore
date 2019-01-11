@@ -181,6 +181,27 @@ public class Validator {
     }
 
     /**
+     * check whether value is matched with regular expression pattern.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is matched with regular expression pattern.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isMatched( String value, Pattern pattern ) {
+        return value != null && pattern != null && pattern.matcher( value ).matches();
+    }
+
+    /**
      * check whether value is not matched with regular expression pattern.
      *
      * @param value   check value
@@ -198,6 +219,27 @@ public class Validator {
      * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotMatched( String value, String pattern ) {
+        return ! isMatched( value, pattern );
+    }
+
+    /**
+     * check whether value is not matched with regular expression pattern.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * <pre>
+     * <b>Prefix category</b>
+     *   - (?i) : CaseInsensitive
+     *   - (?x) : whitespace is ignored, and embedded comments starting with # are ignored
+     *   - (?m) : multiline mode
+     *   - (?s) : dotall mode
+     *   -        multi-line text (contains '\n' character) search needs option '(?ms)'
+     *   - (?d) : Unix lines mode (only the '\n' line terminator is recognized in the behavior of ., ^, and $.)
+     * </pre>
+     * @return true if value is not matched with regular expression pattern.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isNotMatched( String value, Pattern pattern ) {
         return ! isMatched( value, pattern );
     }
 
@@ -221,8 +263,21 @@ public class Validator {
     public static boolean isFound( String value, String pattern ) {
     	if( value == null || pattern == null ) return false;
     	Pattern regexp  = Pattern.compile( pattern, Pattern.MULTILINE | Pattern.DOTALL );
-    	Matcher matcher = regexp.matcher( value );
-    	return matcher.find();
+    	return isFound( value, regexp );
+    }
+
+    /**
+     * check whether regular expression pattern is found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @return true if regular expression pattern is found in value.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isFound( String value, Pattern pattern ) {
+        if( pattern == null || value == null ) return false;
+        Matcher matcher = pattern.matcher( value );
+        return matcher.find();
     }
 
     /**
@@ -243,6 +298,18 @@ public class Validator {
      * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
      */
     public static boolean isNotFound( String value, String pattern ) {
+        return ! isFound( value, pattern );
+    }
+
+    /**
+     * check whether regular expression pattern is not found in value.
+     *
+     * @param value   check value
+     * @param pattern regular expression pattern
+     * @return true if regular expression pattern is not found in value.
+     * @see <a href="http://docs.oracle.com/javase/7/docs/api/java/util/regex/Pattern.html">regex pattern</a>
+     */
+    public static boolean isNotFound( String value, Pattern pattern ) {
         return ! isFound( value, pattern );
     }
 
