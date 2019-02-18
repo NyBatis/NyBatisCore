@@ -9,7 +9,10 @@ import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
+import static org.nybatis.core.model.NDate.ISO_8601_24H_FULL_FORMAT;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -21,6 +24,16 @@ import static org.testng.Assert.assertEquals;
 public class NDateTest {
 
     @Test
+    public void setDateFromLocalDateTime() {
+
+        LocalDateTime nowLocal = LocalDateTime.now();
+        NDate         nowNDate = new NDate( nowLocal );
+
+        Assert.assertEquals( nowLocal.toString(), nowNDate.toString("yyyy-MM-dd'T'HH:mm:ss.SSS") );
+
+    }
+
+    @Test
     public void testSetSecond() throws Exception {
         NDate date = new NDate( "2016-06-02 13:59:21" );
         date.setSecond( 0 );
@@ -30,7 +43,7 @@ public class NDateTest {
     @Test
     public void testIsoConverting() {
 
-        String format = NDate.ISO_8601_24H_FULL_FORMAT;
+        String format = ISO_8601_24H_FULL_FORMAT;
 
         NLogger.debug( new NDate( "2014-01-01T00:00:00.123+0900", format ).toString( format ) );
         NLogger.debug( new NDate( "2014-01-01T00:00:00.12+0900", format ).toString( format ) );
