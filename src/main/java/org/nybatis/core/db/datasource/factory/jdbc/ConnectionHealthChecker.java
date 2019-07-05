@@ -7,6 +7,8 @@ import org.nybatis.core.log.NLogger;
 import org.nybatis.core.model.LimitedQueue;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -56,8 +58,9 @@ public class ConnectionHealthChecker {
 	}
 
 	private void pingConnections() {
-		for( ProxyConnection connection : dataSource.connectionPoolIdle ) {
-			if( connection.getElpasedTimeAfterLastUsed() <= dataSource.datasourceProperties.getPingCycle() ) continue;
+		List<ProxyConnection> connections = new ArrayList( dataSource.connectionPoolIdle );
+		for( ProxyConnection connection : connections ) {
+			if( connection == null || connection.isClosed() || connection.getElpasedTimeAfterLastUsed() <= dataSource.datasourceProperties.getPingCycle() ) continue;
 			if( connection.ping(dataSource.datasourceProperties.getPingQuery()) == false ) {
 				connection.destroy();
 			}
