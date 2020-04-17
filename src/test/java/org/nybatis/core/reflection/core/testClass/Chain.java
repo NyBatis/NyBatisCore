@@ -2,10 +2,6 @@ package org.nybatis.core.reflection.core.testClass;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.nybatis.core.db.annotation.Column;
 import org.nybatis.core.db.annotation.Pk;
 import org.nybatis.core.db.annotation.Table;
@@ -13,6 +9,11 @@ import org.nybatis.core.model.NDate;
 import org.nybatis.core.model.NMap;
 import org.nybatis.core.reflection.Reflector;
 import org.nybatis.core.util.StringUtil;
+
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Chain Entity
@@ -28,7 +29,7 @@ public class Chain {
     private NDate  completeDate;
     @Pk @Column(length=20)
     private String chainId;
-    @Column(length=1000)
+    @Column(length=2000)
     private String chainName;
     @Column(length=20)
     private String chainType;
