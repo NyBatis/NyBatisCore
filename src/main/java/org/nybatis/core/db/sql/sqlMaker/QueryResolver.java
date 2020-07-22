@@ -187,7 +187,7 @@ public class QueryResolver {
 
             } else {
 
-                BindStruct bindStruct = new BindStruct( key, quotChecker.isOn() );
+                BindStruct bindStruct = new BindStruct( key, quotChecker.isIn() );
                 BindParam  bindParam  = null;
 
                 try {
@@ -205,7 +205,7 @@ public class QueryResolver {
 
                         String subKey = String.format( "%s_%d", key, index++ );
 
-                        BindStruct bindStructSub = new BindStruct( subKey, bindStruct.getType(), bindStruct.isOut(), quotChecker.isOn() );
+                        BindStruct bindStructSub = new BindStruct( subKey, bindStruct.getType(), bindStruct.isOut(), quotChecker.isIn() );
                         BindParam  bindParamSub  = bindStruct.toBindParam( o );
 
                         bindStructs.put( subKey, bindStructSub );

@@ -3,33 +3,36 @@ package org.nybatis.core.db.sql.sqlMaker;
 
 public class QuotChecker {
 
-    private boolean onQuot       = false;
-    private boolean onDoubleQuot = false;
+    private boolean quot       = false;
+    private boolean doubleQuot = false;
     
     public void init() {
-        onQuot       = false;
-        onDoubleQuot = false;
+        quot       = false;
+        doubleQuot = false;
     }
-    
-    public void check( char character ) {
 
-        if( onQuot == true ) {
-            if( character == '\'' ) onQuot = false;
-            
-        } else if( onDoubleQuot == true ) {
-            if( character == '"' ) onDoubleQuot = false;
-            
+    public QuotChecker clear() {
+        quot       = false;
+        doubleQuot = false;
+        return this;
+    }
+
+    public void check( char character ) {
+        if( quot == true ) {
+            if( character == '\'' ) quot = false;
+        } else if( doubleQuot == true ) {
+            if( character == '"' ) doubleQuot = false;
         } else {
             if( character == '\'' ) {
-                onQuot = true;
+                quot = true;
             } else if( character == '"' ) {
-                onDoubleQuot = true;
+                doubleQuot = true;
             }
         }
     }
     
-    public boolean isOn() {
-        return onQuot || onDoubleQuot;
+    public boolean isIn() {
+        return quot || doubleQuot;
     }
     
 }

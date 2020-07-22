@@ -32,18 +32,18 @@ public enum SqlType {
 	TIMESTAMP               ( java.sql.Types.TIMESTAMP               , "TIMESTAMP"               )  ,
 	BINARY                  ( java.sql.Types.BINARY                  , "BINARY"                  )  ,
 	ARRAY                   ( java.sql.Types.ARRAY                   , "ARRAY"                   )  ,
-	LIST                    ( 9001                                   , "LIST"                    )  ,
+	LIST                    ( 9001                            , "LIST"                    )  ,
 	BLOB                    ( java.sql.Types.BLOB                    , "BLOB"                    )  ,
-	BLOB_BOXED              ( 9002                                   , "BLOB_BOXED"              )  , // shortcut for Byte[]
+	BLOB_BOXED              ( 9002                            , "BLOB_BOXED"              )  , // shortcut for Byte[]
 	CLOB                    ( java.sql.Types.CLOB                    , "CLOB"                    )  ,
 	BOOLEAN                 ( java.sql.Types.BOOLEAN                 , "BOOLEAN"                 )  ,
 	NULL                    ( java.sql.Types.NULL                    , "NULL"                    )  ,
 
-	SYS_REFCURSOR           ( -10                                    , "SYS_REFCURSOR"           )  , // shortcut for oracle cursor
-	CURSOR                  ( -10                                    , "CURSOR"                  )  , // shortcut for oracle cursor
-	RESULT_SET              ( -10                                    , "RESULTSET"               )  , // shortcut for oracle cursor
-	RS                      ( -10                                    , "RS"                      )  , // shortcut for oracle cursor
-	ORACLE_RESULT_SET       ( -10                                    , "ORACLE_RESULTSET"        )  , // shortcut for oracle cursor
+	SYS_REFCURSOR           ( -10                             , "SYS_REFCURSOR"           )  , // shortcut for oracle cursor
+	CURSOR                  ( -10                             , "CURSOR"                  )  , // shortcut for oracle cursor
+	RESULT_SET              ( -10                             , "RESULTSET"               )  , // shortcut for oracle cursor
+	RS                      ( -10                             , "RS"                      )  , // shortcut for oracle cursor
+	ORACLE_RESULT_SET       ( -10                             , "ORACLE_RESULTSET"        )  , // shortcut for oracle cursor
 
 	// struct
 	REF                     ( java.sql.Types.REF                     , "REF"                     )  ,
@@ -66,8 +66,8 @@ public enum SqlType {
 	TIME_WITH_TIMEZONE      ( java.sql.Types.TIME_WITH_TIMEZONE      , "TIME_WITH_TIMEZONE"      )  ,
 	TIMESTAMP_WITH_TIMEZONE ( java.sql.Types.TIMESTAMP_WITH_TIMEZONE , "TIMESTAMP_WITH_TIMEZONE" )  ,
 
-	TEXT                    ( 9003                                   , "TEXT"                    )  ,
-	LONGTEXT                ( 9004                                   , "LONGTEXT"                )
+	TEXT                    ( 9003                            , "TEXT"                    )  ,
+	LONGTEXT                ( 9004                            , "LONGTEXT"                )
 
 	;
 

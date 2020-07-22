@@ -126,7 +126,7 @@ public class DeformedXmlReader {
 
     		checker.check( currCh );
 
-        	if( checker.isOn() ) {
+        	if( checker.isIn() ) {
         		token.append( currCh ); continue;
         	}
 
